@@ -12,9 +12,17 @@ import taskRunner from '../taskrunner';
 import {
     GrblController,
     MarlinController,
+    SmoothieController,
+    TinyGController,
+    MaslowController
 } from '../../controllers';
 import { GRBL } from '../../controllers/Grbl/constants';
 import { MARLIN } from '../../controllers/Marlin/constants';
+import { GRBL } from '../../controllers/Grbl/constants';
+import { MARLIN } from '../../controllers/Marlin/constants';
+import { SMOOTHIE } from '../../controllers/Smoothie/constants';
+import { G2CORE, TINYG } from '../../controllers/TinyG/constants';
+import { MASLOW } from '../../controllers/Maslow/constants';
 import {
     authorizeIPAddress,
     validateUser
@@ -36,7 +44,15 @@ const isValidController = (controller) => (
     // Grbl
     caseInsensitiveEquals(GRBL, controller) ||
     // Marlin
-    caseInsensitiveEquals(MARLIN, controller)
+    caseInsensitiveEquals(MARLIN, controller) ||
+    // Smoothie
+    caseInsensitiveEquals(SMOOTHIE, controller) ||
+    // g2core
+    caseInsensitiveEquals(G2CORE, controller) ||
+    // TinyG
+    caseInsensitiveEquals(TINYG, controller) ||
+    // Maslow
+    caseInsensitiveEquals(MASLOW, controller)
 );
 
 class CNCEngine {
@@ -94,6 +110,18 @@ class CNCEngine {
         // Marlin
         if (!controller || caseInsensitiveEquals(MARLIN, controller)) {
             this.controllerClass[MARLIN] = MarlinController;
+        }
+        // Smoothie
+        if (!controller || caseInsensitiveEquals(SMOOTHIE, controller)) {
+            this.controllerClass[SMOOTHIE] = SmoothieController;
+        }
+        // TinyG / G2core
+        if (!controller || caseInsensitiveEquals(G2CORE, controller) || caseInsensitiveEquals(TINYG, controller)) {
+            this.controllerClass[TINYG] = TinyGController;
+        }
+        // Maslow
+        if (!controller || caseInsensitiveEquals(MASLOW, controller)) {
+            this.controllerClass[MASLOW] = MaslowController;
         }
 
         if (Object.keys(this.controllerClass).length === 0) {

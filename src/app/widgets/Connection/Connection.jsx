@@ -10,10 +10,13 @@ import Space from 'app/components/Space';
 import { ToastNotification } from 'app/components/Notifications';
 // import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-// import {
-//     GRBL,
-//     MARLIN
-// } from '../../constants';
+import {
+    GRBL,
+    MARLIN,
+    SMOOTHIE,
+    TINYG,
+    MASLOW
+} from '../../constants';
 
 class Connection extends PureComponent {
     static propTypes = {
@@ -106,9 +109,12 @@ class Connection extends PureComponent {
             alertMessage
         } = state;
         const enableHardwareFlowControl = get(connection, 'serial.rtscts', false);
-        // const canSelectControllers = (controller.loadedControllers.length > 1);
-        // const hasGrblController = includes(controller.loadedControllers, GRBL);
-        // const hasMarlinController = includes(controller.loadedControllers, MARLIN);
+        const canSelectControllers = (controller.loadedControllers.length > 1);
+        const hasGrblController = includes(controller.loadedControllers, GRBL);
+        const hasMarlinController = includes(controller.loadedControllers, MARLIN);
+        const hasSmoothieController = includes(controller.loadedControllers, SMOOTHIE);
+        const hasTinyGController = includes(controller.loadedControllers, TINYG);
+        const hasMaslowController = includes(controller.loadedControllers, MASLOW);
         const notLoading = !loading;
         const notConnecting = !connecting;
         const notConnected = !connected;
@@ -165,6 +171,54 @@ class Connection extends PureComponent {
                                         }}
                                     >
                                         {MARLIN}
+                                    </button>
+                                )}
+                                {hasSmoothieController && (
+                                    <button
+                                        type="button"
+                                        className={cx(
+                                            'btn',
+                                            'btn-default',
+                                            { 'btn-select': controllerType === SMOOTHIE }
+                                        )}
+                                        disabled={!canChangeController}
+                                        onClick={() => {
+                                            actions.changeController(SMOOTHIE);
+                                        }}
+                                    >
+                                        {SMOOTHIE}
+                                    </button>
+                                )}
+                                {hasTinyGController && (
+                                    <button
+                                        type="button"
+                                        className={cx(
+                                            'btn',
+                                            'btn-default',
+                                            { 'btn-select': controllerType === TINYG }
+                                        )}
+                                        disabled={!canChangeController}
+                                        onClick={() => {
+                                            actions.changeController(TINYG);
+                                        }}
+                                    >
+                                        {TINYG}
+                                    </button>
+                                )}
+                                {hasMaslowController && (
+                                    <button
+                                        type="button"
+                                        className={cx(
+                                            'btn',
+                                            'btn-default',
+                                            { 'btn-select': controllerType === MASLOW }
+                                        )}
+                                        disabled={!canChangeController}
+                                        onClick={() => {
+                                            actions.changeController(MASLOW);
+                                        }}
+                                    >
+                                        {MASLOW}
                                     </button>
                                 )}
                             </div>
