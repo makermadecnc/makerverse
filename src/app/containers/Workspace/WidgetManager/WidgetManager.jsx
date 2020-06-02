@@ -65,6 +65,13 @@ class WidgetManager extends PureComponent {
         //     disabled: false
         // },
         {
+            id: 'maslow',
+            caption: i18n._('Maslow Widget'),
+            details: i18n._('This widget shows the Maslow state and provides Maslow specific features.'),
+            visible: true,
+            disabled: false
+        },
+        {
             id: 'axes',
             caption: i18n._('Controls Widget'),
             details: i18n._('This widget shows the XYZ position. It includes jog controls, homing, and axis zeroing.'),

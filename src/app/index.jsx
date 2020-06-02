@@ -122,7 +122,7 @@ series([
 
         // Token authentication
         if (token !== store.get('session.token')) {
-            log.warn(`Received a message with an unauthorized token (${token}).`);
+            // log.warn(`Received a message with an unauthorized token (${token}).`);
             return;
         }
 

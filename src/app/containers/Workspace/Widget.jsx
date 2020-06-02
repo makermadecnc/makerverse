@@ -10,6 +10,9 @@ import MarlinWidget from 'app/widgets/Marlin';
 import M2Widget from 'app/widgets/M2';
 import ProbeWidget from 'app/widgets/Probe';
 import SpindleWidget from 'app/widgets/Spindle';
+import CustomWidget from 'app/widgets/Custom';
+import TinyGWidget from 'app/widgets/TinyG';
+import MaslowWidget from 'app/widgets/Maslow';
 import VisualizerWidget from 'app/widgets/Visualizer';
 
 const getWidgetByName = (name) => {
@@ -23,6 +26,9 @@ const getWidgetByName = (name) => {
         'marlin': MarlinWidget,
         'probe': ProbeWidget,
         'spindle': SpindleWidget,
+        'custom': CustomWidget,
+        'tinyg': TinyGWidget,
+        'maslow': MaslowWidget,
         'visualizer': VisualizerWidget,
         'm2': M2Widget
     }[name] || null;

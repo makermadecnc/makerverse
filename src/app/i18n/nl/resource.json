@@ -499,5 +499,9 @@
     "Move machine left & down": "",
     "Move machine down": "",
     "Move machine right & down": "",
-    "Lower bit": ""
+    "Lower bit": "",
+    "Connect to an IP camera": "",
+    "The URL must be for a Motion JPEG (mjpeg) HTTP or RTSP stream.": "",
+    "Maslow Widget": "",
+    "This widget shows the Maslow state and provides Maslow specific features.": ""
 }

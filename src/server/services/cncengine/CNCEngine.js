@@ -242,6 +242,7 @@ class CNCEngine {
 
                 let controller = store.get(`controllers["${port}"]`);
                 if (!controller) {
+                    log.debug(`Creating a controller for ${port}`);
                     let { controllerType = GRBL, baudrate, rtscts } = { ...options };
 
                     const Controller = this.controllerClass[controllerType];
@@ -282,6 +283,7 @@ class CNCEngine {
                     if (store.get(`controllers["${port}"]`)) {
                         log.error(`Serial port "${port}" was not properly closed`);
                     }
+                    log.debug(`Setting Controller for ${port}...`);
                     store.set(`controllers[${JSON.stringify(port)}]`, controller);
 
                     // Join the room

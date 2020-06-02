@@ -16,7 +16,7 @@ const defaultState = {
             primary: {
                 show: true,
                 widgets: [
-                    'connection', 'console', 'grbl', 'm2'
+                    'connection', 'console', 'grbl', 'marlin', 'smoothie', 'tinyg', 'maslow', 'webcam'
                 ]
             },
             secondary: {

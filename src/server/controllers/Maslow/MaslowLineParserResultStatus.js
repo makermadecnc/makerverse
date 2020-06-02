@@ -3,18 +3,20 @@ import _ from 'lodash';
 
 //https://github.com/grbl/grbl/blob/master/grbl/report.c
 class MaslowLineParserResultStatus {
-    // * Maslow v0.9
+    // * Grbl v0.9
     //   <Idle>
     //   <Idle,MPos:5.529,0.560,7.000,WPos:1.529,-5.440,-0.000>
     //   <Idle,MPos:5.529,0.560,7.000,0.000,WPos:1.529,-5.440,-0.000,0.000>
     //   <Idle,MPos:0.000,0.000,0.000,WPos:0.000,0.000,0.000,Buf:0,RX:0,Lim:000>
     //   <Idle,MPos:0.000,0.000,0.000,WPos:0.000,0.000,0.000,Buf:0,RX:0,Ln:0,F:0.>
-    // * Maslow v1.1
+    // * Grbl v1.1
     //   <Idle|MPos:3.000,2.000,0.000|FS:0,0>
     //   <Hold:0|MPos:5.000,2.000,0.000|FS:0,0>
     //   <Idle|MPos:5.000,2.000,0.000|FS:0,0|Ov:100,100,100>
     //   <Idle|MPos:5.000,2.000,0.000|FS:0,0|WCO:0.000,0.000,0.000>
     //   <Run|MPos:23.036,1.620,0.000|FS:500,0>
+    // * Maslow
+    //   <Idle,MPos:39.92,9.93,10.00,WPos:0.000,0.000,0.000>
     static parse(line) {
         const r = line.match(/^<(.+)>$/);
         if (!r) {
@@ -60,45 +62,17 @@ class MaslowLineParserResultStatus {
             }
         }
 
-        // Work Position (v0.9, v1.1)
-        if (_.has(result, 'WPos')) {
-            const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
-            const wPos = _.get(result, 'WPos', ['0.000', '0.000', '0.000']); // Defaults to [x, y, z]
-            payload.wpos = {};
-            for (let i = 0; i < wPos.length; ++i) {
-                payload.wpos[axes[i]] = wPos[i];
-            }
-        }
-
-        // Work Coordinate Offset (v1.1)
-        if (_.has(result, 'WCO')) {
-            const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
-            const wco = _.get(result, 'WCO', ['0.000', '0.000', '0.000']); // Defaults to [x, y, z]
-            payload.wco = {};
-            for (let i = 0; i < wco.length; ++i) {
-                payload.wco[axes[i]] = wco[i];
-            }
-        }
+        // Work Position
+        // Ignored in Maslow because it's hard-coded to 0,0,0 in the firmware.
+        // if (_.has(result, 'WPos')) {
+        // }
 
         // Planner Buffer (v0.9)
-        if (_.has(result, 'Buf')) {
-            payload.buf = payload.buf || {};
-            payload.buf.planner = Number(_.get(result, 'Buf[0]', 0));
-        }
-
-        // RX Buffer (v0.9)
-        if (_.has(result, 'RX')) {
-            payload.buf = payload.buf || {};
-            payload.buf.rx = Number(_.get(result, 'RX[0]', 0));
-        }
-
-        // Buffer State (v1.1)
-        // Bf:15,128. The first value is the number of available blocks in the planner buffer and the second is number of available bytes in the serial RX buffer.
-        if (_.has(result, 'Bf')) {
-            payload.buf = payload.buf || {};
-            payload.buf.planner = Number(_.get(result, 'Bf[0]', 0));
-            payload.buf.rx = Number(_.get(result, 'Bf[1]', 0));
-        }
+        // Ignored in Maslow, this is sent in the positional error message
+        // if (_.has(result, 'Buf')) {
+        //     payload.buf = payload.buf || {};
+        //     payload.buf.planner = Number(_.get(result, 'Buf[0]', 0));
+        // }
 
         // Line Number (v0.9, v1.1)
         // Ln:99999 indicates line 99999 is currently being executed.
@@ -118,20 +92,6 @@ class MaslowLineParserResultStatus {
         if (_.has(result, 'FS')) {
             payload.feedrate = Number(_.get(result, 'FS[0]', 0));
             payload.spindle = Number(_.get(result, 'FS[1]', 0));
-        }
-
-        // Limit Pins (v0.9)
-        // X_AXIS is (1<<0) or bit 0
-        // Y_AXIS is (1<<1) or bit 1
-        // Z_AXIS is (1<<2) or bit 2
-        if (_.has(result, 'Lim')) {
-            const value = Number(_.get(result, 'Lim[0]', 0));
-            payload.pinState = [
-                (value & (1 << 0)) ? 'X' : '',
-                (value & (1 << 1)) ? 'Y' : '',
-                (value & (1 << 2)) ? 'Z' : '',
-                (value & (1 << 2)) ? 'A' : ''
-            ].join('');
         }
 
         // Input Pin State (v1.1)

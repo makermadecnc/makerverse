@@ -6,7 +6,7 @@ import _includes from 'lodash/includes';
 import _set from 'lodash/set';
 import _trim from 'lodash/trim';
 import {
-    GRBL_MODAL_GROUPS
+    MASLOW_MODAL_GROUPS
 } from './constants';
 
 class MaslowLineParserResultParserState {
@@ -31,7 +31,7 @@ class MaslowLineParserResultParserState {
 
             // Gx, Mx
             if (word.indexOf('G') === 0 || word.indexOf('M') === 0) {
-                const r = _find(GRBL_MODAL_GROUPS, (group) => {
+                const r = _find(MASLOW_MODAL_GROUPS, (group) => {
                     return _includes(group.modes, word);
                 });
 

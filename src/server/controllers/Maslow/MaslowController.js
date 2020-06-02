@@ -1071,12 +1071,15 @@ class MaslowController {
             'gcode:start': () => {
                 this.event.trigger('gcode:start');
 
+                log.debug('Starting Workflow');
                 this.workflow.start();
 
                 // Feeder
+                log.debug('Re-setting Feeder');
                 this.feeder.reset();
 
                 // Sender
+                log.debug('Sender next');
                 this.sender.next();
             },
             'stop': () => {
