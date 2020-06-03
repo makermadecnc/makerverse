@@ -513,8 +513,6 @@ class AxesWidget extends PureComponent {
                     }
                 }));
             }
-<<<<<<< HEAD
-=======
 
             // Smoothie
             if (type === SMOOTHIE) {
@@ -616,7 +614,6 @@ class AxesWidget extends PureComponent {
                     })
                 }));
             }
->>>>>>> 8c126a4e... Add basic support for MaslowCNC controllers
         }
     };
 
@@ -778,11 +775,7 @@ class AxesWidget extends PureComponent {
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-<<<<<<< HEAD
-        if (!includes([GRBL, MARLIN], controllerType)) {
-=======
         if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG, MASLOW], controllerType)) {
->>>>>>> 8c126a4e... Add basic support for MaslowCNC controllers
             return false;
         }
         if (controllerType === GRBL) {
@@ -798,8 +791,6 @@ class AxesWidget extends PureComponent {
         if (controllerType === MARLIN) {
             // Ignore
         }
-<<<<<<< HEAD
-=======
         if (controllerType === SMOOTHIE) {
             const activeState = get(controllerState, 'status.activeState');
             const states = [
@@ -833,7 +824,6 @@ class AxesWidget extends PureComponent {
             }
         }
 
->>>>>>> 8c126a4e... Add basic support for MaslowCNC controllers
         return true;
     }
 

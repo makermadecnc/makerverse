@@ -3,11 +3,7 @@ import includes from 'lodash/includes';
 import union from 'lodash/union';
 import React from 'react';
 import ReactDOM from 'react-dom';
-<<<<<<< HEAD
-import { GRBL, MARLIN } from 'app/constants';
-=======
 import { GRBL, MARLIN, SMOOTHIE, TINYG, MASLOW } from 'app/constants';
->>>>>>> 4b51a7b3... Added a widget for Maslow, and fix a few things in the parser
 import controller from 'app/lib/controller';
 import store from 'app/store';
 import defaultState from 'app/store/defaultState';
@@ -28,11 +24,6 @@ export const getActiveWidgets = () => {
             if (widget === 'marlin' && !includes(controller.loadedControllers, MARLIN)) {
                 return false;
             }
-<<<<<<< HEAD
-            // if (widget === 'm2' && !includes(controller.loadedControllers, M2)) {
-            //     return false;
-            // }
-=======
             if (widget === 'smoothie' && !includes(controller.loadedControllers, SMOOTHIE)) {
                 return false;
             }
@@ -42,7 +33,6 @@ export const getActiveWidgets = () => {
             if (widget === 'maslow' && !includes(controller.loadedControllers, MASLOW)) {
                 return false;
             }
->>>>>>> 4b51a7b3... Added a widget for Maslow, and fix a few things in the parser
             return true;
         });
 

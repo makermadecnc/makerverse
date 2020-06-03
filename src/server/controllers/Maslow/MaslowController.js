@@ -266,6 +266,8 @@ class MaslowController {
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 line = line.replace(/\s*;.*/g, '').trim();
+                // Remove comments in parenthesis: `(comment)`
+                line = line.replace(/\(.*\)/, '').trim();
                 context = this.populateContext(context);
 
                 const { sent, received } = this.sender.state;
