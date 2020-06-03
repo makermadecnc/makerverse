@@ -226,13 +226,6 @@ class MaslowController {
                 if (_.includes(words, 'M6')) {
                     log.debug('M6 Tool Change');
                     this.feeder.hold({ data: 'M6' }); // Hold reason
-
-                    // Surround M6 with parentheses to ignore
-                    // unsupported command error. If we nuke the whole
-                    // line, then we'll likely lose other commands that
-                    // share the line, like a T~.  This makes tool
-                    // changes complicated.
-                    line = line.replace('M6', '(M6)');
                 }
 
                 return line;
@@ -312,9 +305,6 @@ class MaslowController {
                 if (_.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
                     this.workflow.pause({ data: 'M6' });
-
-                    // Surround M6 with parentheses to ignore unsupported command error
-                    line = line.replace('M6', '(M6)');
                 }
 
                 return line;
