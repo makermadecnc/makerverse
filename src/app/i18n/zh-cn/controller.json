@@ -1,0 +1,14 @@
+{
+    "Grbl": {
+        "activeState": {
+            "idle": "",
+            "run": "运行",
+            "hold": "保持",
+            "door": "",
+            "home": "",
+            "sleep": "休眠",
+            "alarm": "报警",
+            "check": "检查"
+        }
+    }
+}

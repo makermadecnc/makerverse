@@ -1,0 +1,14 @@
+{
+    "Grbl": {
+        "activeState": {
+            "idle": "Parado",
+            "run": "Iniciar",
+            "hold": "Pausar",
+            "door": "Entrada",
+            "home": "Home",
+            "sleep": "Dormir",
+            "alarm": "Alarma",
+            "check": "Comprobar"
+        }
+    }
+}

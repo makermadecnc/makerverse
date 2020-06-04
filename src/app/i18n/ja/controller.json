@@ -1,0 +1,14 @@
+{
+    "Grbl": {
+        "activeState": {
+            "idle": "待機",
+            "run": "実行",
+            "hold": "一時停止",
+            "door": "ドア",
+            "home": "ホーム",
+            "sleep": "スリープ",
+            "alarm": "アラーム",
+            "check": "確認"
+        }
+    }
+}

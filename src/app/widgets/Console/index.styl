@@ -1,0 +1,37 @@
+.widget-content {
+    position: relative;
+
+    &.hidden {
+        display: none;
+    }
+
+    &.fullscreen {
+        .terminal-container {
+            height: 100%;
+        }
+    }
+}
+
+.no-serial-connection {
+    padding: 10px;
+    color: #333;
+    opacity: .65;
+}
+
+.terminal-container {
+    background: #000;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.icon {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    margin: 0 2px 2px 2px;
+
+    &.select-all {
+        background: url("./images/select-all.svg") no-repeat 0 0;
+    }
+}
