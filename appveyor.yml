@@ -18,9 +18,9 @@ environment:
   global:
     CI_BUILD_NUMBER: $(appveyor_build_number)
     GH_TOKEN:
-      secure: 14dS/9loZ4uMoKGOHGkagaYp5oS30HSIQcPB0FEa7aTEfpb2VJQiUms82hv8nWxY
+      secure: 2b1PHGARRCUEc9Q8cjCw79E4lzZg/wv/WEYDhKKM+gjIbMmPZ6LP4RUGWIAPKk9o
     GITHUB_TOKEN:
-      secure: 14dS/9loZ4uMoKGOHGkagaYp5oS30HSIQcPB0FEa7aTEfpb2VJQiUms82hv8nWxY
+      secure: 2b1PHGARRCUEc9Q8cjCw79E4lzZg/wv/WEYDhKKM+gjIbMmPZ6LP4RUGWIAPKk9o
 #    CSC_LINK:
 #      secure: a+2xo1z15zej505BjOcL6iIaGEbVgJd4usmxpKZWUP4sI2tLvQdBLMOXdxr/KGzVBtMYKDHJcl3Xpv+iOUXeRjd4iplIZkkSaCUkE9mbccs=
 #    CSC_KEY_PASSWORD:
@@ -111,7 +111,7 @@ artifacts:
 deploy:
   - provider: GitHub
     auth_token:
-      secure: 3bef437cdd4d742854e326fc828b50b5ecbb81fd
+      secure: 2b1PHGARRCUEc9Q8cjCw79E4lzZg/wv/WEYDhKKM+gjIbMmPZ6LP4RUGWIAPKk9o
     draft: false
     prerelease: false
     on:
