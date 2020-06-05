@@ -115,5 +115,6 @@ deploy:
     draft: false
     prerelease: false
     on:
+      branch: master
       appveyor_repo_tag: true  # deploy on tag push only
       nodejs_version: "10"
