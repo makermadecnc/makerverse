@@ -61,7 +61,7 @@ const defaultState = {
                 type: 'Grbl' // Grbl|Marlin
             },
             port: '', // will be deprecated in v2
-            baudrate: 115200, // will be deprecated in v2
+            baudrate: 38400, // will be deprecated in v2
             connection: {
                 type: 'serial',
                 serial: {

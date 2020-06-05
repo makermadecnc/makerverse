@@ -161,7 +161,7 @@ class Dashboard extends PureComponent {
                         )}
                         {this.lines.length === 0 && (
                             <div className={styles.absoluteCenter}>
-                                <img src="images/logo-badge-32x32.jpg" alt="" />
+                                <img src="images/logo-badge-32x32.jpg" style={{ maxWidth: '32px' }} alt="" />
                             </div>
                         )}
                     </div>
