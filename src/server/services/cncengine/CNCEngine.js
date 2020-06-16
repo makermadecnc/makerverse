@@ -36,10 +36,7 @@ const isValidController = (controller) => (
     // Grbl
     caseInsensitiveEquals(GRBL, controller) ||
     // Marlin
-    caseInsensitiveEquals(MARLIN, controller) || 
-    // M2
-    caseInsensitiveEquals(N2, controller)
-
+    caseInsensitiveEquals(MARLIN, controller)
 );
 
 class CNCEngine {

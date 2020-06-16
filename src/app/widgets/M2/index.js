@@ -10,6 +10,7 @@ import i18n from 'app/lib/i18n';
 import {
     M2
 } from '../../constants';
+import M2Modal from './M2Modal';
 import styles from './index.styl';
 
 
@@ -219,7 +220,7 @@ class M2Widget extends PureComponent {
             )}
             >
             <div className={classnames(styles['widget-header'])}>Workspace</div>
-            <div className={classnames(styles['widget-container'])} style={{ marginTop:'10px'}}>
+            <div className={classnames(styles['widget-container'])} style={{ marginTop:'10px`'}}>
                 <p>Height: <span>{height} mm</span></p>
                 <p>Width: <span>{width} mm</span></p>
             </div>
@@ -240,6 +241,16 @@ class M2Widget extends PureComponent {
             >
                 {i18n._('Calibrate')}
             </button>
+            {/* <M2Modal 
+                height={height} 
+                width={width} 
+                distance={distance} 
+                offset={offset} 
+                xScaling={xScaling} 
+                yScaling={yScaling} 
+                zScaling={zScaling} 
+                setValue={(e) => this.setState({[e.target.name] :e.target.value})}
+            /> */}
             </Widget.Content>
         )}
     </Widget>
