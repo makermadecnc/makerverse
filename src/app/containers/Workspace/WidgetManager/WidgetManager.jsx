@@ -50,6 +50,13 @@ class WidgetManager extends PureComponent {
             visible: true,
             disabled: false
         },
+        {
+            id: 'm2',
+            caption: i18n._('M2 Widget'),
+            details: i18n._('This widget shows the Grbl state and provides Grbl specific features.'),
+            visible: true,
+            disabled: false
+        },
         // {
         //     id: 'marlin',
         //     caption: i18n._('Marlin Widget'),
@@ -114,12 +121,16 @@ class WidgetManager extends PureComponent {
         super(props);
 
         this.widgetList = this.widgetList.filter(widgetItem => {
+            console.log(widgetItem);
             if (widgetItem.id === 'grbl' && !includes(controller.loadedControllers, GRBL)) {
                 return false;
             }
             if (widgetItem.id === 'marlin' && !includes(controller.loadedControllers, MARLIN)) {
                 return false;
             }
+            // if (widgetItem.id === 'm2' && !includes(controller.loadedControllers, M2)) {
+            //     return false;
+            // }
             return true;
         });
     }

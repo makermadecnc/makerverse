@@ -490,5 +490,6 @@
     "Hide Cutting Tool": "Hide Cutting Tool",
     "Show Cutting Tool": "Show Cutting Tool",
     "Ready to start": "Ready to start",
-    "A web-based interface for CNC milling controller running Grbl": "A web-based interface for CNC milling controller running Grbl"
+    "A web-based interface for CNC milling controller running Grbl": "A web-based interface for CNC milling controller running Grbl",
+    "M2 Widget": "M2 Widget"
 }

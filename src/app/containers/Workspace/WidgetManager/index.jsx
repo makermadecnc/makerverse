@@ -24,6 +24,9 @@ export const getActiveWidgets = () => {
             if (widget === 'marlin' && !includes(controller.loadedControllers, MARLIN)) {
                 return false;
             }
+            // if (widget === 'm2' && !includes(controller.loadedControllers, M2)) {
+            //     return false;
+            // }
             return true;
         });
 

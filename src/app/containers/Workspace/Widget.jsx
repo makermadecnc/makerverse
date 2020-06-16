@@ -7,6 +7,7 @@ import GCodeWidget from 'app/widgets/GCode';
 import GrblWidget from 'app/widgets/Grbl';
 import LaserWidget from 'app/widgets/Laser';
 import MarlinWidget from 'app/widgets/Marlin';
+import M2Widget from 'app/widgets/M2';
 import ProbeWidget from 'app/widgets/Probe';
 import SpindleWidget from 'app/widgets/Spindle';
 import VisualizerWidget from 'app/widgets/Visualizer';
@@ -22,7 +23,8 @@ const getWidgetByName = (name) => {
         'marlin': MarlinWidget,
         'probe': ProbeWidget,
         'spindle': SpindleWidget,
-        'visualizer': VisualizerWidget
+        'visualizer': VisualizerWidget,
+        'm2': M2Widget
     }[name] || null;
 };
 
