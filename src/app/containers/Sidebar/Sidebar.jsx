@@ -25,7 +25,6 @@ class Sidebar extends PureComponent {
                             <i
                                 className={classNames(
                                     styles.icon,
-                                    styles.iconInvert,
                                     styles.iconXyz
                                 )}
                             />
@@ -41,7 +40,6 @@ class Sidebar extends PureComponent {
                             <i
                                 className={classNames(
                                     styles.icon,
-                                    styles.iconInvert,
                                     styles.iconGear
                                 )}
                             />

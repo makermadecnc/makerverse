@@ -138,7 +138,7 @@ class Header extends PureComponent {
                     body: code === 0
                         ? i18n._('Command succeeded')
                         : i18n._('Command failed ({{err}})', { err: err }),
-                    icon: 'images/logo-badge-32x32.jpg',
+                    icon: 'images/logo-badge-32x32.png',
                     timeout: 10 * 1000,
                     onClick: function () {
                         window.focus();
@@ -168,7 +168,7 @@ class Header extends PureComponent {
             if (cmd && this.state.pushPermission === Push.Permission.GRANTED) {
                 Push.create(cmd.title, {
                     body: i18n._('Command failed ({{err}})', { err: err }),
-                    icon: 'images/logo-badge-32x32.jpg',
+                    icon: 'images/logo-badge-32x32.png',
                     timeout: 10 * 1000,
                     onClick: function () {
                         window.focus();
@@ -258,7 +258,6 @@ class Header extends PureComponent {
             <Navbar
                 fixedTop
                 fluid
-                inverse
                 style={{
                     border: 'none',
                     margin: 0
@@ -268,13 +267,12 @@ class Header extends PureComponent {
                     <img
                         style={{
                             margin: '4px auto 0 auto',
-                            width: '32px',
-                            height: '32px'
+                            width: '42px'
                         }}
-                        src="images/logo-badge-32x32.jpg"
+                        src="images/logo-badge-32x32.png"
                         alt=""
                     />
-                    <h1 style={{ color: '#fff', marginLeft: '15px', marginTop: 0, marginBottom: 0, fontSize: '30px' }}>Makerverse</h1>
+                    <h1 style={{ color: '#222', marginLeft: '15px', marginTop: 0, marginBottom: 0, fontSize: '30px', fontWeight: '600' }}>Makerverse</h1>
                     <Navbar.Toggle />
                 </Navbar.Header>
                 <Navbar.Collapse>
