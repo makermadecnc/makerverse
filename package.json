@@ -1,6 +1,6 @@
 {
   "name": "makerverse",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "A web-based interface for CNC milling controller.",
   "homepage": "https://github.com/makermadecnc/makerverse",
   "author": "Maker Made <info@makermade.com>",
@@ -64,7 +64,7 @@
   },
   "build": {
     "appId": "org.makerverse",
-    "asar": false,
+    "asar": true,
     "asarUnpack": [],
     "productName": "Makerverse",
     "directories": {
@@ -76,7 +76,9 @@
     "mac": {
       "category": "public.app-category.productivity",
       "target": [
-        "dmg"
+        "dmg",
+        "mas",
+        "pkg"
       ],
       "icon": "electron-build/icon.icns"
     },

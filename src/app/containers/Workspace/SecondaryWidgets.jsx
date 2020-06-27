@@ -189,12 +189,16 @@ class SecondaryWidgets extends Component {
         const widgets = this.state.widgets
             .filter(widgetId => {
                 const name = widgetId.split(':')[0];
+                console.log(name);
                 if (name === 'grbl' && !includes(controller.loadedControllers, GRBL)) {
                     return false;
                 }
                 if (name === 'marlin' && !includes(controller.loadedControllers, MARLIN)) {
                     return false;
                 }
+                // if (name === 'm2' && !includes(controller.loadedControllers, M2)) {
+                //     return false;
+                // }
                 return true;
             })
             .map(widgetId => (
@@ -215,7 +219,7 @@ class SecondaryWidgets extends Component {
                     />
                 </div>
             ));
-
+        console.log(widgets);
         return (
             <Sortable
                 className={classNames(className, styles.widgets)}

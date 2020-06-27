@@ -66,7 +66,6 @@ export const METRIC_STEPS = [
 // Controller
 export const GRBL = 'Grbl';
 export const MARLIN = 'Marlin';
-
 // Workflow State
 export const WORKFLOW_STATE_IDLE = 'idle';
 export const WORKFLOW_STATE_PAUSED = 'paused';

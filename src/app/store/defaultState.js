@@ -16,7 +16,7 @@ const defaultState = {
             primary: {
                 show: true,
                 widgets: [
-                    'connection', 'console', 'grbl'
+                    'connection', 'console', 'grbl', 'm2'
                 ]
             },
             secondary: {
@@ -103,6 +103,9 @@ const defaultState = {
                 duration: 0,
                 maxS: 1000
             }
+        },
+        m2: {
+            minimized: false,
         },
         // marlin: {
         //     minimized: false,

@@ -10,7 +10,7 @@ const AboutContainer = ({ version }) => {
 
     return (
         <div className={styles.aboutContainer}>
-            <img src="images/logo-badge-32x32.jpg" alt="" className={styles.productLogo} style={{ maxWidth: '32px' }} />
+            <img src="images/logo-badge-32x32.png" alt="" className={styles.productLogo} style={{ maxWidth: '32px' }} />
             <div className={styles.productDetails}>
                 <div className={styles.aboutProductName}>
                     {`${settings.productName} ${version.current}`}
