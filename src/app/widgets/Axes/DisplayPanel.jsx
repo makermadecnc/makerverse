@@ -1164,6 +1164,7 @@ class DisplayPanel extends PureComponent {
 
     render() {
         const { axes, machinePosition, workPosition } = this.props;
+        console.log(this.props, 'Axes Display Props');
         const wcs = this.props.actions.getWorkCoordinateSystem();
         const hasAxisE = (machinePosition.e !== undefined && workPosition.e !== undefined);
         const hasAxisX = includes(axes, AXIS_X);

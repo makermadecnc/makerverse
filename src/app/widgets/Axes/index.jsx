@@ -702,6 +702,8 @@ class AxesWidget extends PureComponent {
             ...this.actions
         };
 
+        console.log(this.props, 'Axes props');
+
         return (
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header>

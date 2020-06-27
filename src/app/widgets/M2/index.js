@@ -7,9 +7,8 @@ import Widget from 'app/components/Widget';
 import WidgetConfig from '../WidgetConfig';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-import {
-    M2
-} from '../../constants';
+import { GRBL } from '../../constants';
+
 import M2Modal from './M2Modal';
 import styles from './index.styl';
 
@@ -19,7 +18,8 @@ class M2Widget extends PureComponent {
         widgetId: PropTypes.string.isRequired,
         onFork: PropTypes.func.isRequired,
         onRemove: PropTypes.func.isRequired,
-        sortable: PropTypes.object
+        sortable: PropTypes.object,
+        state: PropTypes.object,
     };
      // Public methods
      collapse = () => {
@@ -33,6 +33,7 @@ class M2Widget extends PureComponent {
     config = new WidgetConfig(this.props.widgetId);
 
     state = this.getInitialState();
+    
 
     actions = {
         toggleFullscreen: () => {
@@ -56,7 +57,7 @@ class M2Widget extends PureComponent {
         'serialport:open': (options) => {
             const { port, controllerType } = options;
             this.setState({
-                isReady: controllerType === M2,
+                isReady: controllerType === GRBL,
                 port: port
             });
         },
@@ -65,7 +66,7 @@ class M2Widget extends PureComponent {
             this.setState({ ...initialState });
         },
         'controller:settings': (type, controllerSettings) => {
-            if (type === M2) {
+            if (type === GRBL) {
                 this.setState(state => ({
                     controller: {
                         ...state.controller,
@@ -76,7 +77,7 @@ class M2Widget extends PureComponent {
             }
         },
         'controller:state': (type, controllerState) => {
-            if (type === M2) {
+            if (type === GRBL) {
                 this.setState(state => ({
                     controller: {
                         ...state.controller,
@@ -109,16 +110,21 @@ class M2Widget extends PureComponent {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
             port: controller.port,
-            // isReady: (controller.loadedControllers.length === 1) || (controller.type === GRBL),
-            isReady:true,
-            height:"10000.400",
-            width:"10000.400",
-            distance:"10000.400",
-            offset:"10000.400",
-            xScaling:"10000.400",
-            yScaling:"10000.400",
-            zScaling:"10000.400"
+            isReady: (controller.loadedControllers.length === 1) || (controller.type === GRBL),
+            height:"",
+            width:"",
+            distance:"",
+            offset:"",
+            xScaling:"",
+            yScaling:"",
+            zScaling:"",
+            controller: {
+                type: controller.type,
+                settings: controller.settings,
+                state: controller.state
+            },          
         };
+        
     }
 
     addControllerEvents() {
@@ -157,7 +163,7 @@ class M2Widget extends PureComponent {
         const actions = {
             ...this.actions
         };
-
+console.log(state, "M2 State");
     return (
     <Widget fullscreen={false}>
         <Widget.Header>
@@ -221,18 +227,18 @@ class M2Widget extends PureComponent {
             >
             <div className={classnames(styles['widget-header'])}>Workspace</div>
             <div className={classnames(styles['widget-container'])} style={{ marginTop:'10px`'}}>
-                <p>Height: <span>{height} mm</span></p>
-                <p>Width: <span>{width} mm</span></p>
+                <p>Height: <span>{state.controller.settings.settings && state.controller.settings.settings.$82} mm</span></p>
+                <p>Width: <span>{state.controller.settings.settings && state.controller.settings.settings.$81} mm</span></p>
             </div>
             <div className={classnames(styles['widget-header'])}>Calibration</div>
             <div className={classnames(styles['widget-container'])} 
             style={{ flexDirection: 'column', justifyContent:'flex-start', marginTop:'10px' }}
             >
-                <p style={{marginBottom:'7px'}}>Distance between motors: <span>{distance} mm</span></p>
-                <p style={{marginBottom:'7px'}}>Motor offset: <span>{offset} mm</span></p>
-                <p>X Scaling: <span>{xScaling} Steps/mm</span></p>
-                <p>Y Scaling: <span>{yScaling} Steps/mm</span></p>
-                <p>Z Scaling: <span>{zScaling} Steps/mm</span></p>
+                <p style={{marginBottom:'7px'}}>Distance between motors: <span>{state.controller.settings.settings && state.controller.settings.settings.$83} mm</span></p>
+                <p style={{marginBottom:'7px'}}>Motor offset: <span>{state.controller.settings.settings && state.controller.settings.settings.$84} mm</span></p>
+                <p>X Scaling: <span>{state.controller.settings.settings && state.controller.settings.settings.$100} Steps/mm</span></p>
+                <p>Y Scaling: <span>{state.controller.settings.settings && state.controller.settings.settings.$101} Steps/mm</span></p>
+                <p>Z Scaling: <span>{state.controller.settings.settings && state.controller.settings.settings.$102} Steps/mm</span></p>
             </div>
             <button
                 type="button"
