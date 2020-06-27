@@ -259,7 +259,6 @@ class Header extends PureComponent {
                 fixedTop
                 fluid
                 style={{
-                    border: 'none',
                     margin: 0
                 }}
             >
