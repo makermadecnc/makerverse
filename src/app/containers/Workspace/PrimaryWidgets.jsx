@@ -188,7 +188,6 @@ class PrimaryWidgets extends Component {
         const widgets = this.state.widgets
             .filter(widgetId => {
                 const name = widgetId.split(':')[0];
-                console.log(name);
                 if (name === 'grbl' && !includes(controller.loadedControllers, GRBL)) {
                     return false;
                 }
@@ -218,7 +217,6 @@ class PrimaryWidgets extends Component {
                     />
                 </div>
             ));
-        console.log(widgets);
         return (
             <Sortable
                 className={classNames(className, styles.widgets)}
@@ -235,7 +233,6 @@ class PrimaryWidgets extends Component {
                     chosenClass: 'sortable-chosen', // Class name for the chosen item
                     ghostClass: 'sortable-ghost', // Class name for the drop placeholder
                     dataIdAttr: 'data-widget-id',
-                    onStart: () => console.log('hit'),
                     onEnd: this.props.onDragEnd
                 }}
                 onChange={(order) => {

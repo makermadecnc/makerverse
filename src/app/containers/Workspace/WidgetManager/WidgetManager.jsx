@@ -121,7 +121,6 @@ class WidgetManager extends PureComponent {
         super(props);
 
         this.widgetList = this.widgetList.filter(widgetItem => {
-            console.log(widgetItem);
             if (widgetItem.id === 'grbl' && !includes(controller.loadedControllers, GRBL)) {
                 return false;
             }

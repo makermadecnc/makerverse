@@ -7,261 +7,410 @@ import Widget from 'app/components/Widget';
 import WidgetConfig from '../WidgetConfig';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-import { GRBL } from '../../constants';
+import get from 'lodash/get';
+import includes from 'lodash/includes';
+import { in2mm } from 'app/lib/units';
+import {
+  GRBL,
+  GRBL_ACTIVE_STATE_IDLE,
+  GRBL_ACTIVE_STATE_RUN
+} from '../../constants';
 
 import M2Modal from './M2Modal';
 import styles from './index.styl';
 
-
 class M2Widget extends PureComponent {
-    static propTypes = {
-        widgetId: PropTypes.string.isRequired,
-        onFork: PropTypes.func.isRequired,
-        onRemove: PropTypes.func.isRequired,
-        sortable: PropTypes.object,
-        state: PropTypes.object,
+  static propTypes = {
+    widgetId: PropTypes.string.isRequired,
+    onFork: PropTypes.func.isRequired,
+    onRemove: PropTypes.func.isRequired,
+    sortable: PropTypes.object,
+    state: PropTypes.object
+  };
+  // Public methods
+  collapse = () => {
+    this.setState({ minimized: true });
+  };
+
+  expand = () => {
+    this.setState({ minimized: false });
+  };
+
+  config = new WidgetConfig(this.props.widgetId);
+
+  state = this.getInitialState();
+
+  actions = {
+    toggleFullscreen: () => {
+      this.setState(state => ({
+        minimized: state.isFullscreen ? state.minimized : false,
+        isFullscreen: !state.isFullscreen
+      }));
+    },
+    toggleMinimized: () => {
+      this.setState(state => ({
+        minimized: !state.minimized
+      }));
+    },
+    handleCalibrate: (values, metric) => {
+      this.setState({ displayModal: false });
+      for (const [key, value] of Object.entries(values)) {
+        const val = metric === 'mm' ? value : in2mm(value);
+        controller.command('gcode', `${key}=${val}`);
+      }
+    }
+  };
+
+  controllerEvents = {
+    'serialport:open': options => {
+      const { port, controllerType } = options;
+      this.setState({
+        isReady: controllerType === GRBL,
+        port: port
+      });
+    },
+    'serialport:close': options => {
+      const initialState = this.getInitialState();
+      this.setState({ ...initialState });
+    },
+    'controller:settings': (type, controllerSettings) => {
+      if (type === GRBL) {
+        this.setState(state => ({
+          controller: {
+            ...state.controller,
+            type: type,
+            settings: controllerSettings
+          }
+        }));
+      }
+    },
+    'Grbl:settings':(controllerSettings) => {
+        console.log(controllerSettings);
+        console.log('updated');
+    },
+    'controller:state': (type, controllerState) => {
+      if (type === GRBL) {
+        this.setState(state => ({
+          controller: {
+            ...state.controller,
+            type: type,
+            state: controllerState
+          }
+        }));
+      }
+    }
+  };
+
+  componentDidMount() {
+    this.addControllerEvents();
+  }
+
+  componentWillUnmount() {
+    this.removeControllerEvents();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { minimized } = this.state;
+
+    this.config.set('minimized', minimized);
+  }
+
+  getInitialState() {
+    return {
+      minimized: this.config.get('minimized', false),
+      isFullscreen: false,
+      port: controller.port,
+      canClick: true,
+      isReady:
+        controller.loadedControllers.length === 1 || controller.type === GRBL,
+      displayModal: false,
+      modalImg: '../images/calibration_modal_img_1.png',
+      modalConfig: [
+        { name: 'Distance between motors', gCode: '$83', for: 'distance' },
+        { name: 'Motor offset', gCode: '$84', for: 'offset' }
+      ],
+      controller: {
+        type: controller.type,
+        settings: controller.settings,
+        state: controller.state
+      }
     };
-     // Public methods
-     collapse = () => {
-        this.setState({ minimized: true });
+  }
+
+  addControllerEvents() {
+    Object.keys(this.controllerEvents).forEach(eventName => {
+      const callback = this.controllerEvents[eventName];
+      controller.addListener(eventName, callback);
+    });
+  }
+
+  removeControllerEvents() {
+    Object.keys(this.controllerEvents).forEach(eventName => {
+      const callback = this.controllerEvents[eventName];
+      controller.removeListener(eventName, callback);
+    });
+  }
+  canClick() {
+    const controllerType = this.state.controller.type;
+    const controllerState = this.state.controller.state;
+    const activeState = get(controllerState, 'status.activeState');
+    const states = [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_RUN];
+    if (!includes(states, activeState)) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+
+  render() {
+    const { widgetId } = this.props;
+    const {
+      minimized,
+      isFullscreen,
+      isReady,
+      displayModal,
+      modalImg,
+      modalConfig,
+    } = this.state;
+    const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
+    const state = {
+      ...this.state,
+      canClick: this.canClick()
     };
-
-    expand = () => {
-        this.setState({ minimized: false });
+    const actions = {
+      ...this.actions
     };
-
-    config = new WidgetConfig(this.props.widgetId);
-
-    state = this.getInitialState();
-    
-
-    actions = {
-        toggleFullscreen: () => {
-            this.setState(state => ({
-                minimized: state.isFullscreen ? state.minimized : false,
-                isFullscreen: !state.isFullscreen,
-               
-            }));
-        },
-        toggleMinimized: () => {
-            this.setState(state => ({
-                minimized: !state.minimized
-            }))
-        },
-        handleCalibrate: () => {
-            console.log('calibrating');
-        }
-    };
-
-    controllerEvents = {
-        'serialport:open': (options) => {
-            const { port, controllerType } = options;
-            this.setState({
-                isReady: controllerType === GRBL,
-                port: port
-            });
-        },
-        'serialport:close': (options) => {
-            const initialState = this.getInitialState();
-            this.setState({ ...initialState });
-        },
-        'controller:settings': (type, controllerSettings) => {
-            if (type === GRBL) {
-                this.setState(state => ({
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        settings: controllerSettings
-                    }
-                }));
-            }
-        },
-        'controller:state': (type, controllerState) => {
-            if (type === GRBL) {
-                this.setState(state => ({
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    }
-                }));
-            }
-        }
-    };
-
-    componentDidMount() {
-        this.addControllerEvents();
-    }
-
-    componentWillUnmount() {
-        this.removeControllerEvents();
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        const {
-            minimized
-        } = this.state;
-
-        this.config.set('minimized', minimized);
-    }
-
-    getInitialState() {
-        return {
-            minimized: this.config.get('minimized', false),
-            isFullscreen: false,
-            port: controller.port,
-            isReady: (controller.loadedControllers.length === 1) || (controller.type === GRBL),
-            height:"",
-            width:"",
-            distance:"",
-            offset:"",
-            xScaling:"",
-            yScaling:"",
-            zScaling:"",
-            controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
-            },          
-        };
-        
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
-    }
-
-
-    render(){
-        const { widgetId } = this.props;
-        const { 
-            minimized, 
-            isFullscreen, 
-            isReady, 
-            height, 
-            width,
-            distance, 
-            offset, 
-            xScaling, 
-            yScaling, 
-            zScaling 
-        } = this.state;
-        const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
-        const state = {
-            ...this.state
-        };
-        const actions = {
-            ...this.actions
-        };
-console.log(state, "M2 State");
     return (
-    <Widget fullscreen={false}>
+      <Widget fullscreen={false}>
         <Widget.Header>
-            <Widget.Title>
+          <Widget.Title>
             <Widget.Sortable className={this.props.sortable.handleClassName}>
-                <i className="fa fa-bars" />
-                <Space width="8" />
+              <i className="fa fa-bars" />
+              <Space width="8" />
             </Widget.Sortable>
-                {isForkedWidget &&
-                    <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
-                }
-                M2 Configuration
-            </Widget.Title>
-            <Widget.Controls className={this.props.sortable.filterClassName}>
-            {isReady && (
-                <Widget.Button
-                    disabled={isFullscreen}
-                    title={minimized ? i18n._('Expand') : i18n._('Collapse')}
-                    onClick={actions.toggleMinimized}
-                >
-                    <i
-                        className={classnames(
-                            'fa',
-                            { 'fa-chevron-up': !minimized },
-                            { 'fa-chevron-down': minimized }
-                        )}
-                    />
-                </Widget.Button>
+            {isForkedWidget && (
+              <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
             )}
-                <Widget.DropdownButton
-                    title={i18n._('More')}
-                    toggle={<i className="fa fa-ellipsis-v" />}
-                    onSelect={(eventKey) => {
-                         if (eventKey === 'fork') {
-                            this.props.onFork();
-                        } else if (eventKey === 'remove') {
-                            this.props.onRemove();
-                        }
-                    }}
-                >
-                    <Widget.DropdownMenuItem eventKey="fork">
-                        <i className="fa fa-fw fa-code-fork" />
-                        <Space width="4" />
-                        {i18n._('Fork Widget')}
-                    </Widget.DropdownMenuItem>
-                    <Widget.DropdownMenuItem eventKey="remove">
-                        <i className="fa fa-fw fa-times" />
-                        <Space width="4" />
-                        {i18n._('Remove Widget')}
-                    </Widget.DropdownMenuItem>
-                </Widget.DropdownButton>
-            </Widget.Controls>
+            M2 Configuration
+          </Widget.Title>
+          <Widget.Controls className={this.props.sortable.filterClassName}>
+            {isReady && (
+              <Widget.Button
+                disabled={isFullscreen}
+                title={minimized ? i18n._('Expand') : i18n._('Collapse')}
+                onClick={actions.toggleMinimized}
+              >
+                <i
+                  className={classnames(
+                    'fa',
+                    { 'fa-chevron-up': !minimized },
+                    { 'fa-chevron-down': minimized }
+                  )}
+                />
+              </Widget.Button>
+            )}
+            <Widget.DropdownButton
+              title={i18n._('More')}
+              toggle={<i className="fa fa-ellipsis-v" />}
+              onSelect={eventKey => {
+                if (eventKey === 'fork') {
+                  this.props.onFork();
+                } else if (eventKey === 'remove') {
+                  this.props.onRemove();
+                }
+              }}
+            >
+              <Widget.DropdownMenuItem eventKey="fork">
+                <i className="fa fa-fw fa-code-fork" />
+                <Space width="4" />
+                {i18n._('Fork Widget')}
+              </Widget.DropdownMenuItem>
+              <Widget.DropdownMenuItem eventKey="remove">
+                <i className="fa fa-fw fa-times" />
+                <Space width="4" />
+                {i18n._('Remove Widget')}
+              </Widget.DropdownMenuItem>
+            </Widget.DropdownButton>
+          </Widget.Controls>
         </Widget.Header>
         {isReady && (
-            <Widget.Content
+          <Widget.Content
             className={classnames(
-                styles['widget-content'],
-                { [styles.hidden]: minimized },
-                { [styles.fullscreen]: isFullscreen }
+              styles['widget-content'],
+              { [styles.hidden]: minimized },
+              { [styles.fullscreen]: isFullscreen }
             )}
-            >
+          >
             <div className={classnames(styles['widget-header'])}>Workspace</div>
-            <div className={classnames(styles['widget-container'])} style={{ marginTop:'10px`'}}>
-                <p>Height: <span>{state.controller.settings.settings && state.controller.settings.settings.$82} mm</span></p>
-                <p>Width: <span>{state.controller.settings.settings && state.controller.settings.settings.$81} mm</span></p>
-            </div>
-            <div className={classnames(styles['widget-header'])}>Calibration</div>
-            <div className={classnames(styles['widget-container'])} 
-            style={{ flexDirection: 'column', justifyContent:'flex-start', marginTop:'10px' }}
+            <div
+              className={classnames(styles['widget-container'])}
+              style={{ marginTop: '10px`' }}
             >
-                <p style={{marginBottom:'7px'}}>Distance between motors: <span>{state.controller.settings.settings && state.controller.settings.settings.$83} mm</span></p>
-                <p style={{marginBottom:'7px'}}>Motor offset: <span>{state.controller.settings.settings && state.controller.settings.settings.$84} mm</span></p>
-                <p>X Scaling: <span>{state.controller.settings.settings && state.controller.settings.settings.$100} Steps/mm</span></p>
-                <p>Y Scaling: <span>{state.controller.settings.settings && state.controller.settings.settings.$101} Steps/mm</span></p>
-                <p>Z Scaling: <span>{state.controller.settings.settings && state.controller.settings.settings.$102} Steps/mm</span></p>
+              <p>
+                Height:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$82}{' '}
+                  mm
+                </span>
+              </p>
+              <p>
+                Width:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$81}{' '}
+                  mm
+                </span>
+              </p>
             </div>
             <button
-                type="button"
-                className={classnames("btn btn-primary", styles['widget-button'])}
-                onClick={actions.handleCalibrate}
+              type="button"
+              disabled={!state.canClick}
+              className={classnames('btn btn-warning', styles['widget-button'])}
+              onClick={() => {
+                this.setState({
+                  displayModal: true,
+                  modalImg: '../images/calibration_modal_img_1.png',
+                  modalConfig: [
+                    {
+                      name: 'Height',
+                      gCode: '$82',
+                      for: 'height'
+                    },
+                    { name: 'Width', gCode: '$81', for: 'width' }
+                  ]
+                });
+              }}
             >
-                {i18n._('Calibrate')}
+              {i18n._('Dimensions')}
             </button>
-            {/* <M2Modal 
-                height={height} 
-                width={width} 
-                distance={distance} 
-                offset={offset} 
-                xScaling={xScaling} 
-                yScaling={yScaling} 
-                zScaling={zScaling} 
-                setValue={(e) => this.setState({[e.target.name] :e.target.value})}
-            /> */}
-            </Widget.Content>
+            <div className={classnames(styles['widget-header'])}>
+              Calibration
+            </div>
+            <div
+              className={classnames(styles['widget-container'])}
+              style={{
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                marginTop: '10px'
+              }}
+            >
+              <p style={{ marginBottom: '7px' }}>
+                Distance between motors:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$83}{' '}
+                  mm
+                </span>
+              </p>
+              <p style={{ marginBottom: '7px' }}>
+                Motor offset:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$84}{' '}
+                  mm
+                </span>
+              </p>
+            </div>
+            <button
+              type="button"
+              className={classnames('btn btn-warning', styles['widget-button'])}
+              disabled={!state.canClick}
+              onClick={() => {
+                this.setState({
+                  displayModal: true,
+                  modalImg: '../images/calibration_modal_img_1.png',
+                  modalConfig: [
+                    {
+                      name: 'Distance between motors',
+                      gCode: '$83',
+                      for: 'distance'
+                    },
+                    { name: 'Motor offset', gCode: '$84', for: 'offset' }
+                  ]
+                });
+              }}
+            >
+              {i18n._('Motor')}
+            </button>
+            <div
+              className={classnames(styles['widget-container'])}
+              style={{
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                marginTop: '10px'
+              }}
+            >
+              <p>
+                X Scaling:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$100}{' '}
+                  Steps/mm
+                </span>
+              </p>
+              <p>
+                Y Scaling:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$101}{' '}
+                  Steps/mm
+                </span>
+              </p>
+              <p>
+                Z Scaling:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$102}{' '}
+                  Steps/mm
+                </span>
+              </p>
+            </div>
+            <button
+              type="button"
+              className={classnames('btn btn-warning', styles['widget-button'])}
+              disabled={!state.canClick}
+              onClick={() => {
+                this.setState({
+                  displayModal: true,
+                  modalImg: '../images/calibration_modal_img_1.png',
+                  modalConfig: [
+                    {
+                      name: 'X Scaling',
+                      gCode: '$100',
+                      for: 'xScaling'
+                    },
+                    {
+                      name: 'Y Scaling',
+                      gCode: '$101',
+                      for: 'yScaling'
+                    },
+                    {
+                      name: 'Z Scaling',
+                      gCode: '$102',
+                      for: 'zScaling'
+                    }
+                  ]
+                });
+              }}
+            >
+              {i18n._('Scaling')}
+            </button>
+            {displayModal && (
+              <M2Modal
+                modalImg={modalImg}
+                modalConfig={modalConfig}
+                handleCalibrate={actions.handleCalibrate}
+                controllerSettings={state.controller.settings.settings}
+                handleClose={() => this.setState({ displayModal: false })}
+              />
+            )}
+          </Widget.Content>
         )}
-    </Widget>
-  )
+      </Widget>
+    );
+  }
 }
-};
 
 export default M2Widget;

@@ -50,6 +50,13 @@
 .modal-container{
     background-color:#fff;
     padding: 25px;
+    max-width:860px; 
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+.modal-container img{
+    width:65%;
 }
 .modal-container form {
     display:flex;
@@ -60,4 +67,17 @@
 }
 .modal-container form input {
     margin: 7px 0;
+}
+.modal-container form input::-webkit-outer-spin-button,
+.modal-container form input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.button-container{
+    display:flex;
+    justify-content: space-between;
+}
+.input-field{
+    display:flex;
+    flex-direction:column;
 }

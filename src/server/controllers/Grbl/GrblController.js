@@ -1,30 +1,30 @@
 import ensureArray from 'ensure-array';
 import * as parser from 'gcode-parser';
 import _ from 'lodash';
-import SerialConnection from '../../lib/SerialConnection';
-import EventTrigger from '../../lib/EventTrigger';
-import Feeder from '../../lib/Feeder';
-import Sender, { SP_TYPE_CHAR_COUNTING } from '../../lib/Sender';
+import SerialConnection from './src/server/lib/SerialConnection';
+import EventTrigger from './src/server/lib/EventTrigger';
+import Feeder from './src/server/lib/Feeder';
+import Sender, { SP_TYPE_CHAR_COUNTING } from './src/server/lib/Sender';
 import Workflow, {
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING
-} from '../../lib/Workflow';
-import delay from '../../lib/delay';
-import ensurePositiveNumber from '../../lib/ensure-positive-number';
-import evaluateAssignmentExpression from '../../lib/evaluate-assignment-expression';
-import logger from '../../lib/logger';
-import translateExpression from '../../lib/translate-expression';
-import config from '../../services/configstore';
-import monitor from '../../services/monitor';
-import taskRunner from '../../services/taskrunner';
-import store from '../../store';
+} from './src/server/lib/Workflow';
+import delay from './src/server/lib/delay';
+import ensurePositiveNumber from './src/server/lib/ensure-positive-number';
+import evaluateAssignmentExpression from './src/server/lib/evaluate-assignment-expression';
+import logger from './src/server/lib/logger';
+import translateExpression from './src/server/lib/translate-expression';
+import config from './src/server/services/configstore';
+import monitor from './src/server/services/monitor';
+import taskRunner from './src/server/services/taskrunner';
+import store from './src/server/store';
 import {
     GLOBAL_OBJECTS as globalObjects,
     WRITE_SOURCE_CLIENT,
     WRITE_SOURCE_FEEDER
-} from '../constants';
-import GrblRunner from './GrblRunner';
+} from './src/server/controllers/constants';
+import GrblRunner from './src/server/controllers/Grbl/GrblRunner';
 import {
     GRBL,
     GRBL_ACTIVE_STATE_RUN,
@@ -33,7 +33,7 @@ import {
     GRBL_ALARMS,
     GRBL_ERRORS,
     GRBL_SETTINGS
-} from './constants';
+} from './src/server/controllers/Grbl/constants';
 
 // % commands
 const WAIT = '%wait';

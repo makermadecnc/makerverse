@@ -64,7 +64,7 @@
   },
   "build": {
     "appId": "org.makerverse",
-    "asar": true,
+    "asar": false,
     "asarUnpack": [],
     "productName": "Makerverse",
     "directories": {

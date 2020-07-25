@@ -1,32 +1,97 @@
 /* eslint-disable */
-import React from 'react'
+import React, { PureComponent } from 'react';
 import styles from './index.styl';
+import classnames from 'classnames';
+import i18n from 'app/lib/i18n';
+class M2Modal extends PureComponent {
+  state = {
+    values: {},
+    metric: 'mm'
+  };
+  componentDidMount() {
+    const obj = {};
+    this.props.modalConfig.map(conf => {
+      obj[conf.gCode] = this.props.controllerSettings[conf.gCode];
+    });
+    this.setState({ values: obj });
+  }
 
-const M2Modal = ({height, width, distance, offset, xScaling, yScaling, zScaling, setValue}) => {
-  return (
-    <div className={styles['modal-background']}>
-      <div className={styles['modal-container']}>
-      <h3>M2 Calibration</h3>
-        <form onSubmit={(e) => e.preventDefault()}>
-          <label htmlFor="height">Height: </label>
-          <input value={height} name='height' onChange={(e) => setValue(e)}/>
-          <label htmlFor="width">Width: </label>
-          <input value={width} name='width' onChange={(e) => setValue(e)}/>
-          <label htmlFor="distance">Distance between motors: </label>
-          <input value={distance} name='distance' onChange={(e) => setValue(e)}/>
-          <label htmlFor="offset">Motor offset: </label>
-          <input value={offset} name='offset' onChange={(e) => setValue(e)}/>
-          <label htmlFor="xScaling">X Scaling: </label>
-          <input value={xScaling} name='xScaling' onChange={(e) => setValue(e)}/>
-          <label htmlFor="yScaling">Y Scaling: </label>
-          <input value={yScaling} name='yScaling' onChange={(e) => setValue(e)}/>
-          <label htmlFor="zScaling">Z Scaling: </label>
-          <input value={zScaling} name='zScaling' onChange={(e) => setValue(e)}/>
-          <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-end' }}>Finish</button>
-        </form>
+  handleSubmit = e => {
+    e.preventDefault();
+    this.props.handleCalibrate(this.state.values, this.state.metric);
+  };
+  render() {
+    const {
+      modalImg,
+      modalConfig,
+      handleCalibrate,
+      controllerSettings,
+      handleClose
+    } = this.props;
+    const { values, metric } = this.state;
+    return (
+      <div className={styles['modal-background']}>
+        <div className={styles['modal-container']}>
+          <h2>Calibrate</h2>
+          <img src={modalImg} />
+          <form onSubmit={this.handleSubmit}>
+            {modalConfig.map(conf => (
+              <div key={`form-${conf.for}`} className={styles['input-field']}>
+                <label htmlFor={conf.for}>{conf.name}</label>
+                <div>
+                  <input
+                    type="text"
+                    name={conf.for}
+                    value={
+                      values[conf.gCode] !== undefined ? values[conf.gCode] : 0
+                    }
+                    onChange={e => {
+                      this.setState({
+                        values: { ...values, [conf.gCode]: e.target.value }
+                      });
+                    }}
+                  />
+                  <select
+                    style={{ height: '26px', marginLeft: '4px' }}
+                    value={metric}
+                    onChange={e =>
+                      this.setState({ metric: e.target.value, values: {} })
+                    }
+                  >
+                    <option value="mm">
+                      mm
+                    </option>
+                    <option value="in">in</option>
+                  </select>
+                </div>
+              </div>
+            ))}
+            <div className={classnames(styles['button-container'])}>
+              <button
+                type="button"
+                className={classnames(
+                  'btn btn-danger',
+                  styles['widget-button']
+                )}
+                onClick={handleClose}
+              >
+                {i18n._('Close')}
+              </button>
+              <button
+                type="submit"
+                className={classnames(
+                  'btn btn-success',
+                  styles['widget-button']
+                )}
+              >
+                {i18n._('Save')}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-  )
+    );
+  }
 }
 
-export default M2Modal
+export default M2Modal;
