@@ -57,8 +57,7 @@ class M2Widget extends PureComponent {
       this.setState({ displayModal: false });
       for (const [key, value] of Object.entries(values)) {
         const val = value.units === 'mm' ? value.value : in2mm(value.value);
-        console.log(`${key}: ${val}`);
-        // controller.command('gcode', `${key}=${val}`);
+        controller.command('gcode', `${key}=${val}`);
       }
     }
   };
