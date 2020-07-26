@@ -11,14 +11,14 @@ class M2Modal extends PureComponent {
   componentDidMount() {
     const obj = {};
     this.props.modalConfig.map(conf => {
-      obj[conf.gCode] = this.props.controllerSettings[conf.gCode];
+      obj[conf.gCode] = {value:this.props.controllerSettings[conf.gCode], units:'mm'};
     });
     this.setState({ values: obj });
   }
 
   handleSubmit = e => {
     e.preventDefault();
-    this.props.handleCalibrate(this.state.values, this.state.metric);
+    this.props.handleCalibrate(this.state.values);
   };
   render() {
     const {
@@ -43,19 +43,19 @@ class M2Modal extends PureComponent {
                     type="text"
                     name={conf.for}
                     value={
-                      values[conf.gCode] !== undefined ? values[conf.gCode] : 0
+                      values[conf.gCode] !== undefined ? values[conf.gCode].value : 0
                     }
                     onChange={e => {
                       this.setState({
-                        values: { ...values, [conf.gCode]: e.target.value }
+                        values: { ...values, [conf.gCode]:{value: e.target.value, units: values[conf.gCode].units} }
                       });
                     }}
                   />
                   <select
                     style={{ height: '26px', marginLeft: '4px' }}
-                    value={metric}
+                    value={values[conf.gCode] && values[conf.gCode].units}
                     onChange={e =>
-                      this.setState({ metric: e.target.value, values: {} })
+                      this.setState({values:{ ...values, [conf.gCode]:{value: 0, units: e.target.value}}})
                     }
                   >
                     <option value="mm">

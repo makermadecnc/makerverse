@@ -17,6 +17,7 @@ import {
 } from '../../constants';
 
 import M2Modal from './M2Modal';
+import M2ScaleModal from './M2ScaleModal';
 import styles from './index.styl';
 
 class M2Widget extends PureComponent {
@@ -52,11 +53,12 @@ class M2Widget extends PureComponent {
         minimized: !state.minimized
       }));
     },
-    handleCalibrate: (values, metric) => {
+    handleCalibrate: values => {
       this.setState({ displayModal: false });
       for (const [key, value] of Object.entries(values)) {
-        const val = metric === 'mm' ? value : in2mm(value);
-        controller.command('gcode', `${key}=${val}`);
+        const val = value.units === 'mm' ? value.value : in2mm(value.value);
+        console.log(`${key}: ${val}`);
+        // controller.command('gcode', `${key}=${val}`);
       }
     }
   };
@@ -83,10 +85,6 @@ class M2Widget extends PureComponent {
           }
         }));
       }
-    },
-    'Grbl:settings':(controllerSettings) => {
-        console.log(controllerSettings);
-        console.log('updated');
     },
     'controller:state': (type, controllerState) => {
       if (type === GRBL) {
@@ -124,10 +122,24 @@ class M2Widget extends PureComponent {
       isReady:
         controller.loadedControllers.length === 1 || controller.type === GRBL,
       displayModal: false,
+      modalType: 'scale',
       modalImg: '../images/calibration_modal_img_1.png',
       modalConfig: [
-        { name: 'Distance between motors', gCode: '$83', for: 'distance' },
-        { name: 'Motor offset', gCode: '$84', for: 'offset' }
+        {
+          name: 'X Scaling',
+          gCode: '$100',
+          for: 'xScaling'
+        },
+        {
+          name: 'Y Scaling',
+          gCode: '$101',
+          for: 'yScaling'
+        },
+        {
+          name: 'Z Scaling',
+          gCode: '$102',
+          for: 'zScaling'
+        }
       ],
       controller: {
         type: controller.type,
@@ -162,7 +174,6 @@ class M2Widget extends PureComponent {
     }
   }
 
-
   render() {
     const { widgetId } = this.props;
     const {
@@ -172,6 +183,7 @@ class M2Widget extends PureComponent {
       displayModal,
       modalImg,
       modalConfig,
+      modalType
     } = this.state;
     const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
     const state = {
@@ -279,7 +291,8 @@ class M2Widget extends PureComponent {
                       for: 'height'
                     },
                     { name: 'Width', gCode: '$81', for: 'width' }
-                  ]
+                  ],
+                  modalType: 'default'
                 });
               }}
             >
@@ -328,7 +341,8 @@ class M2Widget extends PureComponent {
                       for: 'distance'
                     },
                     { name: 'Motor offset', gCode: '$84', for: 'offset' }
-                  ]
+                  ],
+                  modalType: 'default'
                 });
               }}
             >
@@ -391,21 +405,31 @@ class M2Widget extends PureComponent {
                       gCode: '$102',
                       for: 'zScaling'
                     }
-                  ]
+                  ],
+                  modalType: 'scale'
                 });
               }}
             >
               {i18n._('Scaling')}
             </button>
-            {displayModal && (
-              <M2Modal
-                modalImg={modalImg}
-                modalConfig={modalConfig}
-                handleCalibrate={actions.handleCalibrate}
-                controllerSettings={state.controller.settings.settings}
-                handleClose={() => this.setState({ displayModal: false })}
-              />
-            )}
+            {displayModal &&
+              (modalType === 'scale' ? (
+                <M2ScaleModal
+                  modalImg={modalImg}
+                  modalConfig={modalConfig}
+                  handleCalibrate={actions.handleCalibrate}
+                  controllerSettings={state.controller.settings.settings}
+                  handleClose={() => this.setState({ displayModal: false })}
+                />
+              ) : (
+                <M2Modal
+                  modalImg={modalImg}
+                  modalConfig={modalConfig}
+                  handleCalibrate={actions.handleCalibrate}
+                  controllerSettings={state.controller.settings.settings}
+                  handleClose={() => this.setState({ displayModal: false })}
+                />
+              ))}
           </Widget.Content>
         )}
       </Widget>
