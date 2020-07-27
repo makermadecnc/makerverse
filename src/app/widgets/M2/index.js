@@ -413,7 +413,7 @@ class M2Widget extends PureComponent {
                       name: 'Z Scaling',
                       gCode: '$102',
                       for: 'zScaling',
-                      img: '../../images/calibration_x.png',
+                      img: '../../images/calibration_z.png',
                       dimension: 'Distance'
                     }
                   ],
