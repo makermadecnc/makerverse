@@ -8,13 +8,14 @@ import { in2mm } from 'app/lib/units';
 class M2ScaleModal extends PureComponent {
   state = {
     values: {},
-    activeTab: { name: '', gCode: '' },
+    activeTab: { name: '', gCode: '', img: '', dimension: '' },
     expectedLength: 0,
     expectedUnit: 'mm',
     actualLength: 0,
     actualUnit: 'mm'
   };
   componentDidMount() {
+    const { modalConfig } = this.props;
     const obj = {};
     this.props.modalConfig.map(conf => {
       obj[conf.gCode] = {
@@ -25,8 +26,10 @@ class M2ScaleModal extends PureComponent {
     this.setState({
       values: obj,
       activeTab: {
-        name: this.props.modalConfig[0].name,
-        gCode: this.props.modalConfig[0].gCode
+        name: modalConfig[0].name,
+        gCode: modalConfig[0].gCode,
+        img: modalConfig[0].img,
+        dimension: modalConfig[0].dimension
       }
     });
   }
@@ -54,7 +57,12 @@ class M2ScaleModal extends PureComponent {
   };
   handleTab = conf => {
     this.setState({
-      activeTab: { name: conf.name, gCode: conf.gCode },
+      activeTab: {
+        name: conf.name,
+        gCode: conf.gCode,
+        img: conf.img,
+        dimension: conf.dimension
+      },
       expectedLength: 0,
       expectedUnit: 'mm',
       actualLength: 0,
@@ -63,7 +71,6 @@ class M2ScaleModal extends PureComponent {
   };
   render() {
     const {
-      modalImg,
       modalConfig,
       handleCalibrate,
       controllerSettings,
@@ -94,10 +101,10 @@ class M2ScaleModal extends PureComponent {
             ))}
           </div>
           <h2>{activeTab.name}</h2>
-          <img src={modalImg} />
+          <img src={activeTab.img} />
           <form onSubmit={this.handleSubmit}>
             <div className={styles['input-field']}>
-              <label htmlFor="expected">Expected Length:</label>
+              <label htmlFor="expected">Expected {activeTab.dimension}:</label>
               <div>
                 <input
                   type="text"
@@ -123,7 +130,7 @@ class M2ScaleModal extends PureComponent {
               </div>
             </div>
             <div className={styles['input-field']}>
-              <label htmlFor="actual">Actual Length:</label>
+              <label htmlFor="actual">Actual {activeTab.dimension}:</label>
               <div>
                 <input
                   type="text"
@@ -157,7 +164,7 @@ class M2ScaleModal extends PureComponent {
                 )}
                 onClick={handleClose}
               >
-                {i18n._('Close')}
+                {i18n._('Cancel')}
               </button>
               <button
                 type="submit"

@@ -256,7 +256,11 @@ class M2Widget extends PureComponent {
             <div className={classnames(styles['widget-header'])}>Workspace</div>
             <div
               className={classnames(styles['widget-container'])}
-              style={{ marginTop: '10px`' }}
+              style={{
+                marginTop: '10px',
+                flexDirection: 'column',
+                justifyContent: 'flex-start'
+              }}
             >
               <p>
                 Height:{' '}
@@ -282,7 +286,7 @@ class M2Widget extends PureComponent {
               onClick={() => {
                 this.setState({
                   displayModal: true,
-                  modalImg: '../images/calibration_modal_img_1.png',
+                  modalImg: '../../images/calibration_dimensions.png',
                   modalConfig: [
                     {
                       name: 'Height',
@@ -295,10 +299,10 @@ class M2Widget extends PureComponent {
                 });
               }}
             >
-              {i18n._('Dimensions')}
+              {i18n._('Change Size')}
             </button>
             <div className={classnames(styles['widget-header'])}>
-              Calibration
+              Machine Settings
             </div>
             <div
               className={classnames(styles['widget-container'])}
@@ -332,7 +336,7 @@ class M2Widget extends PureComponent {
               onClick={() => {
                 this.setState({
                   displayModal: true,
-                  modalImg: '../images/calibration_modal_img_1.png',
+                  modalImg: '../../images/calibration_motor.png',
                   modalConfig: [
                     {
                       name: 'Distance between motors',
@@ -345,8 +349,11 @@ class M2Widget extends PureComponent {
                 });
               }}
             >
-              {i18n._('Motor')}
+              {i18n._('Edit')}
             </button>
+            <div className={classnames(styles['widget-header'])}>
+              Configuration
+            </div>
             <div
               className={classnames(styles['widget-container'])}
               style={{
@@ -387,34 +394,38 @@ class M2Widget extends PureComponent {
               onClick={() => {
                 this.setState({
                   displayModal: true,
-                  modalImg: '../images/calibration_modal_img_1.png',
                   modalConfig: [
                     {
                       name: 'X Scaling',
                       gCode: '$100',
-                      for: 'xScaling'
+                      for: 'xScaling',
+                      img: '../../images/calibration_x.png',
+                      dimension: 'Width'
                     },
                     {
                       name: 'Y Scaling',
                       gCode: '$101',
-                      for: 'yScaling'
+                      for: 'yScaling',
+                      img: '../../images/calibration_y.png',
+                      dimension: 'Height'
                     },
                     {
                       name: 'Z Scaling',
                       gCode: '$102',
-                      for: 'zScaling'
+                      for: 'zScaling',
+                      img: '../../images/calibration_x.png',
+                      dimension: 'Distance'
                     }
                   ],
                   modalType: 'scale'
                 });
               }}
             >
-              {i18n._('Scaling')}
+              {i18n._('Calibrate')}
             </button>
             {displayModal &&
               (modalType === 'scale' ? (
                 <M2ScaleModal
-                  modalImg={modalImg}
                   modalConfig={modalConfig}
                   handleCalibrate={actions.handleCalibrate}
                   controllerSettings={state.controller.settings.settings}

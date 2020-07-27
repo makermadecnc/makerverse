@@ -492,8 +492,7 @@
     "Ready to start": "Ready to start",
     "A web-based interface for CNC milling controller running Grbl": "A web-based interface for CNC milling controller running Grbl",
     "M2 Widget": "M2 Widget",
-    "Dimensions": "Dimensions",
-    "Motor": "Motor",
-    "Scaling": "Scaling",
-    "Save": "Save"
+    "Save": "Save",
+    "Change Size": "Change Size",
+    "Calibrate": "Calibrate"
 }
