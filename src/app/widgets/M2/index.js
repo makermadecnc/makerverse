@@ -123,23 +123,7 @@ class M2Widget extends PureComponent {
       displayModal: false,
       modalType: 'scale',
       modalImg: '../images/calibration_modal_img_1.png',
-      modalConfig: [
-        {
-          name: 'X Scaling',
-          gCode: '$100',
-          for: 'xScaling'
-        },
-        {
-          name: 'Y Scaling',
-          gCode: '$101',
-          for: 'yScaling'
-        },
-        {
-          name: 'Z Scaling',
-          gCode: '$102',
-          for: 'zScaling'
-        }
-      ],
+      modalConfig: [],
       controller: {
         type: controller.type,
         settings: controller.settings,
@@ -192,6 +176,7 @@ class M2Widget extends PureComponent {
     const actions = {
       ...this.actions
     };
+    console.log(state.controller.settings.settings);
     return (
       <Widget fullscreen={false}>
         <Widget.Header>
@@ -366,16 +351,14 @@ class M2Widget extends PureComponent {
                 X Scaling:{' '}
                 <span>
                   {state.controller.settings.settings &&
-                    state.controller.settings.settings.$100}{' '}
-                  Steps/mm
+                    state.controller.settings.settings.$85}{' '}
                 </span>
               </p>
               <p>
                 Y Scaling:{' '}
                 <span>
                   {state.controller.settings.settings &&
-                    state.controller.settings.settings.$101}{' '}
-                  Steps/mm
+                    state.controller.settings.settings.$86}{' '}
                 </span>
               </p>
               <p>
@@ -397,14 +380,14 @@ class M2Widget extends PureComponent {
                   modalConfig: [
                     {
                       name: 'X Scaling',
-                      gCode: '$100',
+                      gCode: '$85',
                       for: 'xScaling',
                       img: '../../images/calibration_x.png',
                       dimension: 'Width'
                     },
                     {
                       name: 'Y Scaling',
-                      gCode: '$101',
+                      gCode: '$86',
                       for: 'yScaling',
                       img: '../../images/calibration_y.png',
                       dimension: 'Height'
