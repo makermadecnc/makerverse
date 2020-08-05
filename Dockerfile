@@ -1,5 +1,5 @@
 FROM node:10
-MAINTAINER Cheton Wu <cheton@gmail.com>
+MAINTAINER Chris Skiles <chris@makermadecnc.com>
 
 ADD package.json package.json
 RUN npm i npm@latest -g
