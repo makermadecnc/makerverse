@@ -54,7 +54,7 @@ class M2Widget extends PureComponent {
       }));
     },
     handleCalibrate: values => {
-      this.setState({ displayModal: false });
+      this.setState({ displayModal: false, pendingValues: values });
       for (const [key, value] of Object.entries(values)) {
         const val = value.units === 'mm' ? value.value : in2mm(value.value);
         controller.command('gcode', `${key}=${val}`);
@@ -73,6 +73,20 @@ class M2Widget extends PureComponent {
     'serialport:close': options => {
       const initialState = this.getInitialState();
       this.setState({ ...initialState });
+    },
+    'serialport:read': options => {
+      const { pendingValues } = this.state;
+      if (
+        Object.keys(pendingValues).length !== 0 &&
+        pendingValues.constructor === Object
+      ) {
+        const prevSettings = { ...this.state.controller };
+        for (const [key, value] of Object.entries(this.state.pendingValues)) {
+          const val = value.units === 'mm' ? value.value : in2mm(value.value);
+          prevSettings.settings.settings[key] = val.toFixed(3);
+        }
+        this.setState({ controller: prevSettings, pendingValues: {} });
+      }
     },
     'controller:settings': (type, controllerSettings) => {
       if (type === GRBL) {
@@ -121,6 +135,7 @@ class M2Widget extends PureComponent {
       isReady:
         controller.loadedControllers.length === 1 || controller.type === GRBL,
       displayModal: false,
+      pendingValues: {},
       modalType: 'scale',
       modalImg: '../images/calibration_modal_img_1.png',
       modalConfig: [],

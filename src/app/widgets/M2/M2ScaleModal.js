@@ -45,8 +45,8 @@ class M2ScaleModal extends PureComponent {
     } = this.state;
     e.preventDefault();
     const currentVal =
-      parseInt(values[activeTab.gCode].value) !== 0
-        ? parseInt(values[activeTab.gCode].value)
+      parseFloat(values[activeTab.gCode].value) !== 0
+        ? parseFloat(values[activeTab.gCode].value)
         : 1;
     const parsedExpected =
       expectedUnit === 'mm' ? expectedLength : in2mm(expectedLength);
