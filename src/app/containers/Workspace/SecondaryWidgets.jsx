@@ -189,7 +189,6 @@ class SecondaryWidgets extends Component {
         const widgets = this.state.widgets
             .filter(widgetId => {
                 const name = widgetId.split(':')[0];
-                console.log(name);
                 if (name === 'grbl' && !includes(controller.loadedControllers, GRBL)) {
                     return false;
                 }
@@ -219,7 +218,6 @@ class SecondaryWidgets extends Component {
                     />
                 </div>
             ));
-        console.log(widgets);
         return (
             <Sortable
                 className={classNames(className, styles.widgets)}

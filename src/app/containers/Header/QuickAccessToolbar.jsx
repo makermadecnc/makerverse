@@ -63,11 +63,9 @@ class QuickAccessToolbar extends PureComponent {
                             type="button"
                             className="btn btn-primary"
                             onClick={this.command.homing}
-                            title={i18n._('Homing')}
+                            title={i18n._('Set current position as machine home')}
                         >
-                            <i className="fa fa-home" />
-                            <Space width="8" />
-                            {i18n._('Homing')}
+                            {i18n._('Set Home')}
                         </button>
                         <button
                             type="button"
@@ -83,7 +81,7 @@ class QuickAccessToolbar extends PureComponent {
                             type="button"
                             className="btn btn-warning"
                             onClick={this.command.unlock}
-                            title={i18n._('Unlock')}
+                            title={i18n._('Clear system alarm')}
                         >
                             <i className="fa fa-unlock-alt" />
                             <Space width="8" />
@@ -93,7 +91,7 @@ class QuickAccessToolbar extends PureComponent {
                             type="button"
                             className="btn btn-danger"
                             onClick={this.command.reset}
-                            title={i18n._('Reset')}
+                            title={i18n._('Reset board connection')}
                         >
                             <i className="fa fa-undo" />
                             <Space width="8" />

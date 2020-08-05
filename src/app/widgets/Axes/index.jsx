@@ -702,7 +702,6 @@ class AxesWidget extends PureComponent {
             ...this.actions
         };
 
-        console.log(this.props, 'Axes props');
 
         return (
             <Widget fullscreen={isFullscreen}>
@@ -715,7 +714,7 @@ class AxesWidget extends PureComponent {
                         {isForkedWidget &&
                         <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
                         }
-                        {i18n._('Axes')}
+                        {i18n._('Controls')}
                     </Widget.Title>
                     <Widget.Controls className={this.props.sortable.filterClassName}>
                         <KeypadOverlay

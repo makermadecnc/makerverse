@@ -66,7 +66,7 @@ class WidgetManager extends PureComponent {
         // },
         {
             id: 'axes',
-            caption: i18n._('Axes Widget'),
+            caption: i18n._('Controls Widget'),
             details: i18n._('This widget shows the XYZ position. It includes jog controls, homing, and axis zeroing.'),
             visible: true,
             disabled: false
@@ -121,7 +121,6 @@ class WidgetManager extends PureComponent {
         super(props);
 
         this.widgetList = this.widgetList.filter(widgetItem => {
-            console.log(widgetItem);
             if (widgetItem.id === 'grbl' && !includes(controller.loadedControllers, GRBL)) {
                 return false;
             }

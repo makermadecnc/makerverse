@@ -1,3 +1,4 @@
+
 import ensureArray from 'ensure-array';
 import * as parser from 'gcode-parser';
 import _ from 'lodash';
@@ -423,6 +424,7 @@ class GrblController {
                 if (this.actionMask.replyParserState) {
                     this.actionMask.replyParserState = false;
                     this.emit('serialport:read', res.raw);
+                    console.log('test');
                 }
                 this.actionMask.queryParserState.reply = false;
                 return;

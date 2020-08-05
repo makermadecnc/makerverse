@@ -32,10 +32,10 @@ import {
     CAMERA_MODE_ROTATE
 } from './constants';
 
-const IMPERIAL_GRID_COUNT = 32; // 32 in
+const IMPERIAL_GRID_COUNT = 48; // 32 in
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const IMPERIAL_AXIS_LENGTH = IMPERIAL_GRID_SPACING * 12; // 12 in
-const METRIC_GRID_COUNT = 60; // 60 cm
+const METRIC_GRID_COUNT = 125; // 125 cm
 const METRIC_GRID_SPACING = 10; // 10 mm
 const METRIC_AXIS_LENGTH = METRIC_GRID_SPACING * 30; // 300 mm
 const CAMERA_VIEWPORT_WIDTH = 300; // 300 mm
@@ -484,7 +484,6 @@ class Visualizer extends Component {
         const gridCount = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_COUNT : METRIC_GRID_COUNT;
         const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
         const group = new THREE.Group();
-
         { // Coordinate Grid
             const gridLine = new GridLine(
                 gridCount * gridSpacing,
