@@ -215,5 +215,5 @@ file_glob: true
   skip_cleanup: true
   on:
     # https://docs.travis-ci.com/user/deployment#Conditional-Releases-with-on
-    tags: true  # Deploy app only when a tag is applied to the commit #release the hounds!
+    tags: true  # Deploy app only when a tag is applied to the commit
     node: "10"
