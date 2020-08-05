@@ -207,12 +207,13 @@ before_deploy:
 deploy:
   provider: releases
   api_key:
-secure: "rl9HXqY59g8hCy+wLWq+lxc70zySZE3pSx4FLcnfKxAn04dh5DgDDAkVev2mRMbjNQFsNMBoxiyxnmKmW5V/IFv1fY74ySZH4UTGd00Qy81W3LgxBp1LZt9TcenrFwXtSJUClXRfb+uJkm41UH9zc9ZGnG19SgGpiUWAA2inzOU64phE3oGJPuxWX0oJ+brDgy78XHWTCqFoG0Fa/zq8si9svFeY+qD8evic1fkKLG1bIJhZ5sXXIVcQ2rs28M+nc5XBWs08N358dOC6vdukVzekk/K+nY7zzPf/gE5qJ1dsLaMn+TqOpGK3EaCDCg1OkpqbNE5wPcTO5S5vvigQq1zPO/iSNTu8lqNPxyQCqupHqQG6LUU6yk25x0Kp0beAWg39nbYaUPEL9rxzLYcIqSkcjc6KQhYKwe2gmXzRxjecnCOzq2toa7Px5bkVaWD8weSIyqlR/5Q8tK8JV1Xu6/SNCeCl1kDCL0gltjIPM4D9wL3GjYB0C8cDA/igxFGriVtZ8mT1sod1voGC+mwNHyCKSbZcxpwkA+i4YRnbvfW0Bs9Xio5UwKZytqmvvkpOE63H0h0zZ75e1W1bAF6m6wkpxaq7h63O5YLjEIhCqvzgJFmmnd8Cc1lW/pRsxOOpTh6tQ9AHKyWOM48KLmW9pEIgxgOoCTux7xPoUwq5At0="  file_glob: true
+secure: "rl9HXqY59g8hCy+wLWq+lxc70zySZE3pSx4FLcnfKxAn04dh5DgDDAkVev2mRMbjNQFsNMBoxiyxnmKmW5V/IFv1fY74ySZH4UTGd00Qy81W3LgxBp1LZt9TcenrFwXtSJUClXRfb+uJkm41UH9zc9ZGnG19SgGpiUWAA2inzOU64phE3oGJPuxWX0oJ+brDgy78XHWTCqFoG0Fa/zq8si9svFeY+qD8evic1fkKLG1bIJhZ5sXXIVcQ2rs28M+nc5XBWs08N358dOC6vdukVzekk/K+nY7zzPf/gE5qJ1dsLaMn+TqOpGK3EaCDCg1OkpqbNE5wPcTO5S5vvigQq1zPO/iSNTu8lqNPxyQCqupHqQG6LUU6yk25x0Kp0beAWg39nbYaUPEL9rxzLYcIqSkcjc6KQhYKwe2gmXzRxjecnCOzq2toa7Px5bkVaWD8weSIyqlR/5Q8tK8JV1Xu6/SNCeCl1kDCL0gltjIPM4D9wL3GjYB0C8cDA/igxFGriVtZ8mT1sod1voGC+mwNHyCKSbZcxpwkA+i4YRnbvfW0Bs9Xio5UwKZytqmvvkpOE63H0h0zZ75e1W1bAF6m6wkpxaq7h63O5YLjEIhCqvzgJFmmnd8Cc1lW/pRsxOOpTh6tQ9AHKyWOM48KLmW9pEIgxgOoCTux7xPoUwq5At0="  
+file_glob: true
   file:
     - "releases/*.*"
   overwrite: true
   skip_cleanup: true
   on:
     # https://docs.travis-ci.com/user/deployment#Conditional-Releases-with-on
-    tags: true  # Deploy app only when a tag is applied to the commit
+    tags: true  # Deploy app only when a tag is applied to the commit #release the hounds!
     node: "10"
