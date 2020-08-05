@@ -104,7 +104,7 @@ class M2ScaleModal extends PureComponent {
             ))}
           </div>
           <h2>{activeTab.name}</h2>
-          <img src={activeTab.img} />
+          <img src={activeTab.img} />         
           <form onSubmit={this.handleSubmit}>
             <div className={styles['input-field']}>
               <label htmlFor="expected">Expected {activeTab.dimension}:</label>

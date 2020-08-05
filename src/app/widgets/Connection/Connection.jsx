@@ -266,6 +266,7 @@ class Connection extends PureComponent {
                             className="btn btn-primary"
                             disabled={!canOpenPort}
                             onClick={actions.handleOpenPort}
+                            title="Open connection to control board"
                         >
                             <i className="fa fa-toggle-off" />
                             <Space width="8" />
@@ -278,6 +279,7 @@ class Connection extends PureComponent {
                             className="btn btn-danger"
                             disabled={!canClosePort}
                             onClick={actions.handleClosePort}
+                            title="Close connection with control board"
                         >
                             <i className="fa fa-toggle-on" />
                             <Space width="8" />

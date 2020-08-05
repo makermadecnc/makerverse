@@ -27,16 +27,6 @@ const KeypadText = styled.span`
     vertical-align: baseline;
 `;
 
-const KeypadDirectionText = styled(KeypadText)`
-    min-width: 10px;
-`;
-
-const KeypadSubscriptText = styled(KeypadText)`
-    min-width: 10px;
-    font-size: 80%;
-    line-height: 0;
-`;
-
 class Keypad extends PureComponent {
     static propTypes = {
         canClick: PropTypes.bool,
@@ -168,13 +158,16 @@ class Keypad extends PureComponent {
                                         <Button
                                             btnStyle="flat"
                                             compact
-                                            className={styles.btnKeypad}
+                                            className={cx(
+                                                styles.btnKeypad, styles['btn-xy'],
+                                                { [styles.highlight]: highlightY }
+                                            )}
                                             onClick={() => {
                                                 const distance = actions.getJogDistance();
                                                 actions.jog({ X: -distance, Y: distance });
                                             }}
                                             disabled={!canClickXY}
-                                            title={i18n._('Move X- Y+')}
+                                            title={i18n._('Move machine left & up')}
                                         >
                                             <i className={cx('fa', 'fa-arrow-circle-up', styles['rotate--45deg'])} style={{ fontSize: 16 }} />
                                         </Button>
@@ -186,7 +179,7 @@ class Keypad extends PureComponent {
                                             btnStyle="flat"
                                             compact
                                             className={cx(
-                                                styles.btnKeypad,
+                                                styles.btnKeypad, styles['btn-xy'],
                                                 { [styles.highlight]: highlightY }
                                             )}
                                             onClick={() => {
@@ -194,10 +187,10 @@ class Keypad extends PureComponent {
                                                 actions.jog({ Y: distance });
                                             }}
                                             disabled={!canClickY}
-                                            title={i18n._('Move Y+')}
+                                            title={i18n._('Move machine up')}
                                         >
                                             <KeypadText>Y</KeypadText>
-                                            <KeypadDirectionText>+</KeypadDirectionText>
+                                            <i className="fa fa-arrow-up" />
                                         </Button>
                                     </div>
                                 </div>
@@ -206,13 +199,13 @@ class Keypad extends PureComponent {
                                         <Button
                                             btnStyle="flat"
                                             compact
-                                            className={styles.btnKeypad}
+                                            className={cx(styles.btnKeypad, styles['btn-xy'])}
                                             onClick={() => {
                                                 const distance = actions.getJogDistance();
                                                 actions.jog({ X: distance, Y: distance });
                                             }}
                                             disabled={!canClickXY}
-                                            title={i18n._('Move X+ Y+')}
+                                            title={i18n._('Move machine right & up')}
                                         >
                                             <i className={cx('fa', 'fa-arrow-circle-up', styles['rotate-45deg'])} style={{ fontSize: 16 }} />
                                         </Button>
@@ -224,7 +217,7 @@ class Keypad extends PureComponent {
                                             btnStyle="flat"
                                             compact
                                             className={cx(
-                                                styles.btnKeypad,
+                                                styles.btnKeypad, styles['btn-z'],
                                                 { [styles.highlight]: highlightZ }
                                             )}
                                             onClick={() => {
@@ -232,10 +225,10 @@ class Keypad extends PureComponent {
                                                 actions.jog({ Z: distance });
                                             }}
                                             disabled={!canClickZ}
-                                            title={i18n._('Move Z+')}
+                                            title={i18n._('Raise bit')}
                                         >
                                             <KeypadText>Z</KeypadText>
-                                            <KeypadDirectionText>+</KeypadDirectionText>
+                                            <i className="fa fa-arrow-up" />
                                         </Button>
                                     </div>
                                 </div>
@@ -249,7 +242,7 @@ class Keypad extends PureComponent {
                                             btnStyle="flat"
                                             compact
                                             className={cx(
-                                                styles.btnKeypad,
+                                                styles.btnKeypad, styles['btn-xy'],
                                                 { [styles.highlight]: highlightX }
                                             )}
                                             onClick={() => {
@@ -257,10 +250,10 @@ class Keypad extends PureComponent {
                                                 actions.jog({ X: -distance });
                                             }}
                                             disabled={!canClickX}
-                                            title={i18n._('Move X-')}
+                                            title={i18n._('Move machine left')}
                                         >
+                                            <i className="fa fa-arrow-left" />
                                             <KeypadText>X</KeypadText>
-                                            <KeypadDirectionText>-</KeypadDirectionText>
                                         </Button>
                                     </div>
                                 </div>
@@ -269,15 +262,12 @@ class Keypad extends PureComponent {
                                         <Button
                                             btnStyle="flat"
                                             compact
-                                            className={styles.btnKeypad}
+                                            className={cx(styles.btnKeypad, styles['btn-xy'])}
                                             onClick={() => actions.move({ X: 0, Y: 0 })}
                                             disabled={!canClickXY}
-                                            title={i18n._('Move To XY Zero (G0 X0 Y0)')}
+                                            title={i18n._('Move machine to home')}
                                         >
-                                            <KeypadText>X</KeypadText>
-                                            <KeypadSubscriptText>0</KeypadSubscriptText>
-                                            <KeypadText>Y</KeypadText>
-                                            <KeypadSubscriptText>0</KeypadSubscriptText>
+                                            <i className="fa fa-home" />
                                         </Button>
                                     </div>
                                 </div>
@@ -287,7 +277,7 @@ class Keypad extends PureComponent {
                                             btnStyle="flat"
                                             compact
                                             className={cx(
-                                                styles.btnKeypad,
+                                                styles.btnKeypad, styles['btn-xy'],
                                                 { [styles.highlight]: highlightX }
                                             )}
                                             onClick={() => {
@@ -295,10 +285,10 @@ class Keypad extends PureComponent {
                                                 actions.jog({ X: distance });
                                             }}
                                             disabled={!canClickX}
-                                            title={i18n._('Move X+')}
+                                            title={i18n._('Move machine right')}
                                         >
                                             <KeypadText>X</KeypadText>
-                                            <KeypadDirectionText>+</KeypadDirectionText>
+                                            <i className="fa fa-arrow-right" />
                                         </Button>
                                     </div>
                                 </div>
@@ -307,13 +297,12 @@ class Keypad extends PureComponent {
                                         <Button
                                             btnStyle="flat"
                                             compact
-                                            className={styles.btnKeypad}
+                                            className={cx(styles.btnKeypad, styles['btn-z'])}
                                             onClick={() => actions.move({ Z: 0 })}
                                             disabled={!canClickZ}
-                                            title={i18n._('Move To Z Zero (G0 Z0)')}
+                                            title={i18n._('Move bit to zero')}
                                         >
-                                            <KeypadText>Z</KeypadText>
-                                            <KeypadSubscriptText>0</KeypadSubscriptText>
+                                            <i className="fa fa-home" />
                                         </Button>
                                     </div>
                                 </div>
@@ -326,13 +315,13 @@ class Keypad extends PureComponent {
                                         <Button
                                             btnStyle="flat"
                                             compact
-                                            className={styles.btnKeypad}
+                                            className={cx(styles.btnKeypad, styles['btn-xy'])}
                                             onClick={() => {
                                                 const distance = actions.getJogDistance();
                                                 actions.jog({ X: -distance, Y: -distance });
                                             }}
                                             disabled={!canClickXY}
-                                            title={i18n._('Move X- Y-')}
+                                            title={i18n._('Move machine left & down')}
                                         >
                                             <i className={cx('fa', 'fa-arrow-circle-down', styles['rotate-45deg'])} style={{ fontSize: 16 }} />
                                         </Button>
@@ -344,7 +333,7 @@ class Keypad extends PureComponent {
                                             btnStyle="flat"
                                             compact
                                             className={cx(
-                                                styles.btnKeypad,
+                                                styles.btnKeypad, styles['btn-xy'],
                                                 { [styles.highlight]: highlightY }
                                             )}
                                             onClick={() => {
@@ -352,10 +341,10 @@ class Keypad extends PureComponent {
                                                 actions.jog({ Y: -distance });
                                             }}
                                             disabled={!canClickY}
-                                            title={i18n._('Move Y-')}
+                                            title={i18n._('Move machine down')}
                                         >
                                             <KeypadText>Y</KeypadText>
-                                            <KeypadDirectionText>-</KeypadDirectionText>
+                                            <i className="fa fa-arrow-down" />
                                         </Button>
                                     </div>
                                 </div>
@@ -364,13 +353,13 @@ class Keypad extends PureComponent {
                                         <Button
                                             btnStyle="flat"
                                             compact
-                                            className={styles.btnKeypad}
+                                            className={cx(styles.btnKeypad, styles['btn-xy'])}
                                             onClick={() => {
                                                 const distance = actions.getJogDistance();
                                                 actions.jog({ X: distance, Y: -distance });
                                             }}
                                             disabled={!canClickXY}
-                                            title={i18n._('Move X+ Y-')}
+                                            title={i18n._('Move machine right & down')}
                                         >
                                             <i className={cx('fa', 'fa-arrow-circle-down', styles['rotate--45deg'])} style={{ fontSize: 16 }} />
                                         </Button>
@@ -381,19 +370,16 @@ class Keypad extends PureComponent {
                                         <Button
                                             btnStyle="flat"
                                             compact
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                { [styles.highlight]: highlightZ }
-                                            )}
+                                            className={cx(styles.btnKeypad, styles['btn-z'])}
                                             onClick={() => {
                                                 const distance = actions.getJogDistance();
                                                 actions.jog({ Z: -distance });
                                             }}
                                             disabled={!canClickZ}
-                                            title={i18n._('Move Z-')}
+                                            title={i18n._('Lower bit')}
                                         >
                                             <KeypadText>Z</KeypadText>
-                                            <KeypadDirectionText>-</KeypadDirectionText>
+                                            <i className="fa fa-arrow-down" />
                                         </Button>
                                     </div>
                                 </div>

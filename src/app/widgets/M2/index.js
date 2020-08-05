@@ -90,6 +90,10 @@ class M2Widget extends PureComponent {
     },
     'controller:settings': (type, controllerSettings) => {
       if (type === GRBL) {
+        console.log(controllerSettings)
+        if(controllerSettings.settings['$3'] === "0"){
+          controller.command('gcode', '$3=4');
+        }
         this.setState(state => ({
           controller: {
             ...state.controller,
