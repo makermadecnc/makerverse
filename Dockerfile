@@ -17,15 +17,16 @@ RUN [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && \
   nvm install 10 && nvm use 10 && \
   npm i npm@latest -g
 
-RUN groupadd --gid 1000 cncjs \
-    && useradd --uid 1000 --gid cncjs --shell /bin/bash --create-home cncjs
-ADD . /home/cncjs
-RUN chown -R cncjs:cncjs /home/cncjs
-USER cncjs
-WORKDIR /home/cncjs
+RUN groupadd --gid 1000 makerverse \
+    && useradd --uid 1000 --gid makerverse --shell /bin/bash --create-home makerverse
+ADD . /home/makerverse
+RUN chown -R makerverse:makerverse /home/makerverse
+USER makerverse
+WORKDIR /home/makerverse
 
 RUN [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && \
-    npm install --production . && npm run prepare
+    npm install . && npm run prepare
+# n.b., --production fails due to missing binaries on arhmf
 
 EXPOSE 8000
-CMD ["/home/cncjs/bin/docker-entrypoint"]
+CMD ["/home/makerverse/bin/docker-entrypoint"]
