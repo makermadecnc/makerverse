@@ -18,8 +18,6 @@ import {
 } from '../../controllers';
 import { GRBL } from '../../controllers/Grbl/constants';
 import { MARLIN } from '../../controllers/Marlin/constants';
-import { GRBL } from '../../controllers/Grbl/constants';
-import { MARLIN } from '../../controllers/Marlin/constants';
 import { SMOOTHIE } from '../../controllers/Smoothie/constants';
 import { G2CORE, TINYG } from '../../controllers/TinyG/constants';
 import { MASLOW } from '../../controllers/Maslow/constants';

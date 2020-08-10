@@ -1,6 +1,6 @@
 import find from 'lodash/find';
 import get from 'lodash/get';
-// import includes from 'lodash/includes';
+import includes from 'lodash/includes';
 import map from 'lodash/map';
 import cx from 'classnames';
 import PropTypes from 'prop-types';
@@ -8,7 +8,7 @@ import React, { PureComponent } from 'react';
 import Select from 'react-select';
 import Space from 'app/components/Space';
 import { ToastNotification } from 'app/components/Notifications';
-// import controller from 'app/lib/controller';
+import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import {
     GRBL,
@@ -57,7 +57,7 @@ class Connection extends PureComponent {
                 }
             </div>
         );
-    };
+    }
 
     renderPortValue = (option) => {
         const { state } = this.props;
@@ -101,7 +101,7 @@ class Connection extends PureComponent {
         const { state, actions } = this.props;
         const {
             loading, connecting, connected,
-            // controllerType,
+            controllerType,
             ports, baudrates,
             port, baudrate,
             autoReconnect,
@@ -119,7 +119,7 @@ class Connection extends PureComponent {
         const notConnecting = !connecting;
         const notConnected = !connected;
         const canRefresh = notLoading && notConnected;
-        // const canChangeController = notLoading && notConnected;
+        const canChangeController = notLoading && notConnected;
         const canChangePort = notLoading && notConnected;
         const canChangeBaudrate = notLoading && notConnected && (!(this.isPortInUse(port)));
         const canToggleHardwareFlowControl = notConnected;
@@ -137,7 +137,7 @@ class Connection extends PureComponent {
                         {alertMessage}
                     </ToastNotification>
                 )}
-                { /*canSelectControllers && (
+                { canSelectControllers && (
                     <div className="form-group">
                         <div className="input-group input-group-sm">
                             <div className="input-group-btn">
@@ -224,7 +224,7 @@ class Connection extends PureComponent {
                             </div>
                         </div>
                     </div>
-                                    */}
+                )}
                 <div className="form-group">
                     <label className="control-label">{i18n._('Port')}</label>
                     <div className="input-group input-group-sm">
