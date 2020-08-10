@@ -1,2 +1,9 @@
 #!/bin/bash
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && ./bin/makerverse "$@"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+if [[ "$NODE_ENV" == "development" ]]; then
+  echo "Development mode enabled."
+  npm run dev
+else
+  ./bin/makerverse "$@"
+fi
