@@ -178,6 +178,10 @@ class M2Widget extends PureComponent {
 
   render() {
     const { widgetId } = this.props;
+    const kineticsModes = [
+      'Forward',
+      'Triangular'
+    ];
     const {
       minimized,
       isFullscreen,
@@ -257,7 +261,7 @@ class M2Widget extends PureComponent {
               { [styles.fullscreen]: isFullscreen }
             )}
           >
-            <div className={classnames(styles['widget-header'])}>Workspace</div>
+            <div className={classnames(styles['widget-header'])}>Stock</div>
             <div
               className={classnames(styles['widget-container'])}
               style={{
@@ -267,18 +271,18 @@ class M2Widget extends PureComponent {
               }}
             >
               <p>
-                Height:{' '}
-                <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$82}{' '}
-                  mm
-                </span>
-              </p>
-              <p>
                 Width:{' '}
                 <span>
                   {state.controller.settings.settings &&
                     state.controller.settings.settings.$81}{' '}
+                  mm
+                </span>
+              </p>
+              <p>
+                Height:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$82}{' '}
                   mm
                 </span>
               </p>
@@ -303,7 +307,7 @@ class M2Widget extends PureComponent {
                 });
               }}
             >
-              {i18n._('Change Size')}
+              {i18n._('Change Stock')}
             </button>
             <div className={classnames(styles['widget-header'])}>
               Machine Settings
@@ -316,7 +320,46 @@ class M2Widget extends PureComponent {
                 marginTop: '10px'
               }}
             >
-              <p style={{ marginBottom: '7px' }}>
+              <p >
+                Soft-limit spindle to min/max sizes:{' '}
+                <span>
+                  {(state.controller.settings.settings &&
+                    state.controller.settings.settings.$20 > 0) ? "Yes" : "No"}
+                </span>
+              </p>
+              <p>
+                Max Width:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$130}{' '}
+                  mm
+                </span>
+              </p>
+              <p>
+                Max Height:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$131}{' '}
+                  mm
+                </span>
+              </p>
+              <p>
+                Max Z-Depth:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$132}{' '}
+                  mm
+                </span>
+              </p>
+              <p>
+                Min Z-Depth:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$92}{' '}
+                  mm
+                </span>
+              </p>
+              <p>
                 Distance between motors:{' '}
                 <span>
                   {state.controller.settings.settings &&
@@ -324,12 +367,19 @@ class M2Widget extends PureComponent {
                   mm
                 </span>
               </p>
-              <p style={{ marginBottom: '7px' }}>
+              <p>
                 Motor offset:{' '}
                 <span>
                   {state.controller.settings.settings &&
                     state.controller.settings.settings.$84}{' '}
                   mm
+                </span>
+              </p>
+              <p>
+                Chain over sprocket:{' '}
+                <span>
+                  {(state.controller.settings.settings &&
+                    state.controller.settings.settings.$80 > 0) ? "Yes" : "No"}
                 </span>
               </p>
             </div>
@@ -342,12 +392,18 @@ class M2Widget extends PureComponent {
                   displayModal: true,
                   modalImg: '../../images/calibration_motor.png',
                   modalConfig: [
+                    { name: 'Soft limit', gCode: '$20', for: 'maxwidth' },
+                    { name: 'Max width', gCode: '$130', for: 'maxwidth' },
+                    { name: 'Max height', gCode: '$131', for: 'maxheight' },
+                    { name: 'Max depth', gCode: '$132', for: 'maxdepth' },
+                    { name: 'Min depth', gCode: '$92', for: 'mindepth' },
                     {
                       name: 'Distance between motors',
                       gCode: '$83',
                       for: 'distance'
                     },
-                    { name: 'Motor offset', gCode: '$84', for: 'offset' }
+                    { name: 'Motor offset', gCode: '$84', for: 'offset' },
+                    { name: 'Chain over sprocket', gCode: '$80', for: 'sprocket' },
                   ],
                   modalType: 'default'
                 });
@@ -356,7 +412,7 @@ class M2Widget extends PureComponent {
               {i18n._('Edit')}
             </button>
             <div className={classnames(styles['widget-header'])}>
-              Configuration
+              Calibration (Basic)
             </div>
             <div
               className={classnames(styles['widget-container'])}
@@ -386,6 +442,65 @@ class M2Widget extends PureComponent {
                   {state.controller.settings.settings &&
                     state.controller.settings.settings.$102}{' '}
                   Steps/mm
+                </span>
+              </p>
+            </div>
+            <div className={classnames(styles['widget-header'])}>
+              Kinetics (Advanced)
+            </div>
+            <div
+              className={classnames(styles['widget-container'])}
+              style={{
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                marginTop: '10px'
+              }}
+            >
+              <p>
+                Mode:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    kineticsModes[state.controller.settings.settings.$93]}{' '}
+                </span>
+              </p>
+              <p>
+                Chain sag correction:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$87}{' '}
+                  %
+                </span>
+              </p>
+              <p>
+                Left chain tolerance:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$88}{' '}
+                  %
+                </span>
+              </p>
+              <p>
+                Right chain tolerance:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$89}{' '}
+                  %
+                </span>
+              </p>
+              <p>
+                Rotation Disk Radius:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$90}{' '}
+                  mm
+                </span>
+              </p>
+              <p>
+                Chain Length:{' '}
+                <span>
+                  {state.controller.settings.settings &&
+                    state.controller.settings.settings.$91}{' '}
+                  mm
                 </span>
               </p>
             </div>
