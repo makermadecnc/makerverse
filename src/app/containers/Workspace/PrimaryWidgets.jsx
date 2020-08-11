@@ -31,6 +31,7 @@ class PrimaryWidgets extends Component {
     state = {
         widgets: store.get('workspace.container.primary.widgets')
     };
+
     forkWidget = (widgetId) => () => {
         portal(({ onClose }) => (
             <Modal size="xs" onClose={onClose}>
@@ -194,7 +195,7 @@ class PrimaryWidgets extends Component {
                 if (name === 'marlin' && !includes(controller.loadedControllers, MARLIN)) {
                     return false;
                 }
-                // if (name === 'm2' && !includes(controller.loadedControllers, M2)) {
+                // if (name === 'maslow' && !includes(controller.loadedControllers, MASLOW)) {
                 //     return false;
                 // }
                 return true;

@@ -891,7 +891,7 @@ class MaslowController {
 
             callback(); // register controller
 
-            log.debug(`Connected to serial port "${port}"`);
+            log.debug(`Connected to serial port! "${port}"`);
 
             this.workflow.stop();
 

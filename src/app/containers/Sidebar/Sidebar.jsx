@@ -33,6 +33,21 @@ class Sidebar extends PureComponent {
                     <li
                         className={classNames(
                             'text-center',
+                            { [styles.active]: pathname.indexOf('/tabletop') === 0 }
+                        )}
+                    >
+                        <Link to="/tabletop" title={i18n._('Tabletop')}>
+                            <i
+                                className={classNames(
+                                    styles.icon,
+                                    styles.iconCnc
+                                )}
+                            />
+                        </Link>
+                    </li>
+                    <li
+                        className={classNames(
+                            'text-center',
                             { [styles.active]: pathname.indexOf('/settings') === 0 }
                         )}
                     >

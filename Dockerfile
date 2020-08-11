@@ -30,11 +30,9 @@ WORKDIR /home/makerverse
 RUN echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"' > /home/makerverse/.bashrc
 SHELL ["/bin/bash", "--login", "-c"]
 
-# n.b., --production fails due to missing binaries on arhmf
-RUN npm install . && npm run prepare
-
-# Prebuild dev mode too in case debug is enabled.
-RUN npm run build-dev
+# Node: dev dependencies are required for "build-prod", so npm install does not use --production
+RUN npm install
+RUN npm run build-prod
 
 EXPOSE 8000
 CMD ["/home/makerverse/bin/docker-entrypoint"]

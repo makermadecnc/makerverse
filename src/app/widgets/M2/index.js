@@ -66,7 +66,7 @@ class M2Widget extends PureComponent {
     'serialport:open': options => {
       const { port, controllerType } = options;
       this.setState({
-        isReady: controllerType === GRBL,
+        isReady: true,
         port: port
       });
     },
@@ -89,30 +89,26 @@ class M2Widget extends PureComponent {
       }
     },
     'controller:settings': (type, controllerSettings) => {
-      if (type === GRBL) {
-        console.log(controllerSettings)
-        if(controllerSettings.settings['$3'] === "0"){
-          controller.command('gcode', '$3=4');
-        }
-        this.setState(state => ({
-          controller: {
-            ...state.controller,
-            type: type,
-            settings: controllerSettings
-          }
-        }));
+      console.log(controllerSettings)
+      if(controllerSettings.settings['$3'] === "0"){
+        controller.command('gcode', '$3=4');
       }
+      this.setState(state => ({
+        controller: {
+          ...state.controller,
+          type: type,
+          settings: controllerSettings
+        }
+      }));
     },
     'controller:state': (type, controllerState) => {
-      if (type === GRBL) {
-        this.setState(state => ({
-          controller: {
-            ...state.controller,
-            type: type,
-            state: controllerState
-          }
-        }));
-      }
+      this.setState(state => ({
+        controller: {
+          ...state.controller,
+          type: type,
+          state: controllerState
+        }
+      }));
     }
   };
 
@@ -136,8 +132,7 @@ class M2Widget extends PureComponent {
       isFullscreen: false,
       port: controller.port,
       canClick: true,
-      isReady:
-        controller.loadedControllers.length === 1 || controller.type === GRBL,
+      isReady: true,
       displayModal: false,
       pendingValues: {},
       modalType: 'scale',
@@ -211,7 +206,7 @@ class M2Widget extends PureComponent {
             {isForkedWidget && (
               <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
             )}
-            M2 Configuration
+            Machine
           </Widget.Title>
           <Widget.Controls className={this.props.sortable.filterClassName}>
             {isReady && (

@@ -1,15 +1,18 @@
+import GrblLineParserResultVersion from '../Grbl/GrblLineParserResultVersion';
+
 class MaslowLineParserResultVersion {
     static parse(line) {
-        // * Maslow v1.1
-        //   [VER:]
-        const r = line.match(/^\[(?:VER:)(.+)\]$/);
-        if (!r) {
-            return null;
+        const grbl = GrblLineParserResultVersion.parse(line);
+        const payload = { };
+        if (grbl) { // Maslow DUE
+            payload.message = grbl.payload.message;
+        } else { // Maslow Classic
+            const r = line.match(/^PCB v(.+) Detected$/);
+            if (!r) {
+                return null;
+            }
+            payload.message = r[1];
         }
-
-        const payload = {
-            message: r[1]
-        };
 
         return {
             type: MaslowLineParserResultVersion,
