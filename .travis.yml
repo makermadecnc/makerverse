@@ -4,27 +4,38 @@ jobs:
 - name: "Docker"
   language: bash
   dist: bionic
+  sudo: required
   os: linux
   arch: amd64
-  services:
-    - docker
+  # services:
+  #   - docker
   before_install:
+    # Install Docker 19.x, not 18
     - curl -fsSL https://get.docker.com | sh
     - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
     - mkdir -p $HOME/.docker
     - echo '{"experimental":"enabled"}' | sudo tee $HOME/.docker/config.json
     - sudo service docker start
+    - docker --version
+    # Install docker-buildx plugin for cross-architecture compilation.
+    - mkdir -p ~/.docker/cli-plugins/
+    - curl -fsSL -o ~/.docker/cli-plugins/docker-buildx https://github.com/docker/buildx/releases/download/v0.4.1/buildx-v0.4.1.linux-amd64
+    - chmod a+x ~/.docker/cli-plugins/docker-buildx
+    - docker context ls
   install:
+    # Create a multi-arch buildx user: https://github.com/docker/buildx/issues/138
     - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-    - docker buildx create --name xbuilder --use
-  script: scripts/docker.sh build amd64
+    - docker buildx create --platform linux/arm64,linux/arm/v7 --name xbuilder --use
+    - docker buildx inspect --bootstrap
+  script: scripts/docker.sh build
   after_success: [] # Override.
   addons:
     apt:
-      packages: [] # Override.
+      packages:
+        - qemu-user-static # multi-arch build tools
   deploy:
     provider: script
-    script: scripts/docker.sh push amd64
+    script: scripts/docker.sh push
 # [Job] [Linux]
 - name: "Linux"
   os: linux
