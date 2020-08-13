@@ -1,7 +1,7 @@
 import events from 'events';
 import _ from 'lodash';
-import decimalPlaces from '../../lib/decimal-places';
 import MaslowLineParser from './MaslowLineParser';
+import MaslowMemory from './MaslowMemory';
 import MaslowLineParserResultStatus from './MaslowLineParserResultStatus';
 import MaslowLineParserResultOk from './MaslowLineParserResultOk';
 import MaslowLineParserResultError from './MaslowLineParserResultError';
@@ -12,52 +12,32 @@ import MaslowLineParserResultFeedback from './MaslowLineParserResultFeedback';
 import MaslowLineParserResultSettings from './MaslowLineParserResultSettings';
 import MaslowLineParserResultStartup from './MaslowLineParserResultStartup';
 import MaslowLineParserResultPositionalError from './MaslowLineParserResultPositionalError';
+import MaslowLineParserResultVersion from './MaslowLineParserResultVersion';
 import {
-    MASLOW_ACTIVE_STATE_IDLE,
-    MASLOW_ACTIVE_STATE_ALARM
+    MASLOW_FIRMWARE_CLASSIC,
+    MASLOW_FIRMWARE_DUE,
 } from './constants';
 
 class MaslowRunner extends events.EventEmitter {
-    state = {
-        status: {
-            activeState: '',
-            mpos: {
-                x: '0.000',
-                y: '0.000',
-                z: '0.000'
-            },
-            wpos: {
-                x: '0.000',
-                y: '0.000',
-                z: '0.000'
-            },
-            ov: []
-        },
-        parserstate: {
-            modal: {
-                motion: 'G0', // G0, G1, G2, G3, G38.2, G38.3, G38.4, G38.5, G80
-                wcs: 'G54', // G54, G55, G56, G57, G58, G59
-                plane: 'G17', // G17: xy-plane, G18: xz-plane, G19: yz-plane
-                units: 'G21', // G20: Inches, G21: Millimeters
-                distance: 'G90', // G90: Absolute, G91: Relative
-                feedrate: 'G94', // G93: Inverse time mode, G94: Units per minute
-                program: 'M0', // M0, M1, M2, M30
-                spindle: 'M5', // M3: Spindle (cw), M4: Spindle (ccw), M5: Spindle off
-                coolant: 'M9' // M7: Mist coolant, M8: Flood coolant, M9: Coolant off, [M7,M8]: Both on
-            },
-            tool: '',
-            feedrate: '',
-            spindle: ''
-        }
-    };
-
     settings = {
-        version: '',
+        protocol: {
+            name: 'Grbl',
+            version: '',
+        },
+        firmware: {
+            name: '',
+            version: '',
+        },
         parameters: {
         },
         settings: {
         }
     };
+
+    constructor() {
+        super();
+        this.memory = new MaslowMemory(this);
+    }
 
     parser = new MaslowLineParser();
 
@@ -76,41 +56,7 @@ class MaslowRunner extends events.EventEmitter {
             return;
         }
         if (type === MaslowLineParserResultStatus) {
-            // Maslow v1.1
-            // WCO:0.000,10.000,2.500
-            // A current work coordinate offset is now sent to easily convert
-            // between position vectors, where WPos = MPos - WCO for each axis.
-            if (_.has(payload, 'mpos') && !_.has(payload, 'wpos')) {
-                payload.wpos = payload.wpos || {};
-                _.each(payload.mpos, (mpos, axis) => {
-                    const digits = decimalPlaces(mpos);
-                    const wco = _.get((payload.wco || this.state.status.wco), axis, 0);
-                    payload.wpos[axis] = (Number(mpos) - Number(wco)).toFixed(digits);
-                });
-            } else if (_.has(payload, 'wpos') && !_.has(payload, 'mpos')) {
-                payload.mpos = payload.mpos || {};
-                _.each(payload.wpos, (wpos, axis) => {
-                    const digits = decimalPlaces(wpos);
-                    const wco = _.get((payload.wco || this.state.status.wco), axis, 0);
-                    payload.mpos[axis] = (Number(wpos) + Number(wco)).toFixed(digits);
-                });
-            }
-
-            const nextState = {
-                ...this.state,
-                status: {
-                    ...this.state.status,
-                    ...payload
-                }
-            };
-
-            // Delete the raw key
-            delete nextState.status.raw;
-
-            if (!_.isEqual(this.state.status, nextState.status)) {
-                this.state = nextState; // enforce change
-            }
-            this.emit('status', payload);
+            this.memory.updateStatus(payload);
             return;
         }
         if (type === MaslowLineParserResultOk) {
@@ -128,20 +74,7 @@ class MaslowRunner extends events.EventEmitter {
             return;
         }
         if (type === MaslowLineParserResultParserState) {
-            const { modal, tool, feedrate, spindle } = payload;
-            const nextState = {
-                ...this.state,
-                parserstate: {
-                    modal: modal,
-                    tool: tool,
-                    feedrate: feedrate,
-                    spindle: spindle
-                }
-            };
-            if (!_.isEqual(this.state.parserstate, nextState.parserstate)) {
-                this.state = nextState; // enforce change
-            }
-            this.emit('parserstate', payload);
+            this.memory.updateParserState(payload);
             return;
         }
         if (type === MaslowLineParserResultParameters) {
@@ -178,15 +111,29 @@ class MaslowRunner extends events.EventEmitter {
             this.emit('settings', payload);
             return;
         }
-        if (type === MaslowLineParserResultStartup) {
-            const { version } = payload;
-            const nextSettings = { // enforce change
+        if (type === MaslowLineParserResultVersion) {
+            const nextSettings = {
                 ...this.settings,
-                version: version
+                firmware: {
+                    ...this.settings.firmware,
+                    name: payload.name,
+                    version: payload.version,
+                }
             };
-            if (!_.isEqual(this.settings.version, nextSettings.version)) {
-                this.settings = nextSettings; // enforce change
-            }
+            this.settings = nextSettings;
+            this.emit('version', payload);
+            return;
+        }
+        if (type === MaslowLineParserResultStartup) {
+            const nextSettings = {
+                ...this.settings,
+                protocol: {
+                    ...this.settings.protocol,
+                    name: payload.name,
+                    version: payload.version,
+                }
+            };
+            this.settings = nextSettings;
             this.emit('startup', payload);
             return;
         }
@@ -196,30 +143,12 @@ class MaslowRunner extends events.EventEmitter {
         }
     }
 
-    getMachinePosition(state = this.state) {
-        return _.get(state, 'status.mpos', {});
+    isMaslowClassic() {
+        return this.settings.firmware && this.settings.firmware.name === MASLOW_FIRMWARE_CLASSIC;
     }
 
-    getWorkPosition(state = this.state) {
-        return _.get(state, 'status.wpos', {});
-    }
-
-    getModalGroup(state = this.state) {
-        return _.get(state, 'parserstate.modal', {});
-    }
-
-    getTool(state = this.state) {
-        return Number(_.get(state, 'parserstate.tool')) || 0;
-    }
-
-    isAlarm() {
-        const activeState = _.get(this.state, 'status.activeState');
-        return activeState === MASLOW_ACTIVE_STATE_ALARM;
-    }
-
-    isIdle() {
-        const activeState = _.get(this.state, 'status.activeState');
-        return activeState === MASLOW_ACTIVE_STATE_IDLE;
+    isMaslowDue() {
+        return this.settings.firmware && this.settings.firmware.name === MASLOW_FIRMWARE_DUE;
     }
 }
 

@@ -173,10 +173,6 @@ class M2Widget extends PureComponent {
 
   render() {
     const { widgetId } = this.props;
-    const kineticsModes = [
-      'Forward',
-      'Triangular'
-    ];
     const {
       minimized,
       isFullscreen,
@@ -184,7 +180,7 @@ class M2Widget extends PureComponent {
       displayModal,
       modalImg,
       modalConfig,
-      modalType
+      modalType,
     } = this.state;
     const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
     const state = {
@@ -194,7 +190,8 @@ class M2Widget extends PureComponent {
     const actions = {
       ...this.actions
     };
-    console.log(state.controller.settings.settings);
+    const controllerSettings = state.controller.settings.settings;
+    console.log('Machine', state.controller);
     return (
       <Widget fullscreen={false}>
         <Widget.Header>
@@ -206,7 +203,7 @@ class M2Widget extends PureComponent {
             {isForkedWidget && (
               <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
             )}
-            Machine
+            {state.controller.settings.firmware && state.controller.settings.firmware.name}
           </Widget.Title>
           <Widget.Controls className={this.props.sortable.filterClassName}>
             {isReady && (
@@ -256,6 +253,31 @@ class M2Widget extends PureComponent {
               { [styles.fullscreen]: isFullscreen }
             )}
           >
+            <div className={classnames(styles['widget-header'])}>
+              PCB
+            </div>
+            <div
+              className={classnames(styles['widget-container'])}
+              style={{
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                marginTop: '10px'
+              }}
+            >
+              <p >
+                Firmware:{' '}
+                <span>
+                  v{state.controller.settings.firmware && state.controller.settings.firmware.version}
+                </span>
+              </p>
+              <p >
+                Protocol:{' '}
+                <span>
+                  {state.controller.settings.protocol && state.controller.settings.protocol.name}
+                  ({state.controller.settings.protocol && state.controller.settings.protocol.version})
+                </span>
+              </p>
+            </div>
             <div className={classnames(styles['widget-header'])}>Stock</div>
             <div
               className={classnames(styles['widget-container'])}
@@ -268,16 +290,14 @@ class M2Widget extends PureComponent {
               <p>
                 Width:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$81}{' '}
+                  {controllerSettings && controllerSettings.$81}{' '}
                   mm
                 </span>
               </p>
               <p>
                 Height:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$82}{' '}
+                  {controllerSettings && controllerSettings.$82}{' '}
                   mm
                 </span>
               </p>
@@ -318,63 +338,55 @@ class M2Widget extends PureComponent {
               <p >
                 Soft-limit spindle to min/max sizes:{' '}
                 <span>
-                  {(state.controller.settings.settings &&
-                    state.controller.settings.settings.$20 > 0) ? "Yes" : "No"}
+                  {(controllerSettings && controllerSettings.$20 > 0) ? "Yes" : "No"}
                 </span>
               </p>
               <p>
                 Max Width:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$130}{' '}
+                  {controllerSettings && controllerSettings.$130}{' '}
                   mm
                 </span>
               </p>
               <p>
                 Max Height:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$131}{' '}
+                  {controllerSettings && controllerSettings.$131}{' '}
                   mm
                 </span>
               </p>
               <p>
                 Max Z-Depth:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$132}{' '}
+                  {controllerSettings && controllerSettings.$132}{' '}
                   mm
                 </span>
               </p>
               <p>
                 Min Z-Depth:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$92}{' '}
+                  {controllerSettings && controllerSettings.$92}{' '}
                   mm
                 </span>
               </p>
               <p>
                 Distance between motors:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$83}{' '}
+                  {controllerSettings && controllerSettings.$83}{' '}
                   mm
                 </span>
               </p>
               <p>
                 Motor offset:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$84}{' '}
+                  {controllerSettings && controllerSettings.$84}{' '}
                   mm
                 </span>
               </p>
               <p>
                 Chain over sprocket:{' '}
                 <span>
-                  {(state.controller.settings.settings &&
-                    state.controller.settings.settings.$80 > 0) ? "Yes" : "No"}
+                  {(controllerSettings && controllerSettings.$80 > 0) ? "Yes" : "No"}
                 </span>
               </p>
             </div>
@@ -420,22 +432,19 @@ class M2Widget extends PureComponent {
               <p>
                 X Scaling:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$85}{' '}
+                  {controllerSettings && controllerSettings.$85}{' '}
                 </span>
               </p>
               <p>
                 Y Scaling:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$86}{' '}
+                  {controllerSettings && controllerSettings.$86}{' '}
                 </span>
               </p>
               <p>
                 Z Scaling:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$102}{' '}
+                  {controllerSettings && controllerSettings.$102}{' '}
                   Steps/mm
                 </span>
               </p>
@@ -454,47 +463,41 @@ class M2Widget extends PureComponent {
               <p>
                 Mode:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    kineticsModes[state.controller.settings.settings.$93]}{' '}
+                  {controllerSettings && controllerSettings.$93}{' '}
                 </span>
               </p>
               <p>
                 Chain sag correction:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$87}{' '}
+                  {controllerSettings && controllerSettings.$87}{' '}
                   %
                 </span>
               </p>
               <p>
                 Left chain tolerance:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$88}{' '}
+                  {controllerSettings && controllerSettings.$88}{' '}
                   %
                 </span>
               </p>
               <p>
                 Right chain tolerance:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$89}{' '}
+                  {controllerSettings && controllerSettings.$89}{' '}
                   %
                 </span>
               </p>
               <p>
                 Rotation Disk Radius:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$90}{' '}
+                  {controllerSettings && controllerSettings.$90}{' '}
                   mm
                 </span>
               </p>
               <p>
                 Chain Length:{' '}
                 <span>
-                  {state.controller.settings.settings &&
-                    state.controller.settings.settings.$91}{' '}
+                  {controllerSettings && controllerSettings.$91}{' '}
                   mm
                 </span>
               </p>
@@ -540,7 +543,7 @@ class M2Widget extends PureComponent {
                 <M2ScaleModal
                   modalConfig={modalConfig}
                   handleCalibrate={actions.handleCalibrate}
-                  controllerSettings={state.controller.settings.settings}
+                  controllerSettings={settings}
                   handleClose={() => this.setState({ displayModal: false })}
                 />
               ) : (
@@ -548,7 +551,7 @@ class M2Widget extends PureComponent {
                   modalImg={modalImg}
                   modalConfig={modalConfig}
                   handleCalibrate={actions.handleCalibrate}
-                  controllerSettings={state.controller.settings.settings}
+                  controllerSettings={settings}
                   handleClose={() => this.setState({ displayModal: false })}
                 />
               ))}

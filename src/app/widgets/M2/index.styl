@@ -50,7 +50,7 @@
 .modal-container{
     background-color:#fff;
     padding: 25px;
-    max-width:860px; 
+    max-width:860px;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -98,7 +98,26 @@
     border-top-left-radius: 4px;
     border-top-right-radius:4px;
 }
-.modal-tab-active{ 
+.modal-tab-active{
     background-color: #337ab7;
     color:#fff;
+}
+.panel {
+    margin-bottom: 10px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    :global {
+        .row {
+            margin-bottom: 5px;
+        }
+        .row:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+.panel-heading:hover {
+    background-color: rgba(0, 0, 0, .05);
 }

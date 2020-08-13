@@ -147,31 +147,7 @@ class MaslowController {
             baudRate: baudrate,
             rtscts: rtscts,
             writeFilter: (data) => {
-                const line = data.trim();
-
-                if (!line) {
-                    return data;
-                }
-
-                { // Maslow settings: $0-$255
-                    const r = line.match(/^(\$\d{1,3})=([\d\.]+)$/);
-                    if (r) {
-                        const name = r[1];
-                        const value = Number(r[2]);
-                        if ((name === '$13') && (value >= 0) && (value <= 65535)) {
-                            const nextSettings = {
-                                ...this.runner.settings,
-                                settings: {
-                                    ...this.runner.settings.settings,
-                                    [name]: value ? '1' : '0'
-                                }
-                            };
-                            this.runner.settings = nextSettings; // enforce change
-                        }
-                    }
-                }
-
-                return data;
+                return this.runner.memory.writeFilter(data);
             }
         });
 
@@ -237,7 +213,7 @@ class MaslowController {
                 return;
             }
 
-            if (this.runner.isAlarm()) {
+            if (this.runner.memory.isAlarm()) {
                 this.feeder.reset();
                 log.warn('Stopped sending G-code commands in Alarm mode');
                 return;
@@ -587,7 +563,10 @@ class MaslowController {
                 return;
             }
 
-            if (this.isOpen()) {
+            // Maslow Classic does not support querying for status reports.
+            // Doing so will result in an error: in response.
+            if (this.isOpen() && !this.runner.isMaslowClassic()) {
+                log.silly(`Querying for machine status for ${this.runner.firmware.name}`);
                 this.actionMask.queryStatusReport = true;
                 this.actionTime.queryStatusReport = now;
                 this.connection.write('?');
@@ -606,7 +585,7 @@ class MaslowController {
             // it will consume 3 bytes from the receive buffer in each time period.
             // @see https://github.com/cncjs/cncjs/issues/176
             // @see https://github.com/cncjs/cncjs/issues/186
-            if ((this.workflow.state === WORKFLOW_STATE_IDLE) && this.runner.isIdle()) {
+            if ((this.workflow.state === WORKFLOW_STATE_IDLE) && this.runner.memory.isIdle()) {
                 const lastQueryTime = this.actionTime.queryParserState;
                 if (lastQueryTime > 0) {
                     const timespan = Math.abs(now - lastQueryTime);
@@ -625,7 +604,8 @@ class MaslowController {
                 return;
             }
 
-            if (this.isOpen()) {
+            if (this.isOpen() && !this.runner.isMaslowClassic()) {
+                log.silly(`Querying parser state for ${this.runner.firmware.name}`);
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
@@ -650,8 +630,8 @@ class MaslowController {
             }
 
             const zeroOffset = _.isEqual(
-                this.runner.getWorkPosition(this.state),
-                this.runner.getWorkPosition(this.runner.state)
+                this.runner.memory.getWorkPosition(this.state),
+                this.runner.memory.getWorkPosition(this.runner.memory.state)
             );
 
             // Maslow settings
@@ -662,8 +642,8 @@ class MaslowController {
             }
 
             // Maslow state
-            if (this.state !== this.runner.state) {
-                this.state = this.runner.state;
+            if (this.state !== this.runner.memory.state) {
+                this.state = this.runner.memory.state;
                 this.emit('controller:state', MASLOW, this.state);
                 this.emit('Maslow:state', this.state); // Backward compatibility
             }
@@ -681,7 +661,7 @@ class MaslowController {
 
             // Check if the machine has stopped movement after completion
             if (this.actionTime.senderFinishTime > 0) {
-                const machineIdle = zeroOffset && this.runner.isIdle();
+                const machineIdle = zeroOffset && this.runner.memory.isIdle();
                 const now = new Date().getTime();
                 const timespan = Math.abs(now - this.actionTime.senderFinishTime);
                 const toleranceTime = 500; // in milliseconds
@@ -720,7 +700,7 @@ class MaslowController {
             a: mposa,
             b: mposb,
             c: mposc
-        } = this.runner.getMachinePosition();
+        } = this.runner.memory.getMachinePosition();
 
         // Work position
         const {
@@ -730,13 +710,13 @@ class MaslowController {
             a: posa,
             b: posb,
             c: posc
-        } = this.runner.getWorkPosition();
+        } = this.runner.memory.getWorkPosition();
 
         // Modal group
-        const modal = this.runner.getModalGroup();
+        const modal = this.runner.memory.getModalGroup();
 
         // Tool
-        const tool = this.runner.getTool();
+        const tool = this.runner.memory.getTool();
 
         return Object.assign(context || {}, {
             // User-defined global variables

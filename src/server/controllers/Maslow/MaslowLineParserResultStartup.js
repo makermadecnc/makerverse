@@ -10,21 +10,43 @@ class MaslowLineParserResultStartup {
     // Maslow 1.1h ['$' for help] LongMill build Feb 25, 2020
     // gCarvin 2.0.0 ['$' for help]
     static parse(line) {
+        return MaslowLineParserResultStartup.parseGrbl(line) ||
+            MaslowLineParserResultStartup.parseMaslowClassic(line);
+    }
+
+    static parseGrbl(line) {
         const r = line.match(pattern);
         if (!r) {
             return null;
         }
 
-        const firmware = r[1];
+        const name = r[1];
         const version = r[2];
         const message = _trim(r[3]);
 
         const payload = {
-            firmware,
-            version,
+            name: name,
+            version: version,
             message,
         };
 
+        return {
+            type: MaslowLineParserResultStartup,
+            payload: payload
+        };
+    }
+
+    static parseMaslowClassic(line) {
+        const payload = {
+            message: line
+        };
+        const parts = line.split(' ');
+        if (parts.length >= 2 && parts[0] === 'Grbl') {
+            payload.name = 'Grbl';
+            payload.version = parts[1].substr(1);
+        } else {
+            return null;
+        }
         return {
             type: MaslowLineParserResultStartup,
             payload: payload

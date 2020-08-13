@@ -589,7 +589,9 @@ class AxesWidget extends PureComponent {
                     'G20': IMPERIAL_UNITS,
                     'G21': METRIC_UNITS
                 }[modal.units] || this.state.units;
-                const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
+                const classic = get(controller.settings, 'firmware.name') === 'MaslowClassic';
+                const $13 = classic ? units === IMPERIAL_UNITS :
+                    Number(get(controller.settings, 'settings.$13', 0)) || 0;
 
                 this.setState(state => ({
                     units: units,
