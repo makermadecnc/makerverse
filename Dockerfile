@@ -16,9 +16,9 @@ WORKDIR /home/node
 ADD --chown=node:node . /home/node
 
 # Node: dev dependencies are required for "build-prod", so npm install does not use --production
-RUN npm install
-RUN npm run build-prod-server
-RUN npm run build-prod-app
+# RUN npm install
+# RUN npm run build-prod-server
+# RUN npm run build-prod-app
 
 EXPOSE 8000
 CMD ["/home/node/bin/docker-entrypoint"]

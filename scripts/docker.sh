@@ -6,6 +6,8 @@ echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
 
 DOCKER_REPO=skilescm/makerverse
 
+echo "Pass: $DOCKER_PASS"
+echo "User: $DOCKER_USER"
 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin &> /dev/null
 
 if [ "$TRAVIS_BRANCH" != "master" ]; then
@@ -14,12 +16,16 @@ else
   TAG="${TRAVIS_TAG:-latest}"
 fi
 
-docker buildx build \
-  --progress plain \
-  "--platform=$BUILD_PLATFORMS" \
-  -t "$DOCKER_REPO:$TAG" \
-  .
+FLAG="--load"
 
 if [ "$1" = "push" ] || [ "$TRAVIS_BRANCH" != "master" ]; then
-  docker push "$DOCKER_REPO:$TAG"
+  FLAG="--push"
 fi
+
+if [[ -z "$TRAVIS_TAG" ]]; then
+  npm run build-latest
+else
+  npm run build
+fi
+
+docker buildx build "$FLAG" "--platform=$BUILD_PLATFORMS" -t "$DOCKER_REPO:$TAG" .
