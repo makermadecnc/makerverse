@@ -36,7 +36,7 @@ class MaslowLineParserResultVersion {
     }
 
     static parseMaslowClassic(line) {
-        const r = line.match(/^PCB v(.+) Detected$/);
+        const r = line.match(/^Firmware Version (.+)$/);
         return r && {
             name: MASLOW_FIRMWARE_CLASSIC,
             version: r[1],

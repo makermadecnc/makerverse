@@ -11,6 +11,7 @@ const secret = pkg.version;
 const getUserHome = () => (process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']);
 
 export default {
+    home: getUserHome(),
     rcfile: path.resolve(getUserHome(), RC_FILE),
     verbosity: 0,
     version: pkg.version,

@@ -6,15 +6,6 @@ import logger from '../../lib/logger';
 
 const log = logger('service:configstore');
 
-const defaultState = { // default state
-    checkForUpdates: true,
-    controller: {
-        exception: {
-            ignoreErrors: false
-        }
-    }
-};
-
 class ConfigStore extends events.EventEmitter {
     file = '';
 
@@ -23,9 +14,11 @@ class ConfigStore extends events.EventEmitter {
     watcher = null;
 
     // @param {string} file The path to a filename.
+    // @param {defaults} default values are all guaranteed to be present. Avoid arrays if possible.
     // @return {object} The config object.
-    load(file) {
+    load(file, defaults) {
         this.file = file;
+        this.defaults = defaults || {};
         this.reload();
         this.emit('load', this.config); // emit load event
 
@@ -75,10 +68,8 @@ class ConfigStore extends events.EventEmitter {
             this.config = {};
         }
 
-        this.config.state = {
-            ...defaultState,
-            ...this.config.state
-        };
+        // Deep merge, ensuring presence of defaults.
+        _.defaultsDeep(this.config, this.defaults);
 
         return true;
     }
@@ -132,6 +123,8 @@ class ConfigStore extends events.EventEmitter {
         ok && this.sync(); // it is ok to write
     }
 }
+
+export { ConfigStore };
 
 const configstore = new ConfigStore();
 

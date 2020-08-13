@@ -25,6 +25,7 @@ import {
     WRITE_SOURCE_FEEDER
 } from '../constants';
 import MaslowRunner from './MaslowRunner';
+import MaslowMemory from './MaslowMemory';
 import {
     MASLOW,
     MASLOW_ACTIVE_STATE_RUN,
@@ -37,11 +38,11 @@ import {
 
 // % commands
 const WAIT = '%wait';
-
-const log = logger('controller:Maslow');
 const noop = _.noop;
 
 class MaslowController {
+    log = logger('controller:Maslow');
+
     type = MASLOW;
 
     // CNCEngine
@@ -55,13 +56,13 @@ class MaslowController {
 
     connectionEventListener = {
         data: (data) => {
-            log.silly(`< ${data}`);
+            this.log.silly(`< ${data}`);
             this.runner.parse('' + data);
         },
         close: (err) => {
             this.ready = false;
             if (err) {
-                log.warn(`Disconnected from serial port "${this.options.port}":`, err);
+                this.log.warn(`Disconnected from serial port "${this.options.port}":`, err);
             }
 
             this.close(err => {
@@ -76,7 +77,7 @@ class MaslowController {
         error: (err) => {
             this.ready = false;
             if (err) {
-                log.error(`Unexpected error while reading/writing serial port "${this.options.port}":`, err);
+                this.log.error(`Unexpected error while reading/writing serial port "${this.options.port}":`, err);
             }
         }
     };
@@ -136,10 +137,13 @@ class MaslowController {
         const { port, baudrate, rtscts } = { ...options };
         this.options = {
             ...this.options,
+            id: this.slugify(port.replace('/dev/', '')),
             port: port,
             baudrate: baudrate,
             rtscts: rtscts
         };
+
+        this.log = logger(`controller:Maslow:${this.options.id}`);
 
         // Connection
         this.connection = new SerialConnection({
@@ -147,13 +151,13 @@ class MaslowController {
             baudRate: baudrate,
             rtscts: rtscts,
             writeFilter: (data) => {
-                return this.runner.memory.writeFilter(data);
+                return this.memory.writeFilter(data);
             }
         });
 
         // Event Trigger
         this.event = new EventTrigger((event, trigger, commands) => {
-            log.debug(`EventTrigger: event="${event}", trigger="${trigger}", commands="${commands}"`);
+            this.log.debug(`EventTrigger: e="${event}", t="${trigger}", c="${commands}"`);
             if (trigger === 'system') {
                 taskRunner.run(commands);
             } else {
@@ -171,7 +175,7 @@ class MaslowController {
                 if (line[0] === '%') {
                     // %wait
                     if (line === WAIT) {
-                        log.debug('Wait for the planner to empty');
+                        this.log.debug('Wait for the planner to empty');
                         return 'G4 P0.5'; // dwell
                     }
 
@@ -190,17 +194,17 @@ class MaslowController {
                 { // Program Mode: M0, M1
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
                     if (programMode === 'M0') {
-                        log.debug('M0 Program Pause');
+                        this.log.debug('M0 Program Pause');
                         this.feeder.hold({ data: 'M0' }); // Hold reason
                     } else if (programMode === 'M1') {
-                        log.debug('M1 Program Pause');
+                        this.log.debug('M1 Program Pause');
                         this.feeder.hold({ data: 'M1' }); // Hold reason
                     }
                 }
 
                 // M6 Tool Change
                 if (_.includes(words, 'M6')) {
-                    log.debug('M6 Tool Change');
+                    this.log.debug('M6 Tool Change');
                     this.feeder.hold({ data: 'M6' }); // Hold reason
                 }
 
@@ -209,13 +213,13 @@ class MaslowController {
         });
         this.feeder.on('data', (line = '', context = {}) => {
             if (this.isClose()) {
-                log.error(`Serial port "${this.options.port}" is not accessible`);
+                this.log.error(`Serial port "${this.options.port}" is not accessible`);
                 return;
             }
 
-            if (this.runner.memory.isAlarm()) {
+            if (this.memory.isAlarm()) {
                 this.feeder.reset();
-                log.warn('Stopped sending G-code commands in Alarm mode');
+                this.log.warn('Stopped sending G-code commands in Alarm mode');
                 return;
             }
 
@@ -230,7 +234,7 @@ class MaslowController {
             });
 
             this.connection.write(line + '\n');
-            log.silly(`> ${line}`);
+            this.log.silly(`> ${line}`);
         });
         this.feeder.on('hold', noop);
         this.feeder.on('unhold', noop);
@@ -251,7 +255,7 @@ class MaslowController {
                 if (line[0] === '%') {
                     // %wait
                     if (line === WAIT) {
-                        log.debug(`Wait for the planner to empty: line=${sent + 1}, sent=${sent}, received=${received}`);
+                        this.log.debug(`Wait for the planner to empty: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.sender.hold({ data: WAIT }); // Hold reason
                         return 'G4 P0.5'; // dwell
                     }
@@ -271,17 +275,17 @@ class MaslowController {
                 { // Program Mode: M0, M1
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
                     if (programMode === 'M0') {
-                        log.debug(`M0 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
+                        this.log.debug(`M0 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M0' });
                     } else if (programMode === 'M1') {
-                        log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
+                        this.log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M1' });
                     }
                 }
 
                 // M6 Tool Change
                 if (_.includes(words, 'M6')) {
-                    log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
+                    this.log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
                     this.workflow.pause({ data: 'M6' });
                 }
 
@@ -290,23 +294,23 @@ class MaslowController {
         });
         this.sender.on('data', (line = '', context = {}) => {
             if (this.isClose()) {
-                log.error(`Serial port "${this.options.port}" is not accessible`);
+                this.log.error(`Serial port "${this.options.port}" is not accessible`);
                 return;
             }
 
             if (this.workflow.state === WORKFLOW_STATE_IDLE) {
-                log.error(`Unexpected workflow state: ${this.workflow.state}`);
+                this.log.error(`Unexpected workflow state: ${this.workflow.state}`);
                 return;
             }
 
             line = String(line).trim();
             if (line.length === 0) {
-                log.warn(`Expected non-empty line: N=${this.sender.state.sent}`);
+                this.log.warn(`Expected non-empty line: N=${this.sender.state.sent}`);
                 return;
             }
 
             this.connection.write(line + '\n');
-            log.silly(`> ${line}`);
+            this.log.silly(`> ${line}`);
         });
         this.sender.on('hold', noop);
         this.sender.on('unhold', noop);
@@ -349,7 +353,8 @@ class MaslowController {
         });
 
         // Maslow
-        this.runner = new MaslowRunner();
+        this.runner = new MaslowRunner(this);
+        this.memory = new MaslowMemory(this);
 
         this.runner.on('raw', noop);
 
@@ -403,7 +408,7 @@ class MaslowController {
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
                 if (hold && (received + 1 >= sent)) {
-                    log.debug(`Continue sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
+                    this.log.debug(`Continue sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
                     this.sender.unhold();
                 }
                 this.sender.ack();
@@ -413,10 +418,10 @@ class MaslowController {
 
             if ((this.workflow.state === WORKFLOW_STATE_PAUSED) && (received < sent)) {
                 if (!hold) {
-                    log.error('The sender does not hold off during the paused state');
+                    this.log.error('The sender does not hold off during the paused state');
                 }
                 if (received + 1 >= sent) {
-                    log.debug(`Stop sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
+                    this.log.debug(`Stop sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
                 }
                 this.sender.ack();
                 this.sender.next();
@@ -554,7 +559,7 @@ class MaslowController {
 
                 // Check if it has not been updated for a long time
                 if (timespan >= toleranceTime) {
-                    log.debug(`Continue status report query: timespan=${timespan}ms`);
+                    this.log.debug(`Continue status report query: timespan=${timespan}ms`);
                     this.actionMask.queryStatusReport = false;
                 }
             }
@@ -566,7 +571,7 @@ class MaslowController {
             // Maslow Classic does not support querying for status reports.
             // Doing so will result in an error: in response.
             if (this.isOpen() && !this.runner.isMaslowClassic()) {
-                log.silly(`Querying for machine status for ${this.runner.firmware.name}`);
+                this.log.silly(`Querying machine status for ${this.runner.settings.firmware.name}`);
                 this.actionMask.queryStatusReport = true;
                 this.actionTime.queryStatusReport = now;
                 this.connection.write('?');
@@ -585,7 +590,7 @@ class MaslowController {
             // it will consume 3 bytes from the receive buffer in each time period.
             // @see https://github.com/cncjs/cncjs/issues/176
             // @see https://github.com/cncjs/cncjs/issues/186
-            if ((this.workflow.state === WORKFLOW_STATE_IDLE) && this.runner.memory.isIdle()) {
+            if ((this.workflow.state === WORKFLOW_STATE_IDLE) && this.memory.isIdle()) {
                 const lastQueryTime = this.actionTime.queryParserState;
                 if (lastQueryTime > 0) {
                     const timespan = Math.abs(now - lastQueryTime);
@@ -593,7 +598,7 @@ class MaslowController {
 
                     // Check if it has not been updated for a long time
                     if (timespan >= toleranceTime) {
-                        log.debug(`Continue parser state query: timespan=${timespan}ms`);
+                        this.log.debug(`Continue parser state query: timespan=${timespan}ms`);
                         this.actionMask.queryParserState.state = false;
                         this.actionMask.queryParserState.reply = false;
                     }
@@ -605,7 +610,7 @@ class MaslowController {
             }
 
             if (this.isOpen() && !this.runner.isMaslowClassic()) {
-                log.silly(`Querying parser state for ${this.runner.firmware.name}`);
+                this.log.silly(`Querying parser state for ${this.runner.firmware.name}`);
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
@@ -630,8 +635,8 @@ class MaslowController {
             }
 
             const zeroOffset = _.isEqual(
-                this.runner.memory.getWorkPosition(this.state),
-                this.runner.memory.getWorkPosition(this.runner.memory.state)
+                this.memory.getWorkPosition(this.state),
+                this.memory.getWorkPosition(this.memory.storage.config)
             );
 
             // Maslow settings
@@ -642,8 +647,8 @@ class MaslowController {
             }
 
             // Maslow state
-            if (this.state !== this.runner.memory.state) {
-                this.state = this.runner.memory.state;
+            if (this.state !== this.memory.storage.config) {
+                this.state = this.memory.storage.config;
                 this.emit('controller:state', MASLOW, this.state);
                 this.emit('Maslow:state', this.state); // Backward compatibility
             }
@@ -661,7 +666,7 @@ class MaslowController {
 
             // Check if the machine has stopped movement after completion
             if (this.actionTime.senderFinishTime > 0) {
-                const machineIdle = zeroOffset && this.runner.memory.isIdle();
+                const machineIdle = zeroOffset && this.memory.isIdle();
                 const now = new Date().getTime();
                 const timespan = Math.abs(now - this.actionTime.senderFinishTime);
                 const toleranceTime = 500; // in milliseconds
@@ -670,7 +675,7 @@ class MaslowController {
                     // Extend the sender finish time
                     this.actionTime.senderFinishTime = now;
                 } else if (timespan > toleranceTime) {
-                    log.silly(`Finished sending G-code: timespan=${timespan}`);
+                    this.log.silly(`Finished sending G-code: timespan=${timespan}`);
 
                     this.actionTime.senderFinishTime = 0;
 
@@ -679,6 +684,22 @@ class MaslowController {
                 }
             }
         }, 250);
+    }
+
+    // https://gist.github.com/hagemann/382adfc57adbd5af078dc93feef01fe1
+    slugify(string) {
+        const a = 'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;';
+        const b = 'aaaaaaaaaacccddeeeeeeeegghiiiiiilmnnnnoooooooooprrsssssttuuuuuuuuuwxyyzzz------';
+        const p = new RegExp(a.split('').join('|'), 'g');
+
+        return string.toString().toLowerCase()
+            .replace(/\s+/g, '-') // Replace spaces with -
+            .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
+            .replace(/&/g, '-and-') // Replace & with 'and'
+            .replace(/[^\w\-]+/g, '') // Remove all non-word characters
+            .replace(/\-\-+/g, '-') // Replace multiple - with single -
+            .replace(/^-+/, '') // Trim - from start of text
+            .replace(/-+$/, ''); // Trim - from end of text
     }
 
     async initController() {
@@ -700,7 +721,7 @@ class MaslowController {
             a: mposa,
             b: mposb,
             c: mposc
-        } = this.runner.memory.getMachinePosition();
+        } = this.memory.getMachinePosition();
 
         // Work position
         const {
@@ -710,13 +731,13 @@ class MaslowController {
             a: posa,
             b: posb,
             c: posc
-        } = this.runner.memory.getWorkPosition();
+        } = this.memory.getWorkPosition();
 
         // Modal group
-        const modal = this.runner.memory.getModalGroup();
+        const modal = this.memory.getModalGroup();
 
         // Tool
-        const tool = this.runner.memory.getTool();
+        const tool = this.memory.getTool();
 
         return Object.assign(context || {}, {
             // User-defined global variables
@@ -790,6 +811,10 @@ class MaslowController {
             this.runner = null;
         }
 
+        if (this.memory) {
+            this.memory = null;
+        }
+
         this.sockets = {};
 
         if (this.connection) {
@@ -838,7 +863,7 @@ class MaslowController {
 
         // Assertion check
         if (this.isOpen()) {
-            log.error(`Cannot open serial port "${port}"`);
+            this.log.error(`Cannot open serial port "${port}"`);
             return;
         }
 
@@ -848,7 +873,7 @@ class MaslowController {
 
         this.connection.open((err) => {
             if (err) {
-                log.error(`Error opening serial port "${port}":`, err);
+                this.log.error(`Error opening serial port "${port}":`, err);
                 this.emit('serialport:error', { err: err, port: port });
                 callback(err); // notify error
                 return;
@@ -871,7 +896,7 @@ class MaslowController {
 
             callback(); // register controller
 
-            log.debug(`Connected to serial port! "${port}"`);
+            this.log.debug(`Connected to serial port! "${port}"`);
 
             this.workflow.stop();
 
@@ -933,11 +958,11 @@ class MaslowController {
 
     addConnection(socket) {
         if (!socket) {
-            log.error('The socket parameter is not specified');
+            this.log.error('The socket parameter is not specified');
             return;
         }
 
-        log.debug(`Add socket connection: id=${socket.id}`);
+        this.log.debug(`Add socket connection: id=${socket.id}`);
         this.sockets[socket.id] = socket;
 
         //
@@ -982,11 +1007,11 @@ class MaslowController {
 
     removeConnection(socket) {
         if (!socket) {
-            log.error('The socket parameter is not specified');
+            this.log.error('The socket parameter is not specified');
             return;
         }
 
-        log.debug(`Remove socket connection: id=${socket.id}`);
+        this.log.debug(`Remove socket connection: id=${socket.id}`);
         this.sockets[socket.id] = undefined;
         delete this.sockets[socket.id];
     }
@@ -1021,7 +1046,7 @@ class MaslowController {
                 this.emit('gcode:load', name, gcode, context);
                 this.event.trigger('gcode:load');
 
-                log.debug(`Load G-code: name="${this.sender.state.name}", size=${this.sender.state.gcode.length}, total=${this.sender.state.total}`);
+                this.log.debug(`Load G-code: name="${this.sender.state.name}", size=${this.sender.state.gcode.length}, total=${this.sender.state.total}`);
 
                 this.workflow.stop();
 
@@ -1037,25 +1062,25 @@ class MaslowController {
                 this.event.trigger('gcode:unload');
             },
             'start': () => {
-                log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
+                this.log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
                 this.command('gcode:start');
             },
             'gcode:start': () => {
                 this.event.trigger('gcode:start');
 
-                log.debug('Starting Workflow');
+                this.log.debug('Starting Workflow');
                 this.workflow.start();
 
                 // Feeder
-                log.debug('Re-setting Feeder');
+                this.log.debug('Re-setting Feeder');
                 this.feeder.reset();
 
                 // Sender
-                log.debug('Sender next');
+                this.log.debug('Sender next');
                 this.sender.next();
             },
             'stop': () => {
-                log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
+                this.log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
                 this.command('gcode:stop', ...args);
             },
             // @param {object} options The options object.
@@ -1084,7 +1109,7 @@ class MaslowController {
                 }
             },
             'pause': () => {
-                log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
+                this.log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
                 this.command('gcode:pause');
             },
             'gcode:pause': () => {
@@ -1094,7 +1119,7 @@ class MaslowController {
                 this.write('!');
             },
             'resume': () => {
-                log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
+                this.log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
                 this.command('gcode:resume');
             },
             'gcode:resume': () => {
@@ -1261,7 +1286,7 @@ class MaslowController {
                 const macro = _.find(macros, { id: id });
 
                 if (!macro) {
-                    log.error(`Cannot find the macro: id=${id}`);
+                    this.log.error(`Cannot find the macro: id=${id}`);
                     return;
                 }
 
@@ -1281,7 +1306,7 @@ class MaslowController {
                 const macro = _.find(macros, { id: id });
 
                 if (!macro) {
-                    log.error(`Cannot find the macro: id=${id}`);
+                    this.log.error(`Cannot find the macro: id=${id}`);
                     return;
                 }
 
@@ -1305,7 +1330,7 @@ class MaslowController {
         }[cmd];
 
         if (!handler) {
-            log.error(`Unknown command: ${cmd}`);
+            this.log.error(`Unknown command: ${cmd}`);
             return;
         }
 
@@ -1315,7 +1340,7 @@ class MaslowController {
     write(data, context) {
         // Assertion check
         if (this.isClose()) {
-            log.error(`Serial port "${this.options.port}" is not accessible`);
+            this.log.error(`Serial port "${this.options.port}" is not accessible`);
             return;
         }
 
@@ -1328,7 +1353,7 @@ class MaslowController {
             source: WRITE_SOURCE_CLIENT
         });
         this.connection.write(data);
-        log.silly(`> ${data}`);
+        this.log.silly(`> ${data}`);
     }
 
     writeln(data, context) {

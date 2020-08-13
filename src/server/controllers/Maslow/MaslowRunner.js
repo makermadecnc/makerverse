@@ -1,7 +1,6 @@
 import events from 'events';
 import _ from 'lodash';
 import MaslowLineParser from './MaslowLineParser';
-import MaslowMemory from './MaslowMemory';
 import MaslowLineParserResultStatus from './MaslowLineParserResultStatus';
 import MaslowLineParserResultOk from './MaslowLineParserResultOk';
 import MaslowLineParserResultError from './MaslowLineParserResultError';
@@ -34,9 +33,9 @@ class MaslowRunner extends events.EventEmitter {
         }
     };
 
-    constructor() {
+    constructor(controller) {
         super();
-        this.memory = new MaslowMemory(this);
+        this.controller = controller;
     }
 
     parser = new MaslowLineParser();
@@ -56,7 +55,7 @@ class MaslowRunner extends events.EventEmitter {
             return;
         }
         if (type === MaslowLineParserResultStatus) {
-            this.memory.updateStatus(payload);
+            this.controller.memory.updateStatus(payload);
             return;
         }
         if (type === MaslowLineParserResultOk) {
@@ -74,7 +73,7 @@ class MaslowRunner extends events.EventEmitter {
             return;
         }
         if (type === MaslowLineParserResultParserState) {
-            this.memory.updateParserState(payload);
+            this.controller.memory.updateParserState(payload);
             return;
         }
         if (type === MaslowLineParserResultParameters) {
