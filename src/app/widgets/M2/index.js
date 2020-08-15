@@ -89,8 +89,8 @@ class M2Widget extends PureComponent {
       }
     },
     'controller:settings': (type, controllerSettings) => {
-      console.log(controllerSettings)
       if(controllerSettings.settings['$3'] === "0"){
+        console.log("Enabling axis inversion for Maslow.");
         controller.command('gcode', '$3=4');
       }
       this.setState(state => ({
@@ -191,7 +191,7 @@ class M2Widget extends PureComponent {
       ...this.actions
     };
     const controllerSettings = state.controller.settings.settings;
-    console.log('Machine', state.controller);
+    console.log('Render Maslow Controller', state.controller);
     return (
       <Widget fullscreen={false}>
         <Widget.Header>
@@ -543,7 +543,7 @@ class M2Widget extends PureComponent {
                 <M2ScaleModal
                   modalConfig={modalConfig}
                   handleCalibrate={actions.handleCalibrate}
-                  controllerSettings={settings}
+                  controllerSettings={controllerSettings}
                   handleClose={() => this.setState({ displayModal: false })}
                 />
               ) : (
@@ -551,7 +551,7 @@ class M2Widget extends PureComponent {
                   modalImg={modalImg}
                   modalConfig={modalConfig}
                   handleCalibrate={actions.handleCalibrate}
-                  controllerSettings={settings}
+                  controllerSettings={controllerSettings}
                   handleClose={() => this.setState({ displayModal: false })}
                 />
               ))}

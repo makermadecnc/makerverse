@@ -4,6 +4,7 @@ import styles from './index.styl';
 import classnames from 'classnames';
 import i18n from 'app/lib/i18n';
 import { in2mm } from 'app/lib/units';
+import controller from 'app/lib/controller';
 
 class M2ScaleModal extends PureComponent {
   state = {
@@ -35,6 +36,10 @@ class M2ScaleModal extends PureComponent {
   }
 
   handleSubmit = e => {
+    controller.command('gcode', 'G90');
+    controller.command('gcode', 'G21');
+    controller.command('gcode', 'G0 X0 Y0 Z0');
+    /*
     const {
       values,
       expectedLength,
@@ -56,7 +61,7 @@ class M2ScaleModal extends PureComponent {
     const subObj = {
       [activeTab.gCode]: { value: newScale, units: 'mm' }
     };
-    this.props.handleCalibrate(subObj);
+    this.props.handleCalibrate(subObj);*/
   };
   handleTab = conf => {
     this.setState({
@@ -104,7 +109,7 @@ class M2ScaleModal extends PureComponent {
             ))}
           </div>
           <h2>{activeTab.name}</h2>
-          <img src={activeTab.img} />         
+          <img src={activeTab.img} />
           <form onSubmit={this.handleSubmit}>
             <div className={styles['input-field']}>
               <label htmlFor="expected">Expected {activeTab.dimension}:</label>

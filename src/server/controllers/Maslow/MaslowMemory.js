@@ -30,6 +30,7 @@ const stateDefaults = {
             y: '0.000',
             z: '0.000'
         },
+        err: {},
         ov: []
     },
     parserstate: {
@@ -54,13 +55,14 @@ const stateDefaults = {
         z: 0
     },
 };
+
 /**
  * The Maslow classic expects the software layer to handle settings which it cannot due to
  * limited memory / system capabilities. This translation layer serves as the memory which the
  * hardware lacks.
  */
 class MaslowMemory {
-    storage = new ConfigStore();
+    storage = new ConfigStore(false);
 
     loaded = false;
 
@@ -87,6 +89,10 @@ class MaslowMemory {
         return Number(_.get(state, 'parserstate.tool')) || 0;
     }
 
+    getUnits(state = this.storage.config) {
+        return _.get(state, 'parserstate.modal.units') === 'G21' ? 'mm' : 'in';
+    }
+
     isAlarm() {
         const activeState = _.get(this.storage.config, 'status.activeState');
         return activeState === MASLOW_ACTIVE_STATE_ALARM;
@@ -110,18 +116,26 @@ class MaslowMemory {
 
     updateModal(name, value) {
         this.load(); // Ensure disk memory is loaded.
-        this.save('parserstate', { 'modal': { name: value } });
+        this.save('parserstate', { 'modal': { [name]: value } });
+    }
+
+    toMM(val) {
+        return this.getUnits() === 'mm' ? val : (val * 25.4);
+    }
+
+    fromMM(val) {
+        return this.getUnits() === 'mm' ? val : (val / 25.4);
     }
 
     updateStatus(payload) {
         this.load(); // Ensure disk memory is loaded.
-        if (this.controller.runner.isMaslowClassic()) {
+        if (this.controller.hardware.isMaslowClassic()) {
             // Do not set the work position on the Maslow Classic. It will be set in-memory.
             if (_.has(payload, 'mpos')) {
                 payload.wpos = {
-                    x: Number(payload.mpos.x) - this.storage.config.workOrigin.x,
-                    y: Number(payload.mpos.y) - this.storage.config.workOrigin.y,
-                    z: Number(payload.mpos.z) - this.storage.config.workOrigin.z
+                    x: Number(payload.mpos.x) - this.fromMM(this.storage.config.workOrigin.x),
+                    y: Number(payload.mpos.y) - this.fromMM(this.storage.config.workOrigin.y),
+                    z: Number(payload.mpos.z) - this.fromMM(this.storage.config.workOrigin.z)
                 };
             }
         } else if (_.has(payload, 'mpos') && !_.has(payload, 'wpos')) {
@@ -150,16 +164,9 @@ class MaslowMemory {
     // [name]=[value] handler
     handleGrblSetting(name, value) {
         this.log.debug(`MaslowMemory translating Grbl setting: ${name}=${value}`);
-        if (!this.controller.runner.isMaslowClassic()) {
+        if (!this.controller.hardware.isMaslowClassic()) {
             if ((name === '$13') && (value >= 0) && (value <= 65535)) {
-                const nextSettings = {
-                    ...this.controller.runner.settings,
-                    settings: {
-                        ...this.controller.runner.settings.settings,
-                        [name]: value ? '1' : '0'
-                    }
-                };
-                this.controller.runner.settings = nextSettings; // enforce change
+                this.controller.hardware.setGrbl(name, value ? '1' : '0');
             }
             return true;
         }
@@ -168,8 +175,8 @@ class MaslowMemory {
 
     // Generic Gcode command
     handleCommand(cmd) {
-        this.log.debug(`MaslowMemory translating command: ${cmd}`);
-        if (!this.controller.runner.isMaslowClassic()) {
+        this.log.silly(`MaslowMemory translating command: ${cmd}`);
+        if (!this.controller.hardware.isMaslowClassic()) {
             // Only the Maslow Classic needs in-memory storage.
             return cmd;
         }
@@ -185,11 +192,11 @@ class MaslowMemory {
             const payload = {};
             for (let i = 1; i < cmds.length; ++i) {
                 if (cmds[i].indexOf('X') === 0) {
-                    payload.x = Number(cmds[i].substr(1)) + Number(mpos.x);
+                    payload.x = this.toMM(Number(cmds[i].substr(1)) + Number(mpos.x));
                 } else if (cmds[i].indexOf('Y') === 0) {
-                    payload.y = Number(cmds[i].substr(1)) + Number(mpos.y);
+                    payload.y = this.toMM(Number(cmds[i].substr(1)) + Number(mpos.y));
                 } else if (cmds[i].indexOf('Z') === 0) {
-                    payload.z = Number(cmds[i].substr(1)) + Number(mpos.z);
+                    payload.z = this.toMM(Number(cmds[i].substr(1)) + Number(mpos.z));
                 }
             }
             this.storage.config.workOrigin = { ...this.storage.config.workOrigin, ...payload };
@@ -199,9 +206,9 @@ class MaslowMemory {
             if (_.get(this.storage.config, 'parserstate.modal.distance') === 'G90') {
                 for (let i = 1; i < cmds.length; ++i) {
                     if (cmds[i].indexOf('X') === 0) {
-                        cmds[i] = 'X' + (Number(cmds[i].substr(1)) + Number(this.storage.config.workOrigin.x));
+                        cmds[i] = 'X' + (Number(cmds[i].substr(1)) + this.fromMM(Number(this.storage.config.workOrigin.x)));
                     } else if (cmds[i].indexOf('Y') === 0) {
-                        cmds[i] = 'Y' + (Number(cmds[i].substr(1)) + Number(this.storage.config.workOrigin.y));
+                        cmds[i] = 'Y' + (Number(cmds[i].substr(1)) + this.fromMM(Number(this.storage.config.workOrigin.y)));
                     }
                 }
                 this.log.silly(`translated G91 absolute position for work position: ${cmds}`);
@@ -209,9 +216,6 @@ class MaslowMemory {
         } else if (cmd === '$H') {
             // "Homing" the classic == reset chain lengths
             cmds[0] = 'B08';
-        } else if (cmd === '$$') {
-            // Instead of help, print firmware version number
-            cmds[0] = 'B05';
         } else if (!MaslowClassicGCode.includes(c) && c[0] !== 'T') {
             this.log.error(`MaslowClassic does not support: ${cmd}`);
             return cmd;
@@ -236,7 +240,7 @@ class MaslowMemory {
 
     // Load Maslow Classic pseudo-memory from disk
     load() {
-        if (!this.controller.runner.isMaslowClassic() || this.loaded) {
+        if (!this.controller.hardware.isMaslowClassic() || this.loaded) {
             return;
         }
         const filename = `${this.controller.options.id}.json`;
@@ -253,15 +257,13 @@ class MaslowMemory {
     // Save Maslow Classic pseudo-memory to disk
     save(key, payload) {
         this.load();
-        if (key === 'parserstate' || key === 'status') {
-            this.controller.runner.emit(key, payload);
-        }
         _.update(this.storage.config, key, (val) => {
+            this.controller.log.silly(`${key} = ${JSON.stringify(val)} + ${JSON.stringify(payload)}`);
             return _.merge(val || {}, payload);
         });
         // Do not write to disk for status changes; they happen too frequently, and are
         // actually computed values anyways.
-        if (this.controller.runner.isMaslowClassic() && key !== 'status') {
+        if (this.controller.hardware.isMaslowClassic() && key !== 'status') {
             try {
                 this.storage.sync();
             } catch (e) {

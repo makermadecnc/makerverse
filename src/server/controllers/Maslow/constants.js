@@ -302,7 +302,7 @@ export const MASLOW_ALARMS = [
 
 // Settings
 // https://github.com/gnea/grbl/blob/master/doc/csv/setting_codes_en_US.csv
-export const MASLOW_SETTINGS = [
+export const GRBL_SETTINGS = [
     {
         setting: '$0',
         message: 'Step pulse time',

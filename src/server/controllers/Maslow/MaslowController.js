@@ -26,14 +26,14 @@ import {
 } from '../constants';
 import MaslowRunner from './MaslowRunner';
 import MaslowMemory from './MaslowMemory';
+import MaslowHardware from './MaslowHardware';
 import {
     MASLOW,
     MASLOW_ACTIVE_STATE_RUN,
     MASLOW_ACTIVE_STATE_HOLD,
     MASLOW_REALTIME_COMMANDS,
     MASLOW_ALARMS,
-    MASLOW_ERRORS,
-    MASLOW_SETTINGS
+    MASLOW_ERRORS
 } from './constants';
 
 // % commands
@@ -53,6 +53,8 @@ class MaslowController {
 
     // Connection
     connection = null;
+
+    hardware = new MaslowHardware();
 
     connectionEventListener = {
         data: (data) => {
@@ -510,18 +512,25 @@ class MaslowController {
         });
 
         this.runner.on('settings', (res) => {
-            const setting = _.find(MASLOW_SETTINGS, { setting: res.name });
+            this.log.debug(`setting ${res.name}=${res.value}`);
 
-            if (!res.message && setting) {
-                // Maslow v1.1
-                this.emit('serialport:read', `${res.name}=${res.value} (${setting.message}, ${setting.units})`);
+            if (res.message && res.units) {
+                // Grbl v1.1
+                this.emit('serialport:read', `${res.name}=${res.value} (${res.message}, ${res.units})`);
+            } else if (res.message) {
+                this.emit('serialport:read', `${res.name}=${res.value} (${res.message})`);
             } else {
-                // Maslow v0.9
+                // Grbl v0.9
                 this.emit('serialport:read', res.raw);
             }
         });
 
+        this.runner.on('firmware', (res) => {
+            this.log.debug(`firmware ${res.name} ${res.version}`);
+        });
+
         this.runner.on('startup', (res) => {
+            this.log.debug('startup complete');
             this.emit('serialport:read', res.raw);
 
             // The startup message always prints upon startup, after a reset, or at program end.
@@ -570,8 +579,8 @@ class MaslowController {
 
             // Maslow Classic does not support querying for status reports.
             // Doing so will result in an error: in response.
-            if (this.isOpen() && !this.runner.isMaslowClassic()) {
-                this.log.silly(`Querying machine status for ${this.runner.settings.firmware.name}`);
+            if (this.isOpen() && !this.hardware.isMaslowClassic()) {
+                this.log.silly('Querying machine status');
                 this.actionMask.queryStatusReport = true;
                 this.actionTime.queryStatusReport = now;
                 this.connection.write('?');
@@ -609,8 +618,8 @@ class MaslowController {
                 return;
             }
 
-            if (this.isOpen() && !this.runner.isMaslowClassic()) {
-                this.log.silly(`Querying parser state for ${this.runner.firmware.name}`);
+            if (this.isOpen() && !this.hardware.isMaslowClassic()) {
+                this.log.silly('Querying parser state');
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
@@ -640,17 +649,17 @@ class MaslowController {
             );
 
             // Maslow settings
-            if (this.settings !== this.runner.settings) {
-                this.settings = this.runner.settings;
+            const settings = this.hardware.toDictionary();
+            if (!_.isEqual(settings, this.settings)) {
+                this.settings = _.cloneDeep(settings);
                 this.emit('controller:settings', MASLOW, this.settings);
-                this.emit('Maslow:settings', this.settings); // Backward compatibility
             }
 
             // Maslow state
-            if (this.state !== this.memory.storage.config) {
-                this.state = this.memory.storage.config;
+            if (!_.isEqual(this.state, this.memory.storage.config)) {
+                this.log.debug('state change');
+                this.state = _.cloneDeep(this.memory.storage.config);
                 this.emit('controller:state', MASLOW, this.state);
-                this.emit('Maslow:state', this.state); // Backward compatibility
             }
 
             // Check the ready flag
@@ -706,7 +715,7 @@ class MaslowController {
         // https://github.com/cncjs/cncjs/issues/206
         // $13=0 (report in mm)
         // $13=1 (report in inches)
-        this.writeln('$$');
+        this.hardware.getInitCommands().forEach(this.writeln);
 
         await delay(50);
         this.event.trigger('controller:ready');
@@ -813,6 +822,10 @@ class MaslowController {
 
         if (this.memory) {
             this.memory = null;
+        }
+
+        if (this.hardware) {
+            this.hardware = null;
         }
 
         this.sockets = {};
@@ -979,12 +992,10 @@ class MaslowController {
         if (!_.isEmpty(this.settings)) {
             // controller settings
             socket.emit('controller:settings', MASLOW, this.settings);
-            socket.emit('Maslow:settings', this.settings); // Backward compatibility
         }
         if (!_.isEmpty(this.state)) {
             // controller state
             socket.emit('controller:state', MASLOW, this.state);
-            socket.emit('Maslow:state', this.state); // Backward compatibility
         }
         if (this.feeder) {
             // feeder status

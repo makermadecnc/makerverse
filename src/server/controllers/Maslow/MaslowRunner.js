@@ -12,27 +12,8 @@ import MaslowLineParserResultSettings from './MaslowLineParserResultSettings';
 import MaslowLineParserResultStartup from './MaslowLineParserResultStartup';
 import MaslowLineParserResultPositionalError from './MaslowLineParserResultPositionalError';
 import MaslowLineParserResultVersion from './MaslowLineParserResultVersion';
-import {
-    MASLOW_FIRMWARE_CLASSIC,
-    MASLOW_FIRMWARE_DUE,
-} from './constants';
 
 class MaslowRunner extends events.EventEmitter {
-    settings = {
-        protocol: {
-            name: 'Grbl',
-            version: '',
-        },
-        firmware: {
-            name: '',
-            version: '',
-        },
-        parameters: {
-        },
-        settings: {
-        }
-    };
-
     constructor(controller) {
         super();
         this.controller = controller;
@@ -51,11 +32,18 @@ class MaslowRunner extends events.EventEmitter {
         const result = this.parser.parse(data) || {};
         const { type, payload } = result;
 
+        // delete raw for value parsing
+        const values = { ...payload };
+        delete values.raw;
+
         if (type === MaslowLineParserResultPositionalError) {
+            this.controller.memory.updateStatus({ 'err': values });
+            this.emit('status', payload);
             return;
         }
         if (type === MaslowLineParserResultStatus) {
-            this.controller.memory.updateStatus(payload);
+            this.controller.memory.updateStatus(values);
+            this.emit('status', payload);
             return;
         }
         if (type === MaslowLineParserResultOk) {
@@ -73,21 +61,13 @@ class MaslowRunner extends events.EventEmitter {
             return;
         }
         if (type === MaslowLineParserResultParserState) {
-            this.controller.memory.updateParserState(payload);
+            this.controller.memory.updateParserState(values);
+            this.emit('parserstate', payload);
             return;
         }
         if (type === MaslowLineParserResultParameters) {
             const { name, value } = payload;
-            const nextSettings = {
-                ...this.settings,
-                parameters: {
-                    ...this.settings.parameters,
-                    [name]: value
-                }
-            };
-            if (!_.isEqual(this.settings.parameters[name], nextSettings.parameters[name])) {
-                this.settings = nextSettings; // enforce change
-            }
+            _.set(this.controller.hardware.parameters, name, value);
             this.emit('parameters', payload);
             return;
         }
@@ -96,43 +76,29 @@ class MaslowRunner extends events.EventEmitter {
             return;
         }
         if (type === MaslowLineParserResultSettings) {
-            const { name, value } = payload;
-            const nextSettings = {
-                ...this.settings,
-                settings: {
-                    ...this.settings.settings,
-                    [name]: value
-                }
-            };
-            if (this.settings.settings[name] !== nextSettings.settings[name]) {
-                this.settings = nextSettings; // enforce change
-            }
-            this.emit('settings', payload);
+            const { name, value, message } = payload;
+            const setting = this.controller.hardware.setGrbl(name, value, message);
+            this.emit('settings', setting);
             return;
         }
         if (type === MaslowLineParserResultVersion) {
-            const nextSettings = {
-                ...this.settings,
-                firmware: {
-                    ...this.settings.firmware,
-                    name: payload.name,
-                    version: payload.version,
-                }
-            };
-            this.settings = nextSettings;
-            this.emit('version', payload);
+            const { name, pcb, version } = payload;
+            this.controller.hardware.firmware.name = name;
+            if (pcb) {
+                this.controller.hardware.firmware.pcb = pcb;
+            }
+            if (version) {
+                this.controller.hardware.firmware.version = version;
+            }
+            this.emit('firmware', this.controller.hardware.firmware);
             return;
         }
         if (type === MaslowLineParserResultStartup) {
-            const nextSettings = {
-                ...this.settings,
-                protocol: {
-                    ...this.settings.protocol,
-                    name: payload.name,
-                    version: payload.version,
-                }
+            const { name, version } = payload;
+            this.controller.hardware.protocol = {
+                'name': name,
+                'version': version,
             };
-            this.settings = nextSettings;
             this.emit('startup', payload);
             return;
         }
@@ -140,14 +106,6 @@ class MaslowRunner extends events.EventEmitter {
             this.emit('others', payload);
             return;
         }
-    }
-
-    isMaslowClassic() {
-        return this.settings.firmware && this.settings.firmware.name === MASLOW_FIRMWARE_CLASSIC;
-    }
-
-    isMaslowDue() {
-        return this.settings.firmware && this.settings.firmware.name === MASLOW_FIRMWARE_DUE;
     }
 }
 

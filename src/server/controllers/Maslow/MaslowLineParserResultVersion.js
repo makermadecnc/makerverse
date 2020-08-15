@@ -36,11 +36,21 @@ class MaslowLineParserResultVersion {
     }
 
     static parseMaslowClassic(line) {
-        const r = line.match(/^Firmware Version (.+)$/);
-        return r && {
+        const fw = line.match(/^Firmware Version (.+)$/);
+        const pcb = line.match(/^PCB v(.+) Detected$/);
+        if (!fw && !pcb) {
+            return null;
+        }
+        const ret = {
             name: MASLOW_FIRMWARE_CLASSIC,
-            version: r[1],
         };
+        if (fw) {
+            ret.version = fw[1];
+        }
+        if (pcb) {
+            ret.pcb = pcb[1];
+        }
+        return ret;
     }
 }
 
