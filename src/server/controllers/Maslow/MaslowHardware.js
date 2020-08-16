@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import exec from 'child_process';
+import delay from '../../lib/delay';
 import {
     GRBL_SETTINGS,
     MASLOW_FIRMWARE_CLASSIC,
@@ -34,9 +36,63 @@ class MaslowHardware {
         return this.firmware && this.firmware.name === MASLOW_FIRMWARE_DUE;
     }
 
-    getInitCommands() {
-        // Classic needs to print firmware & reset units when init-ing.
-        return this.isMaslowClassic() ? ['$$', 'B05', 'G21'] : ['$$'];
+    async writeInitCommands(writeFn) {
+        writeFn('$$');
+        if (this.isMaslowClassic()) {
+            // Classic needs to print firmware & reset units when init-ing.
+            writeFn('B05');
+        }
+        await delay(50);
+    }
+
+    // Run a
+    runCalibration(measurements, callback) {
+        const cmd = this.getCalibrationCommand();
+        exec(cmd, (error, stdout, stderr) => {
+            if (error) {
+                callback({
+                    error: error.message
+                });
+                return;
+            }
+            if (stderr) {
+                callback({
+                    error: stderr
+                });
+                return;
+            }
+            callback({
+                stdout: stdout
+            });
+        });
+    }
+
+    // Returns a string that can be shell-executed to run calibration.
+    getCalibrationCommand(measurements) {
+        const config = this.isMaslowClassic() ? {
+            motorSpacingX: this.getGrbl('$2'),
+            motorOffsetY: this.getGrbl('$3'),
+            leftChainTolerance: this.getGrbl('$40'),
+            rightChainTolerance: this.getGrbl('$41'),
+            sledWeight: this.getGrbl('$46'),
+            // chainOverSprocket: this.getGrbl('$46'),
+            // machineHeight: this.getGrbl('$46'),
+            // machineHeight: this.getGrbl('$46'),
+            // sledRadius ?
+            // edgeDistance ?
+            // measuredInches ?
+        } : {
+        };
+
+        const cmds = ['bin/maslow-calibration.py'];
+        Object.keys(config).forEach((key) => {
+            cmds.push(`--${key}`);
+            cmds.push(config[key]);
+        });
+        measurements.forEach((m) => {
+            cmds.push(m);
+        });
+        return cmds.join(' ');
     }
 
     toDictionary() {
@@ -47,6 +103,11 @@ class MaslowHardware {
             'settings': { ...this.settings },
             'grbl': { ...this.grbl },
         };
+    }
+
+    getGrbl(code) {
+        const setting = this.grbl[code];
+        return setting ? setting.value : null;
     }
 
     // During startup, Grbl outputs its variable + values + comments.

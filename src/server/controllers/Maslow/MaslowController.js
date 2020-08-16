@@ -244,7 +244,7 @@ class MaslowController {
         // Sender
         this.sender = new Sender(SP_TYPE_CHAR_COUNTING, {
             // Deduct the buffer size to prevent from buffer overrun
-            bufferSize: (128 - 8), // The default buffer size is 128 bytes
+            bufferSize: (128 - 8 - 2), // The default buffer size is 128-8 bytes; MaslowClassic has a little less
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 line = line.replace(/\s*;.*/g, '').trim();
@@ -527,6 +527,8 @@ class MaslowController {
 
         this.runner.on('firmware', (res) => {
             this.log.debug(`firmware ${res.name} ${res.version}`);
+            // Rebuild the logger to specify the firmware name in every entry.
+            this.log = logger(`controller:${res.name}:${this.options.id}`);
         });
 
         this.runner.on('startup', (res) => {
@@ -657,7 +659,6 @@ class MaslowController {
 
             // Maslow state
             if (!_.isEqual(this.state, this.memory.storage.config)) {
-                this.log.debug('state change');
                 this.state = _.cloneDeep(this.memory.storage.config);
                 this.emit('controller:state', MASLOW, this.state);
             }
@@ -715,9 +716,8 @@ class MaslowController {
         // https://github.com/cncjs/cncjs/issues/206
         // $13=0 (report in mm)
         // $13=1 (report in inches)
-        this.hardware.getInitCommands().forEach(this.writeln);
+        await this.hardware.writeInitCommands(this.writeln.bind(this));
 
-        await delay(50);
         this.event.trigger('controller:ready');
     }
 
@@ -1336,6 +1336,13 @@ class MaslowController {
                     }
 
                     this.command('gcode:load', file, data, context, callback);
+                });
+            },
+            'calibration:calibrate': () => {
+                const [measurements, callback = noop] = args;
+                this.hardware.runCalibration(measurements, (res) => {
+                    this.log.debug(`calibration: ${res}`);
+                    callback(res);
                 });
             }
         }[cmd];

@@ -161,16 +161,22 @@ class MaslowMemory {
         this.save('status', payload);
     }
 
+    // Grbl settings: $0-$255
     // [name]=[value] handler
-    handleGrblSetting(name, value) {
+    handleGrblSetting(line) {
+        const r = line.match(/^(\$\d{1,3})=([\d\.]+)$/);
+        if (!r) {
+            return null;
+        }
+        const name = r[1];
+        const value = Number(r[2]);
         this.log.debug(`MaslowMemory translating Grbl setting: ${name}=${value}`);
         if (!this.controller.hardware.isMaslowClassic()) {
             if ((name === '$13') && (value >= 0) && (value <= 65535)) {
                 this.controller.hardware.setGrbl(name, value ? '1' : '0');
             }
-            return true;
         }
-        return true;
+        return line + '\n';
     }
 
     // Generic Gcode command
@@ -178,10 +184,11 @@ class MaslowMemory {
         this.log.silly(`MaslowMemory translating command: ${cmd}`);
         if (!this.controller.hardware.isMaslowClassic()) {
             // Only the Maslow Classic needs in-memory storage.
-            return cmd;
+            return cmd + '\n';
         }
-        const cmds = cmd.split(' ');
-        const c = cmds[0];
+        const params = cmd.split(' ');
+        const c = params[0];
+        const cmds = [cmd];
         if (c === 'G20' || c === 'G21') {
             this.updateModal('units', c);
         } else if (c === 'G90' || c === 'G91') {
@@ -190,13 +197,13 @@ class MaslowMemory {
             // Implement "Work Position" for the classic.
             const mpos = this.storage.config.status.mpos;
             const payload = {};
-            for (let i = 1; i < cmds.length; ++i) {
-                if (cmds[i].indexOf('X') === 0) {
-                    payload.x = this.toMM(Number(cmds[i].substr(1)) + Number(mpos.x));
-                } else if (cmds[i].indexOf('Y') === 0) {
-                    payload.y = this.toMM(Number(cmds[i].substr(1)) + Number(mpos.y));
-                } else if (cmds[i].indexOf('Z') === 0) {
-                    payload.z = this.toMM(Number(cmds[i].substr(1)) + Number(mpos.z));
+            for (let i = 1; i < params.length; ++i) {
+                if (params[i].indexOf('X') === 0) {
+                    payload.x = this.toMM(Number(mpos.x) - Number(params[i].substr(1)));
+                } else if (params[i].indexOf('Y') === 0) {
+                    payload.y = this.toMM(Number(mpos.y) - Number(params[i].substr(1)));
+                } else if (params[i].indexOf('Z') === 0) {
+                    payload.z = this.toMM(Number(mpos.z) - Number(params[i].substr(1)));
                 }
             }
             this.storage.config.workOrigin = { ...this.storage.config.workOrigin, ...payload };
@@ -204,24 +211,24 @@ class MaslowMemory {
         } else if (c === 'G0') {
             // Adjust absolute movement for the work position
             if (_.get(this.storage.config, 'parserstate.modal.distance') === 'G90') {
-                for (let i = 1; i < cmds.length; ++i) {
-                    if (cmds[i].indexOf('X') === 0) {
-                        cmds[i] = 'X' + (Number(cmds[i].substr(1)) + this.fromMM(Number(this.storage.config.workOrigin.x)));
-                    } else if (cmds[i].indexOf('Y') === 0) {
-                        cmds[i] = 'Y' + (Number(cmds[i].substr(1)) + this.fromMM(Number(this.storage.config.workOrigin.y)));
+                for (let i = 1; i < params.length; ++i) {
+                    if (params[i].indexOf('X') === 0) {
+                        params[i] = 'X' + (Number(params[i].substr(1)) + this.fromMM(Number(this.storage.config.workOrigin.x)));
+                    } else if (params[i].indexOf('Y') === 0) {
+                        params[i] = 'Y' + (Number(params[i].substr(1)) + this.fromMM(Number(this.storage.config.workOrigin.y)));
                     }
                 }
-                this.log.silly(`translated G91 absolute position for work position: ${cmds}`);
+                cmds[0] = params.join(' ');
+                this.log.silly(`translated G91 absolute position for work position: ${params}`);
             }
         } else if (cmd === '$H') {
             // "Homing" the classic == reset chain lengths
             cmds[0] = 'B08';
-        } else if (!MaslowClassicGCode.includes(c) && c[0] !== 'T') {
+        } else if (!MaslowClassicGCode.includes(c) && c[0] !== 'T' && c[0] !== '$') {
             this.log.error(`MaslowClassic does not support: ${cmd}`);
-            return cmd;
         }
         /*if (cmd === '$X') { }*/
-        return cmds.join(' ') + '\n';
+        return cmds.join('\n') + '\n';
     }
 
     // Filter anything that will be written to the serial port, translating the command
@@ -233,9 +240,7 @@ class MaslowMemory {
             return data;
         }
 
-        // Grbl settings: $0-$255
-        const r = line.match(/^(\$\d{1,3})=([\d\.]+)$/);
-        return r ? this.handleGrblSetting(r[1], Number(r[2])) : this.handleCommand(line);
+        return this.handleGrblSetting(line) ?? this.handleCommand(line);
     }
 
     // Load Maslow Classic pseudo-memory from disk

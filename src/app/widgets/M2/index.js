@@ -511,14 +511,14 @@ class M2Widget extends PureComponent {
                   displayModal: true,
                   modalConfig: [
                     {
-                      name: 'X Scaling',
+                      name: 'Define Home',
                       gCode: '$85',
                       for: 'xScaling',
                       img: '../../images/calibration_x.png',
                       dimension: 'Width'
                     },
                     {
-                      name: 'Y Scaling',
+                      name: 'Test Edges',
                       gCode: '$86',
                       for: 'yScaling',
                       img: '../../images/calibration_y.png',
