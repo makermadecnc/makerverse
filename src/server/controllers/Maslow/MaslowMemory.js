@@ -4,12 +4,16 @@ import decimalPlaces from '../../lib/decimal-places';
 import settings from '../../config/settings';
 import { ConfigStore } from '../../services/configstore';
 import {
+    MASLOW_ACTIVE_STATE_RUN,
     MASLOW_ACTIVE_STATE_IDLE,
     MASLOW_ACTIVE_STATE_ALARM,
+    METRIC_UNITS,
+    IMPERIAL_UNITS,
 } from './constants';
 
 // GCode which is actually supported by the Maslow Classic
 const MaslowClassicGCode = [
+    '$', '$$', '!', '~',
     'G0', 'G1', 'G2', 'G3', 'G4', 'G10', 'G20', 'G21', 'G40', 'G38', 'G90', 'G91',
     'M0', 'M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M30', 'M106', 'M107',
     'B01', 'B02', 'B04', 'B05', 'B06', 'B08', 'B09', 'B10',
@@ -31,6 +35,8 @@ const stateDefaults = {
             z: '0.000'
         },
         err: {},
+        buffer: {},
+        alarm: null,
         ov: []
     },
     parserstate: {
@@ -90,7 +96,7 @@ class MaslowMemory {
     }
 
     getUnits(state = this.storage.config) {
-        return _.get(state, 'parserstate.modal.units') === 'G21' ? 'mm' : 'in';
+        return _.get(state, 'parserstate.modal.units') === 'G21' ? METRIC_UNITS : IMPERIAL_UNITS;
     }
 
     isAlarm() {
@@ -120,11 +126,11 @@ class MaslowMemory {
     }
 
     toMM(val) {
-        return this.getUnits() === 'mm' ? val : (val * 25.4);
+        return this.getUnits() === METRIC_UNITS ? val : (val * 25.4);
     }
 
     fromMM(val) {
-        return this.getUnits() === 'mm' ? val : (val / 25.4);
+        return this.getUnits() === METRIC_UNITS ? val : (val / 25.4);
     }
 
     updateStatus(payload) {
@@ -158,6 +164,36 @@ class MaslowMemory {
             });
         }
 
+        if (_.has(payload, 'mpos')) {
+            if (payload.activeState === MASLOW_ACTIVE_STATE_IDLE && this.lastMachinePosition) {
+                // If the Maslow claims it is idle but it has moved since the last status report,
+                // then enforce the RUN state.
+                const lp = this.lastMachinePosition;
+                const mp = payload.mpos;
+                const diff = Math.abs(mp.x - lp.x) + Math.abs(mp.y - lp.y) + Math.abs(mp.z - lp.z);
+                if (this.toMM(diff) > 1) {
+                    payload.activeState = MASLOW_ACTIVE_STATE_RUN;
+                }
+            }
+            this.lastMachinePosition = payload.mpos;
+        }
+
+        if (payload.alarm) {
+            // If an alarm message was captured and not cleared, enforce the alarm state.
+            payload.activeState = MASLOW_ACTIVE_STATE_ALARM;
+        }
+
+        // Check if the receive buffer is available in the status report
+        // @see https://github.com/cncjs/cncjs/issues/115
+        // @see https://github.com/cncjs/cncjs/issues/133
+        const rx = Number(_.get(payload, 'buf.rx', 0)) ||
+                    Number(_.get(payload, 'err.bufferSpaceAvailable', 127)) ||
+                    0;
+        if (rx > 0) {
+            this.controller.adjustBufferSize(rx);
+            payload.buffer = { ...this.controller.sender.sp.state };
+        }
+
         this.save('status', payload);
     }
 
@@ -182,6 +218,10 @@ class MaslowMemory {
     // Generic Gcode command
     handleCommand(cmd) {
         this.log.silly(`MaslowMemory translating command: ${cmd}`);
+        if (cmd === '$X') {
+            // Clear alarm text
+            this.updateStatus({ activeState: MASLOW_ACTIVE_STATE_IDLE, alarm: null });
+        }
         if (!this.controller.hardware.isMaslowClassic()) {
             // Only the Maslow Classic needs in-memory storage.
             return cmd + '\n';
@@ -196,39 +236,67 @@ class MaslowMemory {
         } else if (c === 'G10') {
             // Implement "Work Position" for the classic.
             const mpos = this.storage.config.status.mpos;
+            const dest = this.extractCoords(params);
             const payload = {};
-            for (let i = 1; i < params.length; ++i) {
-                if (params[i].indexOf('X') === 0) {
-                    payload.x = this.toMM(Number(mpos.x) - Number(params[i].substr(1)));
-                } else if (params[i].indexOf('Y') === 0) {
-                    payload.y = this.toMM(Number(mpos.y) - Number(params[i].substr(1)));
-                } else if (params[i].indexOf('Z') === 0) {
-                    payload.z = this.toMM(Number(mpos.z) - Number(params[i].substr(1)));
-                }
-            }
+            Object.keys(dest).forEach((coord) => {
+                payload[coord] = this.toMM(Number(mpos[coord]) - dest[coord]);
+            });
             this.storage.config.workOrigin = { ...this.storage.config.workOrigin, ...payload };
             this.save('workOrigin', payload);
-        } else if (c === 'G0') {
+
+            // Prevent accidentally changing machine positions:
+            cmds[0] = '';
+        } else if (c === 'G0' || c === 'G1') {
             // Adjust absolute movement for the work position
             if (_.get(this.storage.config, 'parserstate.modal.distance') === 'G90') {
-                for (let i = 1; i < params.length; ++i) {
-                    if (params[i].indexOf('X') === 0) {
-                        params[i] = 'X' + (Number(params[i].substr(1)) + this.fromMM(Number(this.storage.config.workOrigin.x)));
-                    } else if (params[i].indexOf('Y') === 0) {
-                        params[i] = 'Y' + (Number(params[i].substr(1)) + this.fromMM(Number(this.storage.config.workOrigin.y)));
-                    }
-                }
-                cmds[0] = params.join(' ');
-                this.log.silly(`translated G91 absolute position for work position: ${params}`);
+                const dest = this.extractCoords(params);
+                const coords = [];
+                Object.keys(dest).forEach((coord) => {
+                    const origin = this.fromMM(Number(this.storage.config.workOrigin[coord]));
+                    const v = Math.round((dest[coord] + origin) * 1000) / 1000;
+                    coords.push(coord.toUpperCase() + v);
+                });
+                cmds[0] = `${c}  ${coords.join(' ')}`;
+                this.log.debug(`translated machine position ${dest} to work position: ${params}`);
             }
         } else if (cmd === '$H') {
             // "Homing" the classic == reset chain lengths
             cmds[0] = 'B08';
-        } else if (!MaslowClassicGCode.includes(c) && c[0] !== 'T' && c[0] !== '$') {
+        } else if (cmd === '$X') {
+            // When unlocking, just print a welcome message. State was changed above.
+            cmds[0] = '$';
+        } else if (c === 'G28.3') {
+            // Machine homing commands, per-axis.
+            const dest = this.extractCoords(params);
+            if (_.has(dest, 'x') || _.has(dest, 'y')) {
+                this.log.error('X and Y must be homed via the homing button.');
+            }
+            if (_.has(dest, 'z')) {
+                // Maslow classic uses G10 to set machine home Z
+                this.log.debug(`Setting machine home Z: ${dest.z}`);
+                cmds[0] = `G10 Z${dest.z}`;
+            }
+        } else if (!MaslowClassicGCode.includes(c) && c[0] !== 'T') {
             this.log.error(`MaslowClassic does not support: ${cmd}`);
         }
         /*if (cmd === '$X') { }*/
         return cmds.join('\n') + '\n';
+    }
+
+    // @params an array like ['X0', 'Y0', 'Z5']
+    // @return an object like {x: 0, y: 0, z: 5}
+    extractCoords(params) {
+        const ret = {};
+        for (let i = 0; i < params.length; ++i) {
+            if (params[i].startsWith('X')) {
+                ret.x = Number(params[i].substr(1));
+            } else if (params[i].startsWith('Y')) {
+                ret.y = Number(params[i].substr(1));
+            } else if (params[i].startsWith('Z')) {
+                ret.z = Number(params[i].substr(1));
+            }
+        }
+        return ret;
     }
 
     // Filter anything that will be written to the serial port, translating the command
@@ -236,7 +304,7 @@ class MaslowMemory {
         this.load(); // Ensure disk memory is loaded.
         const line = data.trim();
 
-        if (!line) {
+        if (!line || line.length <= 0) {
             return data;
         }
 

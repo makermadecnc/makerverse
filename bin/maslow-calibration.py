@@ -742,6 +742,7 @@ class HoleyCalibration():
         self.SetMeasurements(self.processMeasurements())
         self.OptimizationOutput = least_squares(self.LengthDeltaFromIdeal, numpy.array([0, 0, 0, 0]), jac='2-point',
                                                 diff_step=.1, ftol=1e-11)
+        print(self.OptimizationOutput);
         Deltas = self.OptimizationOutput.x
         self.Opt_D = round(Deltas[0] + self.SP_D,5)
         self.Opt_motorOffsetY = round(Deltas[1] + self.SP_motorOffsetY,5)

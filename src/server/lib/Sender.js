@@ -35,12 +35,10 @@ class SPSendResponse {
 class SPCharCounting {
     callback = null;
 
-    state = {
-        bufferSize: 128, // Defaults to 128
-        dataLength: 0,
-        queue: [],
-        line: ''
+    state = { // Populated by reset();
     };
+
+    defaultBufferSize = 128;
 
     constructor(options, callback = noop) {
         if (typeof options === 'function') {
@@ -51,8 +49,9 @@ class SPCharCounting {
         // bufferSize
         const bufferSize = Number(options.bufferSize);
         if (bufferSize && bufferSize > 0) {
-            this.state.bufferSize = bufferSize;
+            this.defaultBufferSize = bufferSize;
         }
+        this.reset();
 
         if (typeof callback === 'function') {
             this.callback = callback;
@@ -64,7 +63,7 @@ class SPCharCounting {
     }
 
     reset() {
-        this.state.bufferSize = 128; // Defaults to 128
+        this.state.bufferSize = this.defaultBufferSize;
         this.state.dataLength = 0;
         this.state.queue = [];
         this.state.line = '';

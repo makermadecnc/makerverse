@@ -37,6 +37,7 @@ import {
 } from './constants';
 
 // % commands
+const BUFFER_PAD = 8;
 const WAIT = '%wait';
 const noop = _.noop;
 
@@ -244,7 +245,7 @@ class MaslowController {
         // Sender
         this.sender = new Sender(SP_TYPE_CHAR_COUNTING, {
             // Deduct the buffer size to prevent from buffer overrun
-            bufferSize: (128 - 8 - 2), // The default buffer size is 128-8 bytes; MaslowClassic has a little less
+            bufferSize: (128 - BUFFER_PAD), // The max buffer size is 128; Grbl shaves off 8 for some reason.
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 line = line.replace(/\s*;.*/g, '').trim();
@@ -366,33 +367,6 @@ class MaslowController {
             if (this.actionMask.replyStatusReport) {
                 this.actionMask.replyStatusReport = false;
                 this.emit('serialport:read', res.raw);
-            }
-
-            // Check if the receive buffer is available in the status report
-            // @see https://github.com/cncjs/cncjs/issues/115
-            // @see https://github.com/cncjs/cncjs/issues/133
-            const rx = Number(_.get(res, 'buf.rx', 0)) || 0;
-            if (rx > 0) {
-                // Do not modify the buffer size when running a G-code program
-                if (this.workflow.state !== WORKFLOW_STATE_IDLE) {
-                    return;
-                }
-
-                // Check if the streaming protocol is character-counting streaming protocol
-                if (this.sender.sp.type !== SP_TYPE_CHAR_COUNTING) {
-                    return;
-                }
-
-                // Check if the queue is empty
-                if (this.sender.sp.dataLength !== 0) {
-                    return;
-                }
-
-                // Deduct the receive buffer length to prevent from buffer overrun
-                const bufferSize = (rx - 8); // TODO
-                if (bufferSize > this.sender.sp.bufferSize) {
-                    this.sender.sp.bufferSize = bufferSize;
-                }
             }
         });
 
@@ -1337,13 +1311,6 @@ class MaslowController {
 
                     this.command('gcode:load', file, data, context, callback);
                 });
-            },
-            'calibration:calibrate': () => {
-                const [measurements, callback = noop] = args;
-                this.hardware.runCalibration(measurements, (res) => {
-                    this.log.debug(`calibration: ${res}`);
-                    callback(res);
-                });
             }
         }[cmd];
 
@@ -1353,6 +1320,30 @@ class MaslowController {
         }
 
         handler();
+    }
+
+    adjustBufferSize(size) {
+        // Do not modify the buffer size when running a G-code program
+        if (this.workflow.state !== WORKFLOW_STATE_IDLE) {
+            return;
+        }
+
+        // Check if the streaming protocol is character-counting streaming protocol
+        if (this.sender.sp.type !== SP_TYPE_CHAR_COUNTING) {
+            return;
+        }
+
+        // Check if the queue is empty
+        if (this.sender.sp.dataLength !== 0) {
+            return;
+        }
+
+        // Deduct the receive buffer length to prevent from buffer overrun
+        size -= BUFFER_PAD;
+        if (size !== this.sender.sp.bufferSize) {
+            this.sender.sp.bufferSize = size;
+            this.log.debug(`adjusting buffer to ${this.sender.sp.state.dataLength}/${size}`);
+        }
     }
 
     write(data, context) {

@@ -6,6 +6,9 @@ export const MASLOW = 'Maslow';
 export const MASLOW_FIRMWARE_CLASSIC = 'MaslowClassic';
 export const MASLOW_FIRMWARE_DUE = 'MaslowDue';
 
+export const METRIC_UNITS = 'mm';
+export const IMPERIAL_UNITS = 'in';
+
 // Active State
 export const MASLOW_ACTIVE_STATE_IDLE = 'Idle';
 export const MASLOW_ACTIVE_STATE_RUN = 'Run';

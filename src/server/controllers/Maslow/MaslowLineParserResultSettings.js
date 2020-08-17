@@ -7,6 +7,11 @@ class MaslowLineParserResultSettings {
             return null;
         }
 
+        const grbl = Number(r[1].substr(1));
+        if (!grbl) {
+            return null;
+        }
+
         const payload = {
             name: r[1],
             value: r[2],

@@ -191,7 +191,7 @@ class M2Widget extends PureComponent {
       ...this.actions
     };
     const controllerSettings = state.controller.settings.settings;
-    console.log('Render Maslow Controller', state.controller);
+    console.log('Render Maslow Controller', state.controller.state.status, state.controller);
     return (
       <Widget fullscreen={false}>
         <Widget.Header>

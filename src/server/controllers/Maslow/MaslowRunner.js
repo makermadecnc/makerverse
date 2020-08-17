@@ -57,6 +57,7 @@ class MaslowRunner extends events.EventEmitter {
             return;
         }
         if (type === MaslowLineParserResultAlarm) {
+            this.controller.memory.updateStatus({ alarm: payload.message });
             this.emit('alarm', payload);
             return;
         }

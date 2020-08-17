@@ -40,6 +40,7 @@ class MaslowHardware {
         writeFn('$$');
         if (this.isMaslowClassic()) {
             // Classic needs to print firmware & reset units when init-ing.
+            await delay(50);
             writeFn('B05');
         }
         await delay(50);
