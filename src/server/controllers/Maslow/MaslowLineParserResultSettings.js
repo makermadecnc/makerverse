@@ -7,8 +7,8 @@ class MaslowLineParserResultSettings {
             return null;
         }
 
-        const grbl = Number(r[1].substr(1));
-        if (!grbl) {
+        if (r[1].toLowerCase() === '$x') {
+            // Exclude help message "$x=val";
             return null;
         }
 

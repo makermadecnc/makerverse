@@ -489,13 +489,11 @@ class MaslowController {
             this.log.debug(`setting ${res.name}=${res.value}`);
 
             if (res.message && res.units) {
-                // Grbl v1.1
                 this.emit('serialport:read', `${res.name}=${res.value} (${res.message}, ${res.units})`);
             } else if (res.message) {
                 this.emit('serialport:read', `${res.name}=${res.value} (${res.message})`);
             } else {
-                // Grbl v0.9
-                this.emit('serialport:read', res.raw);
+                this.emit('serialport:read', `${res.name}=${res.value}`);
             }
         });
 

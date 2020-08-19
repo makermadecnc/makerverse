@@ -89,10 +89,6 @@ class M2Widget extends PureComponent {
       }
     },
     'controller:settings': (type, controllerSettings) => {
-      if(controllerSettings.settings['$3'] === "0"){
-        console.log("Enabling axis inversion for Maslow.");
-        controller.command('gcode', '$3=4');
-      }
       this.setState(state => ({
         controller: {
           ...state.controller,

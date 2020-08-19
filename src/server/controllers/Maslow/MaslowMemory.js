@@ -212,7 +212,7 @@ class MaslowMemory {
                 this.controller.hardware.setGrbl(name, value ? '1' : '0');
             }
         }
-        return line + '\n';
+        return line;
     }
 
     // Generic Gcode command
@@ -224,7 +224,7 @@ class MaslowMemory {
         }
         if (!this.controller.hardware.isMaslowClassic()) {
             // Only the Maslow Classic needs in-memory storage.
-            return cmd + '\n';
+            return cmd;
         }
         const params = cmd.split(' ');
         const c = params[0];
@@ -280,7 +280,7 @@ class MaslowMemory {
             this.log.error(`MaslowClassic does not support: ${cmd}`);
         }
         /*if (cmd === '$X') { }*/
-        return cmds.join('\n') + '\n';
+        return cmds.join('\n');
     }
 
     // @params an array like ['X0', 'Y0', 'Z5']
@@ -302,13 +302,16 @@ class MaslowMemory {
     // Filter anything that will be written to the serial port, translating the command
     writeFilter(data) {
         this.load(); // Ensure disk memory is loaded.
-        const line = data.trim();
-
-        if (!line || line.length <= 0) {
+        const r = data.match(/^(\s*)([^\s]+)(\s*)$/);
+        if (!r) {
             return data;
         }
+        const prefix = r[1];
+        const line = r[2];
+        const suffix = r[3];
 
-        return this.handleGrblSetting(line) ?? this.handleCommand(line);
+        const translated = this.handleGrblSetting(line) ?? this.handleCommand(line);
+        return prefix + translated + suffix;
     }
 
     // Load Maslow Classic pseudo-memory from disk

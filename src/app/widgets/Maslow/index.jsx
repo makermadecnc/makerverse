@@ -8,19 +8,20 @@ import controller from 'app/lib/controller';
 import WidgetConfig from '../WidgetConfig';
 import Maslow from './Maslow';
 import Controller from './Controller';
+import Calibration from './Calibration';
 import {
     MASLOW
 } from '../../constants';
 import {
     MODAL_NONE,
-    MODAL_CONTROLLER
+    MODAL_CONTROLLER,
+    MODAL_CALIBRATION
 } from './constants';
 import styles from './index.styl';
 
 class MaslowWidget extends PureComponent {
     static propTypes = {
         widgetId: PropTypes.string.isRequired,
-        onFork: PropTypes.func.isRequired,
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
@@ -98,6 +99,32 @@ class MaslowWidget extends PureComponent {
                     ...this.state.panel,
                     statusReports: {
                         ...this.state.panel.statusReports,
+                        expanded: !expanded
+                    }
+                }
+            });
+        },
+        toggleAbout: () => {
+            const expanded = this.state.panel.about.expanded;
+
+            this.setState({
+                panel: {
+                    ...this.state.panel,
+                    about: {
+                        ...this.state.panel.about,
+                        expanded: !expanded
+                    }
+                }
+            });
+        },
+        toggleSettings: () => {
+            const expanded = this.state.panel.settings.expanded;
+
+            this.setState({
+                panel: {
+                    ...this.state.panel,
+                    settings: {
+                        ...this.state.panel.settings,
                         expanded: !expanded
                     }
                 }
@@ -188,7 +215,8 @@ class MaslowWidget extends PureComponent {
             },
             modal: {
                 name: MODAL_NONE,
-                params: {}
+                params: {},
+                calibration: {}
             },
             panel: {
                 queueReports: {
@@ -196,6 +224,12 @@ class MaslowWidget extends PureComponent {
                 },
                 statusReports: {
                     expanded: this.config.get('panel.statusReports.expanded')
+                },
+                settings: {
+                    expanded: this.config.get('panel.settings.expanded')
+                },
+                about: {
+                    expanded: this.config.get('panel.settings.about')
                 },
                 modalGroups: {
                     expanded: this.config.get('panel.modalGroups.expanded')
@@ -233,9 +267,7 @@ class MaslowWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId } = this.props;
         const { minimized, isFullscreen, isReady } = this.state;
-        const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const state = {
             ...this.state,
             canClick: this.canClick()
@@ -243,6 +275,9 @@ class MaslowWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
+        const controllerSettings = this.state.controller.settings;
+        const fn = controllerSettings.firmware ? controllerSettings.firmware.name : null;
+        const connected = fn && fn.length > 0;
 
         return (
             <Widget fullscreen={isFullscreen}>
@@ -252,13 +287,10 @@ class MaslowWidget extends PureComponent {
                             <i className="fa fa-bars" />
                             <Space width="8" />
                         </Widget.Sortable>
-                        {isForkedWidget &&
-                        <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
-                        }
                         Maslow
                     </Widget.Title>
                     <Widget.Controls className={this.props.sortable.filterClassName}>
-                        {isReady && (
+                        {isReady && connected && (
                             <Widget.Button
                                 onClick={(event) => {
                                     actions.openModal(MODAL_CONTROLLER);
@@ -267,7 +299,16 @@ class MaslowWidget extends PureComponent {
                                 <i className="fa fa-info" />
                             </Widget.Button>
                         )}
-                        {isReady && (
+                        {isReady && connected && (
+                            <Widget.Button
+                                onClick={(event) => {
+                                    actions.openModal(MODAL_CALIBRATION);
+                                }}
+                            >
+                                <i className="fa fa-bullseye" />
+                            </Widget.Button>
+                        )}
+                        {isReady && connected && (
                             <Widget.DropdownButton
                                 toggle={<i className="fa fa-th-large" />}
                             >
@@ -361,8 +402,6 @@ class MaslowWidget extends PureComponent {
                             onSelect={(eventKey) => {
                                 if (eventKey === 'fullscreen') {
                                     actions.toggleFullscreen();
-                                } else if (eventKey === 'fork') {
-                                    this.props.onFork();
                                 } else if (eventKey === 'remove') {
                                     this.props.onRemove();
                                 }
@@ -379,11 +418,6 @@ class MaslowWidget extends PureComponent {
                                 />
                                 <Space width="4" />
                                 {!isFullscreen ? i18n._('Enter Full Screen') : i18n._('Exit Full Screen')}
-                            </Widget.DropdownMenuItem>
-                            <Widget.DropdownMenuItem eventKey="fork">
-                                <i className="fa fa-fw fa-code-fork" />
-                                <Space width="4" />
-                                {i18n._('Fork Widget')}
                             </Widget.DropdownMenuItem>
                             <Widget.DropdownMenuItem eventKey="remove">
                                 <i className="fa fa-fw fa-times" />
@@ -402,6 +436,9 @@ class MaslowWidget extends PureComponent {
                     >
                         {state.modal.name === MODAL_CONTROLLER &&
                         <Controller state={state} actions={actions} />
+                        }
+                        {state.modal.name === MODAL_CALIBRATION &&
+                        <Calibration state={state} actions={actions} />
                         }
                         <Maslow
                             state={state}

@@ -79,7 +79,7 @@ class MaslowRunner extends events.EventEmitter {
         if (type === MaslowLineParserResultSettings) {
             const { name, value, message } = payload;
             const setting = this.controller.hardware.setGrbl(name, value, message);
-            this.emit('settings', setting);
+            this.emit('settings', { ...payload, ...setting });
             return;
         }
         if (type === MaslowLineParserResultVersion) {

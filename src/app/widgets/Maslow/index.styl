@@ -7,6 +7,24 @@
     }
 }
 
+.no-connection {
+    padding: 10px;
+    color: #333;
+    opacity: .65;
+}
+
+.widget-container{
+    display:flex;
+    justify-content: space-between;
+    padding: 0 15px;
+}
+.widget-container p {
+    margin:0;
+}
+.widget-container p span {
+    font-weight:bold;
+    align-self:flex-end;
+}
 .overrides {
     margin-bottom: 10px;
 
@@ -87,9 +105,12 @@
 .nav-content {
     position: relative;
     overflow-y: auto;
-    background: #000;
-    color: #fff;
-    border: 1px solid #ddd;
+
+    .code {
+        background: #000;
+        border: 1px solid #ddd;
+        color: #fff;
+    }
 
     .pre {
         display: block;

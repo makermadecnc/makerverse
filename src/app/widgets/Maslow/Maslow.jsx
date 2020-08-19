@@ -1,4 +1,3 @@
-import ensureArray from 'ensure-array';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
@@ -7,7 +6,6 @@ import mapGCodeToText from 'app/lib/gcode-text';
 import i18n from 'app/lib/i18n';
 import Panel from 'app/components/Panel';
 import Toggler from 'app/components/Toggler';
-import Overrides from './Overrides';
 import styles from './index.styl';
 
 class Maslow extends PureComponent {
@@ -32,13 +30,12 @@ class Maslow extends PureComponent {
         const none = '–';
         const panel = state.panel;
         const controllerState = state.controller.state || {};
+        const controllerSettings = state.controller.settings || {};
         const parserState = _.get(controllerState, 'parserstate', {});
         const activeState = _.get(controllerState, 'status.activeState') || none;
         const feedrate = _.get(controllerState, 'status.feedrate', _.get(parserState, 'feedrate', none));
         const spindle = _.get(controllerState, 'status.spindle', _.get(parserState, 'spindle', none));
         const tool = _.get(parserState, 'tool', none);
-        const ov = _.get(controllerState, 'status.ov', []);
-        const [ovF = 0, ovR = 0, ovS = 0] = ov;
         const buf = _.get(controllerState, 'status.buf', {});
         const modal = _.mapValues(parserState.modal || {}, mapGCodeToText);
         const receiveBufferStyle = ((rx) => {
@@ -58,9 +55,31 @@ class Maslow extends PureComponent {
         this.plannerBufferMax = Math.max(this.plannerBufferMax, buf.planner) || this.plannerBufferMax;
         this.receiveBufferMax = Math.max(this.receiveBufferMax, buf.rx) || this.receiveBufferMax;
 
+        const fv = controllerSettings.firmware ? (Number(controllerSettings.firmware.version) || 0) : 0;
+        const fn = controllerSettings.firmware ? controllerSettings.firmware.name : null;
+
+        if (!fn || fn.length <= 0) {
+            return <div className={styles.noConnection}>No compatible device detected.</div>;
+        }
+
+        if (fn === 'MaslowClassic') {
+            if (fv < 51.28) {
+                return <div className={styles.noConnection}>Please upgrade to Holey firmware (51.28 or later).</div>;
+            }
+        } else if (fn === 'MaslowDue') {
+            if (fv < 20200811) {
+                return <div className={styles.noConnection}>Please upgrade your Maslow Due firmware (20200811 or later).</div>;
+            }
+        } else {
+            return (
+                <div className={styles.noConnection}>
+                    {fn + ' is not a Maslow.'}
+                </div>
+            );
+        }
+
         return (
             <div>
-                <Overrides ovF={ovF} ovS={ovS} ovR={ovR} />
                 {!_.isEmpty(buf) && (
                     <Panel className={styles.panel}>
                         <Panel.Heading className={styles['panel-heading']}>
@@ -124,6 +143,45 @@ class Maslow extends PureComponent {
                         )}
                     </Panel>
                 )}
+                <Panel className={styles.panel}>
+                    <Panel.Heading className={styles['panel-heading']}>
+                        <Toggler
+                            className="clearfix"
+                            onToggle={() => {
+                                actions.toggleSettings();
+                            }}
+                            title={panel.settings.expanded ? i18n._('Hide') : i18n._('Show')}
+                        >
+                            <div className="pull-left">{i18n._('Settings')}</div>
+                            <Toggler.Icon
+                                className="pull-right"
+                                expanded={panel.settings.expanded}
+                            />
+                        </Toggler>
+                    </Panel.Heading>
+                    {panel.settings.expanded && (
+                        <Panel.Body>
+                            {Object.keys(controllerSettings.grbl).map((key) => {
+                                const val = controllerSettings.grbl[key];
+                                const name = (val.message && val.message.length > 0) ? val.message : val.name;
+                                return (
+                                    <div key={key} className="row no-gutters">
+                                        <div className="col col-xs-8">
+                                            <div className={styles.textEllipsis} title={val.message}>
+                                                {name}
+                                            </div>
+                                        </div>
+                                        <div className="col col-xs-4">
+                                            <div className={styles.well}>
+                                                {val.value}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </Panel.Body>
+                    )}
+                </Panel>
                 <Panel className={styles.panel}>
                     <Panel.Heading className={styles['panel-heading']}>
                         <Toggler
@@ -237,18 +295,6 @@ class Maslow extends PureComponent {
                             </div>
                             <div className="row no-gutters">
                                 <div className="col col-xs-4">
-                                    <div className={styles.textEllipsis} title={i18n._('Plane')}>
-                                        {i18n._('Plane')}
-                                    </div>
-                                </div>
-                                <div className="col col-xs-8">
-                                    <div className={styles.well} title={modal.plane}>
-                                        {modal.plane || none}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="row no-gutters">
-                                <div className="col col-xs-4">
                                     <div className={styles.textEllipsis} title={i18n._('Distance')}>
                                         {i18n._('Distance')}
                                     </div>
@@ -295,29 +341,61 @@ class Maslow extends PureComponent {
                                     </div>
                                 </div>
                             </div>
+                        </Panel.Body>
+                    )}
+                </Panel>
+                <Panel className={styles.panel}>
+                    <Panel.Heading className={styles['panel-heading']}>
+                        <Toggler
+                            className="clearfix"
+                            onToggle={() => {
+                                actions.toggleAbout();
+                            }}
+                            title={panel.about.expanded ? i18n._('Hide') : i18n._('Show')}
+                        >
+                            <div className="pull-left">{i18n._('About')}</div>
+                            <Toggler.Icon
+                                className="pull-right"
+                                expanded={panel.about.expanded}
+                            />
+                        </Toggler>
+                    </Panel.Heading>
+                    {panel.about.expanded && (
+                        <Panel.Body>
                             <div className="row no-gutters">
                                 <div className="col col-xs-4">
-                                    <div className={styles.textEllipsis} title={i18n._('Spindle')}>
-                                        {i18n._('Spindle')}
+                                    <div className={styles.textEllipsis} title={i18n._('Edition')}>
+                                        {i18n._('Edition')}
                                     </div>
                                 </div>
                                 <div className="col col-xs-8">
-                                    <div className={styles.well} title={modal.spindle}>
-                                        {modal.spindle || none}
+                                    <div className={styles.well}>
+                                        {fn}
                                     </div>
                                 </div>
                             </div>
                             <div className="row no-gutters">
                                 <div className="col col-xs-4">
-                                    <div className={styles.textEllipsis} title={i18n._('Coolant')}>
-                                        {i18n._('Coolant')}
+                                    <div className={styles.textEllipsis} title={i18n._('Version')}>
+                                        {i18n._('Version')}
                                     </div>
                                 </div>
                                 <div className="col col-xs-8">
                                     <div className={styles.well}>
-                                        {ensureArray(modal.coolant).map(coolant => (
-                                            <div title={coolant} key={coolant}>{coolant || none}</div>
-                                        ))}
+                                        {fv}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="row no-gutters">
+                                <div className="col col-xs-4">
+                                    <div className={styles.textEllipsis} title={i18n._('Protocol')}>
+                                        {i18n._('Protocol')}
+                                    </div>
+                                </div>
+                                <div className="col col-xs-8">
+                                    <div className={styles.well}>
+                                        {controllerSettings.protocol && controllerSettings.protocol.name}
+                                        ({controllerSettings.protocol && controllerSettings.protocol.version})
                                     </div>
                                 </div>
                             </div>

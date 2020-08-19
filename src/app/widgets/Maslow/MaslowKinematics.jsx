@@ -1,11 +1,88 @@
+import controller from 'app/lib/controller';
+
+const maslowDefaultOpts = {
+    chainLength: 3360,
+    distBetweenMotors: 2978.4,
+    motorOffsetY: 463,
+    leftChainTolerance: 0,
+    rightChainTolerance: 0,
+    sledWeight: 97.9,
+    chainOverSprocket: 2, // 2==bottom, 1==top (requires weights)
+    rotationDiskRadius: 139.1,
+    chainElongationFactor: 5.1685e-6,
+    machineHeight: 1219.2,
+    machineWidth: 2438.4,
+};
+
+/**
+ * Port of Kinematics.cpp from the original Maslow Holey firmware.
+ */
 class MaslowKinematics {
-    constructor(opts) {
-        this.opts = { ...opts };
-        this.sprocketRadius = 10.1;
-        this.maxGuess = 200;
-        this.maxErr = 0.1;
-        this.lastPosition = {x: 0, y: 0};
-        this.recomputeGeometry();
+    sprocketRadius = 10.1;
+
+    maxGuess = 200;
+
+    maxErr = 0.1;
+
+    lastPosition = { x: 0, y: 0 };
+
+    lastChains = [0, 0];
+
+    opts = maslowDefaultOpts;
+
+    constructor() {
+        this.loadControllerSettings();
+    }
+
+    getSettingsMap() {
+        const opts = {};
+        const settings = controller.settings;
+        Object.keys(settings.grbl).forEach((code) => {
+            const g = settings.grbl[code];
+            const msg = `${g.message}, ${g.units}`.toLowerCase();
+            if (msg.startsWith('machine height')) {
+                opts.machineHeight = g;
+            } else if (msg.startsWith('machine width')) {
+                opts.machineWidth = g;
+            } else if (msg.startsWith('motor height')) {
+                opts.motorOffsetY = g;
+            } else if (msg.startsWith('motor distance')) {
+                opts.distBetweenMotors = g;
+            } else if (msg.startsWith('sled width')) {
+                opts.sledWidth = g;
+            } else if (msg.startsWith('sled height')) {
+                opts.sledHeight = g;
+            } else if (msg.startsWith('kinematics type')) {
+                opts.kinematicsType = g;
+            } else if (msg.startsWith('rotation radius')) {
+                opts.rotationDiskRadius = g;
+            } else if (msg.startsWith('calibration chain length')) {
+                opts.origChainLength = g;
+            } else if (msg.startsWith('full length of chain')) {
+                opts.chainLength = g;
+            } else if (msg.startsWith('chain over sprocket')) {
+                opts.chainOverSprocket = g;
+            } else if (msg.startsWith('chain tolerance, left chain')) {
+                opts.leftChainTolerance = g;
+            } else if (msg.startsWith('chain tolerance, right chain')) {
+                opts.rightChainTolerance = g;
+            } else if (msg.startsWith('chain stretch factor')) {
+                opts.chainElongationFactor = g;
+            } else if (msg.startsWith('sled weight') || msg.startsWith('weight of sled')) {
+                opts.sledWeight = g;
+            }
+        });
+        return opts;
+    }
+
+    loadControllerSettings() {
+        const settings = this.getSettingsMap();
+        const opts = {};
+        Object.keys(settings).forEach((key) => {
+            opts[key] = Number(settings[key].value);
+        });
+        this.recomputeGeometry(opts);
+        this.positionToChain(this.lastPosition.x, this.lastPosition.y); // save chain lengths
     }
 
     chainToPosition(chainALength, chainBLength, xGuess, yGuess) {
@@ -19,7 +96,11 @@ class MaslowKinematics {
     }
 
     positionToChain(xTarget, yTarget) {
-        return this.triangularInverse(xTarget, yTarget);
+        const c = this.triangularInverse(xTarget, yTarget);
+        if (c) {
+            this.lastChains = c;
+        }
+        return c;
     }
 
     recomputeGeometry(opts) {
@@ -30,7 +111,7 @@ class MaslowKinematics {
     }
 
     triangularForward(chainALength, chainBLength, xGuess, yGuess) {
-        for(var guessCount = 0; guessCount < this.maxGuess; guessCount++){
+        for (let guessCount = 0; guessCount < this.maxGuess; guessCount++) {
             //check our guess
             const iv = this.triangularInverse(xGuess, yGuess);
 
@@ -47,7 +128,7 @@ class MaslowKinematics {
 
             //if we've converged on the point...or it's time to give up, exit the loop
             if ((Math.abs(aChainError) <= this.maxErr && Math.abs(bChainError) <= this.maxErr)) {
-                return {x: xGuess, y: yGuess};
+                return { x: xGuess, y: yGuess };
             }
         }
         return false;
@@ -60,40 +141,40 @@ class MaslowKinematics {
         const yyy = yTarget; // * this.opts.YcorrScaling;
 
         //Calculate motor axes length to the bit
-        const Motor1Distance = Math.sqrt(Math.pow((-1*this.xCordOfMotor) - (xxx),2)+Math.pow((this.yCordOfMotor) - (yyy),2));
-        const Motor2Distance = Math.sqrt(Math.pow(   (this.xCordOfMotor) - (xxx),2)+Math.pow((this.yCordOfMotor) - (yyy),2));
+        const Motor1Distance = Math.sqrt(Math.pow((-1 * this.xCordOfMotor) - (xxx), 2) + Math.pow((this.yCordOfMotor) - (yyy), 2));
+        const Motor2Distance = Math.sqrt(Math.pow((this.xCordOfMotor) - (xxx), 2) + Math.pow((this.yCordOfMotor) - (yyy), 2));
 
         //Set up variables
-        var Chain1Angle = 0, Chain2Angle = 0;
-        var Chain1AroundSprocket = 0, Chain2AroundSprocket = 0;
-        var xTangent1 = 0, yTangent1 = 0, xTangent2 = 0, yTangent2 = 0;
+        let Chain1Angle = 0, Chain2Angle = 0;
+        let Chain1AroundSprocket = 0, Chain2AroundSprocket = 0;
+        let xTangent1 = 0, yTangent1 = 0, xTangent2 = 0, yTangent2 = 0;
 
         //Calculate the chain angles from horizontal, based on if the chain connects to the sled from the top or bottom of the sprocket
         const yDiff = this.yCordOfMotor - yTarget;
-        if(this.opts.chainOverSprocket == 1){
-          Chain1Angle = Math.asin(yDiff/Motor1Distance) + Math.asin(this.sprocketRadius/Motor1Distance);
-          Chain2Angle = Math.asin(yDiff/Motor2Distance) + Math.asin(this.sprocketRadius/Motor2Distance);
+        if (this.opts.chainOverSprocket === 1) {
+            Chain1Angle = Math.asin(yDiff / Motor1Distance) + Math.asin(this.sprocketRadius / Motor1Distance);
+            Chain2Angle = Math.asin(yDiff / Motor2Distance) + Math.asin(this.sprocketRadius / Motor2Distance);
 
-          Chain1AroundSprocket = this.sprocketRadius * Chain1Angle;
-          Chain2AroundSprocket = this.sprocketRadius * Chain2Angle;
+            Chain1AroundSprocket = this.sprocketRadius * Chain1Angle;
+            Chain2AroundSprocket = this.sprocketRadius * Chain2Angle;
 
-          xTangent1 = -1.0 * this.xCordOfMotor + this.sprocketRadius * Math.sin(Chain1Angle);
-          yTangent1 = this.yCordOfMotor + this.sprocketRadius * Math.cos(Chain1Angle);
+            xTangent1 = -1.0 * this.xCordOfMotor + this.sprocketRadius * Math.sin(Chain1Angle);
+            yTangent1 = this.yCordOfMotor + this.sprocketRadius * Math.cos(Chain1Angle);
 
-          xTangent2 = this.xCordOfMotor - this.sprocketRadius * Math.sin(Chain2Angle);
-          yTangent2 = this.yCordOfMotor + this.sprocketRadius * Math.cos(Chain2Angle);
+            xTangent2 = this.xCordOfMotor - this.sprocketRadius * Math.sin(Chain2Angle);
+            yTangent2 = this.yCordOfMotor + this.sprocketRadius * Math.cos(Chain2Angle);
         } else {
-          Chain1Angle = Math.asin(yDiff/Motor1Distance) - Math.asin(this.sprocketRadius/Motor1Distance);
-          Chain2Angle = Math.asin(yDiff/Motor2Distance) - Math.asin(this.sprocketRadius/Motor2Distance);
+            Chain1Angle = Math.asin(yDiff / Motor1Distance) - Math.asin(this.sprocketRadius / Motor1Distance);
+            Chain2Angle = Math.asin(yDiff / Motor2Distance) - Math.asin(this.sprocketRadius / Motor2Distance);
 
-          Chain1AroundSprocket = this.sprocketRadius * (3.14159 - Chain1Angle);
-          Chain2AroundSprocket = this.sprocketRadius * (3.14159 - Chain2Angle);
+            Chain1AroundSprocket = this.sprocketRadius * (3.14159 - Chain1Angle);
+            Chain2AroundSprocket = this.sprocketRadius * (3.14159 - Chain2Angle);
 
-          xTangent1 = -1.0 * this.xCordOfMotor - this.sprocketRadius * Math.sin(Chain1Angle);
-          yTangent1 = this.yCordOfMotor - this.sprocketRadius * Math.cos(Chain1Angle);
+            xTangent1 = -1.0 * this.xCordOfMotor - this.sprocketRadius * Math.sin(Chain1Angle);
+            yTangent1 = this.yCordOfMotor - this.sprocketRadius * Math.cos(Chain1Angle);
 
-          xTangent2 = this.xCordOfMotor + this.sprocketRadius * Math.sin(Chain2Angle);
-          yTangent2 = this.yCordOfMotor - this.sprocketRadius * Math.cos(Chain2Angle);
+            xTangent2 = this.xCordOfMotor + this.sprocketRadius * Math.sin(Chain2Angle);
+            yTangent2 = this.yCordOfMotor - this.sprocketRadius * Math.cos(Chain2Angle);
         }
 
         const sledWeight = this.opts.sledWeight;
@@ -101,28 +182,31 @@ class MaslowKinematics {
         const chainElasticity = this.opts.chainElongationFactor; // mm/mm/Newton
 
         //Calculate the straight chain length from the sprocket to the bit
-        const srsqrd = Math.pow(this.sprocketRadius,2);
-        const Chain1Straight = Math.sqrt(Math.pow(Motor1Distance,2)-srsqrd);
-        const Chain2Straight = Math.sqrt(Math.pow(Motor2Distance,2)-srsqrd);
+        const srsqrd = Math.pow(this.sprocketRadius, 2);
+        const Chain1Straight = Math.sqrt(Math.pow(Motor1Distance, 2) - srsqrd);
+        const Chain2Straight = Math.sqrt(Math.pow(Motor2Distance, 2) - srsqrd);
 
         // Calculate chain tension
-        const totalWeight = sledWeight + 0.5 * chainDensity * (Chain1Straight + Chain2Straight);
-        const tensionD = (xTangent1*yTangent2-xTangent2*yTangent1-xTangent1*yTarget+xTarget*yTangent1+xTangent2*yTarget-xTarget*yTangent2);
-        const tension1 = - (totalWeight*Math.sqrt(Math.pow(xTangent1-xTarget,2.0)+Math.pow(yTangent1-yTarget,2.0))*(xTangent2-xTarget))/tensionD;
-        const tension2 = (totalWeight*Math.sqrt(Math.pow(xTangent2-xTarget,2.0)+Math.pow(yTangent2-yTarget,2.0))*(xTangent1-xTarget))/tensionD;
+        const tw = sledWeight + 0.5 * chainDensity * (Chain1Straight + Chain2Straight);
+        const tensionD = (xTangent1 * yTangent2 - xTangent2 * yTangent1 - xTangent1 * yTarget +
+            xTarget * yTangent1 + xTangent2 * yTarget - xTarget * yTangent2);
+        const tension1 = -(tw * Math.sqrt(Math.pow(xTangent1 - xTarget, 2.0) + Math.pow(yTangent1 - yTarget, 2.0)) * (xTangent2 - xTarget)) / tensionD;
+        const tension2 = (tw * Math.sqrt(Math.pow(xTangent2 - xTarget, 2.0) + Math.pow(yTangent2 - yTarget, 2.0)) * (xTangent1 - xTarget)) / tensionD;
         const horizontalTension = tension1 * (xTarget - xTangent1) / Chain1Straight;
         const a1 = horizontalTension / chainDensity;
         const a2 = horizontalTension / chainDensity;
 
         // Catenary equation: total chain length excluding sprocket geometry, chain tolerance, and chain elasticity
-        var chain1 = Math.sqrt(Math.pow(2*a1*Math.sinh((xTarget-xTangent1)/(2*a1)),2)+Math.pow(yTangent1-yTarget,2));
-        var chain2 = Math.sqrt(Math.pow(2*a2*Math.sinh((xTangent2-xTarget)/(2*a2)),2)+Math.pow(yTangent2-yTarget,2));
+        let chain1 = Math.sqrt(Math.pow(2 * a1 * Math.sinh((xTarget - xTangent1) / (2 * a1)), 2) + Math.pow(yTangent1 - yTarget, 2));
+        let chain2 = Math.sqrt(Math.pow(2 * a2 * Math.sinh((xTangent2 - xTarget) / (2 * a2)), 2) + Math.pow(yTangent2 - yTarget, 2));
 
         //Calculate total chain lengths accounting for sprocket geometry, chain tolerance, and chain elasticity
-        chain1 = Chain1AroundSprocket + chain1/(1.0+this.opts.leftChainTolerance/100.0)/(1.0+tension1*chainElasticity);
-        chain2 = Chain2AroundSprocket + chain2/(1.0+this.opts.rightChainTolerance/100.0)/(1.0+tension2*chainElasticity);
+        chain1 = Chain1AroundSprocket + chain1 / (1.0 + this.opts.leftChainTolerance / 100.0) / (1.0 + tension1 * chainElasticity);
+        chain2 = Chain2AroundSprocket + chain2 / (1.0 + this.opts.rightChainTolerance / 100.0) / (1.0 + tension2 * chainElasticity);
 
         //Subtract of the virtual length which is added to the chain by the rotation mechanism
         return [chain1 - this.opts.rotationDiskRadius, chain2 - this.opts.rotationDiskRadius];
     }
 }
+
+export default MaslowKinematics;
