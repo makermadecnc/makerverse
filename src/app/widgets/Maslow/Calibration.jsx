@@ -91,7 +91,7 @@ class Calibration extends PureComponent {
             <Modal disableOverlay size="lg" onClose={actions.closeModal}>
                 <Modal.Header>
                     <Modal.Title>
-                        Maslow
+                        Maslow Calibration
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

@@ -15,10 +15,9 @@ WORKDIR /home/node
 # note: add any sensitive or large files to .dockerignore
 ADD --chown=node:node . /home/node
 
-# Node: dev dependencies are required for "build-prod", so npm install does not use --production
-# RUN npm install
-# RUN npm run build-prod-server
-# RUN npm run build-prod-app
+# The node_modules are intentionally excluded by .dockerignore.
+# Some modules have architecture-dependent install candidates, which are resolved here.
+RUN npm install
 
 EXPOSE 8000
 CMD ["/home/node/bin/docker-entrypoint"]

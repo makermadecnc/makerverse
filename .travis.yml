@@ -1,3 +1,9 @@
+branches:
+  # PRs are always built. So we exclude branch builds other than master to prevent double-builds.
+  # https://stackoverflow.com/questions/31882306/how-to-configure-travis-ci-to-build-pull-requests-merges-to-master-w-o-redunda
+  only:
+    - master
+
 # Job queue; see below for default job settings.
 jobs:
 # [Job] [Docker] multi-ach: https://www.docker.com/blog/multi-arch-build-what-about-travis/
@@ -30,8 +36,11 @@ jobs:
     - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
     - docker buildx create --platform linux/arm64,linux/arm/v7 --name xbuilder --use
     - docker buildx inspect --bootstrap
-  # Run the build script with additional time, so it doesn't timeout on amd64
-  script: travis_wait 20 scripts/docker.sh build
+  script:
+    # Pre-build assets; this prevents the multi-arch from running each build in the Dockerfile.
+    - npm run build-latest
+    # Only the master branch supports a "deploy" step. For others, go ahead and push a dev image.
+    - travis_wait 20 scripts/docker.sh build
   after_success: [] # Override.
   addons:
     apt:
@@ -44,7 +53,7 @@ jobs:
         - rpm
   deploy:
     provider: script
-    script: scripts/docker.sh push
+    script: travis_wait 20 scripts/docker.sh deploy
 # [Job] [Linux]
 - name: "Linux"
   os: linux
