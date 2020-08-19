@@ -7,7 +7,6 @@ import GCodeWidget from 'app/widgets/GCode';
 import GrblWidget from 'app/widgets/Grbl';
 import LaserWidget from 'app/widgets/Laser';
 import MarlinWidget from 'app/widgets/Marlin';
-import M2Widget from 'app/widgets/M2';
 import ProbeWidget from 'app/widgets/Probe';
 import SpindleWidget from 'app/widgets/Spindle';
 import CustomWidget from 'app/widgets/Custom';
@@ -29,8 +28,7 @@ const getWidgetByName = (name) => {
         'custom': CustomWidget,
         'tinyg': TinyGWidget,
         'maslow': MaslowWidget,
-        'visualizer': VisualizerWidget,
-        'm2': M2Widget
+        'visualizer': VisualizerWidget
     }[name] || null;
 };
 

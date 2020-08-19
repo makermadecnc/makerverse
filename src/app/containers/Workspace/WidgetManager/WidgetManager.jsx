@@ -50,13 +50,6 @@ class WidgetManager extends PureComponent {
             visible: true,
             disabled: false
         },
-        {
-            id: 'm2',
-            caption: i18n._('M2 Widget'),
-            details: i18n._('This widget shows the Grbl state and provides Grbl specific features.'),
-            visible: true,
-            disabled: false
-        },
         // {
         //     id: 'marlin',
         //     caption: i18n._('Marlin Widget'),
@@ -67,7 +60,7 @@ class WidgetManager extends PureComponent {
         {
             id: 'maslow',
             caption: i18n._('Maslow Widget'),
-            details: i18n._('This widget shows the Maslow state and provides Maslow specific features.'),
+            details: i18n._('This widget provides Maslow specific features, like calibration and center-homing.'),
             visible: true,
             disabled: false
         },
@@ -134,9 +127,6 @@ class WidgetManager extends PureComponent {
             if (widgetItem.id === 'marlin' && !includes(controller.loadedControllers, MARLIN)) {
                 return false;
             }
-            // if (widgetItem.id === 'm2' && !includes(controller.loadedControllers, M2)) {
-            //     return false;
-            // }
             return true;
         });
     }
