@@ -48,6 +48,7 @@ class Workspace extends PureComponent {
     static propTypes = {
         ...withRouter.propTypes,
         workspaceId: PropTypes.string.isRequired,
+        isActive: PropTypes.bool.isRequired,
     };
 
     get workspace() {
@@ -241,7 +242,7 @@ class Workspace extends PureComponent {
             const { location } = this.props;
             const disableHorizontalScroll = !(showPrimaryContainer && showSecondaryContainer);
 
-            if (location.pathname === '/workspace' && disableHorizontalScroll) {
+            if (location.pathname === this.workspace.path && disableHorizontalScroll) {
                 // Disable horizontal scroll
                 document.body.scrollLeft = 0;
                 document.body.style.overflowX = 'hidden';
@@ -321,34 +322,8 @@ class Workspace extends PureComponent {
         }
     };
 
-    updateWidgetsForPrimaryContainer = () => {
-        widgetManager.show((activeWidgets, inactiveWidgets) => {
-            const widgets = Object.keys(store.get('widgets', {}))
-                .filter(widgetId => {
-                    const name = widgetId.split(':')[0];
-                    return _.includes(activeWidgets, name);
-                });
-
-            const centerWidgets = this.workspace.centerWidgets;
-            const sortableWidgets = _.difference(widgets, centerWidgets);
-            let primaryWidgets = this.workspace.primaryWidgets;
-            let secondaryWidgets = this.workspace.secondaryWidgets;
-
-            primaryWidgets = sortableWidgets.slice();
-            _.pullAll(primaryWidgets, secondaryWidgets);
-            pubsub.publish('updatePrimaryWidgets', primaryWidgets);
-
-            secondaryWidgets = sortableWidgets.slice();
-            _.pullAll(secondaryWidgets, primaryWidgets);
-            pubsub.publish('updateSecondaryWidgets', secondaryWidgets);
-
-            // Update inactive count
-            this.setState({ inactiveCount: _.size(inactiveWidgets) });
-        });
-    };
-
     updateWidgetsForSecondaryContainer = () => {
-        widgetManager.show((activeWidgets, inactiveWidgets) => {
+        widgetManager.show(this.workspace.id, (activeWidgets, inactiveWidgets) => {
             const widgets = Object.keys(store.get('widgets', {}))
                 .filter(widgetId => {
                     const name = widgetId.split(':')[0];
@@ -362,10 +337,6 @@ class Workspace extends PureComponent {
             secondaryWidgets = sortableWidgets.slice();
             _.pullAll(secondaryWidgets, primaryWidgets);
             pubsub.publish('updateSecondaryWidgets', secondaryWidgets);
-
-            primaryWidgets = sortableWidgets.slice();
-            _.pullAll(primaryWidgets, secondaryWidgets);
-            pubsub.publish('updatePrimaryWidgets', primaryWidgets);
 
             // Update inactive count
             this.setState({ inactiveCount: _.size(inactiveWidgets) });

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import WidgetManager from './WidgetManager';
 
 // @param {string} targetContainer The target container: primary|secondary
-export const show = (callback) => {
+export const show = (workspaceId, callback) => {
     const el = document.body.appendChild(document.createElement('div'));
     const handleClose = (e) => {
         ReactDOM.unmountComponentAtNode(el);
@@ -12,5 +12,5 @@ export const show = (callback) => {
         }, 0);
     };
 
-    ReactDOM.render(<WidgetManager onSave={callback} onClose={handleClose} />, el);
+    ReactDOM.render(<WidgetManager workspaceId={workspaceId} onSave={callback} onClose={handleClose} />, el);
 };

@@ -80,7 +80,7 @@ class Workspaces {
 
     // ---------------------------------------------------------------------------------------------
     get primaryWidgets() {
-        const ret = ['connection', this.controllerType.toLowerCase()];
+        const ret = ['connection', 'console', this.controllerType.toLowerCase()];
         return ret;
     }
 
@@ -94,7 +94,7 @@ class Workspaces {
 
     // ---------------------------------------------------------------------------------------------
     get secondaryWidgets() {
-        const defaults = ['axes', 'gcode', 'macro', 'probe', 'spindle', 'laser'];
+        const defaults = ['axes', 'gcode', 'macro', 'probe', 'spindle', 'laser', 'webcam'];
         return this.get('container.secondary.widgets', defaults);
     }
 

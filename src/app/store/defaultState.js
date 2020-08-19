@@ -88,6 +88,9 @@ const defaultState = {
         maslow: {
             minimized: false,
         },
+        webcam: {
+            minimized: false,
+        },
         marlin: {
             minimized: false,
             panel: {

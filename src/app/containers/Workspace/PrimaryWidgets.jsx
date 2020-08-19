@@ -3,7 +3,6 @@ import classNames from 'classnames';
 import ensureArray from 'ensure-array';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
-import pubsub from 'pubsub-js';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import Sortable from 'react-sortablejs';
@@ -128,33 +127,9 @@ class PrimaryWidgets extends Component {
 
     widgetMap = {};
 
-    componentDidMount() {
-        this.subscribe();
-    }
-
-    componentWillUnmount() {
-        this.unsubscribe();
-    }
-
     shouldComponentUpdate(nextProps, nextState) {
         // Do not compare props for performance considerations
         return !isEqual(nextState, this.state);
-    }
-
-    subscribe() {
-        { // updatePrimaryWidgets
-            const token = pubsub.subscribe('updatePrimaryWidgets', (msg, widgets) => {
-                this.setState({ widgets: widgets });
-            });
-            this.pubsubTokens.push(token);
-        }
-    }
-
-    unsubscribe() {
-        this.pubsubTokens.forEach((token) => {
-            pubsub.unsubscribe(token);
-        });
-        this.pubsubTokens = [];
     }
 
     expandAll() {

@@ -4,8 +4,6 @@ import includes from 'lodash/includes';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Modal from 'app/components/Modal';
-import { GRBL, MARLIN } from 'app/constants';
-import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import Workspaces from 'app/lib/workspaces';
 import WidgetList from './WidgetList';
@@ -26,48 +24,6 @@ class WidgetManager extends PureComponent {
     };
 
     widgetList = [
-        {
-            id: 'visualizer',
-            caption: i18n._('Visualizer Widget'),
-            details: i18n._('This widget visualizes a G-code file and simulates the tool path.'),
-            visible: true,
-            disabled: true
-        },
-        {
-            id: 'connection',
-            caption: i18n._('Connection Widget'),
-            details: i18n._('This widget lets you establish a connection to a serial port.'),
-            visible: true,
-            disabled: true
-        },
-        {
-            id: 'console',
-            caption: i18n._('Console Widget'),
-            details: i18n._('This widget lets you read and write data to the CNC controller connected to a serial port.'),
-            visible: true,
-            disabled: false
-        },
-        {
-            id: 'grbl',
-            caption: i18n._('Grbl Widget'),
-            details: i18n._('This widget shows the Grbl state and provides Grbl specific features.'),
-            visible: true,
-            disabled: false
-        },
-        // {
-        //     id: 'marlin',
-        //     caption: i18n._('Marlin Widget'),
-        //     details: i18n._('This widget shows the Marlin state and provides Marlin specific features.'),
-        //     visible: true,
-        //     disabled: false
-        // },
-        {
-            id: 'maslow',
-            caption: i18n._('Maslow Widget'),
-            details: i18n._('This widget provides Maslow specific features, like calibration and center-homing.'),
-            visible: true,
-            disabled: false
-        },
         {
             id: 'axes',
             caption: i18n._('Controls Widget'),
@@ -102,6 +58,13 @@ class WidgetManager extends PureComponent {
             details: i18n._('This widget provides the spindle control.'),
             visible: true,
             disabled: false
+        },
+        {
+            id: 'webcam',
+            caption: i18n._('Webcam Widget'),
+            details: i18n._('View a webcam from within the app to monitor progress.'),
+            visible: true,
+            disabled: false
         }
     ];
 
@@ -120,20 +83,6 @@ class WidgetManager extends PureComponent {
     handleCancel = () => {
         this.setState({ show: false });
     };
-
-    constructor(props) {
-        super(props);
-
-        this.widgetList = this.widgetList.filter(widgetItem => {
-            if (widgetItem.id === 'grbl' && !includes(controller.loadedControllers, GRBL)) {
-                return false;
-            }
-            if (widgetItem.id === 'marlin' && !includes(controller.loadedControllers, MARLIN)) {
-                return false;
-            }
-            return true;
-        });
-    }
 
     componentDidUpdate() {
         if (!(this.state.show)) {

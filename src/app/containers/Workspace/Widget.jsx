@@ -13,6 +13,7 @@ import CustomWidget from 'app/widgets/Custom';
 import TinyGWidget from 'app/widgets/TinyG';
 import MaslowWidget from 'app/widgets/Maslow';
 import VisualizerWidget from 'app/widgets/Visualizer';
+import WebcamWidget from 'app/widgets/Webcam';
 
 const getWidgetByName = (name) => {
     return {
@@ -28,7 +29,8 @@ const getWidgetByName = (name) => {
         'custom': CustomWidget,
         'tinyg': TinyGWidget,
         'maslow': MaslowWidget,
-        'visualizer': VisualizerWidget
+        'visualizer': VisualizerWidget,
+        'webcam': WebcamWidget,
     }[name] || null;
 };
 

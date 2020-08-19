@@ -70,6 +70,7 @@ class App extends PureComponent {
                                 <Workspace
                                     {...this.props}
                                     key={workspaceId}
+                                    isActive={active}
                                     workspaceId={workspaceId}
                                     style={{
                                         display: active ? 'block' : 'none'
