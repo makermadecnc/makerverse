@@ -1,21 +1,25 @@
 import difference from 'lodash/difference';
 import find from 'lodash/find';
 import includes from 'lodash/includes';
-import union from 'lodash/union';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Modal from 'app/components/Modal';
 import { GRBL, MARLIN } from 'app/constants';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-import store from 'app/store';
+import Workspaces from 'app/lib/workspaces';
 import WidgetList from './WidgetList';
 
 class WidgetManager extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         onSave: PropTypes.func,
         onClose: PropTypes.func.isRequired
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     state = {
         show: true
@@ -138,13 +142,7 @@ class WidgetManager extends PureComponent {
     }
 
     render() {
-        const defaultWidgets = store.get('workspace.container.default.widgets', [])
-            .map(widgetId => widgetId.split(':')[0]);
-        const primaryWidgets = store.get('workspace.container.primary.widgets', [])
-            .map(widgetId => widgetId.split(':')[0]);
-        const secondaryWidgets = store.get('workspace.container.secondary.widgets', [])
-            .map(widgetId => widgetId.split(':')[0]);
-        const activeWidgets = union(defaultWidgets, primaryWidgets, secondaryWidgets);
+        const activeWidgets = this.workspace.activeWidgetTypes;
 
         this.widgetList.forEach(widget => {
             if (includes(activeWidgets, widget.id)) {

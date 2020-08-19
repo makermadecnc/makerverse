@@ -1,17 +1,25 @@
 import classNames from 'classnames';
-import ensureArray from 'ensure-array';
 import React, { PureComponent } from 'react';
-import store from 'app/store';
+import PropTypes from 'prop-types';
 import Widget from './Widget';
+import Workspaces from '../../lib/workspaces';
 import styles from './widgets.styl';
 
-class DefaultWidgets extends PureComponent {
+class CenterWidgets extends PureComponent {
+    static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
+    };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
+
     render() {
         const { className } = this.props;
-        const defaultWidgets = ensureArray(store.get('workspace.container.default.widgets'));
-        const widgets = defaultWidgets.map(widgetId => (
+        const widgets = this.workspace.centerWidgets.map(widgetId => (
             <div data-widget-id={widgetId} key={widgetId}>
                 <Widget
+                    workspaceId={this.workspace.id}
                     widgetId={widgetId}
                 />
             </div>
@@ -25,4 +33,4 @@ class DefaultWidgets extends PureComponent {
     }
 }
 
-export default DefaultWidgets;
+export default CenterWidgets;

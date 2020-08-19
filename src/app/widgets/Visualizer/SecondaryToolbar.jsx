@@ -96,7 +96,7 @@ class SecondaryToolbar extends PureComponent {
     };
 
     state = {
-        machineProfile: store.get('workspace.machineProfile'),
+        machineProfile: store.get('machineProfile'),
         machineProfiles: []
     };
 
@@ -116,7 +116,7 @@ class SecondaryToolbar extends PureComponent {
     };
 
     updateMachineProfileFromStore = () => {
-        const machineProfile = store.get('workspace.machineProfile');
+        const machineProfile = store.get('machineProfile');
         if (!machineProfile || _isEqual(machineProfile, this.state.machineProfile)) {
             return;
         }
@@ -133,7 +133,7 @@ class SecondaryToolbar extends PureComponent {
     changeMachineProfileById = (id) => {
         const machineProfile = _find(this.state.machineProfiles, { id });
         if (machineProfile) {
-            store.replace('workspace.machineProfile', machineProfile);
+            store.replace('machineProfile', machineProfile);
         }
     };
 

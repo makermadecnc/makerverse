@@ -12,6 +12,7 @@ const settings = {
         // @see store/index.js
         corruptedWorkspaceSettings: false
     },
+    workspaces: [],
     name: pkg.name,
     productName: pkg.productName,
     version: pkg.version,

@@ -19,7 +19,7 @@ import {
 import { GRBL } from '../../controllers/Grbl/constants';
 import { MARLIN } from '../../controllers/Marlin/constants';
 import { SMOOTHIE } from '../../controllers/Smoothie/constants';
-import { G2CORE, TINYG } from '../../controllers/TinyG/constants';
+import { TINYG } from '../../controllers/TinyG/constants';
 import { MASLOW } from '../../controllers/Maslow/constants';
 import {
     authorizeIPAddress,
@@ -27,31 +27,6 @@ import {
 } from '../../access-control';
 
 const log = logger('service:cncengine');
-
-// Case-insensitive equality checker.
-// @param {string} str1 First string to check.
-// @param {string} str2 Second string to check.
-// @return {boolean} True if str1 and str2 are the same string, ignoring case.
-const caseInsensitiveEquals = (str1, str2) => {
-    str1 = str1 ? (str1 + '').toUpperCase() : '';
-    str2 = str2 ? (str2 + '').toUpperCase() : '';
-    return str1 === str2;
-};
-
-const isValidController = (controller) => (
-    // Grbl
-    caseInsensitiveEquals(GRBL, controller) ||
-    // Marlin
-    caseInsensitiveEquals(MARLIN, controller) ||
-    // Smoothie
-    caseInsensitiveEquals(SMOOTHIE, controller) ||
-    // g2core
-    caseInsensitiveEquals(G2CORE, controller) ||
-    // TinyG
-    caseInsensitiveEquals(TINYG, controller) ||
-    // Maslow
-    caseInsensitiveEquals(MASLOW, controller)
-);
 
 class CNCEngine {
     controllerClass = {};
@@ -94,37 +69,12 @@ class CNCEngine {
     });
 
     // @param {object} server The HTTP server instance.
-    // @param {string} controller Specify CNC controller.
-    start(server, controller = '') {
-        // Fallback to an empty string if the controller is not valid
-        if (!isValidController(controller)) {
-            controller = '';
-        }
-
-        // Grbl
-        if (!controller || caseInsensitiveEquals(GRBL, controller)) {
-            this.controllerClass[GRBL] = GrblController;
-        }
-        // Marlin
-        if (!controller || caseInsensitiveEquals(MARLIN, controller)) {
-            this.controllerClass[MARLIN] = MarlinController;
-        }
-        // Smoothie
-        if (!controller || caseInsensitiveEquals(SMOOTHIE, controller)) {
-            this.controllerClass[SMOOTHIE] = SmoothieController;
-        }
-        // TinyG / G2core
-        if (!controller || caseInsensitiveEquals(G2CORE, controller) || caseInsensitiveEquals(TINYG, controller)) {
-            this.controllerClass[TINYG] = TinyGController;
-        }
-        // Maslow
-        if (!controller || caseInsensitiveEquals(MASLOW, controller)) {
-            this.controllerClass[MASLOW] = MaslowController;
-        }
-
-        if (Object.keys(this.controllerClass).length === 0) {
-            throw new Error(`No valid CNC controller specified (${controller})`);
-        }
+    start(server) {
+        this.controllerClass[GRBL] = GrblController;
+        this.controllerClass[MARLIN] = MarlinController;
+        this.controllerClass[SMOOTHIE] = SmoothieController;
+        this.controllerClass[TINYG] = TinyGController;
+        this.controllerClass[MASLOW] = MaslowController;
 
         const loadedControllers = Object.keys(this.controllerClass);
         log.debug(`Loaded controllers: ${loadedControllers}`);

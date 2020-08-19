@@ -1,11 +1,9 @@
 import isElectron from 'is-electron';
 import ensureArray from 'ensure-array';
 import debounce from 'lodash/debounce';
-import difference from 'lodash/difference';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import merge from 'lodash/merge';
-import uniq from 'lodash/uniq';
 import semver from 'semver';
 import settings from '../config/settings';
 import ImmutableStore from '../lib/immutable-store';
@@ -69,40 +67,6 @@ const persist = (data) => {
 };
 
 const normalizeState = (state) => {
-    //
-    // Normalize workspace widgets
-    //
-
-    // Keep default widgets unchanged
-    const defaultList = get(defaultState, 'workspace.container.default.widgets');
-    set(state, 'workspace.container.default.widgets', defaultList);
-
-    // Update primary widgets
-    let primaryList = get(cnc.state, 'workspace.container.primary.widgets');
-    if (primaryList) {
-        set(state, 'workspace.container.primary.widgets', primaryList);
-    } else {
-        primaryList = get(state, 'workspace.container.primary.widgets');
-    }
-
-    // Update secondary widgets
-    let secondaryList = get(cnc.state, 'workspace.container.secondary.widgets');
-    if (secondaryList) {
-        set(state, 'workspace.container.secondary.widgets', secondaryList);
-    } else {
-        secondaryList = get(state, 'workspace.container.secondary.widgets');
-    }
-
-    primaryList = uniq(ensureArray(primaryList)); // Use the same order in primaryList
-    primaryList = difference(primaryList, defaultList); // Exclude defaultList
-
-    secondaryList = uniq(ensureArray(secondaryList)); // Use the same order in secondaryList
-    secondaryList = difference(secondaryList, primaryList); // Exclude primaryList
-    secondaryList = difference(secondaryList, defaultList); // Exclude defaultList
-
-    set(state, 'workspace.container.primary.widgets', primaryList);
-    set(state, 'workspace.container.secondary.widgets', secondaryList);
-
     //
     // Remember configured axes (#416)
     //
@@ -188,7 +152,16 @@ try {
     log.error(err);
 }
 
+const resetDefaults = () => {
+    // Reset to default state
+    store.state = defaultState;
+
+    // Persist data locally
+    store.persist();
+};
+
 store.getConfig = getConfig;
 store.persist = persist;
+store.resetDefaults = resetDefaults;
 
 export default store;

@@ -61,7 +61,8 @@ class WidgetWrapper extends PureComponent {
 }
 
 WidgetWrapper.propTypes = {
-    widgetId: PropTypes.string.isRequired
+    workspaceId: PropTypes.string.isRequired,
+    widgetId: PropTypes.string.isRequired,
 };
 
 export default WidgetWrapper;

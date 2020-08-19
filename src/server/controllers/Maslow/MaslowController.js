@@ -10,6 +10,7 @@ import Workflow, {
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING
 } from '../../lib/Workflow';
+import slugify from '../../lib/slugify';
 import delay from '../../lib/delay';
 import ensurePositiveNumber from '../../lib/ensure-positive-number';
 import evaluateAssignmentExpression from '../../lib/evaluate-assignment-expression';
@@ -140,7 +141,7 @@ class MaslowController {
         const { port, baudrate, rtscts } = { ...options };
         this.options = {
             ...this.options,
-            id: this.slugify(port.replace('/dev/', '')),
+            id: slugify(port.replace('/dev/', '')),
             port: port,
             baudrate: baudrate,
             rtscts: rtscts
@@ -666,22 +667,6 @@ class MaslowController {
                 }
             }
         }, 250);
-    }
-
-    // https://gist.github.com/hagemann/382adfc57adbd5af078dc93feef01fe1
-    slugify(string) {
-        const a = 'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;';
-        const b = 'aaaaaaaaaacccddeeeeeeeegghiiiiiilmnnnnoooooooooprrsssssttuuuuuuuuuwxyyzzz------';
-        const p = new RegExp(a.split('').join('|'), 'g');
-
-        return string.toString().toLowerCase()
-            .replace(/\s+/g, '-') // Replace spaces with -
-            .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
-            .replace(/&/g, '-and-') // Replace & with 'and'
-            .replace(/[^\w\-]+/g, '') // Remove all non-word characters
-            .replace(/\-\-+/g, '-') // Replace multiple - with single -
-            .replace(/^-+/, '') // Trim - from start of text
-            .replace(/-+$/, ''); // Trim - from end of text
     }
 
     async initController() {

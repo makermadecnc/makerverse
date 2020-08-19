@@ -477,12 +477,12 @@ class Settings extends PureComponent {
                                 })
                                 .then(machineProfiles => {
                                     // Update matched machine profile
-                                    const currentMachineProfile = store.get('workspace.machineProfile');
+                                    const currentMachineProfile = store.get('machineProfile');
                                     const currentMachineProfileId = _get(currentMachineProfile, 'id');
                                     const matchedMachineProfile = _find(machineProfiles, { id: currentMachineProfileId });
 
                                     if (matchedMachineProfile) {
-                                        store.replace('workspace.machineProfile', matchedMachineProfile);
+                                        store.replace('machineProfile', matchedMachineProfile);
                                     }
                                 });
                         } catch (err) {
@@ -510,10 +510,10 @@ class Settings extends PureComponent {
                                 })
                                 .then(machineProfiles => {
                                     // Remove matched machine profile
-                                    const currentMachineProfile = store.get('workspace.machineProfile');
+                                    const currentMachineProfile = store.get('machineProfile');
                                     const currentMachineProfileId = _get(currentMachineProfile, 'id');
                                     if (currentMachineProfileId === id) {
-                                        store.replace('workspace.machineProfile', { id: null });
+                                        store.replace('machineProfile', { id: null });
                                     }
                                 });
                         } catch (err) {

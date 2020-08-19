@@ -19,11 +19,11 @@ import portal from './lib/portal';
 import controller from './lib/controller';
 import i18n from './lib/i18n';
 import log from './lib/log';
+import api from './api';
 import series from './lib/promise-series';
 import promisify from './lib/promisify';
 import * as user from './lib/user';
 import store from './store';
-import defaultState from './store/defaultState';
 import App from './containers/App';
 import Login from './containers/Login';
 import Anchor from './components/Anchor';
@@ -32,6 +32,7 @@ import ModalTemplate from './components/ModalTemplate';
 import Modal from './components/Modal';
 import ProtectedRoute from './components/ProtectedRoute';
 import Space from './components/Space';
+import Workspaces from './lib/workspaces';
 import './styles/vendor.styl';
 import './styles/app.styl';
 
@@ -107,6 +108,21 @@ series([
                         next();
                     });
                     return;
+                }
+                next();
+            });
+    })(),
+    () => promisify(next => {
+        api.workspaces
+            .fetch()
+            .then(({ body }) => {
+                if (body && body.records) {
+                    body.records.forEach((record) => {
+                        log.debug(`loading workspace: ${record.id}`);
+                        Workspaces.load(record);
+                    });
+                } else {
+                    log.error('workspaces load error');
                 }
                 next();
             });
@@ -188,13 +204,7 @@ series([
                     <Button
                         btnStyle="danger"
                         onClick={chainedFunction(
-                            () => {
-                                // Reset to default state
-                                store.state = defaultState;
-
-                                // Persist data locally
-                                store.persist();
-                            },
+                            store.resetDefaults,
                             onClose
                         )}
                     >

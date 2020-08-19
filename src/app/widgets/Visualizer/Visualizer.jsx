@@ -73,7 +73,7 @@ class Visualizer extends Component {
         z: 0
     };
 
-    machineProfile = store.get('workspace.machineProfile');
+    machineProfile = store.get('machineProfile');
 
     group = new THREE.Group();
 
@@ -96,7 +96,7 @@ class Visualizer extends Component {
     }, 32); // 60hz
 
     changeMachineProfile = () => {
-        const machineProfile = store.get('workspace.machineProfile');
+        const machineProfile = store.get('machineProfile');
 
         if (!machineProfile) {
             return;
