@@ -23,7 +23,6 @@ class MaslowCalibration {
     recomputeIdeals() {
         this.idealCoordinates = this.calculateIdealCoordinates();
         this.idealChainLengths = this.calculateChainLengths(this.idealCoordinates);
-        this.gcode = this.generateGcode(this.idealCoordinates, this.opts.cutDepth);
     }
 
     calibrate(measurements, callback) {
@@ -201,16 +200,21 @@ class MaslowCalibration {
         return ret;
     }
 
-    generateGcode(points, cutDepth) {
-        const ret = ['G21', 'G90'];
-        const cutOrder = [points[1], points[2], points[5], points[4], points[3], points[0]];
+    generateGcodePoint(pointIndex, gcode = ['$X', 'G21', 'G90']) {
+        const p = this.idealCoordinates[pointIndex];
+        gcode.push(`G0 X${p.x} Y${p.y}`);
+        if (this.opts.cutDepth) {
+            gcode.push(`G0 Z-${this.opts.cutDepth}`);
+            gcode.push(`G0 Z${this.opts.safeTravel}`);
+        }
+        return gcode;
+    }
+
+    generateGcode() {
+        const ret = ['$X', 'G21', 'G90'];
+        const cutOrder = [1, 2, 5, 4, 3, 0];
         for (var i = 0; i < cutOrder.length; i++) {
-            const p = cutOrder[i];
-            ret.push(`G0 X${p.x} Y${p.y}`);
-            if (cutDepth) {
-                ret.push(`G0 Z-${cutDepth}`);
-                ret.push(`G0 Z${this.opts.safeTravel}`);
-            }
+            this.generateGcodePoint(cutOrder[i], ret);
         }
         ret.push('G0 X0 Y0');
         return ret;
