@@ -6,9 +6,9 @@ import Widget from 'app/components/Widget';
 import i18n from 'app/lib/i18n';
 import controller from 'app/lib/controller';
 import WidgetConfig from '../WidgetConfig';
-import Maslow from './Maslow';
-import Controller from './Controller';
-import Calibration from './Calibration';
+import MaslowPanels from './MaslowPanels';
+import InformationModal from './InformationModal';
+import CalibrationModal from './CalibrationModal';
 import {
     MASLOW
 } from '../../constants';
@@ -435,12 +435,12 @@ class MaslowWidget extends PureComponent {
                         )}
                     >
                         {state.modal.name === MODAL_CONTROLLER &&
-                        <Controller state={state} actions={actions} />
+                        <InformationModal state={state} actions={actions} />
                         }
                         {state.modal.name === MODAL_CALIBRATION &&
-                        <Calibration state={state} actions={actions} />
+                        <CalibrationModal state={state} actions={actions} />
                         }
-                        <Maslow
+                        <MaslowPanels
                             state={state}
                             actions={actions}
                         />

@@ -6,7 +6,6 @@ import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
 import Workspaces from 'app/lib/workspaces';
 import WidgetConfig from '../WidgetConfig';
 import Connection from './Connection';
@@ -76,31 +75,22 @@ class ConnectionWidget extends PureComponent {
             this.setState({ ...this.state, ...options });
         },
         'serialport:open': (options) => {
-            const { controllerType, port, baudrate } = options;
-            const controllerConfig = this.workspace._record.controller;
-            if (port !== controllerConfig.port) {
+            const { port } = options;
+            if (port !== this.workspace.controllerAttributes.port) {
                 return;
             }
 
             this.setState(state => ({
                 alertMessage: '',
                 connecting: false,
-                connected: true,
-                controllerType: controllerType,
-                port: port,
-                baudrate: baudrate
+                connected: true
             }));
-
-            log.debug(`Established a connection to the serial port "${port}"`);
         },
         'serialport:close': (options) => {
             const { port } = options;
-            const controllerConfig = this.workspace._record.controller;
-            if (port !== controllerConfig.port) {
+            if (port !== this.workspace.controllerAttributes.port) {
                 return;
             }
-
-            log.debug(`The serial port "${port}" is disconected`);
 
             this.setState(state => ({
                 alertMessage: '',
@@ -110,8 +100,7 @@ class ConnectionWidget extends PureComponent {
         },
         'serialport:error': (options) => {
             const { port } = options;
-            const controllerConfig = this.workspace._record.controller;
-            if (port !== controllerConfig.port) {
+            if (port !== this.workspace.controllerAttributes.port) {
                 return;
             }
 
@@ -120,8 +109,6 @@ class ConnectionWidget extends PureComponent {
                 connecting: false,
                 connected: false
             }));
-
-            log.error(`Error opening serial port "${port}"`);
         }
     };
 
@@ -142,16 +129,16 @@ class ConnectionWidget extends PureComponent {
     }
 
     getInitialState() {
-        if (!includes(controller.loadedControllers, this.workspace.controllerType)) {
-            console.log('controller type not loaded', this.workspace.controllerType);
+        if (!includes(controller.loadedControllers, this.workspace.controllerAttributes.type)) {
+            console.log('controller type not loaded', this.workspace.controllerAttributes.type);
         }
 
         return {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
             loading: false,
-            connecting: false,
-            connected: false,
+            connecting: this.workspace.isConnecting,
+            connected: this.workspace.isConnected,
             alertMessage: ''
         };
     }
@@ -197,22 +184,14 @@ class ConnectionWidget extends PureComponent {
         this.setState(state => ({
             connecting: true
         }));
-        const controllerConfig = this.workspace._record.controller;
-
-        controller.openPort(controllerConfig.port, {
-            controllerType: this.workspace.controllerType,
-            baudrate: controllerConfig.baudRate,
-            rtscts: controllerConfig.rtscts
-        }, (err) => {
+        this.workspace.openPort((err) => {
             if (err) {
+                const v = { port: this.workspace.controllerAttributes.port };
                 this.setState(state => ({
-                    alertMessage: i18n._('Error opening serial port \'{{- port}}\'', { port: controllerConfig.port }),
+                    alertMessage: i18n._('Error opening serial port \'{{- port}}\'', v),
                     connecting: false,
                     connected: false
                 }));
-
-                log.error(err);
-                return;
             }
         });
     }
@@ -222,13 +201,7 @@ class ConnectionWidget extends PureComponent {
             connecting: false,
             connected: false
         }));
-        const controllerConfig = this.workspace._record.controller;
-        controller.closePort(controllerConfig.port, (err) => {
-            if (err) {
-                log.error(err);
-                return;
-            }
-        });
+        this.workspace.closePort();
     }
 
     render() {

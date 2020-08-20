@@ -364,7 +364,6 @@ class TerminalWrapper extends PureComponent {
 
     writeln(data) {
         if (!data) {
-            console.log('empty data sent to terminal');
             return;
         }
         this.term.eraseRight(0, this.term.buffer.y);

@@ -5,14 +5,14 @@ import Modal from 'app/components/Modal';
 import { Nav, NavItem } from 'app/components/Navs';
 import i18n from 'app/lib/i18n';
 import controller from 'app/lib/controller';
+import MaslowCalibration from 'app/lib/Maslow/MaslowCalibration';
 import styles from './index.styl';
-import MaslowCalibration from './MaslowCalibration';
 
 const defaultMeasurements = {
     0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0
 };
 
-class Calibration extends PureComponent {
+class CalibrationModal extends PureComponent {
     calibration = new MaslowCalibration();
 
     static propTypes = {
@@ -62,7 +62,6 @@ class Calibration extends PureComponent {
             const name = settings[k].name;
             const val = this.state.result.optimized[k];
             const cmd = `${name}=${val}`;
-            console.log('setting', cmd);
             controller.writeln(cmd);
         });
     }
@@ -84,7 +83,6 @@ class Calibration extends PureComponent {
             { top: edge, left: inset },
         ];
         const { activeTab } = this.state;
-        console.log('state', this.state);
         const height = Math.max(window.innerHeight / 2, 200);
 
         return (
@@ -109,6 +107,7 @@ class Calibration extends PureComponent {
                     <div className={styles.navContent} style={{ height: height }}>
                         {activeTab === 'home' && (
                             <div>
+                                <image src="/images/calibration_motor.png" />
                             </div>
                         )}
                         {activeTab === 'edge' && (
@@ -206,4 +205,4 @@ class Calibration extends PureComponent {
     }
 }
 
-export default Calibration;
+export default CalibrationModal;

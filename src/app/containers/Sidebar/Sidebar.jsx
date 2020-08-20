@@ -13,8 +13,6 @@ class Sidebar extends PureComponent {
     render() {
         const { pathname = '' } = this.props.location;
 
-        console.log(styles.iconHome);
-
         return (
             <nav className={styles.navbar}>
                 <ul className={styles.nav}>

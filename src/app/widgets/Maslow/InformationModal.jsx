@@ -5,10 +5,10 @@ import Modal from 'app/components/Modal';
 import { Nav, NavItem } from 'app/components/Navs';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
+import MaslowKinematics from 'app/lib/Maslow/MaslowKinematics';
 import styles from './index.styl';
-import MaslowKinematics from './MaslowKinematics';
 
-class Controller extends PureComponent {
+class InformationModal extends PureComponent {
     kinematics = new MaslowKinematics();
 
     static propTypes = {
@@ -18,7 +18,6 @@ class Controller extends PureComponent {
 
     updateChains(pos) {
         pos = { ...this.kinematics.lastPosition, ...pos };
-        console.log('update chains', pos);
         this.kinematics.positionToChain(pos.x, pos.y);
         this.kinematics.lastPosition = pos;
         this.forceUpdate();
@@ -27,7 +26,6 @@ class Controller extends PureComponent {
     updatePosition(leftChain, rightChain) {
         leftChain = leftChain > 0 ? leftChain : this.kinematics.lastChains[0];
         rightChain = rightChain > 0 ? rightChain : this.kinematics.lastChains[1];
-        console.log('update position', leftChain, rightChain);
         this.kinematics.chainToPosition(leftChain, rightChain);
         this.kinematics.lastChains = [leftChain, rightChain];
         this.forceUpdate();
@@ -154,4 +152,4 @@ class Controller extends PureComponent {
     }
 }
 
-export default Controller;
+export default InformationModal;
