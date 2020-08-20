@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone';
 import pubsub from 'pubsub-js';
 import React, { PureComponent } from 'react';
@@ -15,13 +16,14 @@ import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import store from 'app/store';
 import * as widgetManager from './WidgetManager';
-import DefaultWidgets from './DefaultWidgets';
+import CenterWidgets from './CenterWidgets';
 import PrimaryWidgets from './PrimaryWidgets';
 import SecondaryWidgets from './SecondaryWidgets';
 import FeederPaused from './modals/FeederPaused';
 import FeederWait from './modals/FeederWait';
 import ServerDisconnected from './modals/ServerDisconnected';
 import styles from './index.styl';
+import Workspaces from '../../lib/workspaces';
 import {
     MODAL_NONE,
     MODAL_FEEDER_PAUSED,
@@ -44,8 +46,14 @@ const stopWaiting = () => {
 
 class Workspace extends PureComponent {
     static propTypes = {
-        ...withRouter.propTypes
+        ...withRouter.propTypes,
+        workspaceId: PropTypes.string.isRequired,
+        isActive: PropTypes.bool.isRequired,
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     state = {
         mounted: false,
@@ -57,9 +65,9 @@ class Workspace extends PureComponent {
         isDraggingFile: false,
         isDraggingWidget: false,
         isUploading: false,
-        showPrimaryContainer: store.get('workspace.container.primary.show'),
-        showSecondaryContainer: store.get('workspace.container.secondary.show'),
-        inactiveCount: _.size(widgetManager.getInactiveWidgets())
+        showPrimaryContainer: this.workspace.primaryWidgetsVisible,
+        showSecondaryContainer: this.workspace.secondaryWidgetsVisible,
+        inactiveCount: _.size(this.workspace.inactiveWidgetTypes)
     };
 
     action = {
@@ -188,8 +196,8 @@ class Workspace extends PureComponent {
             // TODO
         },
         onRemoveWidget: (widgetId) => {
-            const inactiveWidgets = widgetManager.getInactiveWidgets();
-            this.setState({ inactiveCount: inactiveWidgets.length });
+            const inactiveWidgetTypes = this.workspace.inactiveWidgetTypes;
+            this.setState({ inactiveCount: inactiveWidgetTypes.length });
         },
         onDragStart: () => {
             const { isDraggingWidget } = this.state;
@@ -234,7 +242,7 @@ class Workspace extends PureComponent {
             const { location } = this.props;
             const disableHorizontalScroll = !(showPrimaryContainer && showSecondaryContainer);
 
-            if (location.pathname === '/workspace' && disableHorizontalScroll) {
+            if (location.pathname === this.workspace.path && disableHorizontalScroll) {
                 // Disable horizontal scroll
                 document.body.scrollLeft = 0;
                 document.body.style.overflowX = 'hidden';
@@ -314,52 +322,21 @@ class Workspace extends PureComponent {
         }
     };
 
-    updateWidgetsForPrimaryContainer = () => {
-        widgetManager.show((activeWidgets, inactiveWidgets) => {
-            const widgets = Object.keys(store.get('widgets', {}))
-                .filter(widgetId => {
-                    const name = widgetId.split(':')[0];
-                    return _.includes(activeWidgets, name);
-                });
-
-            const defaultWidgets = store.get('workspace.container.default.widgets');
-            const sortableWidgets = _.difference(widgets, defaultWidgets);
-            let primaryWidgets = store.get('workspace.container.primary.widgets');
-            let secondaryWidgets = store.get('workspace.container.secondary.widgets');
-
-            primaryWidgets = sortableWidgets.slice();
-            _.pullAll(primaryWidgets, secondaryWidgets);
-            pubsub.publish('updatePrimaryWidgets', primaryWidgets);
-
-            secondaryWidgets = sortableWidgets.slice();
-            _.pullAll(secondaryWidgets, primaryWidgets);
-            pubsub.publish('updateSecondaryWidgets', secondaryWidgets);
-
-            // Update inactive count
-            this.setState({ inactiveCount: _.size(inactiveWidgets) });
-        });
-    };
-
     updateWidgetsForSecondaryContainer = () => {
-        widgetManager.show((activeWidgets, inactiveWidgets) => {
+        widgetManager.show(this.workspace.id, (activeWidgets, inactiveWidgets) => {
             const widgets = Object.keys(store.get('widgets', {}))
                 .filter(widgetId => {
                     const name = widgetId.split(':')[0];
                     return _.includes(activeWidgets, name);
                 });
 
-            const defaultWidgets = store.get('workspace.container.default.widgets');
-            const sortableWidgets = _.difference(widgets, defaultWidgets);
-            let primaryWidgets = store.get('workspace.container.primary.widgets');
-            let secondaryWidgets = store.get('workspace.container.secondary.widgets');
+            const sortableWidgets = _.difference(widgets, this.workspace.centerWidgets);
+            let primaryWidgets = this.workspace.primaryWidgets;
+            let secondaryWidgets = this.workspace.secondaryWidgets;
 
             secondaryWidgets = sortableWidgets.slice();
             _.pullAll(secondaryWidgets, primaryWidgets);
             pubsub.publish('updateSecondaryWidgets', secondaryWidgets);
-
-            primaryWidgets = sortableWidgets.slice();
-            _.pullAll(primaryWidgets, secondaryWidgets);
-            pubsub.publish('updatePrimaryWidgets', primaryWidgets);
 
             // Update inactive count
             this.setState({ inactiveCount: _.size(inactiveWidgets) });
@@ -382,8 +359,8 @@ class Workspace extends PureComponent {
     }
 
     componentDidUpdate() {
-        store.set('workspace.container.primary.show', this.state.showPrimaryContainer);
-        store.set('workspace.container.secondary.show', this.state.showSecondaryContainer);
+        this.workspace.primaryWidgetsVisible = this.state.showPrimaryContainer;
+        this.workspace.secondaryWidgetsVisible = this.state.showSecondaryContainer;
 
         this.resizeDefaultContainer();
     }
@@ -425,6 +402,10 @@ class Workspace extends PureComponent {
         } = this.state;
         const hidePrimaryContainer = !showPrimaryContainer;
         const hideSecondaryContainer = !showSecondaryContainer;
+
+        if (!this.workspace) {
+            return <div />;
+        }
 
         return (
             <div style={style} className={classNames(className, styles.workspace)}>
@@ -552,6 +533,7 @@ class Workspace extends PureComponent {
                                     ref={node => {
                                         this.primaryWidgets = node;
                                     }}
+                                    workspaceId={this.workspace.id}
                                     onForkWidget={this.widgetEventHandler.onForkWidget}
                                     onRemoveWidget={this.widgetEventHandler.onRemoveWidget}
                                     onDragStart={this.widgetEventHandler.onDragStart}
@@ -588,7 +570,7 @@ class Workspace extends PureComponent {
                                     styles.fixed
                                 )}
                             >
-                                <DefaultWidgets />
+                                <CenterWidgets workspaceId={this.workspace.id} />
                             </div>
                             {hideSecondaryContainer && (
                                 <div
@@ -682,6 +664,7 @@ class Workspace extends PureComponent {
                                     ref={node => {
                                         this.secondaryWidgets = node;
                                     }}
+                                    workspaceId={this.workspace.id}
                                     onForkWidget={this.widgetEventHandler.onForkWidget}
                                     onRemoveWidget={this.widgetEventHandler.onRemoveWidget}
                                     onDragStart={this.widgetEventHandler.onDragStart}

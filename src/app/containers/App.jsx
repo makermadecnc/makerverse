@@ -4,8 +4,10 @@ import { trackPage } from '../lib/analytics';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Workspace from './Workspace';
+import Home from './Home';
 import Settings from './Settings';
 import styles from './App.styl';
+import Workspaces from '../lib/workspaces';
 
 class App extends PureComponent {
     static propTypes = {
@@ -14,8 +16,11 @@ class App extends PureComponent {
 
     render() {
         const { location } = this.props;
-        const accepted = ([
-            '/workspace',
+        const workspacePaths = Object.keys(Workspaces.all).map((workspaceId) => {
+            return Workspaces.all[workspaceId].path;
+        });
+        const paths = [
+            '/home',
             '/settings',
             '/settings/general',
             '/settings/workspace',
@@ -25,13 +30,14 @@ class App extends PureComponent {
             '/settings/commands',
             '/settings/events',
             '/settings/about'
-        ].indexOf(location.pathname) >= 0);
+        ] + workspacePaths;
+        const accepted = (paths.indexOf(location.pathname) >= 0);
 
         if (!accepted) {
             return (
                 <Redirect
                     to={{
-                        pathname: '/workspace',
+                        pathname: '/home',
                         state: {
                             from: location
                         }
@@ -50,12 +56,28 @@ class App extends PureComponent {
                 </aside>
                 <div className={styles.main}>
                     <div className={styles.content}>
-                        <Workspace
+                        <Home
                             {...this.props}
+                            isActive={location.pathname === '/home'}
                             style={{
-                                display: (location.pathname !== '/workspace') ? 'none' : 'block'
+                                display: (location.pathname !== '/home') ? 'none' : 'block'
                             }}
                         />
+                        {Object.keys(Workspaces.all).map((workspaceId) => {
+                            const workspace = Workspaces.all[workspaceId];
+                            const active = location.pathname === workspace.path;
+                            return (
+                                <Workspace
+                                    {...this.props}
+                                    key={workspaceId}
+                                    isActive={active}
+                                    workspaceId={workspaceId}
+                                    style={{
+                                        display: active ? 'block' : 'none'
+                                    }}
+                                />
+                            );
+                        })}
                         {location.pathname.indexOf('/settings') === 0 &&
                             <Settings {...this.props} />
                         }

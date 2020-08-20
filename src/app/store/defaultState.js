@@ -8,27 +8,8 @@ const defaultState = {
         name: '',
         token: ''
     },
-    workspace: {
-        container: {
-            default: {
-                widgets: ['visualizer']
-            },
-            primary: {
-                show: true,
-                widgets: [
-                    'connection', 'console', 'grbl', 'm2'
-                ]
-            },
-            secondary: {
-                show: true,
-                widgets: [
-                    'axes', 'gcode', 'macro', 'probe', 'spindle', 'laser'
-                ]
-            }
-        },
-        machineProfile: {
-            id: null
-        }
+    machineProfile: {
+        id: null
     },
     widgets: {
         axes: {
@@ -104,35 +85,38 @@ const defaultState = {
                 maxS: 1000
             }
         },
-        m2: {
+        maslow: {
             minimized: false,
         },
-        // marlin: {
-        //     minimized: false,
-        //     panel: {
-        //         heaterControl: {
-        //             expanded: true
-        //         },
-        //         statusReports: {
-        //             expanded: false
-        //         },
-        //         modalGroups: {
-        //             expanded: false
-        //         }
-        //     },
-        //     heater: {
-        //         // Filament          | PLA                | ABS
-        //         // ----------------- | ------------------ | --------------------
-        //         // Uses              | Consumer Products  | Functional Parts
-        //         // Strength          | Medium             | Medium
-        //         // Flexibility       | Low                | Medium
-        //         // Durability        | Medium             | High
-        //         // Print Temperature | 180-230°C          | 210-250°C
-        //         // Bed Temperature   | 20-60°C (optional) | 80-110°C (mandatory)
-        //         extruder: 180,
-        //         heatedBed: 60
-        //     }
-        // },
+        webcam: {
+            minimized: false,
+        },
+        marlin: {
+            minimized: false,
+            panel: {
+                heaterControl: {
+                    expanded: true
+                },
+                statusReports: {
+                    expanded: false
+                },
+                modalGroups: {
+                    expanded: false
+                }
+            },
+            heater: {
+                // Filament          | PLA                | ABS
+                // ----------------- | ------------------ | --------------------
+                // Uses              | Consumer Products  | Functional Parts
+                // Strength          | Medium             | Medium
+                // Flexibility       | Low                | Medium
+                // Durability        | Medium             | High
+                // Print Temperature | 180-230°C          | 210-250°C
+                // Bed Temperature   | 20-60°C (optional) | 80-110°C (mandatory)
+                extruder: 180,
+                heatedBed: 60
+            }
+        },
         probe: {
             minimized: false,
             probeCommand: 'G38.2',

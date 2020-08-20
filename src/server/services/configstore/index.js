@@ -6,15 +6,6 @@ import logger from '../../lib/logger';
 
 const log = logger('service:configstore');
 
-const defaultState = { // default state
-    checkForUpdates: true,
-    controller: {
-        exception: {
-            ignoreErrors: false
-        }
-    }
-};
-
 class ConfigStore extends events.EventEmitter {
     file = '';
 
@@ -22,10 +13,22 @@ class ConfigStore extends events.EventEmitter {
 
     watcher = null;
 
+    // Is it saving?
+    syncing = true;
+
+    reloadDuringSync = false;
+
+    constructor(reloadDuringSync) {
+        super();
+        this.reloadDuringSync = reloadDuringSync;
+    }
+
     // @param {string} file The path to a filename.
+    // @param {defaults} default values are all guaranteed to be present. Avoid arrays if possible.
     // @return {object} The config object.
-    load(file) {
+    load(file, defaults) {
         this.file = file;
+        this.defaults = defaults || {};
         this.reload();
         this.emit('load', this.config); // emit load event
 
@@ -46,8 +49,10 @@ class ConfigStore extends events.EventEmitter {
 
                 if (eventType === 'change') {
                     log.debug(`"${filename}" has been changed`);
-                    const ok = this.reload();
-                    ok && this.emit('change', this.config); // it is ok to emit change event
+                    if (this.reloadDuringSync || !this.syncing) {
+                        const ok = this.reload();
+                        ok && this.emit('change', this.config); // it is ok to emit change event
+                    }
                 }
             });
         } catch (err) {
@@ -75,15 +80,14 @@ class ConfigStore extends events.EventEmitter {
             this.config = {};
         }
 
-        this.config.state = {
-            ...defaultState,
-            ...this.config.state
-        };
+        // Deep merge, ensuring presence of defaults.
+        _.defaultsDeep(this.config, this.defaults);
 
         return true;
     }
 
     sync() {
+        this.syncing = true;
         try {
             const content = JSON.stringify(this.config, null, 4);
             fs.writeFileSync(this.file, content, 'utf8');
@@ -91,6 +95,8 @@ class ConfigStore extends events.EventEmitter {
             log.error(`Unable to write data to "${this.file}"`);
             this.emit('error', err); // emit error event
             return false;
+        } finally {
+            this.syncing = false;
         }
 
         return true;
@@ -133,6 +139,8 @@ class ConfigStore extends events.EventEmitter {
     }
 }
 
-const configstore = new ConfigStore();
+export { ConfigStore };
+
+const configstore = new ConfigStore(true);
 
 export default configstore;

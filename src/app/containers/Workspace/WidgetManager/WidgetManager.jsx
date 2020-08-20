@@ -1,69 +1,29 @@
 import difference from 'lodash/difference';
 import find from 'lodash/find';
 import includes from 'lodash/includes';
-import union from 'lodash/union';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Modal from 'app/components/Modal';
-import { GRBL, MARLIN } from 'app/constants';
-import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-import store from 'app/store';
+import Workspaces from 'app/lib/workspaces';
 import WidgetList from './WidgetList';
 
 class WidgetManager extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         onSave: PropTypes.func,
         onClose: PropTypes.func.isRequired
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     state = {
         show: true
     };
 
     widgetList = [
-        {
-            id: 'visualizer',
-            caption: i18n._('Visualizer Widget'),
-            details: i18n._('This widget visualizes a G-code file and simulates the tool path.'),
-            visible: true,
-            disabled: true
-        },
-        {
-            id: 'connection',
-            caption: i18n._('Connection Widget'),
-            details: i18n._('This widget lets you establish a connection to a serial port.'),
-            visible: true,
-            disabled: true
-        },
-        {
-            id: 'console',
-            caption: i18n._('Console Widget'),
-            details: i18n._('This widget lets you read and write data to the CNC controller connected to a serial port.'),
-            visible: true,
-            disabled: false
-        },
-        {
-            id: 'grbl',
-            caption: i18n._('Grbl Widget'),
-            details: i18n._('This widget shows the Grbl state and provides Grbl specific features.'),
-            visible: true,
-            disabled: false
-        },
-        {
-            id: 'm2',
-            caption: i18n._('M2 Widget'),
-            details: i18n._('This widget shows the Grbl state and provides Grbl specific features.'),
-            visible: true,
-            disabled: false
-        },
-        // {
-        //     id: 'marlin',
-        //     caption: i18n._('Marlin Widget'),
-        //     details: i18n._('This widget shows the Marlin state and provides Marlin specific features.'),
-        //     visible: true,
-        //     disabled: false
-        // },
         {
             id: 'axes',
             caption: i18n._('Controls Widget'),
@@ -98,6 +58,13 @@ class WidgetManager extends PureComponent {
             details: i18n._('This widget provides the spindle control.'),
             visible: true,
             disabled: false
+        },
+        {
+            id: 'webcam',
+            caption: i18n._('Webcam Widget'),
+            details: i18n._('View a webcam from within the app to monitor progress.'),
+            visible: true,
+            disabled: false
         }
     ];
 
@@ -117,23 +84,6 @@ class WidgetManager extends PureComponent {
         this.setState({ show: false });
     };
 
-    constructor(props) {
-        super(props);
-
-        this.widgetList = this.widgetList.filter(widgetItem => {
-            if (widgetItem.id === 'grbl' && !includes(controller.loadedControllers, GRBL)) {
-                return false;
-            }
-            if (widgetItem.id === 'marlin' && !includes(controller.loadedControllers, MARLIN)) {
-                return false;
-            }
-            // if (widgetItem.id === 'm2' && !includes(controller.loadedControllers, M2)) {
-            //     return false;
-            // }
-            return true;
-        });
-    }
-
     componentDidUpdate() {
         if (!(this.state.show)) {
             this.props.onClose();
@@ -141,13 +91,7 @@ class WidgetManager extends PureComponent {
     }
 
     render() {
-        const defaultWidgets = store.get('workspace.container.default.widgets', [])
-            .map(widgetId => widgetId.split(':')[0]);
-        const primaryWidgets = store.get('workspace.container.primary.widgets', [])
-            .map(widgetId => widgetId.split(':')[0]);
-        const secondaryWidgets = store.get('workspace.container.secondary.widgets', [])
-            .map(widgetId => widgetId.split(':')[0]);
-        const activeWidgets = union(defaultWidgets, primaryWidgets, secondaryWidgets);
+        const activeWidgets = this.workspace.activeWidgetTypes;
 
         this.widgetList.forEach(widget => {
             if (includes(activeWidgets, widget.id)) {

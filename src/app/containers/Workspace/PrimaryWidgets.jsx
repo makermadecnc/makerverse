@@ -2,35 +2,38 @@ import chainedFunction from 'chained-function';
 import classNames from 'classnames';
 import ensureArray from 'ensure-array';
 import get from 'lodash/get';
-import includes from 'lodash/includes';
 import isEqual from 'lodash/isEqual';
-import pubsub from 'pubsub-js';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import Sortable from 'react-sortablejs';
 import uuid from 'uuid';
-import { GRBL, MARLIN } from 'app/constants';
 import { Button } from 'app/components/Buttons';
 import Modal from 'app/components/Modal';
-import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import store from 'app/store';
 import Widget from './Widget';
 import styles from './widgets.styl';
+import Workspaces from '../../lib/workspaces';
 
 class PrimaryWidgets extends Component {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         onForkWidget: PropTypes.func.isRequired,
         onRemoveWidget: PropTypes.func.isRequired,
         onDragStart: PropTypes.func.isRequired,
         onDragEnd: PropTypes.func.isRequired
     };
 
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
+
     state = {
-        widgets: store.get('workspace.container.primary.widgets')
+        widgets: this.workspace.primaryWidgets
     };
+
     forkWidget = (widgetId) => () => {
         portal(({ onClose }) => (
             <Modal size="xs" onClose={onClose}>
@@ -124,41 +127,9 @@ class PrimaryWidgets extends Component {
 
     widgetMap = {};
 
-    componentDidMount() {
-        this.subscribe();
-    }
-
-    componentWillUnmount() {
-        this.unsubscribe();
-    }
-
     shouldComponentUpdate(nextProps, nextState) {
         // Do not compare props for performance considerations
         return !isEqual(nextState, this.state);
-    }
-
-    componentDidUpdate() {
-        const { widgets } = this.state;
-
-        // Calling store.set() will merge two different arrays into one.
-        // Remove the property first to avoid duplication.
-        store.replace('workspace.container.primary.widgets', widgets);
-    }
-
-    subscribe() {
-        { // updatePrimaryWidgets
-            const token = pubsub.subscribe('updatePrimaryWidgets', (msg, widgets) => {
-                this.setState({ widgets: widgets });
-            });
-            this.pubsubTokens.push(token);
-        }
-    }
-
-    unsubscribe() {
-        this.pubsubTokens.forEach((token) => {
-            pubsub.unsubscribe(token);
-        });
-        this.pubsubTokens = [];
     }
 
     expandAll() {
@@ -186,19 +157,6 @@ class PrimaryWidgets extends Component {
     render() {
         const { className } = this.props;
         const widgets = this.state.widgets
-            .filter(widgetId => {
-                const name = widgetId.split(':')[0];
-                if (name === 'grbl' && !includes(controller.loadedControllers, GRBL)) {
-                    return false;
-                }
-                if (name === 'marlin' && !includes(controller.loadedControllers, MARLIN)) {
-                    return false;
-                }
-                // if (name === 'm2' && !includes(controller.loadedControllers, M2)) {
-                //     return false;
-                // }
-                return true;
-            })
             .map(widgetId => (
                 <div data-widget-id={widgetId} key={widgetId}>
                     <Widget
@@ -207,6 +165,7 @@ class PrimaryWidgets extends Component {
                                 this.widgetMap[widgetId] = node.widget;
                             }
                         }}
+                        workspaceId={this.workspace.id}
                         widgetId={widgetId}
                         onFork={this.forkWidget(widgetId)}
                         onRemove={this.removeWidget(widgetId)}

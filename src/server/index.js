@@ -27,6 +27,18 @@ import urljoin from './lib/urljoin';
 
 const log = logger('init');
 
+// Default contents of .cncrc, deep-merged with file contents.
+const rcDefault = {
+    state: {
+        checkForUpdates: true,
+        controller: {
+            exception: {
+                ignoreErrors: false
+            }
+        }
+    }
+};
+
 const createServer = (options, callback) => {
     options = { ...options };
 
@@ -52,7 +64,7 @@ const createServer = (options, callback) => {
 
     // configstore service
     log.info(`Loading configuration from ${chalk.yellow(JSON.stringify(rcfile))}`);
-    config.load(rcfile);
+    config.load(rcfile, rcDefault);
 
     // rcfile
     settings.rcfile = rcfile;
@@ -225,7 +237,7 @@ const createServer = (options, callback) => {
     webappengine({ port, host, backlog, routes })
         .on('ready', (server) => {
             // cncengine service
-            cncengine.start(server, options.controller || config.get('controller', ''));
+            cncengine.start(server);
 
             const address = server.address().address;
             const port = server.address().port;

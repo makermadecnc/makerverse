@@ -424,7 +424,6 @@ class GrblController {
                 if (this.actionMask.replyParserState) {
                     this.actionMask.replyParserState = false;
                     this.emit('serialport:read', res.raw);
-                    console.log('test');
                 }
                 this.actionMask.queryParserState.reply = false;
                 return;

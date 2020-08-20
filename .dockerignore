@@ -1,0 +1,11 @@
+.github
+Dockerfile
+*.md
+electron-build
+examples
+/.eslintcache
+/.nyc_output
+/coverage
+windows-store
+src
+node_modules

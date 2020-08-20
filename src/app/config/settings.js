@@ -12,12 +12,13 @@ const settings = {
         // @see store/index.js
         corruptedWorkspaceSettings: false
     },
+    workspaces: [],
     name: pkg.name,
     productName: pkg.productName,
     version: pkg.version,
     webroot: webroot,
     log: {
-        level: 'warn' // trace, debug, info, warn, error
+        level: 'debug' // trace, debug, info, warn, error
     },
     analytics: {
         trackingId: process.env.TRACKING_ID

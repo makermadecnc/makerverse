@@ -663,6 +663,86 @@ machines.run = (id) => new Promise((resolve, reject) => {
         });
 });
 
+//
+// Workspaces
+//
+const workspaces = {};
+
+workspaces.fetch = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/workspaces')
+        .query(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+workspaces.create = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .post('/api/workspaces')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+workspaces.read = (id) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/workspaces/' + id)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+workspaces.update = (id, options) => new Promise((resolve, reject) => {
+    authrequest
+        .put('/api/workspaces/' + id)
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+workspaces.delete = (id) => new Promise((resolve, reject) => {
+    authrequest
+        .delete('/api/workspaces/' + id)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+workspaces.run = (id) => new Promise((resolve, reject) => {
+    authrequest
+        .post('/api/workspaces/run/' + id)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 export default {
     // getLatestVersion,
 
@@ -689,6 +769,7 @@ export default {
     commands,
     events,
     machines,
+    workspaces,
     macros,
     mdi,
     users,

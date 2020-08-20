@@ -15,6 +15,7 @@ import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import * as user from 'app/lib/user';
 import store from 'app/store';
+import Workspaces from 'app/lib/workspaces';
 import QuickAccessToolbar from './QuickAccessToolbar';
 import styles from './index.styl';
 
@@ -409,7 +410,7 @@ class Header extends PureComponent {
                             </MenuItem> */}
                         </NavDropdown>
                     </Nav>
-                    {location.pathname === '/workspace' &&
+                    {Workspaces.findByPath(location.pathname) &&
                     <QuickAccessToolbar state={this.state} actions={this.actions} />
                     }
                 </Navbar.Collapse>

@@ -35,7 +35,7 @@ import {
 const IMPERIAL_GRID_COUNT = 48; // 32 in
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const IMPERIAL_AXIS_LENGTH = IMPERIAL_GRID_SPACING * 12; // 12 in
-const METRIC_GRID_COUNT = 125; // 125 cm
+const METRIC_GRID_COUNT = 120; // 60 cm
 const METRIC_GRID_SPACING = 10; // 10 mm
 const METRIC_AXIS_LENGTH = METRIC_GRID_SPACING * 30; // 300 mm
 const CAMERA_VIEWPORT_WIDTH = 300; // 300 mm
@@ -73,7 +73,7 @@ class Visualizer extends Component {
         z: 0
     };
 
-    machineProfile = store.get('workspace.machineProfile');
+    machineProfile = store.get('machineProfile');
 
     group = new THREE.Group();
 
@@ -96,7 +96,7 @@ class Visualizer extends Component {
     }, 32); // 60hz
 
     changeMachineProfile = () => {
-        const machineProfile = store.get('workspace.machineProfile');
+        const machineProfile = store.get('machineProfile');
 
         if (!machineProfile) {
             return;

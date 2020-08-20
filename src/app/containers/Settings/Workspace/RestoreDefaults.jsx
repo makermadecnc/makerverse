@@ -5,7 +5,6 @@ import Modal from 'app/components/Modal';
 import Space from 'app/components/Space';
 import i18n from 'app/lib/i18n';
 import store from 'app/store';
-import defaultState from 'app/store/defaultState';
 
 class RestoreDefaults extends PureComponent {
     static propTypes = {
@@ -39,11 +38,7 @@ class RestoreDefaults extends PureComponent {
                     <Button
                         btnStyle="danger"
                         onClick={() => {
-                            // Reset to default state
-                            store.state = defaultState;
-
-                            // Persist data locally
-                            store.persist();
+                            store.resetDefaults();
 
                             // Refresh
                             window.location.reload();
