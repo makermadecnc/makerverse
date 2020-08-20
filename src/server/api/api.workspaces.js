@@ -54,7 +54,7 @@ const getSanitizedRecords = () => {
 
 const ensureWorkspace = (payload) => {
     const { path, name, controller, limits } = { ...payload };
-    const { port, baudRate, controllerType, rtscts } = { ...controller };
+    const { port, baudRate, reconnect, controllerType, rtscts } = { ...controller };
     const { xmin = 0, xmax = 0, ymin = 0, ymax = 0, zmin = 0, zmax = 0 } = { ...limits };
 
     return {
@@ -65,6 +65,7 @@ const ensureWorkspace = (payload) => {
             port: ensureString(port),
             baudRate: ensureNumber(baudRate),
             rtscts: ensureBoolean(rtscts),
+            reconnect: ensureBoolean(reconnect),
         },
         limits: {
             xmin: ensureNumber(xmin) || 0,

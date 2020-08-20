@@ -19,7 +19,7 @@ class App extends PureComponent {
         const workspacePaths = Object.keys(Workspaces.all).map((workspaceId) => {
             return Workspaces.all[workspaceId].path;
         });
-        const paths = [
+        const staticPaths = [
             '/home',
             '/settings',
             '/settings/general',
@@ -30,8 +30,10 @@ class App extends PureComponent {
             '/settings/commands',
             '/settings/events',
             '/settings/about'
-        ] + workspacePaths;
-        const accepted = (paths.indexOf(location.pathname) >= 0);
+        ];
+        const isWorkspace = workspacePaths.indexOf(location.pathname) >= 0;
+        const isStaticPath = staticPaths.indexOf(location.pathname) >= 0;
+        const accepted = isWorkspace || isStaticPath;
 
         if (!accepted) {
             return (
@@ -65,15 +67,14 @@ class App extends PureComponent {
                         />
                         {Object.keys(Workspaces.all).map((workspaceId) => {
                             const workspace = Workspaces.all[workspaceId];
-                            const active = location.pathname === workspace.path;
+                            workspace.isActive = location.pathname === workspace.path;
                             return (
                                 <Workspace
                                     {...this.props}
                                     key={workspaceId}
-                                    isActive={active}
                                     workspaceId={workspaceId}
                                     style={{
-                                        display: active ? 'block' : 'none'
+                                        display: workspace.isActive ? 'block' : 'none'
                                     }}
                                 />
                             );

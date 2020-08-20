@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import log from 'app/lib/log';
 import store from '../store';
 import controller from './controller';
 import {
@@ -12,11 +13,6 @@ import {
  */
 class Workspaces {
     static all = {};
-
-    // Easy access to the current UI tab (if applicable).
-    static get current() {
-        return null;
-    }
 
     static findByPath(path) {
         return _.find(Workspaces.all, (w) => {
@@ -47,9 +43,43 @@ class Workspaces {
         return this._record.name;
     }
 
-    // Workspaces own controllers, which each represent a single connection to the hardware.
-    get controller() {
-        return controller;
+    get controllerAttributes() {
+        return {
+            type: this._record.controller.controllerType,
+            port: this._record.controller.port,
+            baudRate: Number(this._record.controller.baudRate),
+            rtscts: !!this._record.controller.rtscts,
+            reconnect: !!this._record.controller.reconnect,
+        };
+    }
+
+    // Flag set by main App.jsx to indicate if this is the active workspace.
+    get isActive() {
+        return this._isActive || false;
+    }
+
+    set isActive(active) {
+        const wasActive = !!this._isActive;
+        this._isActive = !!active;
+        if (wasActive !== this._isActive) {
+            if (this._isActive) {
+                this.onActivated();
+            } else {
+                this.onDeactivated();
+            }
+        }
+    }
+
+    onActivated() {
+        this.addControllerEvents();
+        if (this.controllerAttributes.reconnect) {
+            this.openPort();
+        }
+    }
+
+    onDeactivated() {
+        this.removeControllerEvents();
+        this.closePort();
     }
 
     // Sidebar icon.
@@ -58,18 +88,123 @@ class Workspaces {
             return this._record.icon;
         }
         let icon = 'xyz';
-        if (this.controllerType === MASLOW) {
+        if (this.controllerAttributes.type === MASLOW) {
             icon = 'maslow';
-        } else if (this.controllerType === GRBL) {
+        } else if (this.controllerAttributes.type === GRBL) {
             icon = 'cnc';
-        } else if (this.controllerType === MARLIN) {
+        } else if (this.controllerAttributes.type === MARLIN) {
             icon = '3dp';
         }
         return `images/icons/${icon}.svg`;
     }
 
-    get controllerType() {
-        return this._record.controller.controllerType;
+    // ---------------------------------------------------------------------------------------------
+    // Workspaces own controllers, which each represent a single connection to the hardware.
+    // WIP: controller is still a global, but it gets (dis/re)connected when switching workspaces.
+    // ---------------------------------------------------------------------------------------------
+
+    _hasControllerEvents = false;
+    _connecting = false;
+    _connected = false;
+
+    _controllerEvents = {
+        'serialport:change': (options) => {
+            const { port } = options;
+            if (port !== this.controllerAttributes.port) {
+                return;
+            }
+            log.debug(`Changed ports to "${port}"`);
+        },
+        'serialport:open': (options) => {
+            const { port } = options;
+            if (port !== this.controllerAttributes.port || !this._connecting) {
+                return;
+            }
+
+            log.debug(`Established a connection to the serial port "${port}"`);
+            this._connecting = false;
+            this._connected = true;
+        },
+        'serialport:close': (options) => {
+            const { port } = options;
+            if (port !== this.controllerAttributes.port) {
+                return;
+            }
+
+            log.debug(`The serial port "${port}" is disconected`);
+            this._connecting = false;
+            this._connected = false;
+        },
+        'serialport:error': (options) => {
+            const { port } = options;
+            if (port !== this.controllerAttributes.port) {
+                return;
+            }
+
+            log.error(`Error opening serial port "${port}"`);
+            this._connecting = false;
+            this._connected = false;
+        }
+    };
+
+    get controller() {
+        return controller;
+    }
+
+    get isConnected() {
+        return this._connected;
+    }
+
+    get isConnecting() {
+        return this._connecting;
+    }
+
+    openPort(callback) {
+        const atts = this.controllerAttributes;
+        controller.openPort(atts.port, {
+            controllerType: atts.type,
+            baudrate: atts.baudRate,
+            rtscts: atts.rtscts
+        }, (err) => {
+            if (err) {
+                this._connecting = false;
+                this._connected = false;
+                log.err(err);
+            }
+            if (callback) {
+                callback(err);
+            }
+        });
+    }
+
+    closePort(callback) {
+        this._connecting = false;
+        if (!this.isConnected) {
+            return;
+        }
+        this._connected = false;
+        controller.closePort(this.controllerAttributes.port, (err) => {
+            if (err) {
+                log.err(err);
+            }
+            if (callback) {
+                callback(err);
+            }
+        });
+    }
+
+    addControllerEvents() {
+        Object.keys(this._controllerEvents).forEach(eventName => {
+            const callback = this._controllerEvents[eventName];
+            this.controller.addListener(eventName, callback);
+        });
+    }
+
+    removeControllerEvents() {
+        Object.keys(this._controllerEvents).forEach(eventName => {
+            const callback = this._controllerEvents[eventName];
+            controller.removeListener(eventName, callback);
+        });
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -80,8 +215,8 @@ class Workspaces {
 
     // ---------------------------------------------------------------------------------------------
     get primaryWidgets() {
-        const ret = ['connection', 'console', this.controllerType.toLowerCase()];
-        return ret;
+        const controllerWidget = this.controllerAttributes.type.toLowerCase();
+        return ['connection', 'console', controllerWidget];
     }
 
     get primaryWidgetsVisible() {

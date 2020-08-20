@@ -40,7 +40,7 @@ jobs:
     # Pre-build assets; this prevents the multi-arch from running each build in the Dockerfile.
     - npm run build-latest
     # Only the master branch supports a "deploy" step. For others, go ahead and push a dev image.
-    - travis_wait 20 scripts/docker.sh build
+    - scripts/docker.sh build
   after_success: [] # Override.
   addons:
     apt:
@@ -54,7 +54,7 @@ jobs:
   deploy:
     skip_cleanup: true # Leave build artifacts in place (don't git clean)
     provider: script
-    script: travis_wait 20 scripts/docker.sh deploy
+    script: scripts/docker.sh deploy
 # [Job] [Linux]
 - name: "Linux"
   os: linux

@@ -8,7 +8,7 @@ import Panel from 'app/components/Panel';
 import Toggler from 'app/components/Toggler';
 import styles from './index.styl';
 
-class Maslow extends PureComponent {
+class MaslowPanels extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
         actions: PropTypes.object
@@ -407,4 +407,4 @@ class Maslow extends PureComponent {
     }
 }
 
-export default Maslow;
+export default MaslowPanels;

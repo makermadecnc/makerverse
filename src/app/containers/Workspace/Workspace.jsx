@@ -48,7 +48,6 @@ class Workspace extends PureComponent {
     static propTypes = {
         ...withRouter.propTypes,
         workspaceId: PropTypes.string.isRequired,
-        isActive: PropTypes.bool.isRequired,
     };
 
     get workspace() {

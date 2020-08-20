@@ -5,10 +5,11 @@ import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import i18n from 'app/lib/i18n';
 import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import WidgetConfig from '../WidgetConfig';
-import Maslow from './Maslow';
-import Controller from './Controller';
-import Calibration from './Calibration';
+import MaslowPanels from './MaslowPanels';
+import InformationModal from './InformationModal';
+import CalibrationModal from './CalibrationModal';
 import {
     MASLOW
 } from '../../constants';
@@ -21,12 +22,17 @@ import styles from './index.styl';
 
 class MaslowWidget extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         widgetId: PropTypes.string.isRequired,
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
 
     // Public methods
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
+
     collapse = () => {
         this.setState({ minimized: true });
     };
@@ -435,12 +441,13 @@ class MaslowWidget extends PureComponent {
                         )}
                     >
                         {state.modal.name === MODAL_CONTROLLER &&
-                        <Controller state={state} actions={actions} />
+                        <InformationModal workspaceId={this.workspace.id} state={state} actions={actions} />
                         }
                         {state.modal.name === MODAL_CALIBRATION &&
-                        <Calibration state={state} actions={actions} />
+                        <CalibrationModal workspaceId={this.workspace.id} state={state} actions={actions} />
                         }
-                        <Maslow
+                        <MaslowPanels
+                            workspaceId={this.workspace.id}
                             state={state}
                             actions={actions}
                         />
