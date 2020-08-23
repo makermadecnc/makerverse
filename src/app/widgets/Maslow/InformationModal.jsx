@@ -3,18 +3,23 @@ import React, { PureComponent } from 'react';
 import { Button } from 'app/components/Buttons';
 import Modal from 'app/components/Modal';
 import { Nav, NavItem } from 'app/components/Navs';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import MaslowKinematics from 'app/lib/Maslow/MaslowKinematics';
 import styles from './index.styl';
 
 class InformationModal extends PureComponent {
-    kinematics = new MaslowKinematics();
-
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         state: PropTypes.object,
         actions: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
+
+    kinematics = new MaslowKinematics(this.workspace.controller);
 
     updateChains(pos) {
         pos = { ...this.kinematics.lastPosition, ...pos };
@@ -80,8 +85,8 @@ class InformationModal extends PureComponent {
                                         top: 10
                                     }}
                                     onClick={event => {
-                                        controller.writeln('$#'); // Parameters
-                                        controller.writeln('$$'); // Settings
+                                        this.workspace.controller.writeln('$#'); // Parameters
+                                        this.workspace.controller.writeln('$$'); // Settings
                                     }}
                                 >
                                     <i className="fa fa-refresh" />

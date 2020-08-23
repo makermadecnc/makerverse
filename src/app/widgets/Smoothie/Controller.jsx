@@ -3,12 +3,11 @@ import React from 'react';
 import { Button } from 'app/components/Buttons';
 import Modal from 'app/components/Modal';
 import { Nav, NavItem } from 'app/components/Navs';
-import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import styles from './index.styl';
 
 const Controller = (props) => {
-    const { state, actions } = props;
+    const { state, actions, controller } = props;
     const { activeTab = 'state' } = state.modal.params;
     const height = Math.max(window.innerHeight / 2, 200);
 
@@ -71,6 +70,7 @@ const Controller = (props) => {
 };
 
 Controller.propTypes = {
+    controller: PropTypes.object.isRequired,
     state: PropTypes.object,
     actions: PropTypes.object
 };

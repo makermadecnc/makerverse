@@ -15,7 +15,9 @@ const defaultMeasurements = {
 };
 
 class CalibrationModal extends PureComponent {
-    calibration = new MaslowCalibration();
+    calibration = new MaslowCalibration(this.workspace.controller, {
+        measuredInches: this.workspace.isImperialUnits
+    });
 
     static propTypes = {
         workspaceId: PropTypes.string.isRequired,
@@ -28,13 +30,17 @@ class CalibrationModal extends PureComponent {
     }
 
     state = {
-        activeTab: 'home',
-        cutDepth: 3, // mm to cut in the calibration pattern (zero = no cutting)
+        activeTab: 'welcome',
+        cutDepth: this.calibration.opts.cutDepth, // mm to cut in the calibration pattern (zero = no cutting)
         measurements: defaultMeasurements,
+        measuredInches: this.calibration.opts.measuredInches,
+        machineWidth: this.calibration.kin.opts.machineWidth,
+        machineHeight: this.calibration.kin.opts.machineHeight,
         origChainLength: this.calibration.kin.origChainLength,
         motorOffsetY: this.calibration.kin.opts.motorOffsetY,
         distBetweenMotors: this.calibration.kin.opts.distBetweenMotors,
         sledRadius: this.calibration.opts.sledRadius,
+        yHome: 0,
         calibrating: -1,
         result: false,
         applied: false
@@ -67,7 +73,7 @@ class CalibrationModal extends PureComponent {
         const settings = this.calibration.kin.getSettingsMap();
         const sks = Object.keys(settings);
         const result = this.state.result;
-        this.workspace.controller.writeln('$X');
+        this.workspace.controller.command('gcode', '$X');
         Object.keys(result.optimized).forEach((k) => {
             if (!sks.includes(k)) {
                 return;
@@ -87,7 +93,7 @@ class CalibrationModal extends PureComponent {
 
     updateCalibationOpts(opts) {
         const fullOpts = { ...this.calibration.opts, ...this.calibration.kin.opts, opts };
-        this.calibration = new MaslowCalibration(fullOpts);
+        this.calibration = new MaslowCalibration(this.workspace.controller, fullOpts);
         this.setState({ ...this.state, ...opts });
     }
 
@@ -101,13 +107,20 @@ class CalibrationModal extends PureComponent {
 
     defineHome(opts) {
         const setting = this.calibration.kin.getSettingsMap().origChainLength;
-        const chainLengths = this.calibration.kin.positionToChain(0, 0);
+        const chainLengths = this.calibration.kin.positionToChain(0, this.state.yHome);
         this.calibration.kin.origChainLength = Math.round((chainLengths[0] + chainLengths[1]) / 2);
         const cmd = `${setting.name}=${this.calibration.kin.origChainLength}`;
-        log.debug(`Setting default chain lengths: ${cmd}`);
-        this.workspace.controller.writeln('$X');
-        this.workspace.controller.writeln();
+        this.workspace.controller.command('gcode', '$X');
+        this.workspace.controller.writeln(cmd);
         this.setState({ ...this.state, origChainLength: this.calibration.kin.origChainLength });
+    }
+
+    fromMM(mm) {
+        return Math.round((this.state.measuredInches ? (Number(mm) / 25.4) : Number(mm)) * 100) / 100;
+    }
+
+    toMM(mm) {
+        return Math.round((this.state.measuredInches ? (Number(mm) * 25.4) : Number(mm)) * 100) / 100;
     }
 
     render() {
@@ -138,11 +151,16 @@ class CalibrationModal extends PureComponent {
         const {
             measurements,
             activeTab,
+            cutDepth,
             motorOffsetY,
+            machineWidth,
+            machineHeight,
             distBetweenMotors,
+            measuredInches,
             calibrating,
             result,
             sledRadius,
+            yHome,
             applied
         } = this.state;
         const isCalibrating = calibrating >= 0;
@@ -152,6 +170,11 @@ class CalibrationModal extends PureComponent {
         });
         const measurementsValid = zeroIdx < 0;
         const canCalibrate = measurementsValid && !isCalibrating && !applied;
+        const isPrecisionTab = activeTab === 'precision';
+        const isEdgeTab = activeTab === 'edge';
+        const isCalibrationTab = isPrecisionTab || isEdgeTab;
+        const isImperial = !!measuredInches;
+        const units = isImperial ? 'in' : 'mm';
 
         return (
             <Modal disableOverlay size="lg" onClose={actions.closeModal}>
@@ -169,10 +192,48 @@ class CalibrationModal extends PureComponent {
                         }}
                         style={{ marginBottom: 10 }}
                     >
+                        <NavItem eventKey="welcome">{i18n._('Welcome')}</NavItem>
                         <NavItem eventKey="home">{i18n._('Define Home')}</NavItem>
                         <NavItem eventKey="edge">{i18n._('Edge Calibration')}</NavItem>
+                        <NavItem eventKey="precision">{i18n._('Precision Calibration')}</NavItem>
                     </Nav>
                     <div className={styles.navContent} style={{ height: height }}>
+                        {activeTab === 'welcome' && (
+                            <div className={styles.tabFull}>
+                                <div className={styles.top}>
+                                    {'Please review your basic settings before moving on to "Define Home" (the next tab.)'}
+                                    <br />
+                                    {'In particular, make sure your stock is centered between the motors and matches these measurements.'}
+                                </div>
+                                <div className={styles.center}>
+                                    <div style={{ textAlign: 'center' }}>
+                                        Stock Width:
+                                        <input
+                                            type="text"
+                                            name="machineWidth"
+                                            className={styles.mmInput}
+                                            value={this.fromMM(machineWidth)}
+                                            onChange={e => {
+                                                this.updateKinematics({ machineWidth: this.toMM(e.target.value) || 0 });
+                                            }}
+                                        />
+                                        Height:
+                                        <input
+                                            type="text"
+                                            name="machineHeight"
+                                            className={styles.mmInput}
+                                            value={this.fromMM(machineHeight)}
+                                            onChange={e => {
+                                                this.updateKinematics({ machineHeight: this.toMM(e.target.value) || 0 });
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className={styles.bottom}>
+                                    {'For help, or to change units, see the lower-left corner of this dialog.'}
+                                </div>
+                            </div>
+                        )}
                         {activeTab === 'home' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.center} style={{ top: '20px' }}>
@@ -192,24 +253,34 @@ class CalibrationModal extends PureComponent {
                                     <br />
                                     {'Enter approximate measurements, within 5mm tolerance. Then, press "Define Home."'}
                                     <br />
-                                    motorOffsetY (mm):
+                                    motorOffsetY:
                                     <input
                                         type="text"
                                         name="motorOffsetY"
                                         className={styles.mmInput}
-                                        value={motorOffsetY}
+                                        value={this.fromMM(motorOffsetY)}
                                         onChange={e => {
-                                            this.updateKinematics({ motorOffsetY: Number(e.target.value) || 0 });
+                                            this.updateKinematics({ motorOffsetY: this.toMM(e.target.value) || 0 });
                                         }}
                                     />
-                                    distBetweenMotors (mm):
+                                    distBetweenMotors:
                                     <input
                                         type="text"
                                         name="distBetweenMotors"
                                         className={styles.mmInput}
-                                        value={distBetweenMotors}
+                                        value={this.fromMM(distBetweenMotors)}
                                         onChange={e => {
-                                            this.updateKinematics({ distBetweenMotors: Number(e.target.value) || 0 });
+                                            this.updateKinematics({ distBetweenMotors: this.toMM(e.target.value) || 0 });
+                                        }}
+                                    />
+                                    Y Position (advanced):
+                                    <input
+                                        type="text"
+                                        name="yHome"
+                                        className={styles.mmInput}
+                                        value={this.fromMM(yHome)}
+                                        onChange={e => {
+                                            this.setState({ ...this.state, yHome: this.toMM(e.target.value) || 0 });
                                         }}
                                     />
                                     <Button
@@ -223,7 +294,7 @@ class CalibrationModal extends PureComponent {
                                 </div>
                             </div>
                         )}
-                        {activeTab === 'edge' && (
+                        {isCalibrationTab && (
                             <div className={styles.tabFull}>
                                 <div className={styles.center} style={{ top: '50px' }}>
                                     {Object.keys(measurements).map((i) => {
@@ -336,16 +407,34 @@ class CalibrationModal extends PureComponent {
                                             {'Once all measurements have been entered, the "Calibrate" button will appear.'}
                                         </div>
                                     )}
-                                    Sled radius (mm):
-                                    <input
-                                        type="text"
-                                        name="sledRadius"
-                                        className={styles.mmInput}
-                                        value={sledRadius}
-                                        onChange={e => {
-                                            this.updateCalibationOpts({ sledRadius: Number(e.target.value) || 0 });
-                                        }}
-                                    />
+                                    {isEdgeTab && (
+                                        <span>
+                                            {'Sled radius: '}
+                                            <input
+                                                type="text"
+                                                name="sledRadius"
+                                                className={styles.mmInput}
+                                                value={this.fromMM(sledRadius)}
+                                                onChange={e => {
+                                                    this.updateCalibationOpts({ sledRadius: this.toMM(e.target.value) || 0 });
+                                                }}
+                                            />
+                                        </span>
+                                    )}
+                                    {isPrecisionTab && (
+                                        <span>
+                                            {'Cut depth: '}
+                                            <input
+                                                type="text"
+                                                name="cutDepth"
+                                                className={styles.mmInput}
+                                                value={this.fromMM(cutDepth)}
+                                                onChange={e => {
+                                                    this.updateCalibationOpts({ cutDepth: this.toMM(e.target.value) || 0 });
+                                                }}
+                                            />
+                                        </span>
+                                    )}
                                     {canCalibrate && (
                                         <Button
                                             btnSize="medium"
@@ -373,6 +462,21 @@ class CalibrationModal extends PureComponent {
                 </Modal.Body>
                 <Modal.Footer>
                     <span style={{ float: 'left' }}>
+                        Units:
+                        <select
+                            className={styles.mmInput}
+                            style={{ marginRight: '10px' }}
+                            name="units"
+                            value={units}
+                            onChange={(event) => {
+                                this.updateCalibationOpts({
+                                    measuredInches: event.target.value === 'in'
+                                });
+                            }}
+                        >
+                            <option value="mm">{i18n._('mm')}</option>
+                            <option value="in">{i18n._('in')}</option>
+                        </select>
                         <a href="http://bit.ly/maslow-calibration" target="_blank">Calibration Help</a>
                     </span>
                     <Button onClick={actions.closeModal}>

@@ -6,6 +6,7 @@ import React, { PureComponent } from 'react';
 import api from 'app/api';
 import { Button } from 'app/components/Buttons';
 import Modal from 'app/components/Modal';
+import Workspaces from 'app/lib/workspaces';
 import { Nav, NavItem } from 'app/components/Navs';
 import i18n from 'app/lib/i18n';
 import General from './General';
@@ -26,10 +27,15 @@ const TabPane = styled.div`
 
 class Settings extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         config: PropTypes.object.isRequired,
         onSave: PropTypes.func,
         onCancel: PropTypes.func
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     static defaultProps = {
         onSave: noop,
@@ -140,6 +146,7 @@ class Settings extends PureComponent {
                         </TabPane>
                         <TabPane active={this.state.activeKey === 'mdi'}>
                             <MDI
+                                workspaceId={this.workspace.id}
                                 ref={node => {
                                     this.node.mdi = node;
                                 }}

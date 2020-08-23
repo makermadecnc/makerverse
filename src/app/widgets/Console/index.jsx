@@ -7,7 +7,7 @@ import uuid from 'uuid';
 import settings from 'app/config/settings';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import WidgetConfig from '../WidgetConfig';
 import Console from './Console';
@@ -19,11 +19,16 @@ const TERMINAL_ROWS = 15;
 
 class ConsoleWidget extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         widgetId: PropTypes.string.isRequired,
         onFork: PropTypes.func.isRequired,
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     senderId = uuid.v4();
 
@@ -67,7 +72,7 @@ class ConsoleWidget extends PureComponent {
             const context = {
                 __sender__: this.senderId
             };
-            controller.write(data, context);
+            this.workspace.controller.write(data, context);
         }
     };
 
@@ -78,7 +83,7 @@ class ConsoleWidget extends PureComponent {
 
             if (this.terminal) {
                 const { productName, version } = settings;
-                this.terminal.writeln(color.white.bold(`${productName} ${version} [${controller.type}]`));
+                this.terminal.writeln(color.white.bold(`${productName} ${version} [${this.workspace.controller.type}]`));
                 this.terminal.writeln(color.white(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: color.yellowBright(port), baudrate: color.blueBright(baudrate) })));
             }
         },
@@ -122,12 +127,12 @@ class ConsoleWidget extends PureComponent {
     pubsubTokens = [];
 
     componentDidMount() {
-        this.addControllerEvents();
+        this.workspace.addControllerEvents(this.controllerEvents);
         this.subscribe();
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents(this.controllerEvents);
         this.unsubscribe();
     }
 
@@ -143,7 +148,7 @@ class ConsoleWidget extends PureComponent {
         return {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
-            port: controller.port,
+            port: this.workspace.controller.port,
 
             // Terminal
             terminal: {
@@ -170,20 +175,6 @@ class ConsoleWidget extends PureComponent {
             pubsub.unsubscribe(token);
         });
         this.pubsubTokens = [];
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     resizeTerminal() {

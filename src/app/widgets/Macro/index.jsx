@@ -6,7 +6,7 @@ import React, { PureComponent } from 'react';
 import api from 'app/api';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import WidgetConfig from '../WidgetConfig';
@@ -34,11 +34,16 @@ import styles from './index.styl';
 
 class MacroWidget extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         widgetId: PropTypes.string.isRequired,
         onFork: PropTypes.func.isRequired,
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     // Public methods
     collapse = () => {
@@ -126,7 +131,7 @@ class MacroWidget extends PureComponent {
             }
         },
         runMacro: (id, { name }) => {
-            controller.command('macro:run', id, controller.context, (err, data) => {
+            this.workspace.controller.command('macro:run', id, this.workspace.controller.context, (err, data) => {
                 if (err) {
                     log.error(`Failed to run the macro: id=${id}, name="${name}"`);
                     return;
@@ -138,7 +143,7 @@ class MacroWidget extends PureComponent {
                 let res;
                 res = await api.macros.read(id);
                 const { name } = res.body;
-                controller.command('macro:load', id, controller.context, (err, data) => {
+                this.workspace.controller.command('macro:load', id, this.workspace.controller.context, (err, data) => {
                     if (err) {
                         log.error(`Failed to load the macro: id=${id}, name="${name}"`);
                         return;
@@ -215,11 +220,11 @@ class MacroWidget extends PureComponent {
 
     componentDidMount() {
         this.fetchMacros();
-        this.addControllerEvents();
+        this.workspace.addControllerEvents(this.controllerEvents);
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents(this.controllerEvents);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -234,13 +239,13 @@ class MacroWidget extends PureComponent {
         return {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
-            port: controller.port,
+            port: this.workspace.controller.port,
             controller: {
-                type: controller.type,
-                state: controller.state
+                type: this.workspace.controller.type,
+                state: this.workspace.controller.state
             },
             workflow: {
-                state: controller.workflow.state
+                state: this.workspace.controller.workflow.state
             },
             modal: {
                 name: MODAL_NONE,
@@ -248,20 +253,6 @@ class MacroWidget extends PureComponent {
             },
             macros: []
         };
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     canClick() {

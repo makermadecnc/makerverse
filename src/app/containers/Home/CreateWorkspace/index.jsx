@@ -2,20 +2,22 @@ import classNames from 'classnames';
 import reverse from 'lodash/reverse';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
+import Controller from 'cncjs-controller';
+import io from 'socket.io-client';
 import includes from 'lodash/includes';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
-import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
+import auth from 'app/lib/auth';
 import {
     MASLOW
 } from 'app/constants';
 import Connection from './Connection';
 import styles from './index.styl';
 
-class ConnectionWidget extends PureComponent {
+class CreateWorkspace extends PureComponent {
     // Public methods
     collapse = () => {
         this.setState({ minimized: true });
@@ -24,6 +26,8 @@ class ConnectionWidget extends PureComponent {
     expand = () => {
         this.setState({ minimized: false });
     };
+
+    controller = new Controller(io);
 
     state = this.getInitialState();
 
@@ -99,6 +103,9 @@ class ConnectionWidget extends PureComponent {
             log.debug('Received a list of serial ports:', ports);
 
             this.stopLoading();
+            this.setState(state => ({
+                ports: ports
+            }));
         },
         'serialport:change': (options) => {
             const { port, inuse } = options;
@@ -161,8 +168,12 @@ class ConnectionWidget extends PureComponent {
     };
 
     componentDidMount() {
-        this.addControllerEvents();
-        this.refreshPorts();
+        this._mounting = true;
+        this.controller.connect(auth.host, auth.options, () => {
+            this.addControllerEvents();
+            this.refreshPorts();
+            this._mounting = false;
+        });
     }
 
     componentWillUnmount() {
@@ -171,8 +182,8 @@ class ConnectionWidget extends PureComponent {
 
     getInitialState() {
         let controllerType = MASLOW;
-        if (!includes(controller.loadedControllers, controllerType)) {
-            controllerType = controller.loadedControllers[0];
+        if (!includes(this.controller.loadedControllers, controllerType)) {
+            controllerType = this.controller.loadedControllers[0];
         }
 
         // Common baud rates
@@ -193,9 +204,9 @@ class ConnectionWidget extends PureComponent {
             connecting: false,
             connected: false,
             ports: [],
-            baudrates: reverse(sortBy(uniq(controller.baudrates.concat(defaultBaudrates)))),
+            baudrates: reverse(sortBy(uniq(this.controller.baudrates.concat(defaultBaudrates)))),
             controllerType: controllerType,
-            port: controller.port,
+            port: this.controller.port,
             baudrate: 0,
             connection: {
                 serial: {
@@ -211,14 +222,14 @@ class ConnectionWidget extends PureComponent {
     addControllerEvents() {
         Object.keys(this.controllerEvents).forEach(eventName => {
             const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
+            this.controller.addListener(eventName, callback);
         });
     }
 
     removeControllerEvents() {
         Object.keys(this.controllerEvents).forEach(eventName => {
             const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
+            this.controller.removeListener(eventName, callback);
         });
     }
 
@@ -247,7 +258,7 @@ class ConnectionWidget extends PureComponent {
 
     refreshPorts() {
         this.startLoading();
-        controller.listPorts();
+        this.controller.listPorts();
     }
 
     openPort(port, options) {
@@ -257,7 +268,7 @@ class ConnectionWidget extends PureComponent {
             connecting: true
         }));
 
-        controller.openPort(port, {
+        this.controller.openPort(port, {
             controllerType: this.state.controllerType,
             baudrate: baudrate,
             rtscts: this.state.connection.serial.rtscts
@@ -280,14 +291,14 @@ class ConnectionWidget extends PureComponent {
             connecting: false,
             connected: false
         }));
-        controller.closePort(port, (err) => {
+        this.controller.closePort(port, (err) => {
             if (err) {
                 log.error(err);
                 return;
             }
 
             // Refresh ports
-            controller.listPorts();
+            this.controller.listPorts();
         });
     }
 
@@ -299,6 +310,10 @@ class ConnectionWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
+
+        if (this._mounting) {
+            return <div>Connecting...</div>;
+        }
 
         return (
             <Widget fullscreen={isFullscreen}>
@@ -351,11 +366,11 @@ class ConnectionWidget extends PureComponent {
                         { [styles.hidden]: minimized }
                     )}
                 >
-                    <Connection state={state} actions={actions} />
+                    <Connection controller={this.controller} state={state} actions={actions} />
                 </Widget.Content>
             </Widget>
         );
     }
 }
 
-export default ConnectionWidget;
+export default CreateWorkspace;

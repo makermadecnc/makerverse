@@ -5,7 +5,7 @@ import React, { PureComponent } from 'react';
 import Panel from 'app/components/Panel';
 import Toggler from 'app/components/Toggler';
 import RepeatButton from 'app/components/RepeatButton';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import {
     // Grbl
@@ -17,9 +17,14 @@ import styles from './index.styl';
 
 class Laser extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         state: PropTypes.object,
         actions: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     getLaserIntensityScale() {
         const { state } = this.props;
@@ -64,7 +69,7 @@ class Laser extends PureComponent {
                                         style={{ padding: 5 }}
                                         disabled={!canClick}
                                         onClick={() => {
-                                            controller.command('spindleOverride', -10);
+                                            this.workspace.controller.command('spindleOverride', -10);
                                         }}
                                     >
                                         <i className="fa fa-arrow-down" style={{ fontSize: 14 }} />
@@ -77,7 +82,7 @@ class Laser extends PureComponent {
                                         style={{ padding: 5 }}
                                         disabled={!canClick}
                                         onClick={() => {
-                                            controller.command('spindleOverride', -1);
+                                            this.workspace.controller.command('spindleOverride', -1);
                                         }}
                                     >
                                         <i className="fa fa-arrow-down" style={{ fontSize: 10 }} />
@@ -90,7 +95,7 @@ class Laser extends PureComponent {
                                         style={{ padding: 5 }}
                                         disabled={!canClick}
                                         onClick={() => {
-                                            controller.command('spindleOverride', 1);
+                                            this.workspace.controller.command('spindleOverride', 1);
                                         }}
                                     >
                                         <i className="fa fa-arrow-up" style={{ fontSize: 10 }} />
@@ -103,7 +108,7 @@ class Laser extends PureComponent {
                                         style={{ padding: 5 }}
                                         disabled={!canClick}
                                         onClick={() => {
-                                            controller.command('spindleOverride', 10);
+                                            this.workspace.controller.command('spindleOverride', 10);
                                         }}
                                     >
                                         <i className="fa fa-arrow-up" style={{ fontSize: 14 }} />
@@ -117,7 +122,7 @@ class Laser extends PureComponent {
                                         style={{ padding: 5 }}
                                         disabled={!canClick}
                                         onClick={() => {
-                                            controller.command('spindleOverride', 0);
+                                            this.workspace.controller.command('spindleOverride', 0);
                                         }}
                                     >
                                         <i className="fa fa-undo fa-fw" />

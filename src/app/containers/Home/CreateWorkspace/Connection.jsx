@@ -7,11 +7,11 @@ import React, { PureComponent } from 'react';
 import Select from 'react-select';
 import Space from 'app/components/Space';
 import { ToastNotification } from 'app/components/Notifications';
-import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 
 class Connection extends PureComponent {
     static propTypes = {
+        controller: PropTypes.object.isRequired,
         state: PropTypes.object,
         actions: PropTypes.object
     };
@@ -90,7 +90,7 @@ class Connection extends PureComponent {
     };
 
     render() {
-        const { state, actions } = this.props;
+        const { state, actions, controller } = this.props;
         const {
             loading, connecting, connected,
             controllerType,

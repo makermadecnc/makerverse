@@ -16,9 +16,9 @@ import { TRACE, DEBUG, INFO, WARN, ERROR } from 'universal-logger';
 import { Provider as GridSystemProvider } from 'app/components/GridSystem';
 import settings from './config/settings';
 import portal from './lib/portal';
-import controller from './lib/controller';
 import i18n from './lib/i18n';
 import log from './lib/log';
+import auth from './lib/auth';
 import api from './api';
 import series from './lib/promise-series';
 import promisify from './lib/promisify';
@@ -97,17 +97,12 @@ series([
         user.signin({ token: token })
             .then(({ authenticated, token }) => {
                 if (authenticated) {
-                    log.debug('Create and establish a WebSocket connection');
+                    log.debug('Authenticated');
 
-                    const host = '';
-                    const options = {
+                    auth.host = '';
+                    auth.options = {
                         query: 'token=' + token
                     };
-                    controller.connect(host, options, () => {
-                        // @see "src/web/containers/Login/Login.jsx"
-                        next();
-                    });
-                    return;
                 }
                 next();
             });
@@ -118,7 +113,7 @@ series([
             .then(({ body }) => {
                 if (body && body.records) {
                     body.records.forEach((record) => {
-                        log.debug(`loading workspace: ${record.id}`);
+                        log.debug(`loading workspace: ${record.name}`);
                         Workspaces.load(record);
                     });
                 } else {
@@ -127,7 +122,9 @@ series([
                 next();
             });
     })()
-]).then(async () => {
+]).then(
+    Workspaces.connect
+).then(async () => {
     log.info(`${settings.productName} ${settings.version}`);
 
     // Cross-origin communication

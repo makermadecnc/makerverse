@@ -10,6 +10,7 @@ const Axes = (props) => {
     return (
         <div>
             <DisplayPanel
+                workspaceId={props.workspaceId}
                 canClick={state.canClick}
                 units={state.units}
                 axes={state.axes}
@@ -19,6 +20,7 @@ const Axes = (props) => {
                 actions={actions}
             />
             <Keypad
+                workspaceId={props.workspaceId}
                 canClick={state.canClick}
                 units={state.units}
                 axes={state.axes}
@@ -26,6 +28,7 @@ const Axes = (props) => {
                 actions={actions}
             />
             <MDI
+                workspaceId={props.workspaceId}
                 canClick={state.canClick}
                 mdi={state.mdi}
             />
@@ -34,6 +37,7 @@ const Axes = (props) => {
 };
 
 Axes.propTypes = {
+    workspaceId: PropTypes.string.isRequired,
     state: PropTypes.object,
     actions: PropTypes.object
 };

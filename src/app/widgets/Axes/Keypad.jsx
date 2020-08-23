@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import { Button } from 'app/components/Buttons';
 import Dropdown, { MenuItem } from 'app/components/Dropdown';
 import Space from 'app/components/Space';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import Fraction from './components/Fraction';
 import {
@@ -29,6 +29,7 @@ const KeypadText = styled.span`
 
 class Keypad extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         canClick: PropTypes.bool,
         units: PropTypes.oneOf([IMPERIAL_UNITS, METRIC_UNITS]),
         axes: PropTypes.array,
@@ -36,9 +37,13 @@ class Keypad extends PureComponent {
         actions: PropTypes.object
     };
 
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
+
     handleSelect = (eventKey) => {
         const commands = ensureArray(eventKey);
-        commands.forEach(command => controller.command('gcode', command));
+        commands.forEach(command => this.workspace.controller.command('gcode', command));
     };
 
     renderRationalNumberWithBoundedDenominator(value) {
@@ -412,7 +417,7 @@ class Keypad extends PureComponent {
                                     <MenuItem
                                         active={units === IMPERIAL_UNITS}
                                         onSelect={() => {
-                                            controller.command('gcode', 'G20');
+                                            this.workspace.controller.command('gcode', 'G20');
                                         }}
                                     >
                                         {i18n._('G20 (inch)')}
@@ -420,7 +425,7 @@ class Keypad extends PureComponent {
                                     <MenuItem
                                         active={units === METRIC_UNITS}
                                         onSelect={() => {
-                                            controller.command('gcode', 'G21');
+                                            this.workspace.controller.command('gcode', 'G21');
                                         }}
                                     >
                                         {i18n._('G21 (mm)')}

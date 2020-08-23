@@ -7,7 +7,7 @@ import { Button } from 'app/components/Buttons';
 import Dropdown, { MenuItem } from 'app/components/Dropdown';
 import I18n from 'app/components/I18n';
 import Space from 'app/components/Space';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import * as WebGL from 'app/lib/three/WebGL';
 import {
@@ -30,9 +30,14 @@ import styles from './index.styl';
 
 class PrimaryToolbar extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         state: PropTypes.object,
         actions: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     canSendCommand() {
         const { state } = this.props;
@@ -162,7 +167,7 @@ class PrimaryToolbar extends PureComponent {
                             <MenuItem
                                 active={wcs === 'G54'}
                                 onSelect={() => {
-                                    controller.command('gcode', 'G54');
+                                    this.workspace.controller.command('gcode', 'G54');
                                 }}
                             >
                                 G54 (P1)
@@ -170,7 +175,7 @@ class PrimaryToolbar extends PureComponent {
                             <MenuItem
                                 active={wcs === 'G55'}
                                 onSelect={() => {
-                                    controller.command('gcode', 'G55');
+                                    this.workspace.controller.command('gcode', 'G55');
                                 }}
                             >
                                 G55 (P2)
@@ -178,7 +183,7 @@ class PrimaryToolbar extends PureComponent {
                             <MenuItem
                                 active={wcs === 'G56'}
                                 onSelect={() => {
-                                    controller.command('gcode', 'G56');
+                                    this.workspace.controller.command('gcode', 'G56');
                                 }}
                             >
                                 G56 (P3)
@@ -186,7 +191,7 @@ class PrimaryToolbar extends PureComponent {
                             <MenuItem
                                 active={wcs === 'G57'}
                                 onSelect={() => {
-                                    controller.command('gcode', 'G57');
+                                    this.workspace.controller.command('gcode', 'G57');
                                 }}
                             >
                                 G57 (P4)
@@ -194,7 +199,7 @@ class PrimaryToolbar extends PureComponent {
                             <MenuItem
                                 active={wcs === 'G58'}
                                 onSelect={() => {
-                                    controller.command('gcode', 'G58');
+                                    this.workspace.controller.command('gcode', 'G58');
                                 }}
                             >
                                 G58 (P5)
@@ -202,7 +207,7 @@ class PrimaryToolbar extends PureComponent {
                             <MenuItem
                                 active={wcs === 'G59'}
                                 onSelect={() => {
-                                    controller.command('gcode', 'G59');
+                                    this.workspace.controller.command('gcode', 'G59');
                                 }}
                             >
                                 G59 (P6)

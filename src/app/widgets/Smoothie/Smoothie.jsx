@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import mapGCodeToText from 'app/lib/gcode-text';
 import i18n from 'app/lib/i18n';
+import Workspaces from 'app/lib/workspaces';
 import Panel from 'app/components/Panel';
 import Toggler from 'app/components/Toggler';
 import Overrides from './Overrides';
@@ -11,9 +12,14 @@ import styles from './index.styl';
 
 class Smoothie extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         state: PropTypes.object,
         actions: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     render() {
         const { state, actions } = this.props;
@@ -31,7 +37,7 @@ class Smoothie extends PureComponent {
 
         return (
             <div>
-                <Overrides ovF={ovF} ovS={ovS} />
+                <Overrides controller={this.workspace.controller} ovF={ovF} ovS={ovS} />
                 <Panel className={styles.panel}>
                     <Panel.Heading className={styles.panelHeading}>
                         <Toggler

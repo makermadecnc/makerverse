@@ -10,7 +10,6 @@ import Anchor from 'app/components/Anchor';
 import Space from 'app/components/Space';
 import settings from 'app/config/settings';
 import combokeys from 'app/lib/combokeys';
-import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import * as user from 'app/lib/user';
@@ -36,6 +35,10 @@ class Header extends PureComponent {
     static propTypes = {
         ...withRouter.propTypes
     };
+
+    get workspace() {
+        return Workspaces.findByPath(this.props.location.pathname);
+    }
 
     state = this.getInitialState();
 
@@ -102,7 +105,7 @@ class Header extends PureComponent {
     actionHandlers = {
         CONTROLLER_COMMAND: (event, { command }) => {
             // feedhold, cyclestart, homing, unlock, reset
-            controller.command(command);
+            this.workspace.controller.command(command);
         }
     };
 
@@ -203,7 +206,9 @@ class Header extends PureComponent {
         this._isMounted = true;
 
         this.addActionHandlers();
-        this.addControllerEvents();
+        if (this.workspace) {
+            this.workspace.addControllerEvents(this.controllerEvents);
+        }
 
         // Initial actions
         this.actions.checkForUpdates();
@@ -214,9 +219,22 @@ class Header extends PureComponent {
         this._isMounted = false;
 
         this.removeActionHandlers();
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents();
 
         this.runningTasks = [];
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.location.pathname !== this.props.location.pathname) {
+            const lastWorkspace = Workspaces.findByPath(prevProps.location.pathname);
+            if (lastWorkspace) {
+                lastWorkspace.removeControllerEvents(this.controllerEvents);
+            }
+            if (this.workspace) {
+                this.workspace.addControllerEvents(this.controllerEvents);
+            }
+        }
+        return true;
     }
 
     addActionHandlers() {
@@ -233,20 +251,6 @@ class Header extends PureComponent {
         });
     }
 
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
-    }
-
     render() {
         const { history, location } = this.props;
         const { pushPermission, commands, runningTasks } = this.state;
@@ -254,6 +258,7 @@ class Header extends PureComponent {
         const signedInName = store.get('session.name');
         const hideUserDropdown = !sessionEnabled;
         const showCommands = commands.length > 0;
+        const workspace = Workspaces.findByPath(location.pathname);
 
         return (
             <Navbar
@@ -304,7 +309,7 @@ class Header extends PureComponent {
                                 onClick={() => {
                                     if (user.isAuthenticated()) {
                                         log.debug('Destroy and cleanup the WebSocket connection');
-                                        controller.disconnect();
+                                        Workspaces.disconnect();
 
                                         user.signout();
 
@@ -410,8 +415,8 @@ class Header extends PureComponent {
                             </MenuItem> */}
                         </NavDropdown>
                     </Nav>
-                    {Workspaces.findByPath(location.pathname) &&
-                    <QuickAccessToolbar state={this.state} actions={this.actions} />
+                    {workspace &&
+                    <QuickAccessToolbar workspaceId={workspace.id} state={this.state} actions={this.actions} />
                     }
                 </Navbar.Collapse>
             </Navbar>

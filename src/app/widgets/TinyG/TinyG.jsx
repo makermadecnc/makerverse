@@ -5,7 +5,7 @@ import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import { ProgressBar } from 'react-bootstrap';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import mapGCodeToText from 'app/lib/gcode-text';
 import i18n from 'app/lib/i18n';
 import { Button } from 'app/components/Buttons';
@@ -32,9 +32,14 @@ import styles from './index.styl';
 
 class TinyG extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         state: PropTypes.object,
         actions: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     // See src/app/controllers/TinyG/constants.js
     plannerBufferMax = 28; // default pool size
@@ -42,11 +47,11 @@ class TinyG extends PureComponent {
     plannerBufferMin = 0;
 
     enableMotors = () => {
-        controller.command('energizeMotors:on');
+        this.workspace.controller.command('energizeMotors:on');
     };
 
     disableMotors = () => {
-        controller.command('energizeMotors:off');
+        this.workspace.controller.command('energizeMotors:off');
     };
 
     render() {
@@ -93,7 +98,7 @@ class TinyG extends PureComponent {
 
         return (
             <div>
-                <Overrides ovF={ovF} ovS={ovS} ovT={ovT} />
+                <Overrides controller={this.workspace.controller} ovF={ovF} ovS={ovS} ovT={ovT} />
                 <Panel className={styles.panel}>
                     <Panel.Heading className={styles.panelHeading}>
                         <Toggler

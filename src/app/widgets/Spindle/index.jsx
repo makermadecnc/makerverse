@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import WidgetConfig from '../WidgetConfig';
 import Spindle from './Spindle';
@@ -23,11 +23,16 @@ import styles from './index.styl';
 
 class SpindleWidget extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         widgetId: PropTypes.string.isRequired,
         onFork: PropTypes.func.isRequired,
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     // Public methods
     collapse = () => {
@@ -113,11 +118,11 @@ class SpindleWidget extends PureComponent {
     };
 
     componentDidMount() {
-        this.addControllerEvents();
+        this.workspace.addControllerEvents(this.controllerEvents);
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents(this.controllerEvents);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -135,34 +140,20 @@ class SpindleWidget extends PureComponent {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
             canClick: true, // Defaults to true
-            port: controller.port,
+            port: this.workspace.controller.port,
             controller: {
-                type: controller.type,
-                state: controller.state,
+                type: this.workspace.controller.type,
+                state: this.workspace.controller.state,
                 modal: {
                     spindle: '',
                     coolant: ''
                 }
             },
             workflow: {
-                state: controller.workflow.state
+                state: this.workspace.controller.workflow.state
             },
             spindleSpeed: this.config.get('speed', 1000)
         };
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     canClick() {
@@ -279,6 +270,7 @@ class SpindleWidget extends PureComponent {
                     )}
                 >
                     <Spindle
+                        workspaceId={this.workspace.id}
                         state={state}
                         actions={actions}
                     />

@@ -4,7 +4,6 @@ import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import i18n from 'app/lib/i18n';
-import controller from 'app/lib/controller';
 import Workspaces from 'app/lib/workspaces';
 import WidgetConfig from '../WidgetConfig';
 import MaslowPanels from './MaslowPanels';
@@ -188,11 +187,11 @@ class MaslowWidget extends PureComponent {
     };
 
     componentDidMount() {
-        this.addControllerEvents();
+        this.workspace.addControllerEvents(this.controllerEvents);
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents(this.controllerEvents);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -211,13 +210,13 @@ class MaslowWidget extends PureComponent {
         return {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
-            isReady: (controller.loadedControllers.length === 1) || (controller.type === MASLOW),
+            isReady: (this.workspace.controller.type === MASLOW),
             canClick: true, // Defaults to true
-            port: controller.port,
+            port: this.workspace.controller.port,
             controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
+                type: this.workspace.controller.type,
+                settings: this.workspace.controller.settings,
+                state: this.workspace.controller.state
             },
             modal: {
                 name: MODAL_NONE,
@@ -242,20 +241,6 @@ class MaslowWidget extends PureComponent {
                 }
             }
         };
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     canClick() {
@@ -319,68 +304,68 @@ class MaslowWidget extends PureComponent {
                                 toggle={<i className="fa fa-th-large" />}
                             >
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.write('?')}
+                                    onSelect={() => this.workspace.controller.write('?')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Status Report (?)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('$C')}
+                                    onSelect={() => this.workspace.controller.writeln('$C')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Check G-code Mode ($C)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.command('homing')}
+                                    onSelect={() => this.workspace.controller.command('homing')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Homing ($H)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.command('unlock')}
+                                    onSelect={() => this.workspace.controller.command('unlock')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Kill Alarm Lock ($X)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.command('sleep')}
+                                    onSelect={() => this.workspace.controller.command('sleep')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Sleep ($SLP)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem divider />
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('$')}
+                                    onSelect={() => this.workspace.controller.writeln('$')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Help ($)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('$$')}
+                                    onSelect={() => this.workspace.controller.writeln('$$')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Settings ($$)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('$#')}
+                                    onSelect={() => this.workspace.controller.writeln('$#')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('View G-code Parameters ($#)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('$G')}
+                                    onSelect={() => this.workspace.controller.writeln('$G')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('View G-code Parser State ($G)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('$I')}
+                                    onSelect={() => this.workspace.controller.writeln('$I')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('View Build Info ($I)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('$N')}
+                                    onSelect={() => this.workspace.controller.writeln('$N')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('View Startup Blocks ($N)')}

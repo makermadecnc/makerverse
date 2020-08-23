@@ -1,5 +1,3 @@
-import controller from 'app/lib/controller';
-
 const maslowDefaultOpts = {
     chainLength: 3360,
     distBetweenMotors: 2978.4,
@@ -30,13 +28,12 @@ class MaslowKinematics {
 
     opts = maslowDefaultOpts;
 
-    constructor() {
-        this.loadControllerSettings();
+    constructor(controller) {
+        this.loadControllerSettings(controller);
     }
 
-    getSettingsMap() {
+    getSettingsMap(settings) {
         const opts = {};
-        const settings = controller.settings;
         Object.keys(settings.grbl).forEach((code) => {
             const g = settings.grbl[code];
             const msg = `${g.message}, ${g.units}`.toLowerCase();
@@ -75,8 +72,8 @@ class MaslowKinematics {
         return opts;
     }
 
-    loadControllerSettings() {
-        const settings = this.getSettingsMap();
+    loadControllerSettings(controller) {
+        const settings = this.getSettingsMap(controller.settings);
         const opts = {};
         Object.keys(settings).forEach((key) => {
             opts[key] = Number(settings[key].value);

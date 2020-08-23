@@ -53,6 +53,7 @@ const Controller = (props) => {
 };
 
 Controller.propTypes = {
+    controller: PropTypes.object.isRequired,
     state: PropTypes.object,
     actions: PropTypes.object
 };

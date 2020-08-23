@@ -5,7 +5,7 @@ import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import { ProgressBar } from 'react-bootstrap';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import mapGCodeToText from 'app/lib/gcode-text';
 import i18n from 'app/lib/i18n';
 import { Button } from 'app/components/Buttons';
@@ -20,9 +20,14 @@ import IconHeatedBed from './icons/heated-bed';
 
 class Marlin extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         state: PropTypes.object,
         actions: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     extruderPowerMax = 127;
 
@@ -30,14 +35,14 @@ class Marlin extends PureComponent {
 
     // M104 Set the target temperature for a hotend.
     setExtruderTemperature = (deg) => () => {
-        controller.command('gcode', `M104 S${deg}`);
-        controller.command('gcode', 'M105');
+        this.workspace.controller.command('gcode', `M104 S${deg}`);
+        this.workspace.controller.command('gcode', 'M105');
     };
 
     // M140 Set the target temperature for the heated bed.
     setHeatedBedTemperature = (deg) => () => {
-        controller.command('gcode', `M140 S${deg}`);
-        controller.command('gcode', 'M105');
+        this.workspace.controller.command('gcode', `M140 S${deg}`);
+        this.workspace.controller.command('gcode', 'M105');
     };
 
     render() {
@@ -74,7 +79,7 @@ class Marlin extends PureComponent {
 
         return (
             <div>
-                <Overrides ovF={ovF} ovS={ovS} />
+                <Overrides controller={this.workspace.controller} ovF={ovF} ovS={ovS} />
                 <Panel className={styles.panel}>
                     <Panel.Heading className={styles.panelHeading}>
                         <Toggler

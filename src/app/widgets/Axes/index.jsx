@@ -10,9 +10,9 @@ import api from 'app/api';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import combokeys from 'app/lib/combokeys';
-import controller from 'app/lib/controller';
 import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
+import Workspaces from 'app/lib/workspaces';
 import { in2mm, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
@@ -58,11 +58,16 @@ import styles from './index.styl';
 
 class AxesWidget extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         widgetId: PropTypes.string.isRequired,
         onFork: PropTypes.func.isRequired,
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     // Public methods
     collapse = () => {
@@ -171,17 +176,17 @@ class AxesWidget extends PureComponent {
             value = Number(value) || 0;
 
             const gcode = `G10 L20 P${p} ${axis}${value}`;
-            controller.command('gcode', gcode);
+            this.workspace.controller.command('gcode', gcode);
         },
         jog: (params = {}) => {
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-            controller.command('gcode', 'G91'); // relative
-            controller.command('gcode', 'G0 ' + s);
-            controller.command('gcode', 'G90'); // absolute
+            this.workspace.controller.command('gcode', 'G91'); // relative
+            this.workspace.controller.command('gcode', 'G0 ' + s);
+            this.workspace.controller.command('gcode', 'G90'); // absolute
         },
         move: (params = {}) => {
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-            controller.command('gcode', 'G0 ' + s);
+            this.workspace.controller.command('gcode', 'G0 ' + s);
         },
         toggleMDIMode: () => {
             this.setState(state => ({
@@ -380,7 +385,7 @@ class AxesWidget extends PureComponent {
                 this.shuttleControl.clear();
 
                 if (jog.axis) {
-                    controller.command('gcode', 'G90');
+                    this.workspace.controller.command('gcode', 'G90');
                 }
                 return;
             }
@@ -460,7 +465,7 @@ class AxesWidget extends PureComponent {
                     'G20': IMPERIAL_UNITS,
                     'G21': METRIC_UNITS
                 }[modal.units] || this.state.units;
-                const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
+                const $13 = Number(get(this.workspace.controller.settings, 'settings.$13', 0)) || 0;
 
                 this.setState(state => ({
                     units: units,
@@ -589,9 +594,9 @@ class AxesWidget extends PureComponent {
                     'G20': IMPERIAL_UNITS,
                     'G21': METRIC_UNITS
                 }[modal.units] || this.state.units;
-                const classic = get(controller.settings, 'firmware.name') === 'MaslowClassic';
+                const classic = get(this.workspace.controller.settings, 'firmware.name') === 'MaslowClassic';
                 const $13 = classic ? units === IMPERIAL_UNITS :
-                    Number(get(controller.settings, 'settings.$13', 0)) || 0;
+                    Number(get(this.workspace.controller.settings, 'settings.$13', 0)) || 0;
 
                 this.setState(state => ({
                     units: units,
@@ -639,12 +644,12 @@ class AxesWidget extends PureComponent {
 
     componentDidMount() {
         this.fetchMDICommands();
-        this.addControllerEvents();
+        this.workspace.addControllerEvents(this.controllerEvents);
         this.addShuttleControlEvents();
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents(this.controllerEvents);
         this.removeShuttleControlEvents();
     }
 
@@ -674,15 +679,15 @@ class AxesWidget extends PureComponent {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
             canClick: true, // Defaults to true
-            port: controller.port,
-            units: METRIC_UNITS,
+            port: this.workspace.controller.port,
+            units: this.workspace.isImperialUnits ? IMPERIAL_UNITS : METRIC_UNITS,
             controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
+                type: this.workspace.controller.type,
+                settings: this.workspace.controller.settings,
+                state: this.workspace.controller.state
             },
             workflow: {
-                state: controller.workflow.state
+                state: this.workspace.controller.workflow.state
             },
             modal: {
                 name: MODAL_NONE,
@@ -724,20 +729,6 @@ class AxesWidget extends PureComponent {
         };
     }
 
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
-    }
-
     addShuttleControlEvents() {
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
             const callback = this.shuttleControlEvents[eventName];
@@ -750,9 +741,9 @@ class AxesWidget extends PureComponent {
             feedrate = feedrate.toFixed(3) * 1;
             relativeDistance = relativeDistance.toFixed(4) * 1;
 
-            controller.command('gcode', 'G91'); // relative
-            controller.command('gcode', 'G1 F' + feedrate + ' ' + axis + relativeDistance);
-            controller.command('gcode', 'G90'); // absolute
+            this.workspace.controller.command('gcode', 'G91'); // relative
+            this.workspace.controller.command('gcode', 'G1 F' + feedrate + ' ' + axis + relativeDistance);
+            this.workspace.controller.command('gcode', 'G90'); // absolute
         });
     }
 
@@ -851,7 +842,6 @@ class AxesWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
-
 
         return (
             <Widget fullscreen={isFullscreen}>
@@ -981,7 +971,7 @@ class AxesWidget extends PureComponent {
                             onCancel={actions.closeModal}
                         />
                     )}
-                    <Axes config={config} state={state} actions={actions} />
+                    <Axes workspaceId={this.workspace.id} config={config} state={state} actions={actions} />
                 </Widget.Content>
             </Widget>
         );

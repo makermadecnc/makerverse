@@ -5,7 +5,7 @@ import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import i18n from 'app/lib/i18n';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import ensurePositiveNumber from 'app/lib/ensure-positive-number';
 import WidgetConfig from '../WidgetConfig';
 import Marlin from './Marlin';
@@ -21,11 +21,16 @@ import styles from './index.styl';
 
 class MarlinWidget extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         widgetId: PropTypes.string.isRequired,
         onFork: PropTypes.func.isRequired,
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     // Public methods
     collapse = () => {
@@ -193,11 +198,11 @@ class MarlinWidget extends PureComponent {
     };
 
     componentDidMount() {
-        this.addControllerEvents();
+        this.workspace.addControllerEvents(this.controllerEvents);
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents(this.controllerEvents);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -223,13 +228,13 @@ class MarlinWidget extends PureComponent {
         return {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
-            isReady: (controller.loadedControllers.length === 1) || (controller.type === MARLIN),
+            isReady: (this.workspace.controller.loadedControllers.length === 1) || (this.workspace.controller.type === MARLIN),
             canClick: true, // Defaults to true
-            port: controller.port,
+            port: this.workspace.controller.port,
             controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
+                type: this.workspace.controller.type,
+                settings: this.workspace.controller.settings,
+                state: this.workspace.controller.state
             },
             modal: {
                 name: MODAL_NONE,
@@ -251,20 +256,6 @@ class MarlinWidget extends PureComponent {
                 heatedBed: this.config.get('heater.heatedBed', 0)
             }
         };
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     canClick() {
@@ -321,19 +312,19 @@ class MarlinWidget extends PureComponent {
                                 toggle={<i className="fa fa-th-large" />}
                             >
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('M105')}
+                                    onSelect={() => this.workspace.controller.writeln('M105')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Get Extruder Temperature (M105)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('M114')}
+                                    onSelect={() => this.workspace.controller.writeln('M114')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Get Current Position (M114)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('M115')}
+                                    onSelect={() => this.workspace.controller.writeln('M115')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Get Firmware Version and Capabilities (M115)')}
@@ -401,9 +392,10 @@ class MarlinWidget extends PureComponent {
                         )}
                     >
                         {state.modal.name === MODAL_CONTROLLER &&
-                        <Controller state={state} actions={actions} />
+                        <Controller controller={this.workspace.controller} state={state} actions={actions} />
                         }
                         <Marlin
+                            workspaceId={this.workspace.id}
                             state={state}
                             actions={actions}
                         />

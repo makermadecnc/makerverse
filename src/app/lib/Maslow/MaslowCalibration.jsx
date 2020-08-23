@@ -14,8 +14,8 @@ const calibrationDefaults = {
  * Implements "Edge Calibration" for Maslow, derivative of HoleyCalibration.
  */
 class MaslowCalibration {
-    constructor(opts) {
-        this.kin = new MaslowKinematics();
+    constructor(controller, opts) {
+        this.kin = new MaslowKinematics(controller);
         this.opts = { ...calibrationDefaults, ...this.kin.opts };
         this.recomputeIdeals();
     }

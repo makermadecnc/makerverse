@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
-import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import WidgetConfig from '../WidgetConfig';
 import TinyG from './TinyG';
@@ -168,11 +167,11 @@ class TinyGWidget extends PureComponent {
     };
 
     componentDidMount() {
-        this.addControllerEvents();
+        this.workspace.addControllerEvents(this.controllerEvents);
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents(this.controllerEvents);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -192,13 +191,13 @@ class TinyGWidget extends PureComponent {
         return {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
-            isReady: (controller.loadedControllers.length === 1) || (controller.type === TINYG),
+            isReady: (this.workspace.controller.loadedControllers.length === 1) || (this.workspace.controller.type === TINYG),
             canClick: true, // Defaults to true
-            port: controller.port,
+            port: this.workspace.controller.port,
             controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
+                type: this.workspace.controller.type,
+                settings: this.workspace.controller.settings,
+                state: this.workspace.controller.state
             },
             modal: {
                 name: MODAL_NONE,
@@ -219,20 +218,6 @@ class TinyGWidget extends PureComponent {
                 }
             }
         };
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     canClick() {
@@ -289,60 +274,60 @@ class TinyGWidget extends PureComponent {
                                 toggle={<i className="fa fa-th-large" />}
                             >
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('?')}
+                                    onSelect={() => this.workspace.controller.writeln('?')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Status Report (?)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
                                     onSelect={() => {
-                                        controller.writeln('!%'); // queue flush
-                                        controller.writeln('{"qr":""}'); // queue report
+                                        this.workspace.controller.writeln('!%'); // queue flush
+                                        this.workspace.controller.writeln('{"qr":""}'); // queue report
                                     }}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Queue Flush (%)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.write('\x04')}
+                                    onSelect={() => this.workspace.controller.write('\x04')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Kill Job (^d)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.command('unlock')}
+                                    onSelect={() => this.workspace.controller.command('unlock')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Clear Alarm ($clear)')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem divider />
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('h')}
+                                    onSelect={() => this.workspace.controller.writeln('h')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Help')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('$sys')}
+                                    onSelect={() => this.workspace.controller.writeln('$sys')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Show System Settings')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('$$')}
+                                    onSelect={() => this.workspace.controller.writeln('$$')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Show All Settings')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('$test')}
+                                    onSelect={() => this.workspace.controller.writeln('$test')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('List Self Tests')}
                                 </Widget.DropdownMenuItem>
                                 <Widget.DropdownMenuItem divider />
                                 <Widget.DropdownMenuItem
-                                    onSelect={() => controller.writeln('$defa=1')}
+                                    onSelect={() => this.workspace.controller.writeln('$defa=1')}
                                     disabled={!state.canClick}
                                 >
                                     {i18n._('Restore Defaults')}
@@ -410,9 +395,10 @@ class TinyGWidget extends PureComponent {
                         )}
                     >
                         {state.modal.name === MODAL_CONTROLLER &&
-                        <Controller state={state} actions={actions} />
+                        <Controller controller={this.workspace.controller} state={state} actions={actions} />
                         }
                         <TinyG
+                            workspaceId={this.workspace.id}
                             state={state}
                             actions={actions}
                         />

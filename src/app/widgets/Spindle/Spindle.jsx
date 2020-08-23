@@ -4,15 +4,20 @@ import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import styles from './index.styl';
 
 class Spindle extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         state: PropTypes.object,
         actions: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     render() {
         const { state, actions } = this.props;
@@ -36,9 +41,9 @@ class Spindle extends PureComponent {
                                         style={{ padding: '5px 0' }}
                                         onClick={() => {
                                             if (spindleSpeed > 0) {
-                                                controller.command('gcode', 'M3 S' + spindleSpeed);
+                                                this.workspace.controller.command('gcode', 'M3 S' + spindleSpeed);
                                             } else {
-                                                controller.command('gcode', 'M3');
+                                                this.workspace.controller.command('gcode', 'M3');
                                             }
                                         }}
                                         title={i18n._('Spindle On, CW (M3)', { ns: 'gcode' })}
@@ -62,9 +67,9 @@ class Spindle extends PureComponent {
                                         style={{ padding: '5px 0' }}
                                         onClick={() => {
                                             if (spindleSpeed > 0) {
-                                                controller.command('gcode', 'M4 S' + spindleSpeed);
+                                                this.workspace.controller.command('gcode', 'M4 S' + spindleSpeed);
                                             } else {
-                                                controller.command('gcode', 'M4');
+                                                this.workspace.controller.command('gcode', 'M4');
                                             }
                                         }}
                                         title={i18n._('Spindle On, CCW (M4)', { ns: 'gcode' })}
@@ -86,7 +91,7 @@ class Spindle extends PureComponent {
                                         type="button"
                                         className="btn btn-default"
                                         style={{ padding: '5px 0' }}
-                                        onClick={() => controller.command('gcode', 'M5')}
+                                        onClick={() => this.workspace.controller.command('gcode', 'M5')}
                                         title={i18n._('Spindle Off (M5)', { ns: 'gcode' })}
                                         disabled={!canClick}
                                     >
@@ -106,7 +111,7 @@ class Spindle extends PureComponent {
                                         className="btn btn-default"
                                         style={{ padding: '5px 0' }}
                                         onClick={() => {
-                                            controller.command('gcode', 'M7');
+                                            this.workspace.controller.command('gcode', 'M7');
                                         }}
                                         title={i18n._('Mist Coolant On (M7)', { ns: 'gcode' })}
                                         disabled={!canClick}
@@ -128,7 +133,7 @@ class Spindle extends PureComponent {
                                         className="btn btn-default"
                                         style={{ padding: '5px 0' }}
                                         onClick={() => {
-                                            controller.command('gcode', 'M8');
+                                            this.workspace.controller.command('gcode', 'M8');
                                         }}
                                         title={i18n._('Flood Coolant On (M8)', { ns: 'gcode' })}
                                         disabled={!canClick}
@@ -150,7 +155,7 @@ class Spindle extends PureComponent {
                                         className="btn btn-default"
                                         style={{ padding: '5px 0' }}
                                         onClick={() => {
-                                            controller.command('gcode', 'M9');
+                                            this.workspace.controller.command('gcode', 'M9');
                                         }}
                                         title={i18n._('Coolant Off (M9)', { ns: 'gcode' })}
                                         disabled={!canClick}

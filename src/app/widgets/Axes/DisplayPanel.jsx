@@ -7,7 +7,7 @@ import React, { PureComponent } from 'react';
 import Dropdown, { MenuItem } from 'app/components/Dropdown';
 import Image from 'app/components/Image';
 import { Tooltip } from 'app/components/Tooltip';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import AxisLabel from './components/AxisLabel';
 import AxisSubscript from './components/AxisSubscript';
@@ -36,6 +36,7 @@ import iconPencil from './images/pencil.svg';
 
 class DisplayPanel extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         canClick: PropTypes.bool,
         units: PropTypes.oneOf([IMPERIAL_UNITS, METRIC_UNITS]),
         axes: PropTypes.array,
@@ -44,6 +45,10 @@ class DisplayPanel extends PureComponent {
         jog: PropTypes.object,
         actions: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     state = {
         positionInput: {
@@ -59,7 +64,7 @@ class DisplayPanel extends PureComponent {
 
     handleSelect = (eventKey) => {
         const commands = ensureArray(eventKey);
-        commands.forEach(command => controller.command('gcode', command));
+        commands.forEach(command => this.workspace.controller.command('gcode', command));
     };
 
     showPositionInput = (axis) => () => {
@@ -1040,7 +1045,7 @@ class DisplayPanel extends PureComponent {
                                 <TaskbarButton
                                     disabled={!canZeroOutMachine}
                                     onClick={() => {
-                                        controller.command('gcode', `G28.3 ${axisLabel}0`);
+                                        this.workspace.controller.command('gcode', `G28.3 ${axisLabel}0`);
                                     }}
                                 >
                                     <Tooltip
@@ -1055,7 +1060,7 @@ class DisplayPanel extends PureComponent {
                                 <TaskbarButton
                                     disabled={!canHomeMachine}
                                     onClick={() => {
-                                        controller.command('gcode', `G28.2 ${axisLabel}0`);
+                                        this.workspace.controller.command('gcode', `G28.2 ${axisLabel}0`);
                                     }}
                                 >
                                     <Tooltip

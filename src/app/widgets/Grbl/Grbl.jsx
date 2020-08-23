@@ -5,6 +5,7 @@ import React, { PureComponent } from 'react';
 import { ProgressBar } from 'react-bootstrap';
 import mapGCodeToText from 'app/lib/gcode-text';
 import i18n from 'app/lib/i18n';
+import Workspaces from 'app/lib/workspaces';
 import Panel from 'app/components/Panel';
 import Toggler from 'app/components/Toggler';
 import Overrides from './Overrides';
@@ -12,9 +13,14 @@ import styles from './index.styl';
 
 class Grbl extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         state: PropTypes.object,
         actions: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     // https://github.com/grbl/grbl/wiki/Interfacing-with-Grbl
     // Grbl v0.9: BLOCK_BUFFER_SIZE (18), RX_BUFFER_SIZE (128)
@@ -60,7 +66,7 @@ class Grbl extends PureComponent {
 
         return (
             <div>
-                <Overrides ovF={ovF} ovS={ovS} ovR={ovR} />
+                <Overrides controller={this.workspace.controller} ovF={ovF} ovS={ovS} ovR={ovR} />
                 {!_.isEmpty(buf) && (
                     <Panel className={styles.panel}>
                         <Panel.Heading className={styles['panel-heading']}>

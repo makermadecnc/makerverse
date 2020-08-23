@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
-import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import Workspaces from 'app/lib/workspaces';
 import WidgetConfig from '../WidgetConfig';
@@ -75,11 +74,6 @@ class ConnectionWidget extends PureComponent {
             this.setState({ ...this.state, ...options });
         },
         'serialport:open': (options) => {
-            const { port } = options;
-            if (port !== this.workspace.controllerAttributes.port) {
-                return;
-            }
-
             this.setState(state => ({
                 alertMessage: '',
                 connecting: false,
@@ -87,11 +81,6 @@ class ConnectionWidget extends PureComponent {
             }));
         },
         'serialport:close': (options) => {
-            const { port } = options;
-            if (port !== this.workspace.controllerAttributes.port) {
-                return;
-            }
-
             this.setState(state => ({
                 alertMessage: '',
                 connecting: false,
@@ -100,9 +89,6 @@ class ConnectionWidget extends PureComponent {
         },
         'serialport:error': (options) => {
             const { port } = options;
-            if (port !== this.workspace.controllerAttributes.port) {
-                return;
-            }
 
             this.setState(state => ({
                 alertMessage: i18n._('Error opening serial port \'{{- port}}\'', { port: port }),
@@ -113,11 +99,11 @@ class ConnectionWidget extends PureComponent {
     };
 
     componentDidMount() {
-        this.addControllerEvents();
+        this.workspace.addControllerEvents(this.controllerEvents);
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents(this.controllerEvents);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -129,7 +115,7 @@ class ConnectionWidget extends PureComponent {
     }
 
     getInitialState() {
-        if (!includes(controller.loadedControllers, this.workspace.controllerAttributes.type)) {
+        if (!includes(this.workspace.controller.loadedControllers, this.workspace.controllerAttributes.type)) {
             console.log('controller type not loaded', this.workspace.controllerAttributes.type);
         }
 
@@ -141,20 +127,6 @@ class ConnectionWidget extends PureComponent {
             connected: this.workspace.isConnected,
             alertMessage: ''
         };
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     startLoading() {

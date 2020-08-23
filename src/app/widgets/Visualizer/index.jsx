@@ -12,7 +12,7 @@ import { Button } from 'app/components/Buttons';
 import ModalTemplate from 'app/components/ModalTemplate';
 import Modal from 'app/components/Modal';
 import Widget from 'app/components/Widget';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import portal from 'app/lib/portal';
@@ -70,7 +70,7 @@ const translateExpression = (function() {
     const { Parser } = ExpressionEvaluator;
     const reExpressionContext = new RegExp(/\[[^\]]+\]/g);
 
-    return function (gcode, context = controller.context) {
+    return function (gcode, controller, context) {
         if (typeof gcode !== 'string') {
             log.error(`Invalid parameter: gcode=${gcode}`);
             return '';
@@ -162,8 +162,13 @@ const GCodeName = ({ name, style, ...props }) => {
 
 class VisualizerWidget extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         widgetId: PropTypes.string.isRequired
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     config = new WidgetConfig(this.props.widgetId);
 
@@ -217,7 +222,7 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
 
-            controller.command('watchdir:load', file, (err, data) => {
+            this.workspace.controller.command('watchdir:load', file, (err, data) => {
                 if (err) {
                     this.setState((state) => ({
                         gcode: {
@@ -248,7 +253,7 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
 
-            controller.command('gcode:load', name, gcode, context, (err, data) => {
+            this.workspace.controller.command('gcode:load', name, gcode, context, (err, data) => {
                 if (err) {
                     this.setState((state) => ({
                         gcode: {
@@ -294,8 +299,8 @@ class VisualizerWidget extends PureComponent {
             });
             const callback = () => {
                 // Clear gcode bounding box
-                controller.context = {
-                    ...controller.context,
+                this.workspace.controller.context = {
+                    ...this.workspace.controller.context,
                     xmin: 0,
                     xmax: 0,
                     ymin: 0,
@@ -311,8 +316,8 @@ class VisualizerWidget extends PureComponent {
                 setTimeout(() => {
                     this.visualizer.load(name, gcode, ({ bbox }) => {
                         // Set gcode bounding box
-                        controller.context = {
-                            ...controller.context,
+                        this.workspace.controller.context = {
+                            ...this.workspace.controller.context,
                             xmin: bbox.min.x,
                             xmax: bbox.max.x,
                             ymin: bbox.min.y,
@@ -345,8 +350,8 @@ class VisualizerWidget extends PureComponent {
             }
 
             // Clear gcode bounding box
-            controller.context = {
-                ...controller.context,
+            this.workspace.controller.context = {
+                ...this.workspace.controller.context,
                 xmin: 0,
                 xmax: 0,
                 ymin: 0,
@@ -382,7 +387,7 @@ class VisualizerWidget extends PureComponent {
             console.assert(includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state));
 
             if (workflow.state === WORKFLOW_STATE_IDLE) {
-                controller.command('gcode:start');
+                this.workspace.controller.command('gcode:start');
                 return;
             }
 
@@ -409,7 +414,7 @@ class VisualizerWidget extends PureComponent {
                                     btnStyle="primary"
                                     onClick={chainedFunction(
                                         () => {
-                                            controller.command('gcode:resume');
+                                            this.workspace.controller.command('gcode:resume');
                                         },
                                         onClose
                                     )}
@@ -423,26 +428,26 @@ class VisualizerWidget extends PureComponent {
                     return;
                 }
 
-                controller.command('gcode:resume');
+                this.workspace.controller.command('gcode:resume');
             }
         },
         handlePause: () => {
             const { workflow } = this.state;
             console.assert(includes([WORKFLOW_STATE_RUNNING], workflow.state));
 
-            controller.command('gcode:pause');
+            this.workspace.controller.command('gcode:pause');
         },
         handleStop: () => {
             const { workflow } = this.state;
             console.assert(includes([WORKFLOW_STATE_PAUSED], workflow.state));
 
-            controller.command('gcode:stop', { force: true });
+            this.workspace.controller.command('gcode:stop', { force: true });
         },
         handleClose: () => {
             const { workflow } = this.state;
             console.assert(includes([WORKFLOW_STATE_IDLE], workflow.state));
 
-            controller.command('gcode:unload');
+            this.workspace.controller.command('gcode:unload');
 
             pubsub.publish('gcode:unload'); // Unload the G-code
         },
@@ -607,7 +612,7 @@ class VisualizerWidget extends PureComponent {
             this.setState((state) => ({ ...initialState }));
         },
         'gcode:load': (name, gcode, context) => {
-            gcode = translateExpression(gcode, context); // e.g. xmin,xmax,ymin,ymax,zmin,zmax
+            gcode = translateExpression(gcode, this.workspace.controller, context); // e.g. xmin,xmax,ymin,ymax,zmin,zmax
             this.actions.loadGCode(name, gcode);
         },
         'gcode:unload': () => {
@@ -692,7 +697,7 @@ class VisualizerWidget extends PureComponent {
                     'G20': IMPERIAL_UNITS,
                     'G21': METRIC_UNITS
                 }[modal.units] || this.state.units;
-                const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
+                const $13 = Number(get(this.workspace.controller.settings, 'settings.$13', 0)) || 0;
 
                 this.setState(state => ({
                     units: units,
@@ -823,7 +828,7 @@ class VisualizerWidget extends PureComponent {
                     'G20': IMPERIAL_UNITS,
                     'G21': METRIC_UNITS
                 }[modal.units] || this.state.units;
-                const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
+                const $13 = Number(get(this.workspace.controller.settings, 'settings.$13', 0)) || 0;
 
                 this.setState(state => ({
                     units: units,
@@ -859,7 +864,7 @@ class VisualizerWidget extends PureComponent {
     visualizer = null;
 
     componentDidMount() {
-        this.addControllerEvents();
+        this.workspace.addControllerEvents(this.controllerEvents);
 
         if (!WebGL.isWebGLAvailable() && !this.state.disabled) {
             displayWebGLErrorMessage();
@@ -873,7 +878,7 @@ class VisualizerWidget extends PureComponent {
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents(this.controllerEvents);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -905,15 +910,15 @@ class VisualizerWidget extends PureComponent {
 
     getInitialState() {
         return {
-            port: controller.port,
+            port: this.workspace.controller.port,
             units: METRIC_UNITS,
             controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
+                type: this.workspace.controller.type,
+                settings: this.workspace.controller.settings,
+                state: this.workspace.controller.state
             },
             workflow: {
-                state: controller.workflow.state
+                state: this.workspace.controller.workflow.state
             },
             notification: {
                 type: '',
@@ -978,20 +983,6 @@ class VisualizerWidget extends PureComponent {
             cameraPosition: 'top', // 'top', '3d', 'front', 'left', 'right'
             isAgitated: false // Defaults to false
         };
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     isAgitated() {
@@ -1065,6 +1056,7 @@ class VisualizerWidget extends PureComponent {
             <Widget borderless>
                 <Widget.Header className={styles.widgetHeader} fixed>
                     <PrimaryToolbar
+                        workspaceId={this.workspace.id}
                         state={state}
                         actions={actions}
                     />

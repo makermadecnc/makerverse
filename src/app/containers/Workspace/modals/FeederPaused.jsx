@@ -4,7 +4,6 @@ import React from 'react';
 import { Button } from 'app/components/Buttons';
 import ModalTemplate from 'app/components/ModalTemplate';
 import Modal from 'app/components/Modal';
-import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 
 const FeederPaused = (props) => (
@@ -25,7 +24,7 @@ const FeederPaused = (props) => (
                 btnStyle="danger"
                 onClick={chainedFunction(
                     () => {
-                        controller.command('feeder:stop');
+                        props.controller.command('feeder:stop');
                     },
                     props.onClose
                 )}
@@ -35,7 +34,7 @@ const FeederPaused = (props) => (
             <Button
                 onClick={chainedFunction(
                     () => {
-                        controller.command('feeder:start');
+                        props.controller.command('feeder:start');
                     },
                     props.onClose
                 )}
@@ -47,6 +46,7 @@ const FeederPaused = (props) => (
 );
 
 FeederPaused.propTypes = {
+    controller: PropTypes.object.isRequired,
     title: PropTypes.string,
     onClose: PropTypes.func
 };

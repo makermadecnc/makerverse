@@ -8,18 +8,23 @@ import settings from 'app/config/settings';
 import store from 'app/store';
 import Iframe from 'app/components/Iframe';
 import ResizeObserver from 'app/lib/ResizeObserver';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import styles from './index.styl';
 
 class Custom extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         config: PropTypes.object,
         disabled: PropTypes.bool,
         url: PropTypes.string,
         port: PropTypes.string
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     pubsubTokens = [];
 
@@ -42,8 +47,8 @@ class Custom extends PureComponent {
         if (nextProps.port !== this.props.port) {
             // Post a message to the iframe window
             this.postMessage('change', {
-                port: controller.port,
-                controller: controller.type
+                port: this.workspace.controller.port,
+                controller: this.workspace.controller.type
             });
         }
     }
@@ -53,8 +58,8 @@ class Custom extends PureComponent {
             pubsub.subscribe('message:connect', () => {
                 // Post a message to the iframe window
                 this.postMessage('change', {
-                    port: controller.port,
-                    controller: controller.type
+                    port: this.workspace.controller.port,
+                    controller: this.workspace.controller.type
                 });
             }),
             pubsub.subscribe('message:resize', (type, payload) => {

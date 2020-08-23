@@ -11,7 +11,6 @@ import api from 'app/api';
 import {
     WORKFLOW_STATE_IDLE
 } from 'app/constants';
-import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import store from 'app/store';
@@ -120,21 +119,21 @@ class Workspace extends PureComponent {
 
     controllerEvents = {
         'connect': () => {
-            if (controller.connected) {
+            if (this.workspace.controller.connected) {
                 this.action.closeModal();
             } else {
                 this.action.openModal(MODAL_SERVER_DISCONNECTED);
             }
         },
         'connect_error': () => {
-            if (controller.connected) {
+            if (this.workspace.controller.connected) {
                 this.action.closeModal();
             } else {
                 this.action.openModal(MODAL_SERVER_DISCONNECTED);
             }
         },
         'disconnect': () => {
-            if (controller.connected) {
+            if (this.workspace.controller.connected) {
                 this.action.closeModal();
             } else {
                 this.action.openModal(MODAL_SERVER_DISCONNECTED);
@@ -343,7 +342,7 @@ class Workspace extends PureComponent {
     };
 
     componentDidMount() {
-        this.addControllerEvents();
+        this.workspace.addControllerEvents(this.controllerEvents);
         this.addResizeEventListener();
 
         setTimeout(() => {
@@ -353,7 +352,7 @@ class Workspace extends PureComponent {
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents(this.controllerEvents);
         this.removeResizeEventListener();
     }
 
@@ -362,20 +361,6 @@ class Workspace extends PureComponent {
         this.workspace.secondaryWidgetsVisible = this.state.showSecondaryContainer;
 
         this.resizeDefaultContainer();
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     addResizeEventListener() {
@@ -410,12 +395,14 @@ class Workspace extends PureComponent {
             <div style={style} className={classNames(className, styles.workspace)}>
                 {modal.name === MODAL_FEEDER_PAUSED && (
                     <FeederPaused
+                        controller={this.workspace.controller}
                         title={modal.params.title}
                         onClose={this.action.closeModal}
                     />
                 )}
                 {modal.name === MODAL_FEEDER_WAIT && (
                     <FeederWait
+                        controller={this.workspace.controller}
                         title={modal.params.title}
                         onClose={this.action.closeModal}
                     />
@@ -435,14 +422,14 @@ class Workspace extends PureComponent {
                 </div>
                 <Dropzone
                     className={styles.dropzone}
-                    disabled={controller.workflow.state !== WORKFLOW_STATE_IDLE}
+                    disabled={this.workspace.controller.workflow.state !== WORKFLOW_STATE_IDLE}
                     disableClick={true}
                     disablePreview={true}
                     multiple={false}
                     onDragStart={(event) => {
                     }}
                     onDragEnter={(event) => {
-                        if (controller.workflow.state !== WORKFLOW_STATE_IDLE) {
+                        if (this.workspace.controller.workflow.state !== WORKFLOW_STATE_IDLE) {
                             return;
                         }
                         if (isDraggingWidget) {
@@ -453,7 +440,7 @@ class Workspace extends PureComponent {
                         }
                     }}
                     onDragLeave={(event) => {
-                        if (controller.workflow.state !== WORKFLOW_STATE_IDLE) {
+                        if (this.workspace.controller.workflow.state !== WORKFLOW_STATE_IDLE) {
                             return;
                         }
                         if (isDraggingWidget) {
@@ -464,7 +451,7 @@ class Workspace extends PureComponent {
                         }
                     }}
                     onDrop={(acceptedFiles, rejectedFiles) => {
-                        if (controller.workflow.state !== WORKFLOW_STATE_IDLE) {
+                        if (this.workspace.controller.workflow.state !== WORKFLOW_STATE_IDLE) {
                             return;
                         }
                         if (isDraggingWidget) {

@@ -2,16 +2,21 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import { Container, Row, Col } from 'app/components/GridSystem';
 import { Button } from 'app/components/Buttons';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 
 class MDI extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         canClick: PropTypes.bool,
         mdi: PropTypes.shape({
             disabled: PropTypes.bool,
             commands: PropTypes.array
         })
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     renderMDIButtons() {
         const { canClick, mdi } = this.props;
@@ -37,7 +42,7 @@ class MDI extends PureComponent {
                         }}
                         disabled={!canClick}
                         onClick={() => {
-                            controller.command('gcode', c.command);
+                            this.workspace.controller.command('gcode', c.command);
                         }}
                     >
                         {c.name}

@@ -6,7 +6,9 @@ import Anchor from 'app/components/Anchor';
 import { Notification } from 'app/components/Notifications';
 import Space from 'app/components/Space';
 import settings from 'app/config/settings';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
+import promisify from 'app/lib/promisify';
+import auth from 'app/lib/auth';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import * as user from 'app/lib/user';
@@ -40,7 +42,7 @@ class Login extends PureComponent {
             const password = this.fields.password.value;
 
             user.signin({ name, password })
-                .then(({ authenticated }) => {
+                .then(({ authenticated }) => promisify(next => {
                     if (!authenticated) {
                         this.setState({
                             alertMessage: i18n._('Authentication failed.'),
@@ -53,17 +55,18 @@ class Login extends PureComponent {
                     log.debug('Create and establish a WebSocket connection');
 
                     const token = store.get('session.token');
-                    const host = '';
-                    const options = {
+                    auth.host = '';
+                    auth.options = {
                         query: 'token=' + token
                     };
-                    controller.connect(host, options, () => {
-                        // @see "src/web/index.jsx"
-                        this.setState({
-                            alertMessage: '',
-                            authenticating: false,
-                            redirectToReferrer: true
-                        });
+                    next();
+                }))
+                .then(Workspaces.connect)
+                .then(() => {
+                    this.setState({
+                        alertMessage: '',
+                        authenticating: false,
+                        redirectToReferrer: true
                     });
                 });
         }

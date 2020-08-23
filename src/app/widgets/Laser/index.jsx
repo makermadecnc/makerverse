@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import ensurePositiveNumber from 'app/lib/ensure-positive-number';
 import i18n from 'app/lib/i18n';
 import WidgetConfig from '../WidgetConfig';
@@ -20,11 +20,16 @@ import styles from './index.styl';
 
 class LaserWidget extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         widgetId: PropTypes.string.isRequired,
         onFork: PropTypes.func.isRequired,
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     // Public methods
     collapse = () => {
@@ -111,10 +116,10 @@ class LaserWidget extends PureComponent {
         },
         laserTestOn: () => {
             const { power, duration, maxS } = this.state.test;
-            controller.command('lasertest:on', power, duration, maxS);
+            this.workspace.controller.command('lasertest:on', power, duration, maxS);
         },
         laserTestOff: () => {
-            controller.command('lasertest:off');
+            this.workspace.controller.command('lasertest:off');
         }
     };
 
@@ -148,11 +153,11 @@ class LaserWidget extends PureComponent {
     };
 
     componentDidMount() {
-        this.addControllerEvents();
+        this.workspace.addControllerEvents(this.controllerEvents);
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents(this.controllerEvents);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -180,11 +185,11 @@ class LaserWidget extends PureComponent {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
             canClick: true, // Defaults to true
-            port: controller.port,
+            port: this.workspace.controller.port,
             controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
+                type: this.workspace.controller.type,
+                settings: this.workspace.controller.settings,
+                state: this.workspace.controller.state
             },
             panel: {
                 laserTest: {
@@ -197,20 +202,6 @@ class LaserWidget extends PureComponent {
                 maxS: this.config.get('test.maxS', 1000)
             }
         };
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     canClick() {
@@ -314,6 +305,7 @@ class LaserWidget extends PureComponent {
                     )}
                 >
                     <Laser
+                        workspaceId={this.workspace.id}
                         state={state}
                         actions={actions}
                     />

@@ -1,7 +1,11 @@
 import _ from 'lodash';
 import log from 'app/lib/log';
+import series from 'app/lib/promise-series';
+import auth from 'app/lib/auth';
+import promisify from 'app/lib/promisify';
+import io from 'socket.io-client';
+import Controller from 'cncjs-controller';
 import store from '../store';
-import controller from './controller';
 import {
     MASLOW,
     GRBL,
@@ -23,6 +27,26 @@ class Workspaces {
     static load(record) {
         const workspace = new Workspaces(record);
         Workspaces.all[workspace.id] = workspace;
+    }
+
+    static connect() {
+        const funcs = Object.keys(Workspaces.all).map((id) => {
+            return () => promisify(next => {
+                const workspace = Workspaces.all[id];
+                workspace.controller.connect(auth.host, auth.options, () => {
+                    // @see "src/web/containers/Login/Login.jsx"
+                    next();
+                });
+            })();
+        });
+        return series(funcs);
+    }
+
+    static disconnect() {
+        Object.keys(Workspaces.all).map((id) => {
+            const workspace = Workspaces.all[id];
+            return workspace.controller.disconnect();
+        });
     }
 
     // record comes from an API response, loaded from .cncrc
@@ -58,6 +82,10 @@ class Workspaces {
         return this._isActive || false;
     }
 
+    get isImperialUnits() {
+        return this.isConnected && _.get(this.controller.state, 'parserstate.modal.units') === 'G20';
+    }
+
     set isActive(active) {
         const wasActive = !!this._isActive;
         this._isActive = !!active;
@@ -71,14 +99,14 @@ class Workspaces {
     }
 
     onActivated() {
-        this.addControllerEvents();
+        this.addControllerEvents(this._controllerEvents);
         if (this.controllerAttributes.reconnect) {
             this.openPort();
         }
     }
 
     onDeactivated() {
-        this.removeControllerEvents();
+        this.removeControllerEvents(this._controllerEvents);
         this.closePort();
     }
 
@@ -103,7 +131,7 @@ class Workspaces {
     // WIP: controller is still a global, but it gets (dis/re)connected when switching workspaces.
     // ---------------------------------------------------------------------------------------------
 
-    _hasControllerEvents = false;
+    _controller = new Controller(io);
     _connecting = false;
     _connected = false;
 
@@ -148,7 +176,7 @@ class Workspaces {
     };
 
     get controller() {
-        return controller;
+        return this._controller;
     }
 
     get isConnected() {
@@ -161,7 +189,7 @@ class Workspaces {
 
     openPort(callback) {
         const atts = this.controllerAttributes;
-        controller.openPort(atts.port, {
+        this.controller.openPort(atts.port, {
             controllerType: atts.type,
             baudrate: atts.baudRate,
             rtscts: atts.rtscts
@@ -183,7 +211,7 @@ class Workspaces {
             return;
         }
         this._connected = false;
-        controller.closePort(this.controllerAttributes.port, (err) => {
+        this.controller.closePort(this.controllerAttributes.port, (err) => {
             if (err) {
                 log.err(err);
             }
@@ -193,17 +221,17 @@ class Workspaces {
         });
     }
 
-    addControllerEvents() {
-        Object.keys(this._controllerEvents).forEach(eventName => {
-            const callback = this._controllerEvents[eventName];
+    addControllerEvents(controllerEvents) {
+        Object.keys(controllerEvents).forEach(eventName => {
+            const callback = controllerEvents[eventName];
             this.controller.addListener(eventName, callback);
         });
     }
 
-    removeControllerEvents() {
-        Object.keys(this._controllerEvents).forEach(eventName => {
-            const callback = this._controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
+    removeControllerEvents(controllerEvents) {
+        Object.keys(controllerEvents).forEach(eventName => {
+            const callback = controllerEvents[eventName];
+            this.controller.removeListener(eventName, callback);
         });
     }
 

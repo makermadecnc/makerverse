@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import { mapPositionToUnits } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
@@ -21,11 +21,16 @@ import styles from './index.styl';
 
 class GCodeWidget extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         widgetId: PropTypes.string.isRequired,
         onFork: PropTypes.func.isRequired,
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     // Public methods
     collapse = () => {
@@ -131,11 +136,11 @@ class GCodeWidget extends PureComponent {
 
     componentDidMount() {
         this.subscribe();
-        this.addControllerEvents();
+        this.workspace.addControllerEvents(this.controllerEvents);
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents(this.controllerEvents);
         this.unsubscribe();
     }
 
@@ -152,7 +157,7 @@ class GCodeWidget extends PureComponent {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
 
-            port: controller.port,
+            port: this.workspace.controller.port,
             units: METRIC_UNITS,
 
             // G-code Status (from server)
@@ -221,20 +226,6 @@ class GCodeWidget extends PureComponent {
             pubsub.unsubscribe(token);
         });
         this.pubsubTokens = [];
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     render() {

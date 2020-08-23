@@ -1,34 +1,39 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import styles from './index.styl';
 
 class QuickAccessToolbar extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         state: PropTypes.object,
         actions: PropTypes.object
     };
 
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
+
     command = {
         'cyclestart': () => {
-            controller.command('cyclestart');
+            this.workspace.controller.command('cyclestart');
         },
         'feedhold': () => {
-            controller.command('feedhold');
+            this.workspace.controller.command('feedhold');
         },
         'homing': () => {
-            controller.command('homing');
+            this.workspace.controller.command('homing');
         },
         'sleep': () => {
-            controller.command('sleep');
+            this.workspace.controller.command('sleep');
         },
         'unlock': () => {
-            controller.command('unlock');
+            this.workspace.controller.command('unlock');
         },
         'reset': () => {
-            controller.command('reset');
+            this.workspace.controller.command('reset');
         }
     };
 

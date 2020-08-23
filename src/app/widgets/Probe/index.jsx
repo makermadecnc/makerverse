@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
-import controller from 'app/lib/controller';
+import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import { in2mm, mapValueToUnits } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
@@ -37,11 +37,16 @@ const gcode = (cmd, params) => {
 
 class ProbeWidget extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         widgetId: PropTypes.string.isRequired,
         onFork: PropTypes.func.isRequired,
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     // Public methods
     collapse = () => {
@@ -208,7 +213,7 @@ class ProbeWidget extends PureComponent {
             return useTLO ? tloProbeCommands : wcsProbeCommands;
         },
         runProbeCommands: (commands) => {
-            controller.command('gcode', commands);
+            this.workspace.controller.command('gcode', commands);
         }
     };
 
@@ -267,11 +272,11 @@ class ProbeWidget extends PureComponent {
     unitsDidChange = false;
 
     componentDidMount() {
-        this.addControllerEvents();
+        this.workspace.addControllerEvents(this.controllerEvents);
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
+        this.workspace.removeControllerEvents(this.controllerEvents);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -316,14 +321,14 @@ class ProbeWidget extends PureComponent {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
             canClick: true, // Defaults to true
-            port: controller.port,
+            port: this.workspace.controller.port,
             units: METRIC_UNITS,
             controller: {
-                type: controller.type,
-                state: controller.state
+                type: this.workspace.controller.type,
+                state: this.workspace.controller.state
             },
             workflow: {
-                state: controller.workflow.state
+                state: this.workspace.controller.workflow.state
             },
             modal: {
                 name: MODAL_NONE,
@@ -337,20 +342,6 @@ class ProbeWidget extends PureComponent {
             touchPlateHeight: Number(this.config.get('touchPlateHeight') || 0).toFixed(3) * 1,
             retractionDistance: Number(this.config.get('retractionDistance') || 0).toFixed(3) * 1
         };
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     getWorkCoordinateSystem() {
@@ -483,9 +474,10 @@ class ProbeWidget extends PureComponent {
                     )}
                 >
                     {state.modal.name === MODAL_PREVIEW &&
-                    <RunProbe state={state} actions={actions} />
+                    <RunProbe workspaceId={this.workspace.id} state={state} actions={actions} />
                     }
                     <Probe
+                        workspaceId={this.workspace.id}
                         state={state}
                         actions={actions}
                     />
