@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import log from 'app/lib/log';
+import Limits from 'app/lib/limits';
 import series from 'app/lib/promise-series';
 import auth from 'app/lib/auth';
 import promisify from 'app/lib/promisify';
@@ -291,11 +292,11 @@ class Workspaces {
         return inactiveWidgets;
     }
 
-    get machineProfile() {
-        return {
-            name: this.name,
-            limits: this._record.limits,
-        };
+    get limits() {
+        if (!this._limits) {
+            this._limits = new Limits(this._record.limits);
+        }
+        return this._limits;
     }
 
     // A workspace uses local storage to keep user-level customizations.

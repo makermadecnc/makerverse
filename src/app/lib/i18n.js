@@ -38,6 +38,9 @@ const _ = (...args) => {
     if (typeof text !== 'string' || text.length === 0) {
         text = i18next.t(key, { ...options, lng: 'en' });
     }
+    if (typeof text !== 'string' || text.length === 0) {
+        text = value;
+    }
 
     return text;
 };

@@ -152,7 +152,7 @@ class UpdateRecord extends Component {
                         <div>
                             <Modal.Header>
                                 <Modal.Title>
-                                    {i18n._('Machine Profile')}
+                                    {i18n._('Workspace Profile')}
                                 </Modal.Title>
                             </Modal.Header>
                             <Modal.Body>

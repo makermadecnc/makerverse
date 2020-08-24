@@ -14,7 +14,6 @@ import { TablePagination } from 'app/components/Paginations';
 import portal from 'app/lib/portal';
 import i18n from 'app/lib/i18n';
 import {
-    MODAL_CREATE_RECORD,
     MODAL_UPDATE_RECORD
 } from './constants';
 import styles from './index.styl';
@@ -60,17 +59,6 @@ class TableRecords extends PureComponent {
                 }}
                 title={() => (
                     <div className={styles.tableToolbar}>
-                        <button
-                            type="button"
-                            className="btn btn-default"
-                            onClick={() => {
-                                actions.openModal(MODAL_CREATE_RECORD);
-                            }}
-                        >
-                            <i className="fa fa-plus" />
-                            <Space width="8" />
-                            {i18n._('Add')}
-                        </button>
                         <TablePagination
                             style={{
                                 position: 'absolute',
@@ -103,6 +91,29 @@ class TableRecords extends PureComponent {
                                 >
                                     {name}
                                 </Anchor>
+                            );
+                        }
+                    },
+                    {
+                        title: i18n._('Controller'),
+                        key: 'controller',
+                        render: (value, row, index) => {
+                            return (
+                                <FlexContainer fluid gutterWidth={0}>
+                                    <Row>
+                                        <Col width="auto">
+                                            <div>
+                                                {`Type = ${_get(row, 'controller.controllerType')}`}
+                                            </div>
+                                            <div>
+                                                {`Port = ${_get(row, 'controller.port')}`}
+                                            </div>
+                                            <div>
+                                                {`Baud Rate = ${_get(row, 'controller.baudRate')}`}
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                </FlexContainer>
                             );
                         }
                     },
@@ -206,7 +217,7 @@ class TableRecords extends PureComponent {
                                                     <Modal.Body>
                                                         <ModalTemplate type="warning">
                                                             <FormGroup>
-                                                                <strong>{i18n._('Delete machine profile')}</strong>
+                                                                <strong>{i18n._('Delete Workspace')}</strong>
                                                             </FormGroup>
                                                             <div>
                                                                 {row.name}

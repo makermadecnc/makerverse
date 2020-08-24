@@ -160,6 +160,10 @@ const GCodeName = ({ name, style, ...props }) => {
     );
 };
 
+GCodeName.propTypes = {
+    name: PropTypes.string.isRequired,
+};
+
 class VisualizerWidget extends PureComponent {
     static propTypes = {
         workspaceId: PropTypes.string.isRequired,
@@ -1078,20 +1082,24 @@ class VisualizerWidget extends PureComponent {
                     }
                     {state.modal.name === MODAL_WATCH_DIRECTORY && (
                         <WatchDirectory
+                            workspaceId={this.workspace.id}
                             state={state}
                             actions={actions}
                         />
                     )}
                     <WorkflowControl
+                        workspaceId={this.workspace.id}
                         state={state}
                         actions={actions}
                     />
                     <Dashboard
+                        workspaceId={this.workspace.id}
                         show={showDashboard}
                         state={state}
                     />
                     {WebGL.isWebGLAvailable() && (
                         <Visualizer
+                            workspaceId={this.workspace.id}
                             show={showVisualizer}
                             cameraPosition={state.cameraPosition}
                             ref={node => {
@@ -1102,11 +1110,13 @@ class VisualizerWidget extends PureComponent {
                     )}
                     {(showVisualizer && state.gcode.displayName) && (
                         <GCodeName
+                            workspaceId={this.workspace.id}
                             name={state.gcode.name}
                         />
                     )}
                     {showNotifications && (
                         <Notifications
+                            workspaceId={this.workspace.id}
                             show={showNotifications}
                             type={state.notification.type}
                             data={state.notification.data}
@@ -1116,6 +1126,7 @@ class VisualizerWidget extends PureComponent {
                 </Widget.Content>
                 <Widget.Footer className={styles.widgetFooter}>
                     <SecondaryToolbar
+                        workspaceId={this.workspace.id}
                         is3DView={capable.view3D}
                         cameraMode={state.cameraMode}
                         cameraPosition={state.cameraPosition}

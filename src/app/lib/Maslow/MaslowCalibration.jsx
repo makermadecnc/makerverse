@@ -1,3 +1,4 @@
+import log from 'app/lib/log';
 import MaslowKinematics from './MaslowKinematics';
 
 const calibrationDefaults = {
@@ -36,12 +37,11 @@ class MaslowCalibration {
 
     calibrate(measurements, callback) {
         if (measurements.length !== 10) {
-            console.log('Calibration requires exactly 10 measurements');
+            log.error('Calibration requires exactly 10 measurements');
             return false;
         }
-        console.log('calibrating...');
+        log.debug('calibrating...');
         const measured = this.calculateMeasurementCoordinates(measurements);
-        // console.log('ideals', this.idealCoordinates, this.idealChainLengths);
 
         const origSettings = {
             leftChainTolerance: this.kin.opts.leftChainTolerance,
@@ -52,11 +52,10 @@ class MaslowCalibration {
         const origErr = this.calculateError(measured, this.idealCoordinates);
         const orig = { ...origSettings, ...origErr };
 
-        // console.log('orig', orig);
-        var op = orig;
+        let op = orig;
         const decimals = 4;
-        for (var i = 0; i < decimals; i++) {
-            console.log('calibration #', i);
+        for (let i = 0; i < decimals; i++) {
+            log.debug('calibration #', i);
             op = this.optimize(measured, op, i, decimals, callback);
         }
 
@@ -78,7 +77,7 @@ class MaslowCalibration {
         const percentMult = (i + 1) / decimals;
         const percentAdd = percentMult * i;
         const chainBounds = 5; // Math.pow(steps, 1/2) / 2;
-        var mxBounds = Math.min(this.opts.motorXAccuracy, 1), myBounds = Math.min(this.opts.motorYAccuracy, 1);
+        let mxBounds = Math.min(this.opts.motorXAccuracy, 1), myBounds = Math.min(this.opts.motorYAccuracy, 1);
         if (precision > 0.01) {
             mxBounds = this.opts.motorXAccuracy;
             myBounds = this.opts.motorYAccuracy;
@@ -86,12 +85,12 @@ class MaslowCalibration {
         const iters = (mxBounds * 2) * (myBounds * 2) * (chainBounds * 2) * (chainBounds * 2);
         const step = precision / chainBounds;
         let idx = 0;
-        var best = { ...start };
+        let best = { ...start };
 
-        for (var mw = -mxBounds; mw <= mxBounds; mw++) {
-            for (var mh = -myBounds; mh <= myBounds; mh++) {
-                for (var left = -chainBounds; left <= chainBounds; left++) {
-                    for (var right = -chainBounds; right <= chainBounds; right++) {
+        for (let mw = -mxBounds; mw <= mxBounds; mw++) {
+            for (let mh = -myBounds; mh <= myBounds; mh++) {
+                for (let left = -chainBounds; left <= chainBounds; left++) {
+                    for (let right = -chainBounds; right <= chainBounds; right++) {
                         const opt = this.calculateOptimization(
                             measured,
                             start.leftChainTolerance + left * step,
@@ -100,7 +99,7 @@ class MaslowCalibration {
                             start.distBetweenMotors + mw
                         );
                         if (opt.maxErrDist < best.maxErrDist && opt.totalErrDist <= best.totalErrDist) {
-                            console.log('new best', opt, 'change=', this.calculateChange(best, opt));
+                            log.debug('new best', opt, 'change=', this.calculateChange(best, opt));
                             best = opt;
                         }
                         idx++;
@@ -132,7 +131,7 @@ class MaslowCalibration {
         };
         this.kin.recomputeGeometry(opt);
         const points = [];
-        for (var x = 0; x < this.idealChainLengths.length; x++) {
+        for (let x = 0; x < this.idealChainLengths.length; x++) {
             const cl = this.idealChainLengths[x];
             const p = this.kin.chainToPosition(cl[0], cl[1], measured[x].x, measured[x].y);
             if (!p) {
@@ -149,7 +148,7 @@ class MaslowCalibration {
             totalErrDist: 0,
             maxErrDist: 0,
         };
-        for (var i = 0; i < measured.length; i++) {
+        for (let i = 0; i < measured.length; i++) {
             const d = this.dist(measured[i], points[i]);
             opt.totalErrDist += d;
             opt.maxErrDist = Math.max(opt.maxErrDist, this.round(d));
@@ -202,7 +201,7 @@ class MaslowCalibration {
 
     calculateChainLengths(points) {
         const ret = [];
-        for (var x = 0; x < points.length; x++) {
+        for (let x = 0; x < points.length; x++) {
             const cl = this.kin.positionToChain(points[x].x, points[x].y);
             ret.push(cl);
         }
@@ -229,7 +228,7 @@ class MaslowCalibration {
     generateGcode() {
         const ret = ['$X', 'G21', 'G90'];
         const cutOrder = [1, 2, 5, 4, 3, 0];
-        for (var i = 0; i < cutOrder.length; i++) {
+        for (let i = 0; i < cutOrder.length; i++) {
             this.generateGcodePoint(cutOrder[i], ret);
         }
         ret.push('G0 X0 Y0');

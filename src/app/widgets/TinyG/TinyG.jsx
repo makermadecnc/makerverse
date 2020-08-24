@@ -98,7 +98,12 @@ class TinyG extends PureComponent {
 
         return (
             <div>
-                <Overrides controller={this.workspace.controller} ovF={ovF} ovS={ovS} ovT={ovT} />
+                <Overrides
+                    controller={this.workspace.controller}
+                    ovF={ovF}
+                    ovS={ovS}
+                    ovT={ovT}
+                />
                 <Panel className={styles.panel}>
                     <Panel.Heading className={styles.panelHeading}>
                         <Toggler

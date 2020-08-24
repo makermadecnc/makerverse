@@ -26,7 +26,7 @@ const getSanitizedRecords = () => {
 
         const record = records[i];
 
-        if (!record.id) {
+        if (!record.id || record.id.length <= 0) {
             record.id = slugify(record.name);
             shouldUpdate = true;
         }
@@ -53,11 +53,12 @@ const getSanitizedRecords = () => {
 };
 
 const ensureWorkspace = (payload) => {
-    const { path, name, controller, limits } = { ...payload };
+    const { id, path, name, controller, limits } = { ...payload };
     const { port, baudRate, reconnect, controllerType, rtscts } = { ...controller };
     const { xmin = 0, xmax = 0, ymin = 0, ymax = 0, zmin = 0, zmax = 0 } = { ...limits };
 
     return {
+        id,
         path,
         name: ensureString(name),
         controller: {

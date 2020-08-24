@@ -1,6 +1,4 @@
-import _get from 'lodash/get';
 import _each from 'lodash/each';
-import _isEqual from 'lodash/isEqual';
 import _tail from 'lodash/tail';
 import _throttle from 'lodash/throttle';
 import colornames from 'colornames';
@@ -17,7 +15,7 @@ import CombinedCamera from 'app/lib/three/CombinedCamera';
 import TrackballControls from 'app/lib/three/TrackballControls';
 import * as WebGL from 'app/lib/three/WebGL';
 import log from 'app/lib/log';
-import store from 'app/store';
+import Workspaces from 'app/lib/workspaces';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
 import Viewport from './Viewport';
 import CoordinateAxes from './CoordinateAxes';
@@ -52,10 +50,15 @@ const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 
 class Visualizer extends Component {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         show: PropTypes.bool,
         cameraPosition: PropTypes.oneOf(['top', '3d', 'front', 'left', 'right']),
         state: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     pubsubTokens = [];
 
@@ -72,8 +75,6 @@ class Visualizer extends Component {
         y: 0,
         z: 0
     };
-
-    machineProfile = store.get('machineProfile');
 
     group = new THREE.Group();
 
@@ -94,37 +95,6 @@ class Visualizer extends Component {
     throttledResize = _throttle(() => {
         this.resizeRenderer();
     }, 32); // 60hz
-
-    changeMachineProfile = () => {
-        const machineProfile = store.get('machineProfile');
-
-        if (!machineProfile) {
-            return;
-        }
-
-        if (_isEqual(machineProfile, this.machineProfile)) {
-            return;
-        }
-
-        this.machineProfile = { ...machineProfile };
-
-        if (this.limits) {
-            this.group.remove(this.limits);
-            this.limits = null;
-        }
-
-        const state = this.props.state;
-        const limits = _get(this.machineProfile, 'limits');
-        const { xmin = 0, xmax = 0, ymin = 0, ymax = 0, zmin = 0, zmax = 0 } = { ...limits };
-        this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
-        this.limits.name = 'Limits';
-        this.limits.visible = state.objects.limits.visible;
-        this.group.add(this.limits);
-
-        this.updateLimitsPosition();
-
-        this.updateScene();
-    };
 
     renderAnimationLoop = () => {
         if (this.isAgitated) {
@@ -160,7 +130,6 @@ class Visualizer extends Component {
     componentDidMount() {
         this.subscribe();
         this.addResizeEventListener();
-        store.on('change', this.changeMachineProfile);
         if (this.node) {
             const el = ReactDOM.findDOMNode(this.node);
             this.createScene(el);
@@ -328,7 +297,6 @@ class Visualizer extends Component {
     componentWillUnmount() {
         this.unsubscribe();
         this.removeResizeEventListener();
-        store.removeListener('change', this.changeMachineProfile);
         this.clearScene();
     }
 
@@ -450,10 +418,7 @@ class Visualizer extends Component {
         this.updateScene();
     }
 
-    createLimits(xmin, xmax, ymin, ymax, zmin, zmax) {
-        const dx = Math.abs(xmax - xmin) || Number.MIN_VALUE;
-        const dy = Math.abs(ymax - ymin) || Number.MIN_VALUE;
-        const dz = Math.abs(zmax - zmin) || Number.MIN_VALUE;
+    createLimitsCuboid(limits) {
         const color = colornames('indianred');
         const opacity = 0.5;
         const transparent = true;
@@ -462,10 +427,10 @@ class Visualizer extends Component {
         const gapSize = 1; // The size of the gap.
         const linewidth = 1; // Controls line thickness.
         const scale = 1; // The scale of the dashed part of a line.
-        const limits = new Cuboid({
-            dx,
-            dy,
-            dz,
+        return new Cuboid({
+            dx: limits.xrange,
+            dy: limits.yrange,
+            dz: limits.zrange,
             color,
             opacity,
             transparent,
@@ -475,8 +440,6 @@ class Visualizer extends Component {
             gapSize,
             scale,
         });
-
-        return limits;
     }
 
     createCoordinateSystem(units) {
@@ -738,9 +701,7 @@ class Visualizer extends Component {
         }
 
         { // Limits
-            const limits = _get(this.machineProfile, 'limits');
-            const { xmin = 0, xmax = 0, ymin = 0, ymax = 0, zmin = 0, zmax = 0 } = { ...limits };
-            this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
+            this.limits = this.createLimitsCuboid(this.workspace.limits);
             this.limits.name = 'Limits';
             this.limits.visible = objects.limits.visible;
             this.group.add(this.limits);
@@ -923,14 +884,13 @@ class Visualizer extends Component {
             return;
         }
 
-        const limits = _get(this.machineProfile, 'limits');
-        const { xmin = 0, xmax = 0, ymin = 0, ymax = 0, zmin = 0, zmax = 0 } = { ...limits };
+        const limits = this.workspace.limits;
         const pivotPoint = this.pivotPoint.get();
         const { x: mpox, y: mpoy, z: mpoz } = this.machinePosition;
         const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
-        const x0 = ((xmin + xmax) / 2) - (mpox - wpox) - pivotPoint.x;
-        const y0 = ((ymin + ymax) / 2) - (mpoy - wpoy) - pivotPoint.y;
-        const z0 = ((zmin + zmax) / 2) - (mpoz - wpoz) - pivotPoint.z;
+        const x0 = ((limits.xmin + limits.xmax) / 2) - (mpox - wpox) - pivotPoint.x;
+        const y0 = ((limits.ymin + limits.ymax) / 2) - (mpoy - wpoy) - pivotPoint.y;
+        const z0 = ((limits.zmin + limits.zmax) / 2) - (mpoz - wpoz) - pivotPoint.z;
 
         this.limits.position.set(x0, y0, z0);
     }

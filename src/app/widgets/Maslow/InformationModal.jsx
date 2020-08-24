@@ -102,7 +102,7 @@ class InformationModal extends PureComponent {
                                 <textarea
                                     style={{ width: '100%' }}
                                     name="settings"
-                                    value={ JSON.stringify(this.kinematics.opts) }
+                                    value={JSON.stringify(this.kinematics.opts)}
                                     onChange={e => {
                                         this.updateKinematicsOpts(JSON.parse(e.target.value));
                                     }}
@@ -111,7 +111,7 @@ class InformationModal extends PureComponent {
                                     X: <input
                                         type="text"
                                         name="xPos"
-                                        value={ this.kinematics.lastPosition.x }
+                                        value={this.kinematics.lastPosition.x}
                                         onChange={e => {
                                             this.updateChains({ x: Number(e.target.value) });
                                         }}
@@ -119,7 +119,7 @@ class InformationModal extends PureComponent {
                                     Y: <input
                                         type="text"
                                         name="yPos"
-                                        value={ this.kinematics.lastPosition.y }
+                                        value={this.kinematics.lastPosition.y}
                                         onChange={e => {
                                             this.updateChains({ y: Number(e.target.value) });
                                         }}
@@ -129,7 +129,7 @@ class InformationModal extends PureComponent {
                                     Left Chain Length: <input
                                         type="text"
                                         name="leftChain"
-                                        value={ this.kinematics.lastChains[0] }
+                                        value={this.kinematics.lastChains[0]}
                                         onChange={e => {
                                             this.updatePosition(Number(e.target.value), -1);
                                         }}
@@ -137,7 +137,7 @@ class InformationModal extends PureComponent {
                                     Right Chain Length: <input
                                         type="text"
                                         name="rightChain"
-                                        value={ this.kinematics.lastChains[1] }
+                                        value={this.kinematics.lastChains[1]}
                                         onChange={e => {
                                             this.updatePosition(-1, Number(e.target.value));
                                         }}

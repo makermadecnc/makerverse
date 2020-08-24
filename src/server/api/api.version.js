@@ -1,49 +1,29 @@
-import url from 'url';
-import registryUrl from 'registry-url';
-import registryAuthToken from 'registry-auth-token';
+import _ from 'lodash';
 import request from 'superagent';
 import {
     ERR_INTERNAL_SERVER_ERROR
 } from '../constants';
 
-const pkgName = 'makerverse';
+const releasesUrl = 'https://api.github.com/repos/makermadecnc/makerverse/releases';
 
 export const getLatestVersion = (req, res) => {
-    const scope = pkgName.split('/')[0];
-    const regUrl = registryUrl(scope);
-    const pkgUrl = url.resolve(regUrl, encodeURIComponent(pkgName).replace(/^%40/, '@'));
-    const authInfo = registryAuthToken(regUrl);
-    const headers = {};
-
-    if (authInfo) {
-        headers.Authorization = `${authInfo.type} ${authInfo.token}`;
-    }
-
     request
-        .get(pkgUrl)
-        .set(headers)
+        .get(releasesUrl)
         .end((err, _res) => {
             if (err) {
                 res.status(ERR_INTERNAL_SERVER_ERROR).send({
-                    msg: `Failed to connect to ${pkgUrl}: code=${err.code}`
+                    msg: `Failed to connect to ${releasesUrl}: code=${err.code}`
                 });
                 return;
             }
 
-            const { body: data = {} } = { ..._res };
-            data.time = data.time || {};
-            data['dist-tags'] = data['dist-tags'] || {};
-            data.versions = data.versions || {};
+            const { body: data = [] } = { ..._res };
+            const rel = _.findLastIndex(data, { draft: false, prerelease: false });
+            const pre = _.findLastIndex(data, { draft: false, prerelease: true });
 
-            const time = data.time[latest];
-            const latest = data['dist-tags'].latest;
-            const {
-                name,
-                version,
-                description,
-                homepage
-            } = { ...data.versions[latest] };
-
-            res.send({ time, name, version, description, homepage });
+            res.send({
+                prerelease: data[pre],
+                release: data[rel],
+            });
         });
 };

@@ -219,7 +219,9 @@ class Header extends PureComponent {
         this._isMounted = false;
 
         this.removeActionHandlers();
-        this.workspace.removeControllerEvents();
+        if (this.workspace) {
+            this.workspace.removeControllerEvents();
+        }
 
         this.runningTasks = [];
     }

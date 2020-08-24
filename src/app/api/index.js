@@ -48,17 +48,17 @@ const signin = (options) => new Promise((resolve, reject) => {
 //
 // Latest Version
 //
-// const getLatestVersion = () => new Promise((resolve, reject) => {
-//     authrequest
-//         .get('/api/version/latest')
-//         .end((err, res) => {
-//             if (err) {
-//                 reject(res);
-//             } else {
-//                 resolve(res);
-//             }
-//         });
-// });
+const getLatestVersion = () => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/version/latest')
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
 
 //
 // State
@@ -584,86 +584,6 @@ commands.run = (id) => new Promise((resolve, reject) => {
 });
 
 //
-// Machines
-//
-const machines = {};
-
-machines.fetch = (options) => new Promise((resolve, reject) => {
-    authrequest
-        .get('/api/machines')
-        .query(options)
-        .end((err, res) => {
-            if (err) {
-                reject(res);
-            } else {
-                resolve(res);
-            }
-        });
-});
-
-machines.create = (options) => new Promise((resolve, reject) => {
-    authrequest
-        .post('/api/machines')
-        .send(options)
-        .end((err, res) => {
-            if (err) {
-                reject(res);
-            } else {
-                resolve(res);
-            }
-        });
-});
-
-machines.read = (id) => new Promise((resolve, reject) => {
-    authrequest
-        .get('/api/machines/' + id)
-        .end((err, res) => {
-            if (err) {
-                reject(res);
-            } else {
-                resolve(res);
-            }
-        });
-});
-
-machines.update = (id, options) => new Promise((resolve, reject) => {
-    authrequest
-        .put('/api/machines/' + id)
-        .send(options)
-        .end((err, res) => {
-            if (err) {
-                reject(res);
-            } else {
-                resolve(res);
-            }
-        });
-});
-
-machines.delete = (id) => new Promise((resolve, reject) => {
-    authrequest
-        .delete('/api/machines/' + id)
-        .end((err, res) => {
-            if (err) {
-                reject(res);
-            } else {
-                resolve(res);
-            }
-        });
-});
-
-machines.run = (id) => new Promise((resolve, reject) => {
-    authrequest
-        .post('/api/machines/run/' + id)
-        .end((err, res) => {
-            if (err) {
-                reject(res);
-            } else {
-                resolve(res);
-            }
-        });
-});
-
-//
 // Workspaces
 //
 const workspaces = {};
@@ -744,7 +664,7 @@ workspaces.run = (id) => new Promise((resolve, reject) => {
 });
 
 export default {
-    // getLatestVersion,
+    getLatestVersion,
 
     // State
     getState,
@@ -768,7 +688,6 @@ export default {
     // Settings
     commands,
     events,
-    machines,
     workspaces,
     macros,
     mdi,

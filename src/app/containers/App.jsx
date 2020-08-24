@@ -22,15 +22,7 @@ class App extends PureComponent {
         const staticPaths = [
             '/home',
             '/settings',
-            '/settings/general',
-            '/settings/workspace',
-            '/settings/machine-profiles',
-            '/settings/user-accounts',
-            '/settings/controller',
-            '/settings/commands',
-            '/settings/events',
-            '/settings/about'
-        ];
+        ] + Settings.paths;
         const isWorkspace = workspacePaths.indexOf(location.pathname) >= 0;
         const isStaticPath = staticPaths.indexOf(location.pathname) >= 0;
         const accepted = isWorkspace || isStaticPath;

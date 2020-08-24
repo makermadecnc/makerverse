@@ -9,8 +9,8 @@ const defaultState = {
         name: '',
         token: ''
     },
-    machineProfile: {
-        id: null
+    updater: {
+        prereleases: false,
     },
     widgets: {
         axes: {

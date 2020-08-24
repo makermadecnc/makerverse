@@ -8,6 +8,7 @@ import _findIndex from 'lodash/findIndex';
 import _get from 'lodash/get';
 import _isEqual from 'lodash/isEqual';
 import pubsub from 'pubsub-js';
+import semver from 'semver';
 import React, { PureComponent } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import api from 'app/api';
@@ -20,8 +21,7 @@ import Breadcrumbs from 'app/components/Breadcrumbs';
 import i18n from 'app/lib/i18n';
 import store from 'app/store';
 import General from './General';
-import Workspace from './Workspace';
-import MachineProfiles from './MachineProfiles';
+import Workspaces from './Workspaces';
 import UserAccounts from './UserAccounts';
 import Controller from './Controller';
 import Commands from './Commands';
@@ -38,56 +38,56 @@ class Settings extends PureComponent {
         ...withRouter.propTypes
     };
 
-    sections = [
+    static sections = [
         {
             id: 'general',
             path: 'general',
-            title: i18n._('General'),
+            title: 'General',
             component: (props) => <General {...props} />
         },
         {
-            id: 'workspace',
-            path: 'workspace',
-            title: i18n._('Workspace'),
-            component: (props) => <Workspace {...props} />
+            id: 'workspaces',
+            path: 'workspaces',
+            title: 'Workspaces',
+            component: (props) => <Workspaces {...props} />
         },
         {
             id: 'controller',
             path: 'controller',
-            title: i18n._('Controller'),
+            title: 'Controller',
             component: (props) => <Controller {...props} />
-        },
-        {
-            id: 'machineProfiles',
-            path: 'machine-profiles',
-            title: i18n._('Machine Profiles'),
-            component: (props) => <MachineProfiles {...props} />
         },
         {
             id: 'userAccounts',
             path: 'user-accounts',
-            title: i18n._('User Accounts'),
+            title: 'User Accounts',
             component: (props) => <UserAccounts {...props} />
         },
         {
             id: 'commands',
             path: 'commands',
-            title: i18n._('Commands'),
+            title: 'Commands',
             component: (props) => <Commands {...props} />
         },
         {
             id: 'events',
             path: 'events',
-            title: i18n._('Events'),
+            title: 'Events',
             component: (props) => <Events {...props} />
         },
         {
             id: 'about',
             path: 'about',
-            title: i18n._('About'),
+            title: 'About',
             component: (props) => <About {...props} />
         }
     ];
+
+    static get paths() {
+        return Settings.sections.map(s => {
+            return `/settings/${s.path}`;
+        });
+    }
 
     initialState = this.getInitialState();
 
@@ -223,31 +223,6 @@ class Settings extends PureComponent {
                 });
             }
         },
-        // Workspace
-        workspace: {
-            openModal: (name = '', params = {}) => {
-                this.setState({
-                    workspace: {
-                        ...this.state.workspace,
-                        modal: {
-                            name: name,
-                            params: params
-                        }
-                    }
-                });
-            },
-            closeModal: () => {
-                this.setState({
-                    workspace: {
-                        ...this.state.workspace,
-                        modal: {
-                            name: '',
-                            params: {}
-                        }
-                    }
-                });
-            }
-        },
         // Controller
         controller: {
             load: (options) => {
@@ -354,35 +329,35 @@ class Settings extends PureComponent {
                 }));
             }
         },
-        // Machine Profiles
-        machineProfiles: {
+        // Workspaces
+        workspaces: {
             fetchRecords: (options) => {
-                const state = this.state.machineProfiles;
+                const state = this.state.workspaces;
                 const {
                     page = state.pagination.page,
                     pageLength = state.pagination.pageLength
                 } = { ...options };
 
                 this.setState({
-                    machineProfiles: {
-                        ...this.state.machineProfiles,
+                    workspaces: {
+                        ...this.state.workspaces,
                         api: {
-                            ...this.state.machineProfiles.api,
+                            ...this.state.workspaces.api,
                             err: false,
                             fetching: true
                         }
                     }
                 });
 
-                api.machines.fetch({ paging: true, page, pageLength })
+                api.workspaces.fetch({ paging: true, page, pageLength })
                     .then((res) => {
                         const { pagination, records } = res.body;
 
                         this.setState({
-                            machineProfiles: {
-                                ...this.state.machineProfiles,
+                            workspaces: {
+                                ...this.state.workspaces,
                                 api: {
-                                    ...this.state.machineProfiles.api,
+                                    ...this.state.workspaces.api,
                                     err: false,
                                     fetching: false
                                 },
@@ -396,15 +371,15 @@ class Settings extends PureComponent {
                         });
 
                         // FIXME: Use redux store
-                        const machineProfiles = ensureArray(records);
-                        pubsub.publish('updateMachineProfiles', machineProfiles);
+                        const workspaces = ensureArray(records);
+                        pubsub.publish('updateWorkspaces', workspaces);
                     })
                     .catch((res) => {
                         this.setState({
-                            machineProfiles: {
-                                ...this.state.machineProfiles,
+                            workspaces: {
+                                ...this.state.workspaces,
                                 api: {
-                                    ...this.state.machineProfiles.api,
+                                    ...this.state.workspaces.api,
                                     err: true,
                                     fetching: false
                                 },
@@ -414,9 +389,9 @@ class Settings extends PureComponent {
                     });
             },
             createRecord: (options) => {
-                const actions = this.actions.machineProfiles;
+                const actions = this.actions.workspaces;
 
-                api.machines.create(options)
+                api.workspaces.create(options)
                     .then((res) => {
                         actions.closeModal();
                         actions.fetchRecords();
@@ -431,9 +406,9 @@ class Settings extends PureComponent {
                     });
             },
             updateRecord: (id, options, forceReload = false) => {
-                const actions = this.actions.machineProfiles;
+                const actions = this.actions.workspaces;
 
-                api.machines.update(id, options)
+                api.workspaces.update(id, options)
                     .then((res) => {
                         actions.closeModal();
 
@@ -442,7 +417,7 @@ class Settings extends PureComponent {
                             return;
                         }
 
-                        const records = [...this.state.machineProfiles.records];
+                        const records = [...this.state.workspaces.records];
                         const index = _findIndex(records, { id: id });
 
                         if (index >= 0) {
@@ -452,8 +427,8 @@ class Settings extends PureComponent {
                             };
 
                             this.setState({
-                                machineProfiles: {
-                                    ...this.state.machineProfiles,
+                                workspaces: {
+                                    ...this.state.workspaces,
                                     records: records
                                 }
                             });
@@ -470,20 +445,20 @@ class Settings extends PureComponent {
                     .then(() => {
                         try {
                             // Fetch machine profiles
-                            api.machines.fetch()
+                            api.workspaces.fetch()
                                 .then(res => {
-                                    const { records: machineProfiles } = res.body;
-                                    return ensureArray(machineProfiles);
+                                    const { records: workspaces } = res.body;
+                                    return ensureArray(workspaces);
                                 })
-                                .then(machineProfiles => {
+                                .then(workspaces => {
                                     // Update matched machine profile
-                                    const currentMachineProfile = store.get('machineProfile');
+                                    /*const currentMachineProfile = store.get('machineProfile');
                                     const currentMachineProfileId = _get(currentMachineProfile, 'id');
                                     const matchedMachineProfile = _find(machineProfiles, { id: currentMachineProfileId });
 
                                     if (matchedMachineProfile) {
-                                        store.replace('machineProfile', matchedMachineProfile);
-                                    }
+                                        store.replace('workspaces', matchedMachineProfile);
+                                    }*/
                                 });
                         } catch (err) {
                             // Ignore
@@ -491,9 +466,9 @@ class Settings extends PureComponent {
                     });
             },
             deleteRecord: (id) => {
-                const actions = this.actions.machineProfiles;
+                const actions = this.actions.workspaces;
 
-                api.machines.delete(id)
+                api.workspaces.delete(id)
                     .then((res) => {
                         actions.fetchRecords();
                     })
@@ -502,19 +477,20 @@ class Settings extends PureComponent {
                     })
                     .then(() => {
                         try {
-                            // Fetch machine profiles
-                            api.machines.fetch()
+                            // Fetch workspace profiles
+                            api.workspaces.fetch()
                                 .then(res => {
-                                    const { records: machineProfiles } = res.body;
-                                    return ensureArray(machineProfiles);
+                                    const { records: workspaces } = res.body;
+                                    return ensureArray(workspaces);
                                 })
-                                .then(machineProfiles => {
+                                .then(workspaces => {
                                     // Remove matched machine profile
+                                    /*
                                     const currentMachineProfile = store.get('machineProfile');
                                     const currentMachineProfileId = _get(currentMachineProfile, 'id');
                                     if (currentMachineProfileId === id) {
                                         store.replace('machineProfile', { id: null });
-                                    }
+                                    }*/
                                 });
                         } catch (err) {
                             // Ignore
@@ -523,8 +499,8 @@ class Settings extends PureComponent {
             },
             openModal: (name = '', params = {}) => {
                 this.setState({
-                    machineProfiles: {
-                        ...this.state.machineProfiles,
+                    workspaces: {
+                        ...this.state.workspaces,
                         modal: {
                             name: name,
                             params: params
@@ -534,8 +510,8 @@ class Settings extends PureComponent {
             },
             closeModal: () => {
                 this.setState({
-                    machineProfiles: {
-                        ...this.state.machineProfiles,
+                    workspaces: {
+                        ...this.state.workspaces,
                         modal: {
                             name: '',
                             params: {}
@@ -545,12 +521,12 @@ class Settings extends PureComponent {
             },
             updateModalParams: (params = {}) => {
                 this.setState({
-                    machineProfiles: {
-                        ...this.state.machineProfiles,
+                    workspaces: {
+                        ...this.state.workspaces,
                         modal: {
-                            ...this.state.machineProfiles.modal,
+                            ...this.state.workspaces.modal,
                             params: {
-                                ...this.state.machineProfiles.modal.params,
+                                ...this.state.workspaces.modal.params,
                                 ...params
                             }
                         }
@@ -1035,10 +1011,19 @@ class Settings extends PureComponent {
         },
         // About
         about: {
+            togglePrereleases: () => {
+                const v = !this.state.about.prereleases;
+                store.set('updater.prereleases', v);
+                this.actions.about.checkVersion(v);
+            },
             checkLatestVersion: () => {
+                this.actions.about.checkVersion(this.state.about.prereleases);
+            },
+            checkVersion: (prereleases) => {
                 this.setState({
                     about: {
                         ...this.state.about,
+                        prereleases: prereleases,
                         version: {
                             ...this.state.about.version,
                             checking: true
@@ -1052,15 +1037,18 @@ class Settings extends PureComponent {
                             return;
                         }
 
-                        const { version, time } = res.body;
+                        const usePre = prereleases && semver.lt(res.body.release.tag_name, res.body.prerelease.tag_name);
+                        console.log(prereleases, usePre, res.body.release.tag_name, res.body.prerelease.tag_name);
+                        const release = usePre ? res.body.prerelease : res.body.release;
                         this.setState({
                             about: {
                                 ...this.state.about,
                                 version: {
                                     ...this.state.about.version,
                                     checking: false,
-                                    latest: version,
-                                    lastUpdate: time
+                                    latest: release.tag_name,
+                                    lastUpdate: release.published_at,
+                                    release: release,
                                 }
                             }
                         });
@@ -1092,16 +1080,8 @@ class Settings extends PureComponent {
                 checkForUpdates: true,
                 lang: i18next.language
             },
-            // Workspace
-            workspace: {
-                modal: {
-                    name: '',
-                    params: {
-                    }
-                }
-            },
-            // Machine Profiles
-            machineProfiles: {
+            // Workspaces
+            workspaces: {
                 api: {
                     err: false,
                     fetching: false
@@ -1185,6 +1165,7 @@ class Settings extends PureComponent {
             },
             // About
             about: {
+                prereleases: store.get('updater.prereleases', false),
                 version: {
                     checking: false,
                     current: settings.version,
@@ -1203,11 +1184,11 @@ class Settings extends PureComponent {
             ...this.actions
         };
         const { pathname = '' } = this.props.location;
-        const initialSectionPath = this.sections[0].path;
+        const initialSectionPath = Settings.sections[0].path;
         const sectionPath = pathname.replace(/^\/settings(\/)?/, ''); // TODO
         const id = mapSectionPathToId(sectionPath || initialSectionPath);
-        const activeSection = _find(this.sections, { id: id }) || this.sections[0];
-        const sectionItems = this.sections.map((section, index) => (
+        const activeSection = _find(Settings.sections, { id: id }) || Settings.sections[0];
+        const sectionItems = Settings.sections.map((section, index) => (
             <li
                 key={section.id}
                 className={classNames(
@@ -1215,7 +1196,7 @@ class Settings extends PureComponent {
                 )}
             >
                 <Link to={`/settings/${section.path}`}>
-                    {section.title}
+                    {i18n._(section.title)}
                 </Link>
             </li>
         ));
@@ -1243,7 +1224,7 @@ class Settings extends PureComponent {
                         </div>
                         <div className={classNames(styles.col, styles.splitter)} />
                         <div className={classNames(styles.col, styles.section)}>
-                            <div className={styles.heading}>{activeSection.title}</div>
+                            <div className={styles.heading}>{i18n._(activeSection.title)}</div>
                             <div className={styles.content}>
                                 <Section
                                     initialState={sectionInitialState}

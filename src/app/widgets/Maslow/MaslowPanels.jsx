@@ -59,7 +59,14 @@ class MaslowPanels extends PureComponent {
         const fn = controllerSettings.firmware ? controllerSettings.firmware.name : null;
 
         if (!fn || fn.length <= 0) {
-            return <div className={styles.noConnection}>No compatible device detected.</div>;
+            return (
+                <div className={styles.noConnection}>
+                    No compatible device detected.
+                    <br />
+                    For Maslows using the Mega board, upgrade to Holey firmware (v51.28 or later).
+                    For Maslows using the Due board,
+                </div>
+            );
         }
 
         if (fn === 'MaslowClassic') {

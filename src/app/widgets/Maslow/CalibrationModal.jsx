@@ -338,16 +338,18 @@ class CalibrationModal extends PureComponent {
                                             ...{ position: 'absolute', width: '50px' },
                                             ...inputPositions[i]
                                         };
-                                        return (<input
-                                            type="text"
-                                            style={style}
-                                            name={'measurement' + i}
-                                            key={'measurement' + i}
-                                            value={v}
-                                            onChange={e => {
-                                                this.handleMeasurement(i, e.target.value);
-                                            }}
-                                        />);
+                                        return (
+                                            <input
+                                                type="text"
+                                                style={style}
+                                                name={'measurement' + i}
+                                                key={'measurement' + i}
+                                                value={v}
+                                                onChange={e => {
+                                                    this.handleMeasurement(i, e.target.value);
+                                                }}
+                                            />
+                                        );
                                     })}
                                     {buttonPositions.map((style, i) => {
                                         return (
@@ -369,7 +371,7 @@ class CalibrationModal extends PureComponent {
                                             <table>
                                                 <tbody>
                                                     <tr>
-                                                        <td></td>
+                                                        <td />
                                                         <td>Old</td>
                                                         <td>New</td>
                                                         <td>Delta</td>
@@ -536,7 +538,9 @@ class CalibrationModal extends PureComponent {
                             <option value="mm">{i18n._('mm')}</option>
                             <option value="in">{i18n._('in')}</option>
                         </select>
-                        <a href="http://bit.ly/maslow-calibration" target="_blank">Calibration Help</a>
+                        <a href="http://bit.ly/maslow-calibration" target="_blank" rel="noopener noreferrer">
+                            Calibration Help
+                        </a>
                     </span>
                     <Button onClick={actions.closeModal}>
                         {i18n._('Close')}

@@ -1,14 +1,12 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import CreateRecord from './CreateRecord';
 import UpdateRecord from './UpdateRecord';
 import TableRecords from './TableRecords';
 import {
-    MODAL_CREATE_RECORD,
     MODAL_UPDATE_RECORD
 } from './constants';
 
-class MachineProfiles extends PureComponent {
+class WorkspaceProfiles extends PureComponent {
     static propTypes = {
         initialState: PropTypes.object,
         state: PropTypes.object,
@@ -26,9 +24,6 @@ class MachineProfiles extends PureComponent {
 
         return (
             <div style={{ margin: -15 }}>
-                {state.modal.name === MODAL_CREATE_RECORD &&
-                <CreateRecord state={state} actions={actions} />
-                }
                 {state.modal.name === MODAL_UPDATE_RECORD &&
                 <UpdateRecord state={state} actions={actions} />
                 }
@@ -38,4 +33,4 @@ class MachineProfiles extends PureComponent {
     }
 }
 
-export default MachineProfiles;
+export default WorkspaceProfiles;
