@@ -29,11 +29,13 @@ class MaslowKinematics {
     opts = maslowDefaultOpts;
 
     constructor(controller) {
+        this.controller = controller;
         this.loadControllerSettings(controller);
     }
 
     getSettingsMap(settings) {
         const opts = {};
+        settings = settings || this.controller.settings;
         Object.keys(settings.grbl).forEach((code) => {
             const g = settings.grbl[code];
             const msg = `${g.message}, ${g.units}`.toLowerCase();

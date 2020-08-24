@@ -1,6 +1,7 @@
 import {
     IMPERIAL_STEPS,
-    METRIC_STEPS
+    METRIC_STEPS,
+    GRBL
 } from '../constants';
 
 const defaultState = {
@@ -39,7 +40,7 @@ const defaultState = {
         connection: {
             minimized: false,
             controller: {
-                type: 'Grbl' // Grbl|Marlin
+                type: GRBL
             },
             port: '', // will be deprecated in v2
             baudrate: 38400, // will be deprecated in v2

@@ -69,6 +69,13 @@ export const MARLIN = 'Marlin';
 export const SMOOTHIE = 'Smoothie';
 export const TINYG = 'TinyG';
 export const MASLOW = 'Maslow';
+export const CONTROLLERS = [
+    GRBL,
+    MARLIN,
+    SMOOTHIE,
+    TINYG,
+    MASLOW,
+];
 
 // Workflow State
 export const WORKFLOW_STATE_IDLE = 'idle';

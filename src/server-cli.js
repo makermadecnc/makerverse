@@ -37,16 +37,6 @@ const parseMountPoint = (val, acc) => {
     return acc;
 };
 
-const parseController = (val) => {
-    val = val ? (val + '').toLowerCase() : '';
-
-    if (['grbl', 'marlin'].includes(val)) {
-        return val;
-    } else {
-        return '';
-    }
-};
-
 const defaultHost = isElectron() ? '127.0.0.1' : '0.0.0.0';
 const defaultPort = isElectron() ? 0 : 8000;
 
@@ -61,8 +51,7 @@ program
     .option('-m, --mount <route-path>:<target>', 'Add a mount point for serving static files', parseMountPoint, [])
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')
     .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
-    .option('--allow-remote-access', 'Allow remote access to the server (default: false)')
-    .option('--controller <type>', 'Specify CNC controller: Grbl|Marlin (default: \'\')', parseController, '');
+    .option('--allow-remote-access', 'Allow remote access to the server (default: false)');
 
 // program.on('--help', () => {
 //     console.log('');

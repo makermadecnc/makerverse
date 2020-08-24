@@ -6,17 +6,26 @@ const calibrationDefaults = {
     motorYAccuracy: 5,
     sledRadius: 228.6,
     edgeDistance: 25.4,
+    origChainLength: 1790,
     measuredInches: false,
-    cutDepth: 0,
+    cutDepth: 3,
+    cutHoles: false,
 };
 
 /**
  * Implements "Edge Calibration" for Maslow, derivative of HoleyCalibration.
  */
 class MaslowCalibration {
+    opts = {};
+
     constructor(controller, opts) {
+        this.controller = controller;
         this.kin = new MaslowKinematics(controller);
-        this.opts = { ...calibrationDefaults, ...this.kin.opts };
+        this.update({ ...calibrationDefaults, ...(opts || {}) });
+    }
+
+    update(opts) {
+        this.opts = { ...this.opts, ...opts };
         this.recomputeIdeals();
     }
 
@@ -35,10 +44,10 @@ class MaslowCalibration {
         // console.log('ideals', this.idealCoordinates, this.idealChainLengths);
 
         const origSettings = {
-            leftChainTolerance: this.opts.leftChainTolerance,
-            rightChainTolerance: this.opts.leftChainTolerance,
-            distBetweenMotors: this.opts.distBetweenMotors,
-            motorOffsetY: this.opts.motorOffsetY,
+            leftChainTolerance: this.kin.opts.leftChainTolerance,
+            rightChainTolerance: this.kin.opts.rightChainTolerance,
+            distBetweenMotors: this.kin.opts.distBetweenMotors,
+            motorOffsetY: this.kin.opts.motorOffsetY,
         };
         const origErr = this.calculateError(measured, this.idealCoordinates);
         const orig = { ...origSettings, ...origErr };
@@ -161,9 +170,9 @@ class MaslowCalibration {
 
     calculateMeasurementCoordinates(ms) {
         const mm = this.opts.measuredInches ? 25.4 : 1;
-        const h = this.opts.machineHeight;
-        const w = this.opts.machineWidth;
-        const r = (this.opts.cutDepth ? 0 : this.opts.sledRadius);
+        const h = this.kin.opts.machineHeight;
+        const w = this.kin.opts.machineWidth;
+        const r = (this.opts.cutHoles ? 0 : this.opts.sledRadius);
         return [
             { x: (ms[8] * mm + r - w / 2), y: (h / 2 - ms[9] * mm - r) },
             { x: (0), y: (h / 2 - ms[0] * mm - r) },
@@ -176,7 +185,7 @@ class MaslowCalibration {
     }
 
     calculateIdealCoordinates() {
-        const inset = (this.opts.cutDepth ? 0 : this.opts.sledRadius) + this.opts.edgeDistance;
+        const inset = (this.opts.cutHoles ? 0 : this.opts.sledRadius) + this.opts.edgeDistance;
         const aH1x = -(this.kin.opts.machineWidth / 2.0 - inset);
         const aH1y = (this.kin.opts.machineHeight / 2.0 - inset);
         const aH2x = 0;
@@ -200,10 +209,17 @@ class MaslowCalibration {
         return ret;
     }
 
+    // Gcode to set the work position to the home position, aka, 0,0
+    get setWposToMposCmd() {
+        const mpos = this.controller.state.status.mpos;
+        return `G10 L20 P1 X${mpos.x} Y${mpos.y}`;
+    }
+
     generateGcodePoint(pointIndex, gcode = ['$X', 'G21', 'G90']) {
         const p = this.idealCoordinates[pointIndex];
+        gcode.push(this.setWposToMposCmd);
         gcode.push(`G0 X${p.x} Y${p.y}`);
-        if (this.opts.cutDepth) {
+        if (this.opts.cutHoles) {
             gcode.push(`G0 Z-${this.opts.cutDepth}`);
             gcode.push(`G0 Z${this.opts.safeTravel}`);
         }
