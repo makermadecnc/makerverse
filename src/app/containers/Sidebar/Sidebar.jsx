@@ -38,7 +38,7 @@ class Sidebar extends PureComponent {
                                 key={workspace.path}
                                 className={classNames(
                                     'text-center',
-                                    { [styles.active]: pathname.indexOf(workspace.path) === 0 }
+                                    { [styles.active]: pathname === workspace.path }
                                 )}
                             >
                                 <Link to={workspace.path} title={workspace.name}>

@@ -24,7 +24,6 @@ class Connection extends PureComponent {
         const port = controllerConfig.port;
         const baudrate = controllerConfig.baudRate;
         const canOpenPort = port && baudrate && !connecting && !connected;
-        const canClosePort = connected;
 
         return (
             <div>
@@ -85,19 +84,6 @@ class Connection extends PureComponent {
                             <i className="fa fa-toggle-off" />
                             <Space width="8" />
                             {i18n._('Open')}
-                        </button>
-                    )}
-                    {connected && (
-                        <button
-                            type="button"
-                            className="btn btn-danger"
-                            disabled={!canClosePort}
-                            onClick={actions.handleClosePort}
-                            title="Close connection with control board"
-                        >
-                            <i className="fa fa-toggle-on" />
-                            <Space width="8" />
-                            {i18n._('Close')}
                         </button>
                     )}
                 </div>

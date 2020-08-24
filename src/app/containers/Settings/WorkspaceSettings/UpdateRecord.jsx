@@ -44,7 +44,6 @@ class UpdateRecord extends Component {
     onSubmit = (values) => {
         const { id } = this.props.state.modal.params;
         const { updateRecord } = this.props.actions;
-        const forceReload = true;
 
         updateRecord(id, {
             name: _get(values, 'name', ''),
@@ -56,7 +55,7 @@ class UpdateRecord extends Component {
                 zmin: Number(_get(values, 'limits.zmin')) || 0,
                 zmax: Number(_get(values, 'limits.zmax')) || 0,
             }
-        }, forceReload);
+        });
     };
 
     renderLimits = () => (

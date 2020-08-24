@@ -20,8 +20,10 @@ import settings from 'app/config/settings';
 import Breadcrumbs from 'app/components/Breadcrumbs';
 import i18n from 'app/lib/i18n';
 import store from 'app/store';
+import log from 'app/lib/log';
+import Workspaces from 'app/lib/workspaces';
 import General from './General';
-import Workspaces from './Workspaces';
+import WorkspaceSettings from './WorkspaceSettings';
 import UserAccounts from './UserAccounts';
 import Controller from './Controller';
 import Commands from './Commands';
@@ -49,7 +51,7 @@ class Settings extends PureComponent {
             id: 'workspaces',
             path: 'workspaces',
             title: 'Workspaces',
-            component: (props) => <Workspaces {...props} />
+            component: (props) => <WorkspaceSettings {...props} />
         },
         {
             id: 'controller',
@@ -388,43 +390,19 @@ class Settings extends PureComponent {
                         });
                     });
             },
-            createRecord: (options) => {
-                const actions = this.actions.workspaces;
-
-                api.workspaces.create(options)
-                    .then((res) => {
-                        actions.closeModal();
-                        actions.fetchRecords();
-                    })
-                    .catch((res) => {
-                        const fallbackMsg = i18n._('An unexpected error has occurred.');
-                        const msg = {
-                            // TODO
-                        }[res.status] || fallbackMsg;
-
-                        actions.updateModalParams({ alertMessage: msg });
-                    });
-            },
             updateRecord: (id, options, forceReload = false) => {
                 const actions = this.actions.workspaces;
 
                 api.workspaces.update(id, options)
                     .then((res) => {
                         actions.closeModal();
-
-                        if (forceReload) {
-                            actions.fetchRecords();
-                            return;
-                        }
+                        Workspaces.load(res.body);
 
                         const records = [...this.state.workspaces.records];
                         const index = _findIndex(records, { id: id });
 
                         if (index >= 0) {
-                            records[index] = {
-                                ...records[index],
-                                ...options
-                            };
+                            records[index] = res.body;
 
                             this.setState({
                                 workspaces: {
@@ -433,68 +411,28 @@ class Settings extends PureComponent {
                                 }
                             });
                         }
+
+                        if (forceReload) {
+                            actions.fetchRecords();
+                        }
                     })
                     .catch((res) => {
+                        log.error(res);
                         const fallbackMsg = i18n._('An unexpected error has occurred.');
                         const msg = {
                             // TODO
                         }[res.status] || fallbackMsg;
 
                         actions.updateModalParams({ alertMessage: msg });
-                    })
-                    .then(() => {
-                        try {
-                            // Fetch machine profiles
-                            api.workspaces.fetch()
-                                .then(res => {
-                                    const { records: workspaces } = res.body;
-                                    return ensureArray(workspaces);
-                                })
-                                .then(workspaces => {
-                                    // Update matched machine profile
-                                    /*const currentMachineProfile = store.get('machineProfile');
-                                    const currentMachineProfileId = _get(currentMachineProfile, 'id');
-                                    const matchedMachineProfile = _find(machineProfiles, { id: currentMachineProfileId });
-
-                                    if (matchedMachineProfile) {
-                                        store.replace('workspaces', matchedMachineProfile);
-                                    }*/
-                                });
-                        } catch (err) {
-                            // Ignore
-                        }
                     });
             },
             deleteRecord: (id) => {
-                const actions = this.actions.workspaces;
-
                 api.workspaces.delete(id)
                     .then((res) => {
-                        actions.fetchRecords();
+                        window.location.reload();
                     })
                     .catch((res) => {
-                        // Ignore error
-                    })
-                    .then(() => {
-                        try {
-                            // Fetch workspace profiles
-                            api.workspaces.fetch()
-                                .then(res => {
-                                    const { records: workspaces } = res.body;
-                                    return ensureArray(workspaces);
-                                })
-                                .then(workspaces => {
-                                    // Remove matched machine profile
-                                    /*
-                                    const currentMachineProfile = store.get('machineProfile');
-                                    const currentMachineProfileId = _get(currentMachineProfile, 'id');
-                                    if (currentMachineProfileId === id) {
-                                        store.replace('machineProfile', { id: null });
-                                    }*/
-                                });
-                        } catch (err) {
-                            // Ignore
-                        }
+                        log.error(res);
                     });
             },
             openModal: (name = '', params = {}) => {
@@ -1038,7 +976,6 @@ class Settings extends PureComponent {
                         }
 
                         const usePre = prereleases && semver.lt(res.body.release.tag_name, res.body.prerelease.tag_name);
-                        console.log(prereleases, usePre, res.body.release.tag_name, res.body.prerelease.tag_name);
                         const release = usePre ? res.body.prerelease : res.body.release;
                         this.setState({
                             about: {

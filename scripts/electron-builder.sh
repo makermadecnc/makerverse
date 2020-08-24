@@ -10,7 +10,7 @@ display_usage() {
 if [ $# -le 1 ]; then
     display_usage
     exit 1
-fi 
+fi
 
 if [[ ( $# == "--help") ||  $# == "-h" ]]; then
     display_usage

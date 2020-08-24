@@ -26,8 +26,26 @@ class Workspaces {
     }
 
     static load(record) {
-        const workspace = new Workspaces(record);
-        Workspaces.all[workspace.id] = workspace;
+        const id = record.id;
+        if (_.has(Workspaces.all, id)) {
+            Workspaces.all[id]._record = {
+                ...Workspaces.all[id]._record,
+                ...record
+            };
+        } else {
+            Workspaces.all[id] = new Workspaces(record);
+        }
+        return Workspaces.all[id];
+    }
+
+    static unload(id) {
+        if (!_.has(Workspaces.all, id)) {
+            return;
+        }
+        const workspace = Workspaces.all[id];
+        workspace.removeControllerEvents(workspace._controllerEvents);
+        workspace.closePort();
+        delete Workspaces.all[id];
     }
 
     static connect() {
@@ -53,11 +71,12 @@ class Workspaces {
     // record comes from an API response, loaded from .cncrc
     constructor(record) {
         this._record = record;
+        this.addControllerEvents(this._controllerEvents);
     }
 
     // Convenience method which uses the slug (path without prefix slash)
     get id() {
-        return this.path.substr(1);
+        return this._record.id;
     }
 
     get path() {
@@ -100,16 +119,12 @@ class Workspaces {
     }
 
     onActivated() {
-        this.addControllerEvents(this._controllerEvents);
         if (this.controllerAttributes.reconnect) {
             this.openPort();
         }
     }
 
-    onDeactivated() {
-        this.removeControllerEvents(this._controllerEvents);
-        this.closePort();
-    }
+    onDeactivated() { }
 
     // Sidebar icon.
     get icon() {
@@ -189,6 +204,12 @@ class Workspaces {
     }
 
     openPort(callback) {
+        if (this._connected) {
+            if (callback) {
+                callback(null);
+            }
+            return;
+        }
         const atts = this.controllerAttributes;
         this.controller.openPort(atts.port, {
             controllerType: atts.type,
@@ -198,7 +219,7 @@ class Workspaces {
             if (err) {
                 this._connecting = false;
                 this._connected = false;
-                log.err(err);
+                log.error(err);
             }
             if (callback) {
                 callback(err);
@@ -208,13 +229,10 @@ class Workspaces {
 
     closePort(callback) {
         this._connecting = false;
-        if (!this.isConnected) {
-            return;
-        }
         this._connected = false;
         this.controller.closePort(this.controllerAttributes.port, (err) => {
             if (err) {
-                log.err(err);
+                log.error(err);
             }
             if (callback) {
                 callback(err);

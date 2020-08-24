@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Select from 'react-select';
 import Space from 'app/components/Space';
-import { ToastNotification } from 'app/components/Notifications';
 import i18n from 'app/lib/i18n';
 
 class Connection extends PureComponent {
@@ -75,12 +74,8 @@ class Connection extends PureComponent {
     };
 
     renderBaudrateValue = (option) => {
-        const { state } = this.props;
-        const notLoading = !(state.loading);
-        const notInUse = !(this.isPortInUse(state.port));
-        const canChangeBaudrate = notLoading && notInUse;
         const style = {
-            color: canChangeBaudrate ? '#333' : '#ccc',
+            color: '#333',
             textOverflow: 'ellipsis',
             overflow: 'hidden'
         };
@@ -97,8 +92,7 @@ class Connection extends PureComponent {
             ports, baudrates,
             port, baudrate,
             autoReconnect,
-            connection,
-            alertMessage
+            connection
         } = state;
         const enableHardwareFlowControl = get(connection, 'serial.rtscts', false);
         const notLoading = !loading;
@@ -107,22 +101,11 @@ class Connection extends PureComponent {
         const canRefresh = notLoading && notConnected;
         const canChangeController = notLoading && notConnected;
         const canChangePort = notLoading && notConnected;
-        const canChangeBaudrate = notLoading && notConnected && (!(this.isPortInUse(port)));
         const canToggleHardwareFlowControl = notConnected;
         const canOpenPort = port && baudrate && notConnecting && notConnected;
-        const canClosePort = connected;
 
         return (
             <div>
-                {alertMessage && (
-                    <ToastNotification
-                        style={{ margin: '-10px -10px 10px -10px' }}
-                        type="error"
-                        onDismiss={actions.clearAlert}
-                    >
-                        {alertMessage}
-                    </ToastNotification>
-                )}
                 <div className="form-group">
                     <div className="input-group input-group-sm">
                         <div className="input-group-btn">
@@ -197,7 +180,6 @@ class Connection extends PureComponent {
                         backspaceRemoves={false}
                         className="sm"
                         clearable={false}
-                        disabled={!canChangeBaudrate}
                         menuContainerStyle={{ zIndex: 5 }}
                         name="baudrate"
                         onChange={actions.onChangeBaudrateOption}
@@ -240,6 +222,7 @@ class Connection extends PureComponent {
                     {notConnected && (
                         <button
                             type="button"
+                            style={{ float: 'right' }}
                             className="btn btn-primary"
                             disabled={!canOpenPort}
                             onClick={actions.handleOpenPort}
@@ -247,20 +230,7 @@ class Connection extends PureComponent {
                         >
                             <i className="fa fa-toggle-off" />
                             <Space width="8" />
-                            {i18n._('Open')}
-                        </button>
-                    )}
-                    {connected && (
-                        <button
-                            type="button"
-                            className="btn btn-danger"
-                            disabled={!canClosePort}
-                            onClick={actions.handleClosePort}
-                            title="Close connection with control board"
-                        >
-                            <i className="fa fa-toggle-on" />
-                            <Space width="8" />
-                            {i18n._('Close')}
+                            {i18n._('Connect')}
                         </button>
                     )}
                 </div>

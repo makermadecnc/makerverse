@@ -53,9 +53,11 @@ const getSanitizedRecords = () => {
 };
 
 const ensureWorkspace = (payload) => {
-    const { id, path, name, controller, limits } = { ...payload };
+    const { name, controller, limits } = { ...payload };
     const { port, baudRate, reconnect, controllerType, rtscts } = { ...controller };
     const { xmin = 0, xmax = 0, ymin = 0, ymax = 0, zmin = 0, zmax = 0 } = { ...limits };
+    const id = payload.id || slugify(name);
+    const path = payload.path || `/${id}`;
 
     return {
         id,
@@ -107,19 +109,27 @@ export const fetch = (req, res) => {
 export const create = (req, res) => {
     const record = { ...req.body };
 
-    if (!record.name) {
+    if (!record.name || record.name.length <= 0) {
         res.status(ERR_BAD_REQUEST).send({
             msg: 'The "name" parameter must not be empty'
         });
         return;
     }
+    const records = getSanitizedRecords();
+    const ws = ensureWorkspace(record);
+    const existing = _.find(records, { id: ws.id });
+    if (existing) {
+        res.status(ERR_BAD_REQUEST).send({
+            msg: `The workspace already exists: ${ws.id}`
+        });
+        return;
+    }
 
     try {
-        const records = getSanitizedRecords();
-        records.push(ensureWorkspace(record));
+        records.push(ws);
         config.set(CONFIG_KEY, records);
 
-        res.send({ id: record.id });
+        res.send(ws);
     } catch (err) {
         res.status(ERR_INTERNAL_SERVER_ERROR).send({
             msg: 'Failed to save ' + JSON.stringify(settings.rcfile)
@@ -159,6 +169,9 @@ export const update = (req, res) => {
 
         [ // [key, ensureType]
             ['name', ensureString],
+            ['controller.controllerType', ensureString],
+            ['controller.port', ensureString],
+            ['controller.baudRate', ensureNumber],
             ['limits.xmin', ensureNumber],
             ['limits.xmax', ensureNumber],
             ['limits.ymin', ensureNumber],
@@ -175,7 +188,7 @@ export const update = (req, res) => {
 
         config.set(CONFIG_KEY, records);
 
-        res.send({ id: record.id });
+        res.send(record);
     } catch (err) {
         res.status(ERR_INTERNAL_SERVER_ERROR).send({
             msg: 'Failed to save ' + JSON.stringify(settings.rcfile)

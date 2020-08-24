@@ -5,6 +5,7 @@ import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import i18n from 'app/lib/i18n';
+import log from 'app/lib/log';
 import Workspaces from 'app/lib/workspaces';
 import WidgetConfig from '../WidgetConfig';
 import Connection from './Connection';
@@ -116,7 +117,7 @@ class ConnectionWidget extends PureComponent {
 
     getInitialState() {
         if (!includes(this.workspace.controller.loadedControllers, this.workspace.controllerAttributes.type)) {
-            console.log('controller type not loaded', this.workspace.controllerAttributes.type);
+            log.error('controller type not loaded', this.workspace.controllerAttributes.type);
         }
 
         return {

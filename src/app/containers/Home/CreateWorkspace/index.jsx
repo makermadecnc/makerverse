@@ -1,18 +1,18 @@
+import _ from 'lodash';
 import classNames from 'classnames';
-import reverse from 'lodash/reverse';
-import sortBy from 'lodash/sortBy';
-import uniq from 'lodash/uniq';
 import Controller from 'cncjs-controller';
 import io from 'socket.io-client';
-import includes from 'lodash/includes';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
+import { ToastNotification } from 'app/components/Notifications';
+import api from 'app/api';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import auth from 'app/lib/auth';
+import Workspaces from 'app/lib/workspaces';
 import {
-    MASLOW
+    MASLOW,
 } from 'app/constants';
 import Connection from './Connection';
 import styles from './index.styl';
@@ -95,17 +95,56 @@ class CreateWorkspace extends PureComponent {
         handleClosePort: (event) => {
             const { port } = this.state;
             this.closePort(port);
+        },
+        handleCreateWorkspace: (event) => {
+            this.setState({ creating: true });
+            const { name, port, baudrate, controllerType, connection, autoReconnect } = this.state;
+            api.workspaces.create({
+                name: name,
+                controller: {
+                    controllerType,
+                    port,
+                    baudRate: baudrate,
+                    rtscts: connection.serial.rtscts,
+                    reconnect: autoReconnect,
+                }
+            })
+                .then((res) => {
+                    const record = res.body;
+                    Workspaces.load(record);
+                    window.location = '/#' + Workspaces.all[record.id].path;
+                    window.location.reload();
+                })
+                .catch((res) => {
+                    this.setState({
+                        alertMessage: res.body.msg || i18n._('An unexpected error has occurred.'),
+                        creating: false
+                    });
+                });
         }
     };
+
+    setPortList(ports) {
+        const usedPorts = Object.keys(Workspaces.all).map((k) => {
+            return Workspaces.all[k].controllerAttributes.port;
+        });
+        const portList = [];
+        ports.forEach((p) => {
+            if (!usedPorts.includes(p.port)) {
+                portList.push(p);
+            }
+        });
+        this.setState({
+            ports: portList
+        });
+    }
 
     controllerEvents = {
         'serialport:list': (ports) => {
             log.debug('Received a list of serial ports:', ports);
 
             this.stopLoading();
-            this.setState(state => ({
-                ports: ports
-            }));
+            this.setPortList(ports);
         },
         'serialport:change': (options) => {
             const { port, inuse } = options;
@@ -116,12 +155,10 @@ class CreateWorkspace extends PureComponent {
                 return { ...o, inuse };
             });
 
-            this.setState(state => ({
-                ports: ports
-            }));
+            this.setPortList(ports);
         },
         'serialport:open': (options) => {
-            /*const { controllerType, port, baudrate, inuse } = options;
+            const { controllerType, port, baudrate, inuse } = options;
             const ports = this.state.ports.map((o) => {
                 if (o.port !== port) {
                     return o;
@@ -133,13 +170,13 @@ class CreateWorkspace extends PureComponent {
                 alertMessage: '',
                 connecting: false,
                 connected: true,
-                controllerType: controllerType, // Grbl|Marlin
+                version: null,
+                controllerType: controllerType,
                 port: port,
                 baudrate: baudrate,
                 ports: ports
-            }));*/
-            const { port } = options;
-            log.debug(`Established a connection to the serial port "${port}"`);
+            }));
+            log.debug(`Established a connection to ${controllerType} on the serial port "${port}"`);
         },
         'serialport:close': (options) => {
             const { port } = options;
@@ -164,6 +201,19 @@ class CreateWorkspace extends PureComponent {
             }));
 
             log.error(`Error opening serial port "${port}"`);
+        },
+        'controller:settings': (type, controllerSettings) => {
+            if (type === MASLOW) {
+                if (controllerSettings.firmware && controllerSettings.firmware.name.length > 0) {
+                    this.setState({ version: `${controllerSettings.firmware.name} v${controllerSettings.firmware.version}` });
+                }
+            } else if (_.has(controllerSettings, 'version')) {
+                if (controllerSettings.version && controllerSettings.version.length > 0) {
+                    this.setState({ version: `${type} v${controllerSettings.version}` });
+                }
+            } else {
+                this.setState({ version: `${type} device` });
+            }
         }
     };
 
@@ -181,11 +231,6 @@ class CreateWorkspace extends PureComponent {
     }
 
     getInitialState() {
-        let controllerType = MASLOW;
-        if (!includes(this.controller.loadedControllers, controllerType)) {
-            controllerType = this.controller.loadedControllers[0];
-        }
-
         // Common baud rates
         const defaultBaudrates = [
             250000,
@@ -198,14 +243,17 @@ class CreateWorkspace extends PureComponent {
         ];
 
         return {
+            name: null,
             minimized: false,
             isFullscreen: false,
             loading: false,
             connecting: false,
             connected: false,
+            creating: false,
+            version: null,
             ports: [],
-            baudrates: reverse(sortBy(uniq(this.controller.baudrates.concat(defaultBaudrates)))),
-            controllerType: controllerType,
+            baudrates: _.reverse(_.sortBy(_.uniq(this.controller.baudrates.concat(defaultBaudrates)))),
+            controllerType: MASLOW,
             port: this.controller.port,
             baudrate: 0,
             connection: {
@@ -303,20 +351,21 @@ class CreateWorkspace extends PureComponent {
     }
 
     render() {
-        const { minimized, isFullscreen } = this.state;
+        const { minimized, isFullscreen, connected, version, name, alertMessage } = this.state;
         const state = {
             ...this.state
         };
         const actions = {
             ...this.actions
         };
+        const wrn = version ? '' : 'Querying hardware. If this message persists, the controllerType or baudRate may be wrong.';
 
         if (this._mounting) {
             return <div>Connecting...</div>;
         }
 
         return (
-            <Widget fullscreen={isFullscreen}>
+            <Widget fullscreen={isFullscreen} className={styles.widgetSmall}>
                 <Widget.Header>
                     <Widget.Title>
                         {i18n._('New Workspace')}
@@ -336,28 +385,6 @@ class CreateWorkspace extends PureComponent {
                                 )}
                             />
                         </Widget.Button>
-                        <Widget.DropdownButton
-                            title={i18n._('More')}
-                            toggle={<i className="fa fa-ellipsis-v" />}
-                            onSelect={(eventKey) => {
-                                if (eventKey === 'fullscreen') {
-                                    actions.toggleFullscreen();
-                                }
-                            }}
-                        >
-                            <Widget.DropdownMenuItem eventKey="fullscreen">
-                                <i
-                                    className={classNames(
-                                        'fa',
-                                        'fa-fw',
-                                        { 'fa-expand': !isFullscreen },
-                                        { 'fa-compress': isFullscreen }
-                                    )}
-                                />
-                                <Space width="4" />
-                                {!isFullscreen ? i18n._('Enter Full Screen') : i18n._('Exit Full Screen')}
-                            </Widget.DropdownMenuItem>
-                        </Widget.DropdownButton>
                     </Widget.Controls>
                 </Widget.Header>
                 <Widget.Content
@@ -366,7 +393,65 @@ class CreateWorkspace extends PureComponent {
                         { [styles.hidden]: minimized }
                     )}
                 >
-                    <Connection controller={this.controller} state={state} actions={actions} />
+                    {alertMessage && (
+                        <ToastNotification
+                            style={{ margin: '-10px -10px 10px -10px' }}
+                            type="error"
+                            onDismiss={actions.clearAlert}
+                        >
+                            {alertMessage}
+                        </ToastNotification>
+                    )}
+                    {!connected && (
+                        <Connection controller={this.controller} state={state} actions={actions} />
+                    )}
+                    {connected && (
+                        <div>
+                            <div>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    style={{ width: '100%' }}
+                                    placeholder="Workspace Name"
+                                    value={name || ''}
+                                    onChange={e => {
+                                        this.setState({ name: e.target.value });
+                                    }}
+                                />
+                                {wrn}
+                            </div>
+                            <hr />
+                            <div>
+                                <div
+                                    style={{ float: 'right' }}
+                                >
+                                    <span style={{ paddingRight: '10px', position: 'relative', top: '5px' }}>
+                                        {version || ''}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        style={{ float: 'right' }}
+                                        className="btn btn-primary"
+                                        disabled={!version || !name}
+                                        onClick={actions.handleCreateWorkspace}
+                                        title="Create the workspace"
+                                    >
+                                        {i18n._('Create Workspace')}
+                                    </button>
+                                </div>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    onClick={actions.handleClosePort}
+                                    title="Close connection with control board"
+                                >
+                                    <i className="fa fa-toggle-on" />
+                                    <Space width="8" />
+                                    {i18n._('Cancel')}
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </Widget.Content>
             </Widget>
         );
