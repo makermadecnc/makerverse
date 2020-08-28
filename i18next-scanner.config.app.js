@@ -32,6 +32,7 @@ module.exports = {
         },
         lngs: languages,
         ns: [
+            'controller',
             'gcode',
             'resource' // default
         ],

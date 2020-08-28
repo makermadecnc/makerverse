@@ -31,6 +31,7 @@ const log = logger('init');
 const rcDefault = {
     state: {
         checkForUpdates: true,
+        prereleases: false,
         controller: {
             exception: {
                 ignoreErrors: false

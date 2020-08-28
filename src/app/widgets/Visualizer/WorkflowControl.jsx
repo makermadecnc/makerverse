@@ -7,6 +7,7 @@ import React, { PureComponent } from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 import Space from 'app/components/Space';
 import i18n from 'app/lib/i18n';
+import Workspaces from 'app/lib/workspaces';
 import log from 'app/lib/log';
 import {
     // Grbl
@@ -23,12 +24,18 @@ import {
     MODAL_WATCH_DIRECTORY
 } from './constants';
 import styles from './workflow-control.styl';
+import AlertErrorToast from './AlertErrorToast';
 
 class WorkflowControl extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         state: PropTypes.object,
         actions: PropTypes.object
     };
+
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
 
     fileInputEl = null;
 
@@ -227,6 +234,9 @@ class WorkflowControl extends PureComponent {
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>
+                <AlertErrorToast
+                    workspaceId={this.workspace.id}
+                />
             </div>
         );
     }

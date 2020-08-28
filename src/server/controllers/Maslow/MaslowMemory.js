@@ -34,9 +34,10 @@ const stateDefaults = {
             y: '0.000',
             z: '0.000'
         },
-        err: {},
         buffer: {},
-        alarm: null,
+        feedback: {}, // MSG, positional errors, buffer space.
+        alarm: null, // Alarm object (from constants)
+        error: null, // Error object (from constants)
         ov: []
     },
     parserstate: {
@@ -187,7 +188,7 @@ class MaslowMemory {
         // @see https://github.com/cncjs/cncjs/issues/115
         // @see https://github.com/cncjs/cncjs/issues/133
         const rx = Number(_.get(payload, 'buf.rx', 0)) ||
-                    Number(_.get(payload, 'err.bufferSpaceAvailable', 127)) ||
+                    Number(_.get(payload, 'feedback.bufferSpaceAvailable', 127)) ||
                     0;
         if (rx > 0) {
             this.controller.adjustBufferSize(rx);
@@ -209,18 +210,20 @@ class MaslowMemory {
         this.log.debug(`MaslowMemory translating Grbl setting: ${name}=${value}`);
         if (!this.controller.hardware.isMaslowClassic()) {
             if ((name === '$13') && (value >= 0) && (value <= 65535)) {
-                this.controller.hardware.setGrbl(name, value ? '1' : '0');
+                this.controller.hardware.setGrblValue(name, value ? '1' : '0');
+                return line;
             }
         }
+        this.controller.hardware.setGrblValue(name, value);
         return line;
     }
 
     // Generic Gcode command
     handleCommand(cmd) {
         this.log.silly(`MaslowMemory translating command: ${cmd}`);
-        if (cmd === '$X') {
-            // Clear alarm text
-            this.updateStatus({ activeState: MASLOW_ACTIVE_STATE_IDLE, alarm: null });
+        if (cmd === '$X' || cmd === '\x18') {
+            // Unlock/Reset: clear alarm & error text
+            this.updateStatus({ activeState: MASLOW_ACTIVE_STATE_IDLE, error: null, alarm: null });
         }
         if (!this.controller.hardware.isMaslowClassic()) {
             // Only the Maslow Classic needs in-memory storage.
@@ -279,7 +282,6 @@ class MaslowMemory {
         } else if (!MaslowClassicGCode.includes(c) && c[0] !== 'T') {
             this.log.error(`MaslowClassic does not support: ${cmd}`);
         }
-        /*if (cmd === '$X') { }*/
         return cmds.join('\n');
     }
 

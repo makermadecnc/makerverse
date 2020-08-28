@@ -4,6 +4,7 @@ import Limits from 'app/lib/limits';
 import series from 'app/lib/promise-series';
 import auth from 'app/lib/auth';
 import promisify from 'app/lib/promisify';
+import api from 'app/api';
 import io from 'socket.io-client';
 import Controller from 'cncjs-controller';
 import store from '../store';
@@ -97,6 +98,19 @@ class Workspaces {
         };
     }
 
+    get hasOnboarded() {
+        return !!this._record.onboarded;
+    }
+
+    set hasOnboarded(val) {
+        if (this.hasOnboarded === !!val) {
+            return;
+        }
+        this.updateRecord({
+            onboarded: !!val
+        });
+    }
+
     // Flag set by main App.jsx to indicate if this is the active workspace.
     get isActive() {
         return this._isActive || false;
@@ -142,13 +156,20 @@ class Workspaces {
         return `images/icons/${icon}.svg`;
     }
 
+    updateRecord(values) {
+        this._record = { ...this._record, values };
+        api.workspaces.update(this.id, values);
+    }
+
     // ---------------------------------------------------------------------------------------------
     // Workspaces own controllers, which each represent a single connection to the hardware.
     // WIP: controller is still a global, but it gets (dis/re)connected when switching workspaces.
     // ---------------------------------------------------------------------------------------------
 
     _controller = new Controller(io);
+
     _connecting = false;
+
     _connected = false;
 
     _controllerEvents = {
@@ -188,6 +209,12 @@ class Workspaces {
             log.error(`Error opening serial port "${port}"`);
             this._connecting = false;
             this._connected = false;
+        },
+        'controller:state': (type, state) => {
+            log.debug(type, 'state changed', state);
+        },
+        'controller:settings': (type, settings) => {
+            log.debug(type, 'settings changed', settings);
         }
     };
 

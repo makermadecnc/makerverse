@@ -1,27 +1,23 @@
 import _ from 'lodash';
 
-// https://github.com/grbl/grbl/wiki/Interfacing-with-Maslow#alarms
+// https://github.com/grbl/grbl/wiki/Interfacing-with-Gribl#alarms
 class MaslowLineParserResultAlarm {
     static parse(line) {
-        const payload = this.parseErrorStrings(line) ?? this.parseGenericAlarm(line);
-        if (!payload) {
+        let alarmMsg = this.parseGenericAlarm(line);
+        if (!alarmMsg) {
             return null;
+        }
+
+        if (alarmMsg.startsWith('The sled is not keeping up')) {
+            alarmMsg = '3'; // Translate into "Abort during cycle"
         }
 
         return {
             type: MaslowLineParserResultAlarm,
-            payload: payload
-        };
-    }
-
-    static parseErrorStrings(line) {
-        const errs = ['Buffer Overflow!'];
-        for (var i = 0; i < errs.length; i++) {
-            if (errs[i] === line) {
-                return line;
+            payload: {
+                message: alarmMsg,
             }
-        }
-        return null;
+        };
     }
 
     static parseGenericAlarm(line) {

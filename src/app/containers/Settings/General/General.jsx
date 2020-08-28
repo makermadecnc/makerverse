@@ -16,13 +16,18 @@ class General extends PureComponent {
     };
 
     fields = {
-        checkForUpdates: null
+        checkForUpdates: null,
+        prereleases: null,
     };
 
     handlers = {
         changeCheckForUpdates: (event) => {
             const { actions } = this.props;
             actions.toggleCheckForUpdates();
+        },
+        changePrereleases: (event) => {
+            const { actions } = this.props;
+            actions.togglePrereleases();
         },
         changeLanguage: (event) => {
             const { actions } = this.props;
@@ -73,6 +78,19 @@ class General extends PureComponent {
                                     onChange={this.handlers.changeCheckForUpdates}
                                 />
                                 {i18n._('Automatically check for updates')}
+                            </label>
+                        </div>
+                        <div className="checkbox">
+                            <label>
+                                <input
+                                    ref={(node) => {
+                                        this.fields.prereleases = node;
+                                    }}
+                                    type="checkbox"
+                                    checked={state.prereleases}
+                                    onChange={this.handlers.changePrereleases}
+                                />
+                                {i18n._('Prereleases (beta channel)')}
                             </label>
                         </div>
                     </div>

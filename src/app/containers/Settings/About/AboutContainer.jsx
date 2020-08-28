@@ -10,10 +10,15 @@ const AboutContainer = ({ version }) => {
 
     return (
         <div className={styles.aboutContainer}>
-            <img src="images/logo-badge-32x32.png" alt="" className={styles.productLogo} style={{ maxWidth: '32px' }} />
+            <img
+                src="images/logo-badge-32x32.png"
+                alt=""
+                className={styles.productLogo}
+                style={{ maxWidth: '32px' }}
+            />
             <div className={styles.productDetails}>
                 <div className={styles.aboutProductName}>
-                    {`${settings.productName} ${version.current}`}
+                    {`${settings.productName} ${version.currentVersion}`}
                 </div>
                 <div className={styles.aboutProductDescription}>
                     {i18n._('A web-based interface for CNC milling controller running Grbl')}

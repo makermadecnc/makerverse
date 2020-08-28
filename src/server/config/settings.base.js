@@ -108,6 +108,7 @@ export default {
 
         // string or array of namespaces
         ns: [
+            'controller',
             'config',
             'resource' // default
         ],

@@ -60,13 +60,19 @@ class MaslowHardware {
         return setting ? setting.value : null;
     }
 
+    setGrblValue(code, value) {
+        this.grbl[code] = {
+            ...(this.grbl[code] || { name: code }),
+            value: value
+        };
+        return this.grbl[code];
+    }
+
     // During startup, Grbl outputs its variable + values + comments.
     // If the comment is present, it will be used to populate message/description/units.
     // Otherwise, this will fall back on GRBL_SETTINGS for this metadata.
     setGrbl(code, value, message) {
-        const map = this.grbl[code] || {};
-        map.name = code;
-        map.value = value;
+        const map = this.setGrblValue(code, value);
         if (!message) {
             const setting = _.find(GRBL_SETTINGS, { setting: code });
             if (setting) {
@@ -81,8 +87,7 @@ class MaslowHardware {
             }
             map.message = parts.join(', ');
         }
-        this.grbl[code] = map;
-        return this.grbl[code];
+        return map;
     }
 }
 

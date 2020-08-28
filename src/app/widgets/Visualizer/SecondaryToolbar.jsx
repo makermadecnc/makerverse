@@ -265,7 +265,7 @@ class SecondaryToolbar extends PureComponent {
                     </Col>
                     <Col width="auto">
                         {showLimits && (
-                            <div className={styles.limits} >
+                            <div className={styles.limits}>
                                 <span>
                                     [min] x: {limits.xmin}, y: {limits.ymin}, z: {limits.zmin}
                                 </span>

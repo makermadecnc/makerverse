@@ -44,7 +44,11 @@ class Grbl extends PureComponent {
         const spindle = _.get(controllerState, 'status.spindle', _.get(parserState, 'spindle', none));
         const tool = _.get(parserState, 'tool', none);
         const ov = _.get(controllerState, 'status.ov', []);
-        const [ovF = 0, ovR = 0, ovS = 0] = ov;
+        const [
+            ovF = 0,
+            ovR = 0,
+            ovS = 0,
+        ] = ov;
         const buf = _.get(controllerState, 'status.buf', {});
         const modal = _.mapValues(parserState.modal || {}, mapGCodeToText);
         const receiveBufferStyle = ((rx) => {
@@ -66,7 +70,12 @@ class Grbl extends PureComponent {
 
         return (
             <div>
-                <Overrides controller={this.workspace.controller} ovF={ovF} ovS={ovS} ovR={ovR} />
+                <Overrides
+                    controller={this.workspace.controller}
+                    ovF={ovF}
+                    ovS={ovS}
+                    ovR={ovR}
+                />
                 {!_.isEmpty(buf) && (
                     <Panel className={styles.panel}>
                         <Panel.Heading className={styles['panel-heading']}>

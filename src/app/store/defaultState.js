@@ -9,9 +9,6 @@ const defaultState = {
         name: '',
         token: ''
     },
-    updater: {
-        prereleases: false,
-    },
     widgets: {
         axes: {
             minimized: false,

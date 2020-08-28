@@ -171,10 +171,11 @@ class MaslowPanels extends PureComponent {
                             {Object.keys(controllerSettings.grbl).map((key) => {
                                 const val = controllerSettings.grbl[key];
                                 const name = (val.message && val.message.length > 0) ? val.message : val.name;
+                                const title = `${val.name}: ${val.message}`;
                                 return (
                                     <div key={key} className="row no-gutters">
                                         <div className="col col-xs-8">
-                                            <div className={styles.textEllipsis} title={val.message}>
+                                            <div className={styles.textEllipsis} title={title}>
                                                 {name}
                                             </div>
                                         </div>

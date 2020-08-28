@@ -1,6 +1,8 @@
 import ensureArray from 'ensure-array';
 import superagent from 'superagent';
+import semver from 'semver';
 import superagentUse from 'superagent-use';
+import settings from 'app/config/settings';
 import store from '../store';
 
 const bearer = (request) => {
@@ -48,14 +50,25 @@ const signin = (options) => new Promise((resolve, reject) => {
 //
 // Latest Version
 //
-const getLatestVersion = () => new Promise((resolve, reject) => {
+const getLatestVersion = (prereleases) => new Promise((resolve, reject) => {
     authrequest
         .get('/api/version/latest')
         .end((err, res) => {
             if (err) {
                 reject(res);
             } else {
-                resolve(res);
+                const usePre = prereleases && semver.lt(res.body.release.tag_name, res.body.prerelease.tag_name);
+                const latestRelease = usePre ? res.body.prerelease : res.body.release;
+                const latestVersion = latestRelease.tag_name;
+                const isNewer = semver.lt(settings.version, latestVersion);
+                resolve({
+                    currentVersion: settings.version,
+                    latestVersion: latestVersion,
+                    lastUpdate: latestRelease.published_at,
+                    updateAvailable: isNewer,
+                    updateUrl: latestRelease.html_url,
+                    release: latestRelease,
+                });
             }
         });
 });

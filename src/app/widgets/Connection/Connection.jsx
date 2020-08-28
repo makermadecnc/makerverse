@@ -86,6 +86,18 @@ class Connection extends PureComponent {
                             {i18n._('Open')}
                         </button>
                     )}
+                    {connected && (
+                        <button
+                            type="button"
+                            className="btn btn-danger"
+                            onClick={actions.handleClosePort}
+                            title="Close connection to control board"
+                        >
+                            <i className="fa fa-toggle-on" />
+                            <Space width="8" />
+                            {i18n._('Close')}
+                        </button>
+                    )}
                 </div>
             </div>
         );

@@ -53,7 +53,7 @@ const getSanitizedRecords = () => {
 };
 
 const ensureWorkspace = (payload) => {
-    const { name, controller, limits } = { ...payload };
+    const { name, onboarded, controller, limits } = { ...payload };
     const { port, baudRate, reconnect, controllerType, rtscts } = { ...controller };
     const { xmin = 0, xmax = 0, ymin = 0, ymax = 0, zmin = 0, zmax = 0 } = { ...limits };
     const id = payload.id || slugify(name);
@@ -63,6 +63,7 @@ const ensureWorkspace = (payload) => {
         id,
         path,
         name: ensureString(name),
+        onboarded: ensureBoolean(onboarded),
         controller: {
             controllerType: ensureString(controllerType),
             port: ensureString(port),
@@ -169,6 +170,7 @@ export const update = (req, res) => {
 
         [ // [key, ensureType]
             ['name', ensureString],
+            ['onboarded', ensureBoolean],
             ['controller.controllerType', ensureString],
             ['controller.port', ensureString],
             ['controller.baudRate', ensureNumber],

@@ -1,19 +1,39 @@
 // https://github.com/grbl/grbl/wiki/Interfacing-with-Grbl#grbl-response-meanings
 class MaslowLineParserResultError {
     static parse(line) {
-        const r = line.match(/^error:\s*(.+)$/);
-        if (!r) {
+        const errCode = this.parseErrorStrings(line) || this.parseGenericError(line);
+        if (!errCode) {
             return null;
         }
 
         const payload = {
-            message: r[1]
+            message: errCode
         };
 
         return {
             type: MaslowLineParserResultError,
             payload: payload
         };
+    }
+
+    static parseGenericError(line) {
+        const r = line.match(/^error:\s*(.+)$/);
+        return r ? r[1] : null;
+    }
+
+    static parseErrorStrings(line) {
+        const errs = {
+            'Buffer Overflow!': 11, // Maslow Classic: STATUS_OVERFLOW
+        };
+        const errStrs = Object.keys(errs);
+        for (let i = 0; i < errStrs.length; i++) {
+            const str = errStrs[i];
+            if (str === line) {
+                // Return the error code.
+                return errs[str];
+            }
+        }
+        return null;
     }
 }
 

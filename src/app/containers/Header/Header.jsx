@@ -1,35 +1,23 @@
 import classNames from 'classnames';
+import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { Nav, Navbar, NavDropdown, MenuItem } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
-// import semver from 'semver';
 import without from 'lodash/without';
 import Push from 'push.js';
 import api from 'app/api';
+import { Tooltip } from 'app/components/Tooltip';
 import Anchor from 'app/components/Anchor';
 import Space from 'app/components/Space';
-import settings from 'app/config/settings';
 import combokeys from 'app/lib/combokeys';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import * as user from 'app/lib/user';
 import store from 'app/store';
 import Workspaces from 'app/lib/workspaces';
+import settings from 'app/config/settings';
 import QuickAccessToolbar from './QuickAccessToolbar';
 import styles from './index.styl';
-
-// const releases = 'https://makerverse.com';
-
-// const newUpdateAvailableTooltip = () => {
-//     return (
-//         <Tooltip
-//             id="navbarBrandTooltip"
-//             style={{ color: '#fff' }}
-//         >
-//             <div>{i18n._('New update available')}</div>
-//         </Tooltip>
-//     );
-// };
 
 class Header extends PureComponent {
     static propTypes = {
@@ -59,16 +47,11 @@ class Header extends PureComponent {
         checkForUpdates: async () => {
             try {
                 const res = await api.getState();
-                const { checkForUpdates } = res.body;
+                const { checkForUpdates, prereleases } = res.body;
 
                 if (checkForUpdates) {
-                    const res = await api.getLatestVersion();
-                    const { time, version } = res.body;
-
-                    this._isMounted && this.setState({
-                        latestVersion: version,
-                        latestTime: time
-                    });
+                    const versionInfo = await api.getLatestVersion(prereleases);
+                    this._isMounted && this.setState(versionInfo);
                 }
             } catch (res) {
                 // Ignore error
@@ -198,7 +181,10 @@ class Header extends PureComponent {
             pushPermission: pushPermission,
             commands: [],
             runningTasks: [],
-            latestVersion: settings.version
+            latestVersion: '',
+            lastUpdate: '',
+            updateAvailable: false,
+            updateUrl: null,
         };
     }
 
@@ -255,12 +241,15 @@ class Header extends PureComponent {
 
     render() {
         const { history, location } = this.props;
-        const { pushPermission, commands, runningTasks } = this.state;
+        const { pushPermission, commands, runningTasks, updateAvailable, updateUrl, latestVersion, lastUpdate } = this.state;
         const sessionEnabled = store.get('session.enabled');
         const signedInName = store.get('session.name');
         const hideUserDropdown = !sessionEnabled;
         const showCommands = commands.length > 0;
         const workspace = Workspaces.findByPath(location.pathname);
+        const updateMsg = i18n._('A new version of {{name}} is available', { name: settings.productName }) + '. ' +
+            i18n._('Version {{version}}', { version: latestVersion }) +
+            ` (${moment(lastUpdate).format('LLL')})`;
 
         return (
             <Navbar
@@ -280,6 +269,20 @@ class Header extends PureComponent {
                         alt=""
                     />
                     <h1 style={{ color: '#222', marginLeft: '15px', marginTop: 0, marginBottom: 0, fontSize: '30px', fontWeight: '600' }}>Makerverse</h1>
+                    {updateAvailable && (
+                        <Tooltip
+                            placement="bottom"
+                            id="navbarBrandTooltip"
+                            style={{ color: '#fff' }}
+                            content={updateMsg}
+                        >
+                            <div style={{ marginTop: '-15px', paddingLeft: '10px' }}>
+                                <a href={updateUrl} target="_blank" rel="noopener noreferrer">
+                                    {i18n._('New update available')}
+                                </a>
+                            </div>
+                        </Tooltip>
+                    )}
                     <Navbar.Toggle />
                 </Navbar.Header>
                 <Navbar.Collapse>

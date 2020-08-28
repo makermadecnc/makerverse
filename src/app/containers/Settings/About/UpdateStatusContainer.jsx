@@ -2,7 +2,6 @@ import moment from 'moment';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
-import semver from 'semver';
 import Anchor from 'app/components/Anchor';
 import Space from 'app/components/Space';
 import settings from 'app/config/settings';
@@ -10,8 +9,8 @@ import i18n from 'app/lib/i18n';
 import styles from './index.styl';
 
 const UpdateStatusContainer = (props) => {
-    const { checking, current, latest, lastUpdate } = props;
-    const newUpdateAvailable = (checking === false) && semver.lt(current, latest);
+    const { version } = props;
+    const { checking, latestVersion, lastUpdate, updateAvailable, updateUrl } = version;
 
     if (checking) {
         return (
@@ -28,7 +27,7 @@ const UpdateStatusContainer = (props) => {
         );
     }
 
-    if (newUpdateAvailable) {
+    if (updateAvailable) {
         return (
             <div className={styles.updateStatusContainer}>
                 <div className={classNames(styles.updateStatusIcon, styles.warning)}>
@@ -39,14 +38,14 @@ const UpdateStatusContainer = (props) => {
                         {i18n._('A new version of {{name}} is available', { name: settings.productName })}
                     </div>
                     <div className={styles.releaseLatest}>
-                        {i18n._('Version {{version}}', { version: latest })}
+                        {i18n._('Version {{version}}', { version: latestVersion })}
                         <br />
                         {moment(lastUpdate).format('LLL')}
                     </div>
                 </div>
                 <div className={styles.updateStatusActionContainer}>
                     <Anchor
-                        href="https://github.com/makermadecnc/makerverse/releases"
+                        href={updateUrl}
                         target="_blank"
                     >
                         <span className={styles.label}>
@@ -67,7 +66,7 @@ const UpdateStatusContainer = (props) => {
             </div>
             <div className={styles.updateStatusMessageContainer}>
                 <div className={styles.updateStatusMessage}>
-                    {i18n._('You already have the newest version of {{name}} ({{version}})', { name: settings.productName, version: latest })}
+                    {i18n._('You already have the newest version of {{name}} ({{version}})', { name: settings.productName, version: latestVersion })}
                 </div>
             </div>
         </div>
@@ -75,10 +74,13 @@ const UpdateStatusContainer = (props) => {
 };
 
 UpdateStatusContainer.propTypes = {
-    checking: PropTypes.bool,
-    current: PropTypes.string,
-    latest: PropTypes.string,
-    lastUpdate: PropTypes.string
+    version: PropTypes.shape({
+        checking: PropTypes.bool,
+        updateAvailable: PropTypes.bool.isRequired,
+        latestVersion: PropTypes.string.isRequired,
+        lastUpdate: PropTypes.string.isRequired,
+        updateUrl: PropTypes.string,
+    }).isRequired
 };
 
 export default UpdateStatusContainer;

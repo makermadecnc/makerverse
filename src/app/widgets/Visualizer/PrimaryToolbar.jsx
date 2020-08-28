@@ -13,20 +13,13 @@ import * as WebGL from 'app/lib/three/WebGL';
 import {
     // Grbl
     GRBL,
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_RUN,
-    GRBL_ACTIVE_STATE_HOLD,
-    GRBL_ACTIVE_STATE_DOOR,
-    GRBL_ACTIVE_STATE_HOME,
-    GRBL_ACTIVE_STATE_SLEEP,
-    GRBL_ACTIVE_STATE_ALARM,
-    GRBL_ACTIVE_STATE_CHECK,
-    // Marlin
+    // Others
     MARLIN,
     // Workflow
     WORKFLOW_STATE_IDLE
 } from 'app/constants';
 import styles from './index.styl';
+import ControllerStatusBadge from './ControllerStatusBadge';
 
 class PrimaryToolbar extends PureComponent {
     static propTypes = {
@@ -67,55 +60,6 @@ class PrimaryToolbar extends PureComponent {
         );
     }
 
-    renderControllerState() {
-        const { state } = this.props;
-        const controllerType = state.controller.type;
-        const controllerState = state.controller.state;
-        let stateStyle = '';
-        let stateText = '';
-
-        if (controllerType === GRBL) {
-            const activeState = _.get(controllerState, 'status.activeState');
-
-            stateStyle = {
-                [GRBL_ACTIVE_STATE_IDLE]: 'controller-state-default',
-                [GRBL_ACTIVE_STATE_RUN]: 'controller-state-primary',
-                [GRBL_ACTIVE_STATE_HOLD]: 'controller-state-warning',
-                [GRBL_ACTIVE_STATE_DOOR]: 'controller-state-warning',
-                [GRBL_ACTIVE_STATE_HOME]: 'controller-state-primary',
-                [GRBL_ACTIVE_STATE_SLEEP]: 'controller-state-success',
-                [GRBL_ACTIVE_STATE_ALARM]: 'controller-state-danger',
-                [GRBL_ACTIVE_STATE_CHECK]: 'controller-state-info'
-            }[activeState];
-
-            stateText = {
-                [GRBL_ACTIVE_STATE_IDLE]: i18n.t('controller:Grbl.activeState.idle'),
-                [GRBL_ACTIVE_STATE_RUN]: i18n.t('controller:Grbl.activeState.run'),
-                [GRBL_ACTIVE_STATE_HOLD]: i18n.t('controller:Grbl.activeState.hold'),
-                [GRBL_ACTIVE_STATE_DOOR]: i18n.t('controller:Grbl.activeState.door'),
-                [GRBL_ACTIVE_STATE_HOME]: i18n.t('controller:Grbl.activeState.home'),
-                [GRBL_ACTIVE_STATE_SLEEP]: i18n.t('controller:Grbl.activeState.sleep'),
-                [GRBL_ACTIVE_STATE_ALARM]: i18n.t('controller:Grbl.activeState.alarm'),
-                [GRBL_ACTIVE_STATE_CHECK]: i18n.t('controller:Grbl.activeState.check')
-            }[activeState];
-        }
-
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
-        }
-
-        return (
-            <div
-                className={classNames(
-                    styles.controllerState,
-                    styles[stateStyle]
-                )}
-            >
-                {stateText}
-            </div>
-        );
-    }
-
     getWorkCoordinateSystem() {
         const { state } = this.props;
         const controllerType = state.controller.type;
@@ -144,7 +88,10 @@ class PrimaryToolbar extends PureComponent {
         return (
             <div className={styles.primaryToolbar}>
                 {this.renderControllerType()}
-                {this.renderControllerState()}
+                <ControllerStatusBadge
+                    workspaceId={this.workspace.id}
+                    controller={state.controller}
+                />
                 <div className="pull-right">
                     <Dropdown
                         style={{ marginRight: 5 }}

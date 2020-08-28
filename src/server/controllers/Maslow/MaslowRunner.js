@@ -1,5 +1,4 @@
 import events from 'events';
-import _ from 'lodash';
 import MaslowLineParser from './MaslowLineParser';
 import MaslowLineParserResultStatus from './MaslowLineParserResultStatus';
 import MaslowLineParserResultOk from './MaslowLineParserResultOk';
@@ -32,17 +31,11 @@ class MaslowRunner extends events.EventEmitter {
         const result = this.parser.parse(data) || {};
         const { type, payload } = result;
 
-        // delete raw for value parsing
-        const values = { ...payload };
-        delete values.raw;
-
         if (type === MaslowLineParserResultPositionalError) {
-            this.controller.memory.updateStatus({ 'err': values });
-            this.emit('status', payload);
+            this.emit('feedback', payload);
             return;
         }
         if (type === MaslowLineParserResultStatus) {
-            this.controller.memory.updateStatus(values);
             this.emit('status', payload);
             return;
         }
@@ -57,18 +50,14 @@ class MaslowRunner extends events.EventEmitter {
             return;
         }
         if (type === MaslowLineParserResultAlarm) {
-            this.controller.memory.updateStatus({ alarm: payload.message });
             this.emit('alarm', payload);
             return;
         }
         if (type === MaslowLineParserResultParserState) {
-            this.controller.memory.updateParserState(values);
             this.emit('parserstate', payload);
             return;
         }
         if (type === MaslowLineParserResultParameters) {
-            const { name, value } = payload;
-            _.set(this.controller.hardware.parameters, name, value);
             this.emit('parameters', payload);
             return;
         }
@@ -77,29 +66,14 @@ class MaslowRunner extends events.EventEmitter {
             return;
         }
         if (type === MaslowLineParserResultSettings) {
-            const { name, value, message } = payload;
-            const setting = this.controller.hardware.setGrbl(name, value, message);
-            this.emit('settings', { ...payload, ...setting });
+            this.emit('settings', payload);
             return;
         }
         if (type === MaslowLineParserResultVersion) {
-            const { name, pcb, version } = payload;
-            this.controller.hardware.firmware.name = name;
-            if (pcb) {
-                this.controller.hardware.firmware.pcb = pcb;
-            }
-            if (version) {
-                this.controller.hardware.firmware.version = version;
-            }
-            this.emit('firmware', this.controller.hardware.firmware);
+            this.emit('firmware', payload);
             return;
         }
         if (type === MaslowLineParserResultStartup) {
-            const { name, version } = payload;
-            this.controller.hardware.protocol = {
-                'name': name,
-                'version': version,
-            };
             this.emit('startup', payload);
             return;
         }

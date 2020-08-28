@@ -595,8 +595,8 @@ class AxesWidget extends PureComponent {
                     'G21': METRIC_UNITS
                 }[modal.units] || this.state.units;
                 const classic = get(this.workspace.controller.settings, 'firmware.name') === 'MaslowClassic';
-                const $13 = classic ? units === IMPERIAL_UNITS :
-                    Number(get(this.workspace.controller.settings, 'settings.$13', 0)) || 0;
+                const $13 = classic ? units === IMPERIAL_UNITS
+                    : Number(get(this.workspace.controller.settings, 'settings.$13', 0)) || 0;
 
                 this.setState(state => ({
                     units: units,
@@ -971,7 +971,12 @@ class AxesWidget extends PureComponent {
                             onCancel={actions.closeModal}
                         />
                     )}
-                    <Axes workspaceId={this.workspace.id} config={config} state={state} actions={actions} />
+                    <Axes
+                        workspaceId={this.workspace.id}
+                        config={config}
+                        state={state}
+                        actions={actions}
+                    />
                 </Widget.Content>
             </Widget>
         );

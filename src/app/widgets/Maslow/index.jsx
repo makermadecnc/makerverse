@@ -56,9 +56,10 @@ class MaslowWidget extends PureComponent {
             const { minimized } = this.state;
             this.setState({ minimized: !minimized });
         },
-        openModal: (name = MODAL_NONE, params = {}) => {
+        openModal: (name = MODAL_NONE, params = {}, opts = {}) => {
             this.setState({
                 modal: {
+                    ...opts,
                     name: name,
                     params: params
                 }
@@ -163,26 +164,22 @@ class MaslowWidget extends PureComponent {
             this.setState({ ...initialState });
         },
         'controller:settings': (type, controllerSettings) => {
-            if (type === MASLOW) {
-                this.setState(state => ({
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        settings: controllerSettings
-                    }
-                }));
-            }
+            this.setState(state => ({
+                controller: {
+                    ...state.controller,
+                    type: type,
+                    settings: controllerSettings
+                }
+            }));
         },
         'controller:state': (type, controllerState) => {
-            if (type === MASLOW) {
-                this.setState(state => ({
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    }
-                }));
-            }
+            this.setState(state => ({
+                controller: {
+                    ...state.controller,
+                    type: type,
+                    state: controllerState
+                }
+            }));
         }
     };
 
@@ -204,6 +201,11 @@ class MaslowWidget extends PureComponent {
         this.config.set('panel.queueReports.expanded', panel.queueReports.expanded);
         this.config.set('panel.statusReports.expanded', panel.statusReports.expanded);
         this.config.set('panel.modalGroups.expanded', panel.modalGroups.expanded);
+
+        const canOnboard = this.state.modal.name === MODAL_NONE && !this.state.modal.startedOnboarding;
+        if (canOnboard && !this.workspace.hasOnboarded && this.isConnectedToMaslow) {
+            this.actions.openModal(MODAL_CALIBRATION, null, { startedOnboarding: true });
+        }
     }
 
     getInitialState() {
@@ -220,6 +222,7 @@ class MaslowWidget extends PureComponent {
             },
             modal: {
                 name: MODAL_NONE,
+                startedOnboarding: false,
                 params: {},
                 calibration: {}
             },
@@ -257,6 +260,12 @@ class MaslowWidget extends PureComponent {
         return true;
     }
 
+    get isConnectedToMaslow() {
+        const controllerSettings = this.state.controller.settings;
+        const fn = controllerSettings.firmware ? controllerSettings.firmware.name : null;
+        return fn && fn.length > 0;
+    }
+
     render() {
         const { minimized, isFullscreen, isReady } = this.state;
         const state = {
@@ -266,9 +275,7 @@ class MaslowWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
-        const controllerSettings = this.state.controller.settings;
-        const fn = controllerSettings.firmware ? controllerSettings.firmware.name : null;
-        const connected = fn && fn.length > 0;
+        const connected = this.isConnectedToMaslow;
 
         return (
             <Widget fullscreen={isFullscreen}>

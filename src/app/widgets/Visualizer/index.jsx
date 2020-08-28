@@ -1110,13 +1110,11 @@ class VisualizerWidget extends PureComponent {
                     )}
                     {(showVisualizer && state.gcode.displayName) && (
                         <GCodeName
-                            workspaceId={this.workspace.id}
                             name={state.gcode.name}
                         />
                     )}
                     {showNotifications && (
                         <Notifications
-                            workspaceId={this.workspace.id}
                             show={showNotifications}
                             type={state.notification.type}
                             data={state.notification.data}

@@ -8,7 +8,6 @@ import _findIndex from 'lodash/findIndex';
 import _get from 'lodash/get';
 import _isEqual from 'lodash/isEqual';
 import pubsub from 'pubsub-js';
-import semver from 'semver';
 import React, { PureComponent } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import api from 'app/api';
@@ -19,7 +18,6 @@ import {
 import settings from 'app/config/settings';
 import Breadcrumbs from 'app/components/Breadcrumbs';
 import i18n from 'app/lib/i18n';
-import store from 'app/store';
 import log from 'app/lib/log';
 import Workspaces from 'app/lib/workspaces';
 import General from './General';
@@ -112,7 +110,7 @@ class Settings extends PureComponent {
 
                 api.getState()
                     .then((res) => {
-                        const { checkForUpdates } = { ...res.body };
+                        const { checkForUpdates, prereleases } = { ...res.body };
 
                         const nextState = {
                             ...this.state.general,
@@ -123,6 +121,7 @@ class Settings extends PureComponent {
                             },
                             // followed by data
                             checkForUpdates: !!checkForUpdates,
+                            prereleases: !!prereleases,
                             lang: i18next.language
                         };
 
@@ -158,7 +157,8 @@ class Settings extends PureComponent {
                 });
 
                 const data = {
-                    checkForUpdates: this.state.general.checkForUpdates
+                    checkForUpdates: this.state.general.checkForUpdates,
+                    prereleases: this.state.general.prereleases,
                 };
 
                 api.setState(data)
@@ -213,6 +213,15 @@ class Settings extends PureComponent {
                     general: {
                         ...this.state.general,
                         checkForUpdates: !checkForUpdates
+                    }
+                });
+            },
+            togglePrereleases: () => {
+                const v = !this.state.general.prereleases;
+                this.setState({
+                    general: {
+                        ...this.state.general,
+                        prereleases: v
                     }
                 });
             },
@@ -949,19 +958,10 @@ class Settings extends PureComponent {
         },
         // About
         about: {
-            togglePrereleases: () => {
-                const v = !this.state.about.prereleases;
-                store.set('updater.prereleases', v);
-                this.actions.about.checkVersion(v);
-            },
             checkLatestVersion: () => {
-                this.actions.about.checkVersion(this.state.about.prereleases);
-            },
-            checkVersion: (prereleases) => {
                 this.setState({
                     about: {
                         ...this.state.about,
-                        prereleases: prereleases,
                         version: {
                             ...this.state.about.version,
                             checking: true
@@ -969,23 +969,18 @@ class Settings extends PureComponent {
                     }
                 });
 
-                api.getLatestVersion()
-                    .then((res) => {
+                api.getLatestVersion(this.state.general.prereleases)
+                    .then((updateData) => {
                         if (!this.mounted) {
                             return;
                         }
-
-                        const usePre = prereleases && semver.lt(res.body.release.tag_name, res.body.prerelease.tag_name);
-                        const release = usePre ? res.body.prerelease : res.body.release;
                         this.setState({
                             about: {
                                 ...this.state.about,
                                 version: {
                                     ...this.state.about.version,
+                                    ...updateData,
                                     checking: false,
-                                    latest: release.tag_name,
-                                    lastUpdate: release.published_at,
-                                    release: release,
                                 }
                             }
                         });
@@ -1015,6 +1010,7 @@ class Settings extends PureComponent {
                     saving: false
                 },
                 checkForUpdates: true,
+                prereleases: false,
                 lang: i18next.language
             },
             // Workspaces
@@ -1102,11 +1098,12 @@ class Settings extends PureComponent {
             },
             // About
             about: {
-                prereleases: store.get('updater.prereleases', false),
                 version: {
                     checking: false,
-                    current: settings.version,
-                    latest: settings.version,
+                    currentVersion: settings.version,
+                    latestVersion: settings.version,
+                    updateAvailable: false,
+                    updateUrl: null,
                     lastUpdate: ''
                 }
             }

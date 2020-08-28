@@ -6,7 +6,8 @@ const calibrationDefaults = {
     motorXAccuracy: 5,
     motorYAccuracy: 5,
     sledRadius: 228.6,
-    edgeDistance: 25.4,
+    edgeDistance: 0,
+    cutEdgeDistance: 25.4,
     origChainLength: 1790,
     measuredInches: false,
     cutDepth: 3,
@@ -41,7 +42,8 @@ class MaslowCalibration {
             return false;
         }
         log.debug('calibrating...');
-        const measured = this.calculateMeasurementCoordinates(measurements);
+        const xError = this.calculateXError(measurements);
+        const measured = this.calculateMeasurementCoordinates(measurements, xError);
 
         const origSettings = {
             leftChainTolerance: this.kin.opts.leftChainTolerance,
@@ -68,8 +70,26 @@ class MaslowCalibration {
                 avgErrDist: this.round(-change.avgErrDist / orig.avgErrDist * 100, 2),
                 maxErrDist: this.round(-change.maxErrDist / orig.maxErrDist * 100, 2),
             },
-            optimized: op
+            optimized: op,
+            xError: xError
         };
+    }
+
+    calculateXError(measurements) {
+        const tr = measurements[2];
+        const br = measurements[3];
+        const bl = measurements[7];
+        const tl = measurements[8];
+        const left = Math.round((bl + tl) / 2);
+        const right = Math.round((tr + br) / 2);
+        const lneg = left < 0;
+        const rneg = right < 0;
+        if (lneg === rneg) {
+            // If both have the same sign, there cannot be an error
+            return 0;
+        }
+        // Return the mm adjustment needed to center the stock.
+        return Math.min(Math.abs(left), Math.abs(right)) * (lneg ? 1 : -1);
     }
 
     optimize(measured, start, i, decimals, callback) {
@@ -167,36 +187,35 @@ class MaslowCalibration {
         return Math.round(v * factor) / factor;
     }
 
-    calculateMeasurementCoordinates(ms) {
+    calculateMeasurementCoordinates(ms, xError) {
         const mm = this.opts.measuredInches ? 25.4 : 1;
         const h = this.kin.opts.machineHeight;
         const w = this.kin.opts.machineWidth;
         const r = (this.opts.cutHoles ? 0 : this.opts.sledRadius);
         return [
-            { x: (ms[8] * mm + r - w / 2), y: (h / 2 - ms[9] * mm - r) },
-            { x: (0), y: (h / 2 - ms[0] * mm - r) },
-            { x: (w / 2 - ms[2] * mm - r), y: (h / 2 - ms[1] * mm - r) },
-
-            { x: (ms[7] * mm + r - w / 2), y: (ms[6] * mm + r - h / 2) },
-            { x: (0), y: (ms[5] * mm + r - h / 2) },
-            { x: (w / 2 - ms[3] * mm - r), y: (ms[4] * mm + r - h / 2) }
+            { x: (xError), y: (h / 2 - ms[0] * mm - r) },
+            { x: xError + (w / 2 - ms[2] * mm - r), y: (h / 2 - ms[1] * mm - r) },
+            { x: xError + (w / 2 - ms[3] * mm - r), y: (ms[4] * mm + r - h / 2) },
+            { x: (xError), y: (ms[5] * mm + r - h / 2) },
+            { x: xError + (ms[7] * mm + r - w / 2), y: (ms[6] * mm + r - h / 2) },
+            { x: xError + (ms[8] * mm + r - w / 2), y: (h / 2 - ms[9] * mm - r) },
         ];
     }
 
     calculateIdealCoordinates() {
-        const inset = (this.opts.cutHoles ? 0 : this.opts.sledRadius) + this.opts.edgeDistance;
+        const ed = this.opts.cutHoles ? this.opts.cutEdgeDistance : this.opts.edgeDistance;
+        const inset = (this.opts.cutHoles ? 0 : this.opts.sledRadius) + ed;
         const aH1x = -(this.kin.opts.machineWidth / 2.0 - inset);
         const aH1y = (this.kin.opts.machineHeight / 2.0 - inset);
         const aH2x = 0;
         return [
-            { x: aH1x, y: aH1y },
             { x: aH2x, y: aH1y },
             { x: -aH1x, y: aH1y },
-            { x: aH1x, y: -aH1y },
+            { x: -aH1x, y: -aH1y },
             { x: aH2x, y: -aH1y },
-            { x: -aH1x, y: -aH1y }
+            { x: aH1x, y: -aH1y },
+            { x: aH1x, y: aH1y },
         ];
-        // this.kin.recomputeGeometry();
     }
 
     calculateChainLengths(points) {
@@ -214,7 +233,7 @@ class MaslowCalibration {
         return `G10 L20 P1 X${mpos.x} Y${mpos.y}`;
     }
 
-    generateGcodePoint(pointIndex, gcode = ['$X', 'G21', 'G90']) {
+    generateGcodePoint(pointIndex, gcode = ['G21', 'G90']) {
         const p = this.idealCoordinates[pointIndex];
         gcode.push(this.setWposToMposCmd);
         gcode.push(`G0 X${p.x} Y${p.y}`);
@@ -222,14 +241,16 @@ class MaslowCalibration {
             gcode.push(`G0 Z-${this.opts.cutDepth}`);
             gcode.push(`G0 Z${this.opts.safeTravel}`);
         }
+        if (this.opts.measuredInches) {
+            gcode.push('G20');
+        }
         return gcode;
     }
 
     generateGcode() {
-        const ret = ['$X', 'G21', 'G90'];
-        const cutOrder = [1, 2, 5, 4, 3, 0];
-        for (let i = 0; i < cutOrder.length; i++) {
-            this.generateGcodePoint(cutOrder[i], ret);
+        const ret = ['G21', 'G90'];
+        for (let i = 0; i < this.idealCoordinates.length; i++) {
+            this.generateGcodePoint(i, ret);
         }
         ret.push('G0 X0 Y0');
         return ret;

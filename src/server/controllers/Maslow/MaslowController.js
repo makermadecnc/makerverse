@@ -208,8 +208,15 @@ class MaslowController {
 
                 // M6 Tool Change
                 if (_.includes(words, 'M6')) {
-                    this.log.debug('M6 Tool Change');
                     this.feeder.hold({ data: 'M6' }); // Hold reason
+                    if (!this.hardware.isMaslowClassic()) {
+                        // Maslow Due does not support tool changes. However, the app does pause workflow.
+                        // Therefore, it is safe to ignore the command to prevent an error.
+                        this.log.debug('My Tool Change: Ignored by Due');
+                        line = '';
+                    } else {
+                        this.log.debug('M6 Tool Change');
+                    }
                 }
 
                 return line;
@@ -289,8 +296,15 @@ class MaslowController {
 
                 // M6 Tool Change
                 if (_.includes(words, 'M6')) {
-                    this.log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
                     this.workflow.pause({ data: 'M6' });
+                    if (!this.hardware.isMaslowClassic()) {
+                        // Maslow Due does not support tool changes. However, the app does pause workflow.
+                        // Therefore, it is safe to ignore the command to prevent an error.
+                        this.log.debug(`My Tool Change: Ignored by Due: line=${sent + 1}, sent=${sent}, received=${received}`);
+                        line = '';
+                    } else {
+                        this.log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
+                    }
                 }
 
                 return line;
@@ -369,6 +383,9 @@ class MaslowController {
                 this.actionMask.replyStatusReport = false;
                 this.emit('serialport:read', res.raw);
             }
+
+            delete res.raw;
+            this.memory.updateStatus(res);
         });
 
         this.runner.on('ok', (res) => {
@@ -422,15 +439,13 @@ class MaslowController {
                 const line = lines[received] || '';
 
                 this.emit('serialport:read', `> ${line.trim()} (line=${received + 1})`);
-                if (error) {
-                    // Maslow v1.1
+                if (error) { // Grbl v1.1
                     this.emit('serialport:read', `error:${code} (${error.message})`);
 
                     if (pauseError) {
                         this.workflow.pause({ err: `error:${code} (${error.message})` });
                     }
-                } else {
-                    // Maslow v0.9
+                } else { // Grbl v0.9
                     this.emit('serialport:read', res.raw);
 
                     if (pauseError) {
@@ -444,11 +459,10 @@ class MaslowController {
                 return;
             }
 
-            if (error) {
-                // Maslow v1.1
+            if (error) { // Grbl v1.1
                 this.emit('serialport:read', `error:${code} (${error.message})`);
-            } else {
-                // Maslow v0.9
+                this.memory.updateStatus({ error: error });
+            } else { // Grbl v0.9
                 this.emit('serialport:read', res.raw);
             }
 
@@ -460,11 +474,10 @@ class MaslowController {
             const code = Number(res.message) || undefined;
             const alarm = _.find(MASLOW_ALARMS, { code: code });
 
-            if (alarm) {
-                // Maslow v1.1
+            if (alarm) { // Grbl v1.1
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
-            } else {
-                // Maslow v0.9
+                this.memory.updateStatus({ alarm: alarm });
+            } else { // Grbl v0.9
                 this.emit('serialport:read', res.raw);
             }
         });
@@ -476,37 +489,62 @@ class MaslowController {
             if (this.actionMask.replyParserState) {
                 this.emit('serialport:read', res.raw);
             }
+
+            delete res.raw;
+            this.memory.updateParserState(res);
         });
 
         this.runner.on('parameters', (res) => {
+            const { name, value } = res;
+            _.set(this.hardware.parameters, name, value);
+
             this.emit('serialport:read', res.raw);
         });
 
         this.runner.on('feedback', (res) => {
-            this.emit('serialport:read', res.raw);
+            if (res.message) {
+                this.emit('serialport:read', res.raw);
+            }
+            delete res.raw;
+            this.memory.updateStatus({ 'feedback': res });
         });
 
         this.runner.on('settings', (res) => {
-            this.log.debug(`setting ${res.name}=${res.value}`);
+            const { name, value, message } = res;
+            const setting = this.hardware.setGrbl(name, value, message);
+            this.log.debug(`setting ${setting.name}=${setting.value}`);
 
-            if (res.message && res.units) {
-                this.emit('serialport:read', `${res.name}=${res.value} (${res.message}, ${res.units})`);
-            } else if (res.message) {
-                this.emit('serialport:read', `${res.name}=${res.value} (${res.message})`);
+            if (setting.message && setting.units) {
+                this.emit('serialport:read', `${setting.name}=${setting.value} (${setting.message}, ${setting.units})`);
+            } else if (setting.message) {
+                this.emit('serialport:read', `${setting.name}=${setting.value} (${setting.message})`);
             } else {
-                this.emit('serialport:read', `${res.name}=${res.value}`);
+                this.emit('serialport:read', `${setting.name}=${setting.value}`);
             }
         });
 
         this.runner.on('firmware', (res) => {
             this.log.debug(`firmware ${res.name} ${res.version}`);
             // Rebuild the logger to specify the firmware name in every entry.
-            this.log = logger(`controller:${res.name}:${this.options.id}`);
+            const { name, pcb, version } = res;
+            this.hardware.firmware.name = name;
+            if (pcb) {
+                this.hardware.firmware.pcb = pcb;
+            }
+            if (version) {
+                this.hardware.firmware.version = version;
+            }
+            this.log = logger(`controller:${name}:${this.options.id}`);
         });
 
         this.runner.on('startup', (res) => {
             this.log.debug('startup complete');
             this.emit('serialport:read', res.raw);
+
+            this.hardware.protocol = {
+                'name': res.name,
+                'version': res.version,
+            };
 
             // The startup message always prints upon startup, after a reset, or at program end.
             // Setting the initial state when Maslow has completed re-initializing all systems.
