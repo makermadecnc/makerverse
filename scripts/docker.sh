@@ -12,7 +12,11 @@ if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
   fi
   TAG="latest"
 else
-  TAG="ci"
+  if [ "$TRAVIS_BRANCH" = "master" ]; then
+    TAG="ci"
+  else
+    TAG="${TRAVIS_BRANCH}"
+  fi
 fi
 
 echo "Building $DOCKER_REPO:$TAG for $BUILD_PLATFORMS"
@@ -29,8 +33,8 @@ else
   exit 1
 fi
 
-if [[ ! -z "$TRAVIS_TAG" ]]; then
+if [[ ! -z "$CI_VERSION" ]]; then
   # If there's an explicit release tag, retag this image to use it.
-  docker tag "$DOCKER_REPO:$TAG" "$DOCKER_REPO:$TRAVIS_TAG"
-  docker push "$DOCKER_REPO:$TRAVIS_TAG"
+  docker tag "$DOCKER_REPO:$TAG" "$DOCKER_REPO:$CI_VERSION"
+  docker push "$DOCKER_REPO:$CI_VERSION"
 fi

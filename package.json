@@ -17,7 +17,7 @@
   "preferGlobal": true,
   "scripts": {
     "prepare": "",
-    "prebuild-latest": "npm run package-sync && bash -c \"cd src; npm version ${npm_package_version}-${COMMIT_COUNT:-latest}\" && bash scripts/prebuild-prod.sh",
+    "prebuild-latest": "npm run package-sync && bash -c \"cd src; npm version `./scripts/semver.sh` --allow-same-version\" && bash scripts/prebuild-prod.sh",
     "prebuild-dev": "npm run package-sync && bash scripts/prebuild-dev.sh",
     "prebuild-prod": "npm run package-sync && bash scripts/prebuild-prod.sh",
     "build": "npm run build-prod",

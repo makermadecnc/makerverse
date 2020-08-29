@@ -37,6 +37,7 @@ jobs:
     - docker buildx create --platform linux/arm64,linux/arm/v7 --name xbuilder --use
     - docker buildx inspect --bootstrap
   script:
+    - echo "Building $CI_SEMVER"
     # Pre-build assets; this prevents the multi-arch from running each build in the Dockerfile.
     - npm run build-latest
     # Only the master branch supports a "deploy" step. For others, go ahead and push a dev image.
@@ -81,7 +82,8 @@ node_js:
 
 env:
   global:
-    - CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
+    - CI_VERSION=`git describe --tags | sed 's/-\(.*\)//'`
+    - CI_SEMVER=`./scripts/semver.sh $CI_VERSION`
     - secure: j7SoxNxs3KBRvvLrEWeZGmsgHRLMwcCvYnNh/F8GeaCnM0U87s9AqHMmV4NNRyDoac7PpqegCYk21nLN4mx1Mj9rs/wvQBnl1LYuetRm7ib9Zq21+cJSIaO2USourexEuivySEuzWqR5pb7bcdAZYhKVzBOStw1k0h2rD0xrbdr91UclcQniiex5bqQ4UIE+cPZVqS5vOPZck9P9GMBmVNM0mrfzqTUkiLUFtTbg9Msz5GIIZzJsHj49EqmYwoN1B7te3IkF6tEVLKKNIJPqYMcGhKLZ5jF9ugxkPYPP1JvAxRftrFdCvmdclwJK6yE5ByMY9YHkXw1NvMQ9rzuI10NBM0inUZUmPZepWvnOh4k0FSeFKReWGeVVciap/W0seqxn99lDGMDXaauz5CKD9tVXwAOZ8H/dZAnPEUSd9xEvl5NtLbi1djvvz6LkdDSj9iGedoLEwcxkueBu/UUWLbm+ALdn1dcH1e37TLPc5amP5fIh/klP2KZtfgKzFn8lW65RyrB+UgVlhwQMyv5cCMKAttE1JyU/6bNXvfa0qbnk5m5weVoUsp5PBbx9IYCj7pgGaqmqqON5AOm+JBDK1sl1T2uHCU3wfKBqES8krTPjP7wNiwCTKr7RqyAVYf8d006G6cuDcYIg5NR+l5zM4tfE3U8NHyFrdy0Iw9WBcGg= # DOCKER_EMAIL
 #   - secure: "BAiWc6AblNednsnoh2+3OMW81MVzCQPR0UT3E2/gCdScw8Q9C4a8fC0OpXxJOqHy9JgAL3s5kxZVlAbUhBwXJlarDyQl++Y9aeKjr6J0+iVXu3cSF0cUw+rYbQ41u3dFmF3Sa0K5Lo0uB5XX/ximCX8RzgUJ6B79Jh1ac9FbZrYBth6Ovnsy3Us9VvxB8jXI2St6GJgewmXUo8qlWZKClM79NPBjwpboU09zSGhqQ32JssHUjw/peLt6x4SGV+NsMNgSNELXxVVbBBp7Wp5PNJY8D5vhO703Ka2WLJEebZnE+7r5j1VzLO1/OGrOS9QwVzw/fZEhQYST4NZPMu65bR7VI8jwJN2OjIcUx3yH0JbSXmPtdANofusIozGHKvg7odLTSo3js5crFnDBuoP3ZQ8XNusse2smbyd5snUCb0g9FsEzlQLQZBfcubuW3qY5BZwbCyc2e9WoNOLt4C83rcaFuRER5sK/UG9nSGivIsSKOCJpacdIxmCEvZV8h5YUd/OQqTMbFA2YliaLGt7AsfJrR8W4wy+vB12pVEEg7xPK+TnhzhCK61JGOn/pjVmFjUb0zHgcJEry3C5W+J2TEwKxRIEgkLCL7YP3WnE4c5fcqg2c9B4SHOqReO0KEx5mP0FVlGliW69ZHoUPoEC+VTwVzMJheOTnpzXNh4puh1E=" # GITHUB_TOKEN
 #    - secure: "zn6ZQM7LFgFcwFNqcbhBGY9DYZzw3tOa3puTntdcEfnMsp+ikcJSYl8lvTj1TL1rvZIAJfO896Uk79HTyJtv06a9LjpEElaQvkBEtPGnE0fdGWLgK1cl0JBxPNEDicAoYrUV2QkuuwaTtpKeUsnD6XmWSzzpqmZKDLfRyO1xwHyvH4aTvqAhDXM7Hb+Hae4Nk7ZCq5v1CwScu6gdaJMBPdcmWBzAPNnAJYbDilw3fFdfOrxhuTagmmBQFn99iaIRbLR4sTuI/c53NMUS8FJyfistTVVuMOFTSdFvlQ/Ikm6PbIYYIMDp9RetGIJk7IL4U18LpwACzhjc25SvWrQXPI7eiW0H3uD8rGPtR50cBrbxRI/Of7271eqXvtNMzHSsCo0ENQ1qYWoF5OhI4roklAfZjQpdi7Ngg+EPNIgf24vpf0fI9u8caOHxzAYjrwdcXCLTmcu0ANuQMMXP5G7mBZG5/kGzC5cpc11uqwINCU10rVQa7JVNuFNhuT98/c+DSeBY92w9nEsCshG1AKcNjY677FbBdVS+DCPPRjiAfjomT9Ma8VqR/bGCogzaEaA7adUbGLGI9V397QF9gSrzyBP/zjOiYVX1mRjylmEitdQtXF3CXsbhrOOCenDifKHhtnOgXgpObcbwV4B82VhGzDOvTxF2n+QTGhUAA/Okyv8=" # CSC_LINK
@@ -95,21 +97,17 @@ cache:
 
 install: npm install
 script:
-  - |
-    if [[ -z "$TRAVIS_TAG" ]]; then
-      npm run build-latest
-    else
-      npm run build
-    fi
+  - echo "Building $CI_SEMVER (v. $CI_VERSION)"
+  - npm run build-latest
 after_success:
   - PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
   - PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
   - PRODUCT_NAME=Makerverse
-  - RELEASE=${PACKAGE_NAME}-${PACKAGE_VERSION}
-  - echo "$PACKAGE_NAME"
-  - echo "$PACKAGE_VERSION"
-  - echo "$PRODUCT_NAME"
-  - echo "$RELEASE"
+  - RELEASE_FILE=${PACKAGE_NAME}-${CI_SEMVER}
+  - RELEASE_TAG=${CI_VERSION}
+  - RELEASE_NAME="${PACKAGE_NAME} v${CI_VERSION}"
+  - echo "$RELEASE_NAME"
+  - echo "$RELEASE_TAG"
   - npm run coveralls
   - mkdir -p releases
   - |
@@ -123,23 +121,23 @@ after_success:
       sudo spctl --status;
       npm run build:mac-x64;
       ls -al output output/*;
-      cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.dmg" "releases/${RELEASE}-mac-x64.dmg";
+      cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.dmg" "releases/${RELEASE_FILE}-mac-x64.dmg";
       ls -al releases/*;
-      if [[ "$TRAVIS_BRANCH" == "master" && -z "$TRAVIS_TAG" && ! -z "$(ls -A releases)" ]]; then
+      if [[ "$TRAVIS_BRANCH" == "master" && ! -z "$(ls -A releases)" ]]; then
         npm run github-release -- delete \
           --owner=makerverse \
           --repo=makerverse \
-          --tag="${TRAVIS_BRANCH}-latest" \
-          --name="${TRAVIS_BRANCH}" \
+          --tag="${RELEASE_TAG}" \
+          --name="${RELEASE_NAME}" \
           "*-mac-x64.dmg";
         npm run github-release -- upload \
           --owner=makerverse \
           --repo=makerverse \
-          --tag="${TRAVIS_BRANCH}-latest" \
-          --name="${TRAVIS_BRANCH}" \
+          --tag="${RELEASE_TAG}" \
+          --name="${RELEASE_NAME}" \
           --body="${COMMIT_LOG}" \
-          "releases/${RELEASE}-mac-x64.dmg";
-        rm -f "releases/${RELEASE}-mac-x64.dmg";
+          "releases/${RELEASE_FILE}-mac-x64.dmg";
+        rm -f "releases/${RELEASE_FILE}-mac-x64.dmg";
       fi
     fi
   - |
@@ -147,21 +145,21 @@ after_success:
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       npm run build:linux-ia32;
       ls -al output output/*;
-      cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-i386.AppImage" "releases/${RELEASE}-linux-i386.AppImage";
-      cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_i386.deb" "releases/${RELEASE}-linux-i386.deb";
-      cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.i686.rpm" "releases/${RELEASE}-linux.i686.rpm";
+      cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-i386.AppImage" "releases/${RELEASE_FILE}-linux-i386.AppImage";
+      cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_i386.deb" "releases/${RELEASE_FILE}-linux-i386.deb";
+      cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.i686.rpm" "releases/${RELEASE_FILE}-linux.i686.rpm";
       pushd releases;
-      ln -sf ../output/linux-ia32-unpacked "${RELEASE}-linux-ia32";
-      tar zcfh "${RELEASE}-linux-ia32.tar.gz" "${RELEASE}-linux-ia32";
-      rm -f "${RELEASE}-linux-ia32";
+      ln -sf ../output/linux-ia32-unpacked "${RELEASE_FILE}-linux-ia32";
+      tar zcfh "${RELEASE_FILE}-linux-ia32.tar.gz" "${RELEASE_FILE}-linux-ia32";
+      rm -f "${RELEASE_FILE}-linux-ia32";
       popd;
       ls -al releases/*;
-      if [[ "$TRAVIS_BRANCH" == "master" && -z "$TRAVIS_TAG" && ! -z "$(ls -A releases)" ]]; then
+      if [[ "$TRAVIS_BRANCH" == "master" && ! -z "$(ls -A releases)" ]]; then
         npm run github-release -- delete \
           --owner=makerverse \
           --repo=makerverse \
-          --tag="${TRAVIS_BRANCH}-latest" \
-          --name="${TRAVIS_BRANCH}" \
+          --tag="${RELEASE_TAG}" \
+          --name="${RELEASE_NAME}" \
           "*-linux-i386.AppImage" \
           "*-linux-i386.deb" \
           "*-linux.i686.rpm" \
@@ -169,17 +167,17 @@ after_success:
         npm run github-release -- upload \
           --owner=makerverse \
           --repo=makerverse \
-          --tag="${TRAVIS_BRANCH}-latest" \
-          --name="${TRAVIS_BRANCH}" \
+          --tag="${RELEASE_TAG}" \
+          --name="${RELEASE_NAME}" \
           --body="${COMMIT_LOG}" \
-          "releases/${RELEASE}-linux-i386.AppImage" \
-          "releases/${RELEASE}-linux-i386.deb" \
-          "releases/${RELEASE}-linux.i686.rpm" \
-          "releases/${RELEASE}-linux-ia32.tar.gz";
-        rm -f "releases/${RELEASE}-linux-i386.AppImage";
-        rm -f "releases/${RELEASE}-linux-i386.deb";
-        rm -f "releases/${RELEASE}-linux.i686.rpm";
-        rm -f "releases/${RELEASE}-linux-ia32.tar.gz";
+          "releases/${RELEASE_FILE}-linux-i386.AppImage" \
+          "releases/${RELEASE_FILE}-linux-i386.deb" \
+          "releases/${RELEASE_FILE}-linux.i686.rpm" \
+          "releases/${RELEASE_FILE}-linux-ia32.tar.gz";
+        rm -f "releases/${RELEASE_FILE}-linux-i386.AppImage";
+        rm -f "releases/${RELEASE_FILE}-linux-i386.deb";
+        rm -f "releases/${RELEASE_FILE}-linux.i686.rpm";
+        rm -f "releases/${RELEASE_FILE}-linux-ia32.tar.gz";
       fi
     fi
   - |
@@ -187,21 +185,21 @@ after_success:
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       npm run build:linux-x64;
       ls -al output output/*;
-      cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.AppImage" "releases/${RELEASE}-linux-x86_64.AppImage";
-      cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_amd64.deb" "releases/${RELEASE}-linux-amd64.deb";
-      cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.x86_64.rpm" "releases/${RELEASE}-linux.x86_64.rpm";
+      cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.AppImage" "releases/${RELEASE_FILE}-linux-x86_64.AppImage";
+      cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_amd64.deb" "releases/${RELEASE_FILE}-linux-amd64.deb";
+      cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.x86_64.rpm" "releases/${RELEASE_FILE}-linux.x86_64.rpm";
       pushd releases;
-      ln -sf ../output/linux-unpacked "${RELEASE}-linux-x64";
-      tar zcfh "${RELEASE}-linux-x64.tar.gz" "${RELEASE}-linux-x64";
-      rm -f "${RELEASE}-linux-x64";
+      ln -sf ../output/linux-unpacked "${RELEASE_FILE}-linux-x64";
+      tar zcfh "${RELEASE_FILE}-linux-x64.tar.gz" "${RELEASE_FILE}-linux-x64";
+      rm -f "${RELEASE_FILE}-linux-x64";
       popd;
       ls -al releases/*;
-      if [[ "$TRAVIS_BRANCH" == "master" && -z "$TRAVIS_TAG" && ! -z "$(ls -A releases)" ]]; then
+      if [[ "$TRAVIS_BRANCH" == "master" && ! -z "$(ls -A releases)" ]]; then
         npm run github-release -- delete \
           --owner=makerverse \
           --repo=makerverse \
-          --tag="${TRAVIS_BRANCH}-latest" \
-          --name="${TRAVIS_BRANCH}" \
+          --tag="${RELEASE_TAG}" \
+          --name="${RELEASE_NAME}" \
           "*-linux-x86_64.AppImage" \
           "*-linux-amd64.deb" \
           "*-linux.x86_64.rpm" \
@@ -209,17 +207,17 @@ after_success:
         npm run github-release -- upload \
           --owner=makerverse \
           --repo=makerverse \
-          --tag="${TRAVIS_BRANCH}-latest" \
-          --name="${TRAVIS_BRANCH}" \
+          --tag="${RELEASE_TAG}" \
+          --name="${RELEASE_NAME}" \
           --body="${COMMIT_LOG}" \
-          "releases/${RELEASE}-linux-x86_64.AppImage" \
-          "releases/${RELEASE}-linux-amd64.deb" \
-          "releases/${RELEASE}-linux.x86_64.rpm" \
-          "releases/${RELEASE}-linux-x64.tar.gz";
-        rm -f "releases/${RELEASE}-linux-x86_64.AppImage";
-        rm -f "releases/${RELEASE}-linux-amd64.deb";
-        rm -f "releases/${RELEASE}-linux.x86_64.rpm";
-        rm -f "releases/${RELEASE}-linux-x64.tar.gz";
+          "releases/${RELEASE_FILE}-linux-x86_64.AppImage" \
+          "releases/${RELEASE_FILE}-linux-amd64.deb" \
+          "releases/${RELEASE_FILE}-linux.x86_64.rpm" \
+          "releases/${RELEASE_FILE}-linux-x64.tar.gz";
+        rm -f "releases/${RELEASE_FILE}-linux-x86_64.AppImage";
+        rm -f "releases/${RELEASE_FILE}-linux-amd64.deb";
+        rm -f "releases/${RELEASE_FILE}-linux.x86_64.rpm";
+        rm -f "releases/${RELEASE_FILE}-linux-x64.tar.gz";
       fi
     fi
   - |
@@ -227,23 +225,23 @@ after_success:
     if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
       npm run build:win-x64;
       ls -al output output/*;
-      cp -af "output/${PRODUCT_NAME} Setup ${PACKAGE_VERSION}.exe" "releases/${RELEASE}.exe";
+      cp -af "output/${PRODUCT_NAME} Setup ${PACKAGE_VERSION}.exe" "releases/${RELEASE_FILE}.exe";
       ls -al releases/*;
-      if [[ "$TRAVIS_BRANCH" == "master" && -z "$TRAVIS_TAG" && ! -z "$(ls -A releases)" ]]; then
+      if [[ "$TRAVIS_BRANCH" == "master" && ! -z "$(ls -A releases)" ]]; then
         npm run github-release -- delete \
           --owner=makerverse \
           --repo=makerverse \
-          --tag="${TRAVIS_BRANCH}-latest" \
-          --name="${TRAVIS_BRANCH}" \
-          "releases/${RELEASE}.exe";
+          --tag="${RELEASE_TAG}" \
+          --name="${RELEASE_NAME}" \
+          "releases/${RELEASE_FILE}.exe";
         npm run github-release -- upload \
           --owner=makerverse \
           --repo=makerverse \
-          --tag="${TRAVIS_BRANCH}-latest" \
-          --name="${TRAVIS_BRANCH}" \
+          --tag="${RELEASE_TAG}" \
+          --name="${RELEASE_NAME}" \
           --body="${COMMIT_LOG}" \
-          "releases/${RELEASE}.exe";
-        rm -f "releases/${RELEASE}.exe";
+          "releases/${RELEASE_FILE}.exe";
+        rm -f "releases/${RELEASE_FILE}.exe";
       fi
     fi
 addons:
