@@ -82,7 +82,7 @@ class Custom extends PureComponent {
         const target = get(this.iframe, 'contentWindow');
         const message = {
             token: token,
-            version: settings.version,
+            version: settings.version.public,
             action: {
                 type: type,
                 payload: {

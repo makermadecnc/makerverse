@@ -1,4 +1,6 @@
 #!/bin/bash
+set -euo pipefail
+
 tag=${1:-`git describe --tags`}
 version=`echo $tag | sed 's/-\(.*\)//'`
 

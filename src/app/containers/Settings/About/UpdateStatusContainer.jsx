@@ -38,7 +38,7 @@ const UpdateStatusContainer = (props) => {
                         {i18n._('A new version of {{name}} is available', { name: settings.productName })}
                     </div>
                     <div className={styles.releaseLatest}>
-                        {i18n._('Version {{version}}', { version: latestVersion })}
+                        {i18n._('Version {{version}}', { version: latestVersion.readable })}
                         <br />
                         {moment(lastUpdate).format('LLL')}
                     </div>
@@ -66,7 +66,7 @@ const UpdateStatusContainer = (props) => {
             </div>
             <div className={styles.updateStatusMessageContainer}>
                 <div className={styles.updateStatusMessage}>
-                    {i18n._('You already have the newest version of {{name}} ({{version}})', { name: settings.productName, version: latestVersion })}
+                    {i18n._('You already have the newest version of {{name}} ({{version}})', { name: settings.productName, version: latestVersion.readable })}
                 </div>
             </div>
         </div>
@@ -77,7 +77,7 @@ UpdateStatusContainer.propTypes = {
     version: PropTypes.shape({
         checking: PropTypes.bool,
         updateAvailable: PropTypes.bool.isRequired,
-        latestVersion: PropTypes.string.isRequired,
+        latestVersion: PropTypes.object.isRequired,
         lastUpdate: PropTypes.string.isRequired,
         updateUrl: PropTypes.string,
     }).isRequired

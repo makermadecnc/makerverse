@@ -18,7 +18,7 @@ const AboutContainer = ({ version }) => {
             />
             <div className={styles.productDetails}>
                 <div className={styles.aboutProductName}>
-                    {`${settings.productName} ${version.currentVersion}`}
+                    {`${settings.productName} v${version.currentVersion.readable}`}
                 </div>
                 <div className={styles.aboutProductDescription}>
                     {i18n._('A web-based interface for CNC milling controller running Grbl')}

@@ -3,6 +3,7 @@ import superagent from 'superagent';
 import semver from 'semver';
 import superagentUse from 'superagent-use';
 import settings from 'app/config/settings';
+import { parseSemver } from 'app/lib/semvers';
 import store from '../store';
 
 const bearer = (request) => {
@@ -59,8 +60,8 @@ const getLatestVersion = (prereleases) => new Promise((resolve, reject) => {
             } else {
                 const usePre = prereleases && semver.lt(res.body.release.tag_name, res.body.prerelease.tag_name);
                 const latestRelease = usePre ? res.body.prerelease : res.body.release;
-                const latestVersion = latestRelease.tag_name;
-                const isNewer = semver.lt(settings.version, latestVersion);
+                const latestVersion = parseSemver(latestRelease.tag_name);
+                const isNewer = semver.lt(settings.version.public, latestVersion.public);
                 resolve({
                     currentVersion: settings.version,
                     latestVersion: latestVersion,

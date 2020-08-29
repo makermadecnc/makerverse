@@ -125,7 +125,7 @@ series([
 ]).then(
     Workspaces.connect
 ).then(async () => {
-    log.info(`${settings.productName} ${settings.version}`);
+    log.info(`${settings.productName} ${settings.version.full}`);
 
     // Cross-origin communication
     window.addEventListener('message', (event) => {
@@ -173,7 +173,7 @@ series([
     if (settings.error.corruptedWorkspaceSettings) {
         const text = store.getConfig();
         const url = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
-        const filename = `${settings.name}-${settings.version}.json`;
+        const filename = `${settings.name}-${settings.version.full}.json`;
 
         await portal(({ onClose }) => (
             <Modal
