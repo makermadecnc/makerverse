@@ -114,7 +114,7 @@ const migrateStore = () => {
     // 1.9.0
     // * Renamed "widgets.probe.tlo" to "widgets.probe.touchPlateHeight"
     // * Removed "widgets.webcam.scale"
-    if (semver.lt(cnc.version, '1.9.0')) {
+    if (semver.lt(cnc.version.public, '1.9.0')) {
         // Probe widget
         const tlo = store.get('widgets.probe.tlo');
         if (tlo !== undefined) {
@@ -128,7 +128,7 @@ const migrateStore = () => {
     // Removed "widgets.axes.mzero"
     // Removed "widgets.axes.jog.customDistance"
     // Removed "widgets.axes.jog.selectedDistance"
-    if (semver.lt(cnc.version, '1.9.13')) {
+    if (semver.lt(cnc.version.public, '1.9.13')) {
         // Axes widget
         store.unset('widgets.axes.wzero');
         store.unset('widgets.axes.mzero');
@@ -141,7 +141,7 @@ const migrateStore = () => {
     // Removed "widgets.axes.mzero"
     // Removed "widgets.axes.jog.customDistance"
     // Removed "widgets.axes.jog.selectedDistance"
-    if (semver.lt(cnc.version, '1.9.16')) {
+    if (semver.lt(cnc.version.public, '1.9.16')) {
         store.unset('widgets.axes.jog.step');
     }
 };

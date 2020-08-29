@@ -109,7 +109,6 @@ after_success:
   - RELEASE_TAG=${CI_VERSION}
   - echo "$RELEASE_NAME"
   - echo "$RELEASE_TAG"
-  - npm run coveralls
   - mkdir -p releases
   - |
     # build:mac-x64

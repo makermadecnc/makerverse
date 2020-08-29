@@ -18,8 +18,8 @@ export const getLatestVersion = (req, res) => {
             }
 
             const { body: data = [] } = { ..._res };
-            const rel = _.findLastIndex(data, { draft: false, prerelease: false });
-            const pre = _.findLastIndex(data, { draft: false, prerelease: true });
+            const rel = _.findIndex(data, { draft: false, prerelease: false });
+            const pre = _.findIndex(data, { draft: false, prerelease: true });
 
             res.send({
                 prerelease: data[pre],
