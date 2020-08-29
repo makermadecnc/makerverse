@@ -21,7 +21,9 @@ const AboutContainer = ({ version }) => {
                     {`${settings.productName} v${version.currentVersion.readable}`}
                 </div>
                 <div className={styles.aboutProductDescription}>
-                    {i18n._('A web-based interface for CNC milling controller running Grbl')}
+                    A collarboration between MakerMade and OpenWorkShop.
+                    <br />
+                    Forked from the CNCjs project.
                 </div>
                 <Anchor
                     className={styles.learnmore}

@@ -8,6 +8,7 @@ import Home from './Home';
 import Settings from './Settings';
 import styles from './App.styl';
 import Workspaces from '../lib/workspaces';
+import { checkPath } from '../lib/paths';
 
 class App extends PureComponent {
     static propTypes = {
@@ -16,18 +17,7 @@ class App extends PureComponent {
 
     render() {
         const { location } = this.props;
-        const workspacePaths = Object.keys(Workspaces.all).map((workspaceId) => {
-            return Workspaces.all[workspaceId].path;
-        });
-        const staticPaths = Settings.paths.concat([
-            '/home',
-            '/settings',
-        ]);
-        const isWorkspace = workspacePaths.includes(location.pathname);
-        const isStaticPath = staticPaths.includes(location.pathname);
-        const accepted = isWorkspace || isStaticPath;
-
-        if (!accepted) {
+        if (!checkPath(location)) {
             return (
                 <Redirect
                     to={{

@@ -1,5 +1,4 @@
 #!/bin/bash
-set -euo pipefail
 
 mkdir -p output
 rm -rf output/*

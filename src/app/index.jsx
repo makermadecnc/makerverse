@@ -125,7 +125,7 @@ series([
 ]).then(
     Workspaces.connect
 ).then(async () => {
-    log.info(`${settings.productName} ${settings.version.full}`);
+    log.info(`${settings.productName}`);
 
     // Cross-origin communication
     window.addEventListener('message', (event) => {

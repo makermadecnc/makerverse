@@ -6,7 +6,11 @@ import mapGCodeToText from 'app/lib/gcode-text';
 import i18n from 'app/lib/i18n';
 import Panel from 'app/components/Panel';
 import Toggler from 'app/components/Toggler';
+import Space from 'app/components/Space';
 import styles from './index.styl';
+import {
+    MODAL_CALIBRATION
+} from './constants';
 
 class MaslowPanels extends PureComponent {
     static propTypes = {
@@ -410,6 +414,18 @@ class MaslowPanels extends PureComponent {
                         </Panel.Body>
                     )}
                 </Panel>
+                <button
+                    type="button"
+                    className="btn btn-default"
+                    onClick={() => {
+                        actions.openModal(MODAL_CALIBRATION);
+                    }}
+                    title={i18n._('Calibrate')}
+                >
+                    <i className="fa fa-bullseye" />
+                    <Space width="8" />
+                    {i18n._('Calibrate')}
+                </button>
             </div>
         );
     }

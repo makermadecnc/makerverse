@@ -1,5 +1,4 @@
 #!/bin/bash
-set -euo pipefail
 
 mkdir -p dist
 rm -rf dist/*

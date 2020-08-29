@@ -1,6 +1,6 @@
 {
   "name": "makerverse",
-  "version": "1.1.0",
+  "version": "1.1.0-dev",
   "description": "A web-based interface for CNC milling controller.",
   "homepage": "https://github.com/makermadecnc/makerverse",
   "author": "Maker Made <info@makermade.com>",
@@ -17,7 +17,7 @@
   "preferGlobal": true,
   "scripts": {
     "prepare": "",
-    "prebuild-latest": "npm run package-sync && bash -c \"cd src; npm version `./scripts/semver.sh` --allow-same-version\" && bash scripts/prebuild-prod.sh",
+    "prebuild-latest": "npm run package-sync && bash scripts/prebuild-latest.sh",
     "prebuild-dev": "npm run package-sync && bash scripts/prebuild-dev.sh",
     "prebuild-prod": "npm run package-sync && bash scripts/prebuild-prod.sh",
     "build": "npm run build-prod",
@@ -73,6 +73,7 @@
       "output": "output",
       "app": "dist/makerverse"
     },
+    "copyright": "Copyright © 2020 MakerMade & OpenWorkShop, Inc.",
     "publish": [],
     "mac": {
       "category": "public.app-category.productivity",

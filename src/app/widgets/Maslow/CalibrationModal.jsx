@@ -389,6 +389,8 @@ class CalibrationModal extends PureComponent {
                                     {'Your "Home" position is at the center of the workspace, where Machine Position (MPos) = 0, 0, 0.'}
                                     <br />
                                     {'Make sure your sled is as close as possible to this point before proceeding.'}
+                                    <br />
+                                    {'You may need to close this dialog and jog/shuttle the sled into position.'}
                                 </div>
                                 <div className={styles.bottom}>
                                     {'Measure motorOffsetY coplanar with the workspace. For distBetweenMotors, measure between the centers of the sprockets.'}

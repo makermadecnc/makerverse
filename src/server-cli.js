@@ -26,7 +26,7 @@ const parseMountPoint = (val, acc) => {
         mount.target = r[2];
     }
 
-    // mount.route is interpreted by cncjs code that uses posix syntax
+    // mount.route is interpreted by makerverse code that uses posix syntax
     // where the separator is / , so we perform this join in posix mode
     // mode to avoid introducing \ separators when running on Windows.
     mount.route = path.posix.join('/', mount.route || '').trim(); // path.join('/', 'pendant') => '/pendant'
@@ -57,14 +57,14 @@ program
 //     console.log('');
 //     console.log('  Examples:');
 //     console.log('');
-//     console.log('    $ cncjs -vv');
-//     console.log('    $ cncjs --mount /pendant:/home/pi/tinyweb');
-//     console.log('    $ cncjs --mount /widget:~+/widget --mount /pendant:~/pendant');
-//     console.log('    $ cncjs --mount /widget:https://cncjs.github.io/cncjs-widget-boilerplate/v1/');
-//     console.log('    $ cncjs --watch-directory /home/pi/watch');
-//     console.log('    $ cncjs --access-token-lifetime 60d  # e.g. 3600, 30m, 12h, 30d');
-//     console.log('    $ cncjs --allow-remote-access');
-//     console.log('    $ cncjs --controller Grbl');
+//     console.log('    $ makerverse -vv');
+//     console.log('    $ makerverse --mount /pendant:/home/pi/tinyweb');
+//     console.log('    $ makerverse --mount /widget:~+/widget --mount /pendant:~/pendant');
+//     console.log('    $ makerverse --mount /widget:https://cncjs.github.io/cncjs-widget-boilerplate/v1/');
+//     console.log('    $ makerverse --watch-directory /home/pi/watch');
+//     console.log('    $ makerverse --access-token-lifetime 60d  # e.g. 3600, 30m, 12h, 30d');
+//     console.log('    $ makerverse --allow-remote-access');
+//     console.log('    $ makerverse --controller Grbl');
 //     console.log('');
 // });
 

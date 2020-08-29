@@ -1,11 +1,9 @@
 #!/bin/bash
-set -euo pipefail
-
 tag=${1:-`git describe --tags`}
 version=`echo $tag | sed 's/-\(.*\)//'`
 
 if [ -z "$TRAVIS_PULL_REQUEST_BRANCH" ]; then
-  branch=${TRAVIS_BRANCH:-latest}
+  branch=${TRAVIS_BRANCH:-dev}
 else
   branch="$TRAVIS_PULL_REQUEST_BRANCH"
 fi

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+nv=$(node -v)
+if [[ "$nv" =~ "v12." ]]; then
+  echo "NodeJS $nv detected";
+elif [[ -z "$nv" ]]; then
+  echo "Could not detect NodeJS. Please install version 12.xx.x:"
+  echo "https://nodejs.org/en/download/"
+  exit 1
+else
+  echo "NodeJS was not version 12.x"
+  echo "Please consider using NVM to support multiple versions of NodeJS."
+  exit 1
+fi
+
+npm install
+npm run build-prod
+node ./bin/makerverse

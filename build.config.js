@@ -16,6 +16,6 @@ module.exports = {
         'zh-tw' // Traditional Chinese
     ],
     analytics: {
-        trackingId: 'UA-107017110-1'
+        trackingId: 'UA-3920215-30'
     }
 };

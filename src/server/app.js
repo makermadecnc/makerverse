@@ -332,7 +332,7 @@ const appMain = () => {
         return {
             webroot: webroot,
             lang: lng,
-            title: `${t('title')} ${settings.version.public}`,
+            title: `${t('title')}`,
             loading: t('loading')
         };
     }));

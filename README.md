@@ -1,27 +1,83 @@
+# Makerverse
 
+A full-featured web-based controller platform for CNC & 3DP machines.
 
-[![NPM](https://nodei.co/npm/cncjs.png?downloads=true&stars=true)](https://www.npmjs.com/package/cncjs)
-![cncjs](https://raw.githubusercontent.com/cncjs/cncjs/master/media/banner.png)
+## Getting Started
 
-CNCjs is a full-featured web-based interface for CNC controllers running [Grbl](https://github.com/grbl/grbl) or [Marlin](https://github.com/MarlinFirmware/Marlin).
+You can always find the latest versions on the [Releases page](https://github.com/makermadecnc/makerverse/releases/).
 
-For a more complete introduction, see the [Introduction](https://github.com/cncjs/cncjs/wiki/Introduction) section of the wiki page.
+![screenshot](https://raw.githubusercontent.com/makermadecnc/makerverse/master/screenshot.png)
 
-![cncjs](https://cloud.githubusercontent.com/assets/447801/24392019/aa2d725e-13c4-11e7-9538-fd5f746a2130.png)
+There are several ways to run Makerverse.
 
-## Features
+### Stand-Alone Application
 
-* Supported controllers
-    - [Grbl](https://github.com/gnea/grbl) ([Download](https://github.com/gnea/grbl/releases))
-    - [Grbl-Mega](https://github.com/gnea/grbl-Mega) ([Download](https://github.com/gnea/grbl-Mega/releases))
-    - [Marlin](https://github.com/MarlinFirmware/Marlin) ([Download](http://marlinfw.org/meta/download/))
+In the Release, find the appropriate file:
 
-* [Desktop App for Linux, Mac OS X, and Windows](https://github.com/cncjs/cncjs/wiki/Desktop-App)
+- **Windows**: `.exe`
+- **MacOS**: `.dmg` (_coming soon_)
+
+### Web Server
+
+With this approach, you can connect to the Makerverse app from any web browser on the same network. Choose from the below installation options, given your hardware and knowledge.
+
+_Note: for security reasons, you can only access the Makerverse app from a browser on the same device by default. To enable access from other machines, enable the `allowRemoteAccess` flag (see Configuration). Be sure that you understand the security implications of this decision._
+
+#### Command Line Installation
+
+You will need `node` (**Node.js**) version `12.xx.y`. Downloads can be [found here](https://nodejs.org/en/download/) (including [via package managers](https://nodejs.org/en/download/package-manager/)).
+
+Either `git clone` this repository (preferred), or download and unzip the Source Code from the Release. Enter the source code directory from the command line and run:
+
+```
+chmod +x ./bin/launch
+bash ./bin/launch
+```
+
+The first time you run, this will take a while. This "run" script is doing the necessary installs and updates. Once it starts, open `http://localhost:8000` **on the same device**. You should find the web application. If you'd like to access it from a different device, see the Configuration section.
+
+To update the application, first acquire the new source code (`git pull` or download the latest release and unzip on top of the existing directory). Then, just run the `./bin/launch` script again to launch the application.
+
+#### Start at Boot (Service)
+
+On a Raspberry Pi, Ubuntu, or other Debian Linux machine you can use systemd to run Makerverse as a service. From the makerverse directory:
+
+```
+mkdir -p ~/.config/systemd/user/
+cp ./bin/makerverse.service ~/.config/systemd/user/
+systemctl --user enable makerverse.service
+systemctl --user start makerverse.service
+```
+
+To view logs, use `journalctl -xe`.
+
+#### Docker Image
+
+Pull from `skilescm/makerverse:latest` (multi-arch image, including `amd64`, `armv7`, and `arm64`). The application is launched from the `/home/node` directory, where the root of this repository resides. Consider mounting widgets into `/home/node/widgets`, for example.
+
+#### Pre-Built Raspberry Pi Image
+
+_Coming soon._
+
+## Configuration
+
+### The Settings File
+
+Settings are loaded from the `$HOME/.cncrc` file (e.g., `/home/pi/.cncrc`); a [sample file is located here](https://github.com/makermadecnc/makerverse/blob/master/examples/.cncrc).
+
+### Supported Controllers
+
+- [Maslow Mega](https://github.com/WebControlCNC/Firmware/tree/release/holey) - aka "Maslow Classic" ([Holey v51.28 or later](https://github.com/WebControlCNC/Firmware/tree/release/holey))
+- [Maslow Due](https://github.com/makermadecnc/MaslowDue) - aka "M2" ([v20200811 or later](https://github.com/makermadecnc/MaslowDue))
+- [Grbl](https://github.com/gnea/grbl) ([Download](https://github.com/gnea/grbl/releases))
+- [Grbl-Mega](https://github.com/gnea/grbl-Mega) ([Download](https://github.com/gnea/grbl-Mega/releases))
+- [Marlin](https://github.com/MarlinFirmware/Marlin) ([Download](http://marlinfw.org/meta/download/))
+
+### Core Features
+
 * 6-axis digital readout (DRO)
 * Tool path 3D visualization
 * Simultaneously communicate with multiple clients
-* Responsive view for small screen display with device width less than 720px
-    - <i>Safari on an iPhone 5S</i> [\[1\]](https://cloud.githubusercontent.com/assets/447801/15633749/b817cd4a-25e7-11e6-9beb-600c65ea1324.PNG) [\[2\]](https://cloud.githubusercontent.com/assets/447801/15633750/b819b5f6-25e7-11e6-8bfe-d3e6247e443b.PNG)
 * Customizable workspace
 * Custom MDI (Multiple Document Interface) command buttons (since 1.9.13)
 * My Account
@@ -29,20 +85,15 @@ For a more complete introduction, see the [Introduction](https://github.com/cncj
 * Events
 * [Keyboard Shortcuts](https://cnc.js.org/docs/user-guide/#keyboard-shortcuts)
 * [Contour ShuttleXpress](https://cnc.js.org/docs/user-guide/#contour-shuttlexpress)
-* Multi-Language Support 
+* Multi-Language Support
 * Watch Directory
+* Laser
 * [Tool Change](https://github.com/cncjs/cncjs/wiki/Tool-Change) (since 1.9.11)
 * Z-Probe
 
-## Custom Widgets
+### Custom Widgets
 
-* [cncjs-widget-boilerplate](https://github.com/cncjs/cncjs-widget-boilerplate) - Creating custom widgets for CNCjs.
-
-## Pendants
-
-### Boilerplate Code
-
-* [cncjs-pendant-boilerplate](https://github.com/cncjs/cncjs-pendant-boilerplate) - A bare minimum example to develop a cncjs pendant.
+* [cncjs-widget-boilerplate](https://github.com/cncjs/cncjs-widget-boilerplate) - Boilerplate for custom widgets in Makerverse.
 
 ### Existing Pendants
 
@@ -50,35 +101,39 @@ For a more complete introduction, see the [Introduction](https://github.com/cncj
 * [cncjs-pendant-lcd](https://github.com/cncjs/cncjs-pendant-lcd) - CNCjs Web Kiosk for Raspberry Pi Touch Displays.
 * [cncjs-pendant-ps3](https://github.com/cncjs/cncjs-pendant-ps3) - Dual Shock / PS3 Bluetooth Remote Pendant for CNCjs.
 * [cncjs-pendant-raspi-gpio](https://github.com/cncjs/cncjs-pendant-raspi-gpio) - Simple Raspberry Pi GPIO Pendant control for CNCjs.
+* Responsive view for small screen display with device width less than 720px
+    - <i>Safari on an iPhone 5S</i> [\[1\]](https://cloud.githubusercontent.com/assets/447801/15633749/b817cd4a-25e7-11e6-9beb-600c65ea1324.PNG) [\[2\]](https://cloud.githubusercontent.com/assets/447801/15633750/b819b5f6-25e7-11e6-8bfe-d3e6247e443b.PNG)
 
-## Tablet UI
+### Tablet UI
 
 * [cncjs-pendant-tinyweb](https://github.com/cncjs/cncjs-pendant-tinyweb) - A tiny web console for small 320x240 LCD display.<br>
     ![cncjs-pendant-tinyweb](https://raw.githubusercontent.com/cncjs/cncjs/master/media/tinyweb-axes.png)
 * [cncjs-shopfloor-tablet](https://github.com/cncjs/cncjs-shopfloor-tablet) - A simplified UI for cncjs optimized for tablet computers in a production (shop floor) environment.<br>
     ![cncjs-shopfloor-tablet](https://user-images.githubusercontent.com/4861133/33970662-4a8244b2-e018-11e7-92ab-5a379e3de461.PNG)
 
-## Browser Support
+### Command-Line Usage
 
-![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png)<br>Chrome | ![Edge](https://raw.github.com/alrra/browser-logos/master/src/edge/edge_48x48.png)<br>Edge | ![Firefox](https://raw.github.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png)<br>Firefox | ![IE](https://raw.github.com/alrra/browser-logos/master/src/archive/internet-explorer_9-11/internet-explorer_9-11_48x48.png)<br>IE | ![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png)<br>Opera | ![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png)<br>Safari
---- | --- | --- | --- | --- | --- |
- Yes | Yes | Yes| Not supported | Yes | Yes | 
+For help, type `./bin/makerverse --help`:
+```
+Usage: app [options]
 
-## Supported Node.js Versions
+Options:
+  -V, --version                       output the version number
+  -p, --port <port>                   Set listen port (default: 8000) (default: 8000)
+  -H, --host <host>                   Set listen address or hostname (default: 0.0.0.0) (default: "0.0.0.0")
+  -b, --backlog <backlog>             Set listen backlog (default: 511) (default: 511)
+  -c, --config <filename>             Set config file (default: ~/.cncrc)
+  -v, --verbose                       Increase the verbosity level (-v, -vv, -vvv)
+  -m, --mount <route-path>:<target>   Add a mount point for serving static files (default: [])
+  -w, --watch-directory <path>        Watch a directory for changes
+  --access-token-lifetime <lifetime>  Access token lifetime in seconds or a time span string (default: 30d)
+  --allow-remote-access               Allow remote access to the server (default: false)
+  -h, --help                          output usage information
+```
 
- Version | Supported Level
-:------- |:---------------
- 4       | Dropped support
- 6       | Supported
- 8       | Supported
- 10      | Recommended
- 12      | Recommended
+### Troubleshooting Node.js
 
-## Getting Started
-
-### Node.js Installation
-
-Node.js 8 or higher is recommended. You can install [Node Version Manager](https://github.com/creationix/nvm) to manage multiple Node.js versions. If you have `git` installed, just clone the `nvm` repo, and check out the latest version:
+Node.js 12 is recommended. You can install [Node Version Manager](https://github.com/creationix/nvm) to manage multiple Node.js versions. If you have `git` installed, just clone the `nvm` repo, and check out the latest version:
 ```
 git clone https://github.com/creationix/nvm.git ~/.nvm
 cd ~/.nvm
@@ -87,7 +142,7 @@ cd ..
 . ~/.nvm/nvm.sh
 ```
 
-Add these lines to your `~/.bash_profile`, `~/.bashrc`, or `~/.profile` file to have it automatically sourced upon login: 
+Add these lines to your `~/.bash_profile`, `~/.bashrc`, or `~/.profile` file to have it automatically sourced upon login:
 ```bash
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
@@ -104,168 +159,33 @@ It's also recommended that you upgrade npm to the latest version. To upgrade, ru
 npm install npm@latest -g
 ```
 
-### Installation
 
-Install cncjs as a non-root user, or the [serialport](https://github.com/node-serialport/node-serialport) module may not install correctly on some platforms like Raspberry Pi.
-```
-npm install -g cncjs
-```
+## Browser Support
 
-If you're going to use sudo or root to install cncjs, you need to specify the `--unsafe-perm` option to run npm as the root account.
-```
-sudo npm install --unsafe-perm -g cncjs
-```
+![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png)<br>Chrome | ![Edge](https://raw.github.com/alrra/browser-logos/master/src/edge/edge_48x48.png)<br>Edge | ![Firefox](https://raw.github.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png)<br>Firefox | ![IE](https://raw.github.com/alrra/browser-logos/master/src/archive/internet-explorer_9-11/internet-explorer_9-11_48x48.png)<br>IE | ![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png)<br>Opera | ![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png)<br>Safari
+--- | --- | --- | --- | --- | --- |
+ Yes | Yes | Yes| Not supported | Yes | Yes |
 
-Check out [https://github.com/cncjs/cncjs/wiki/Installation](https://github.com/cncjs/cncjs/wiki/Installation) for other installation methods.
+## Supported Node.js Versions
 
-### Upgrade
-
-Run `npm install -g cncjs@latest` to install the latest version. To determine the version, use `cncjs -V`.
-
-### Usage
-
-Run `cncjs` to start the server, and visit `http://yourhostname:8000/` to view the web interface. Pass `--help` to `cncjs` for more options.
-
-```
-pi@rpi3$ cncjs -h
-
-  Usage: cncjs [options]
+ Version | Supported Level
+:------- |:---------------
+ 4       | Dropped support
+ 6       | Supported
+ 8       | Supported
+ 10      | Recommended
+ 12      | Recommended
 
 
-  Options:
+## About
 
-    -V, --version                       output the version number
-    -p, --port <port>                   Set listen port (default: 8000)
-    -H, --host <host>                   Set listen address or hostname (default: 0.0.0.0)
-    -b, --backlog <backlog>             Set listen backlog (default: 511)
-    -c, --config <filename>             Set config file (default: ~/.cncrc)
-    -v, --verbose                       Increase the verbosity level (-v, -vv, -vvv)
-    -m, --mount <route-path>:<target>   Add a mount point for serving static files
-    -w, --watch-directory <path>        Watch a directory for changes
-    --access-token-lifetime <lifetime>  Access token lifetime in seconds or a time span string (default: 30d)
-    --allow-remote-access               Allow remote access to the server (default: false)
-    --controller <type>                 Specify CNC controller: Grbl|Marlin (default: '')
-    -h, --help                          output usage information
+This is a fork of the [CNCjs project](https://github.com/cncjs/cncjs) which spawned from the Maslow CNC ecosystem. Several members of the Maslow community worked together to make the Maslow and M2 (Due) firmware compatible with CNCjs. At the same time, the CNCjs project development was paused due to extenuating circumstances. As a result, Makerverse evolved its own vision of an application which supports a wide variety of CNC & 3DP hardware with a clean interface and powerful widgets.
 
-  Examples:
+@zaneclaes
+@skilescm
 
-    $ cncjs -vv
-    $ cncjs --mount /pendant:/home/pi/tinyweb
-    $ cncjs --mount /widget:~+/widget --mount /pendant:~/pendant
-    $ cncjs --mount /widget:https://cncjs.github.io/cncjs-widget-boilerplate/v1/
-    $ cncjs --watch-directory /home/pi/watch
-    $ cncjs --access-token-lifetime 60d  # e.g. 3600, 30m, 12h, 30d
-    $ cncjs --allow-remote-access
-    $ cncjs --controller Grbl
-```
+Original CNCjs contributors: <a href="graphs/contributors"><img src="https://opencollective.com/cncjs/contributors.svg?width=890&button=false" /></a>
 
-Instead of passing command line options for `--watch-directory`, `--access-token-lifetime`, `--allow-remote-access`, and `--controller`, you can create a `~/.cncrc` file that contains the following configuration in JSON format:
-```json
-{
-    "mountPoints": [
-        {
-            "route": "/pendant",
-            "target": "/home/pi/tinyweb"
-        },
-        {
-            "route": "/widget",
-            "target": "https://cncjs.github.io/cncjs-widget-boilerplate/v1/"
-        }
-    ],
-    "watchDirectory": "/path/to/dir",
-    "accessTokenLifetime": "30d",
-    "allowRemoteAccess": false,
-    "controller": ""
-}
-```
-
-To troubleshoot issues, run:
-```
-cncjs -vvv
-```
-
-### Configuration File
-
-The configuration file <b>.cncrc</b> contains settings that are equivalent to the cncjs command-line options. The configuration file is stored in user's home directory. To find out the actual location of the home directory, do the following:
-
-* Linux/Mac
-  ```sh
-  echo $HOME
-  ```
-
-* Windows
-  ```sh
-  echo %USERPROFILE%
-  ```
-
-Check out an example configuration file [here](https://github.com/cncjs/cncjs/blob/master/examples/.cncrc).
-
-### File Format
-
-See https://github.com/cncjs/cncjs/issues/242#issuecomment-352294549 for a detailed explanation.
-
-```json
-{
-  "ports": [
-     {
-       "comName": "/dev/ttyAMA0",
-       "manufacturer": ""
-     }
-  ],
-  "baudrates": [115200, 250000],
-  "mountPoints": [
-    {
-      "route": "/widget",
-      "target": "https://cncjs.github.io/cncjs-widget-boilerplate/v1/"
-    }
-  ],
-  "watchDirectory": "/path/to/dir",
-  "accessTokenLifetime": "30d",
-  "allowRemoteAccess": false,
-  "controller": "",
-  "state": {
-    "checkForUpdates": true,
-    "controller": {
-      "exception": {
-        "ignoreErrors": false
-      }
-    }
-  },
-  "commands": [
-    {
-      "title": "Update (root user)",
-      "commands": "sudo npm install -g cncjs@latest --unsafe-perm; pkill -f cncjs"
-    },
-    {
-      "title": "Update (non-root user)",
-      "commands": "npm install -g cncjs@latest; pkill -f cncjs"
-    },
-    {
-      "title": "Reboot",
-      "commands": "sudo /sbin/reboot"
-    },
-    {
-      "title": "Shutdown",
-      "commands": "sudo /sbin/shutdown"
-    }
-  ],
-  "events": [],
-  "macros": [],
-  "users": []
-}
-```
-
-## Documentation
-
-https://cnc.js.org/docs/
-
-## Examples
-
-There are several *.gcode files in the [examples](https://github.com/cncjs/cncjs/tree/master/examples) directory. You can use the GCode widget to load a GCode file and make a trial run.
-
-If you don't have a CAM software, try using [jscut](http://jscut.org/) to create G-Code from *.svg. It's a simple CAM package that runs in the browser.
-
-Check out a live demo at http://jscut.org/jscut.html.
 
 ## Contributions
 
@@ -277,7 +197,7 @@ Pull requests welcome! Learn how to [contribute](CONTRIBUTING.md).
 
 You can help translate resource files in both of [app](https://github.com/cncjs/cncjs/tree/master/src/app/i18n) and [web](https://github.com/cncjs/cncjs/tree/master/src/web/i18n) directories from English to other languages. Check out [Localization guide](https://github.com/cncjs/cncjs/blob/master/CONTRIBUTING.md#localization) to learn how to get started. If you are not familiar with GitHub development, you can [open an issue](https://github.com/cncjs/cncjs/issues) or send your translations to cheton@gmail.com.
 
-Locale | Language | Status | Contributors 
+Locale | Language | Status | Contributors
 :----- | :------- | :----- | :-----------
 [cs](https://github.com/cncjs/cncjs/tree/master/src/web/i18n/cs) | Čeština (Czech) | ✔ | [Miroslav Zuzelka](https://github.com/dronecz)
 [de](https://github.com/cncjs/cncjs/tree/master/src/web/i18n/de) | Deutsch (German) | ✔ | [Thorsten Godau](https://github.com/dl9sec), [Max B.](https://github.com/mbs38)
@@ -293,42 +213,7 @@ Locale | Language | Status | Contributors
 [zh-cn](https://github.com/cncjs/cncjs/tree/master/src/web/i18n/zh-cn) | 简体中文 (Simplified Chinese) | ✔ | [Mandy Chien](https://github.com/MandyChien), [Terry Lee](https://github.com/TerryShampoo)
 [zh-tw](https://github.com/cncjs/cncjs/tree/master/src/web/i18n/zh-tw) | 繁體中文 (Traditional Chinese) | ✔ | [Cheton Wu](https://github.com/cheton)
 
-## Donate
-
-If you would like to support this project, you can make a donation using PayPal. Thank you!
-
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=38CYN33CWPBR2)
-
-## Contributors
-
-This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
-<a href="graphs/contributors"><img src="https://opencollective.com/cncjs/contributors.svg?width=890&button=false" /></a>
-
-
-## Backers
-
-Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/cncjs#backer)]
-
-<a href="https://opencollective.com/cncjs#backers" target="_blank"><img src="https://opencollective.com/cncjs/backers.svg?width=890"></a>
-
-
-## Sponsors
-
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/cncjs#sponsor)]
-
-<a href="https://opencollective.com/cncjs/sponsor/0/website" target="_blank"><img src="https://opencollective.com/cncjs/sponsor/0/avatar.svg"></a>
-<a href="https://opencollective.com/cncjs/sponsor/1/website" target="_blank"><img src="https://opencollective.com/cncjs/sponsor/1/avatar.svg"></a>
-<a href="https://opencollective.com/cncjs/sponsor/2/website" target="_blank"><img src="https://opencollective.com/cncjs/sponsor/2/avatar.svg"></a>
-<a href="https://opencollective.com/cncjs/sponsor/3/website" target="_blank"><img src="https://opencollective.com/cncjs/sponsor/3/avatar.svg"></a>
-<a href="https://opencollective.com/cncjs/sponsor/4/website" target="_blank"><img src="https://opencollective.com/cncjs/sponsor/4/avatar.svg"></a>
-<a href="https://opencollective.com/cncjs/sponsor/5/website" target="_blank"><img src="https://opencollective.com/cncjs/sponsor/5/avatar.svg"></a>
-<a href="https://opencollective.com/cncjs/sponsor/6/website" target="_blank"><img src="https://opencollective.com/cncjs/sponsor/6/avatar.svg"></a>
-<a href="https://opencollective.com/cncjs/sponsor/7/website" target="_blank"><img src="https://opencollective.com/cncjs/sponsor/7/avatar.svg"></a>
-<a href="https://opencollective.com/cncjs/sponsor/8/website" target="_blank"><img src="https://opencollective.com/cncjs/sponsor/8/avatar.svg"></a>
-<a href="https://opencollective.com/cncjs/sponsor/9/website" target="_blank"><img src="https://opencollective.com/cncjs/sponsor/9/avatar.svg"></a>
-
-
-
 ## License
 
 Licensed under the [MIT License](https://raw.githubusercontent.com/cncjs/cncjs/master/LICENSE).
+
