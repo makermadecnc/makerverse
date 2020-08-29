@@ -918,7 +918,7 @@ class Visualizer extends Component {
         // Remove previous G-code object
         this.unload();
 
-        this.visualizer = new GCodeVisualizer();
+        this.visualizer = new GCodeVisualizer(this.workspace.controllerState);
 
         const obj = this.visualizer.render(gcode);
         obj.name = 'Visualizer';

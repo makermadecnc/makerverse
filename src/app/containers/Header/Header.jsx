@@ -181,7 +181,7 @@ class Header extends PureComponent {
             pushPermission: pushPermission,
             commands: [],
             runningTasks: [],
-            latestVersion: '',
+            latestVersion: { readable: '' },
             lastUpdate: '',
             updateAvailable: false,
             updateUrl: null,
@@ -206,7 +206,7 @@ class Header extends PureComponent {
 
         this.removeActionHandlers();
         if (this.workspace) {
-            this.workspace.removeControllerEvents();
+            this.workspace.removeControllerEvents(this.controllerEvents);
         }
 
         this.runningTasks = [];
@@ -248,7 +248,7 @@ class Header extends PureComponent {
         const showCommands = commands.length > 0;
         const workspace = Workspaces.findByPath(location.pathname);
         const updateMsg = i18n._('A new version of {{name}} is available', { name: settings.productName }) + '. ' +
-            i18n._('Version {{version}}', { version: latestVersion }) +
+            i18n._('Version {{version}}', { version: latestVersion.readable }) +
             ` (${moment(lastUpdate).format('LLL')})`;
 
         return (

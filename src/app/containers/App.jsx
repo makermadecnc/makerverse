@@ -19,12 +19,12 @@ class App extends PureComponent {
         const workspacePaths = Object.keys(Workspaces.all).map((workspaceId) => {
             return Workspaces.all[workspaceId].path;
         });
-        const staticPaths = [
+        const staticPaths = Settings.paths.concat([
             '/home',
             '/settings',
-        ] + Settings.paths;
-        const isWorkspace = workspacePaths.indexOf(location.pathname) >= 0;
-        const isStaticPath = staticPaths.indexOf(location.pathname) >= 0;
+        ]);
+        const isWorkspace = workspacePaths.includes(location.pathname);
+        const isStaticPath = staticPaths.includes(location.pathname);
         const accepted = isWorkspace || isStaticPath;
 
         if (!accepted) {

@@ -34,6 +34,11 @@ const stateDefaults = {
             y: '0.000',
             z: '0.000'
         },
+        wco: {
+            x: '0.000',
+            y: '0.000',
+            z: '0.000'
+        },
         buffer: {},
         feedback: {}, // MSG, positional errors, buffer space.
         alarm: null, // Alarm object (from constants)
@@ -55,12 +60,7 @@ const stateDefaults = {
         tool: '',
         feedrate: '',
         spindle: ''
-    },
-    workOrigin: {
-        x: 0,
-        y: 0,
-        z: 0
-    },
+    }
 };
 
 /**
@@ -131,6 +131,9 @@ class MaslowMemory {
     }
 
     fromMM(val) {
+        if (typeof val === 'string') {
+            val = Number(val);
+        }
         return this.getUnits() === METRIC_UNITS ? val : (val / 25.4);
     }
 
@@ -140,9 +143,9 @@ class MaslowMemory {
             // Do not set the work position on the Maslow Classic. It will be set in-memory.
             if (_.has(payload, 'mpos')) {
                 payload.wpos = {
-                    x: Number(payload.mpos.x) - this.fromMM(this.storage.config.workOrigin.x),
-                    y: Number(payload.mpos.y) - this.fromMM(this.storage.config.workOrigin.y),
-                    z: Number(payload.mpos.z) - this.fromMM(this.storage.config.workOrigin.z)
+                    x: Number(payload.mpos.x) - this.fromMM(this.storage.config.status.wco.x),
+                    y: Number(payload.mpos.y) - this.fromMM(this.storage.config.status.wco.y),
+                    z: Number(payload.mpos.z) - this.fromMM(this.storage.config.status.wco.z)
                 };
             }
         } else if (_.has(payload, 'mpos') && !_.has(payload, 'wpos')) {
@@ -244,8 +247,8 @@ class MaslowMemory {
             Object.keys(dest).forEach((coord) => {
                 payload[coord] = this.toMM(Number(mpos[coord]) - dest[coord]);
             });
-            this.storage.config.workOrigin = { ...this.storage.config.workOrigin, ...payload };
-            this.save('workOrigin', payload);
+            this.storage.config.status.wco = { ...this.storage.config.status.wco, ...payload };
+            this.save('status.wco', payload);
 
             // Prevent accidentally changing machine positions:
             cmds[0] = '';
@@ -255,7 +258,7 @@ class MaslowMemory {
                 const dest = this.extractCoords(params);
                 const coords = [];
                 Object.keys(dest).forEach((coord) => {
-                    const origin = this.fromMM(Number(this.storage.config.workOrigin[coord]));
+                    const origin = this.fromMM(Number(this.storage.config.status.wco[coord]));
                     const v = Math.round((dest[coord] + origin) * 1000) / 1000;
                     coords.push(coord.toUpperCase() + v);
                 });

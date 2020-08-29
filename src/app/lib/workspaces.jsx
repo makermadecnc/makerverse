@@ -172,6 +172,10 @@ class Workspaces {
 
     _connected = false;
 
+    _controllerState = null;
+
+    _controllerSettings = null;
+
     _controllerEvents = {
         'serialport:change': (options) => {
             const { port } = options;
@@ -212,14 +216,24 @@ class Workspaces {
         },
         'controller:state': (type, state) => {
             log.debug(type, 'state changed', state);
+            this._controllerState = state;
         },
         'controller:settings': (type, settings) => {
             log.debug(type, 'settings changed', settings);
+            this._controllerSettings = settings;
         }
     };
 
     get controller() {
         return this._controller;
+    }
+
+    get controllerState() {
+        return this._controllerState;
+    }
+
+    get controllerSettings() {
+        return this._controllerSettings;
     }
 
     get isConnected() {

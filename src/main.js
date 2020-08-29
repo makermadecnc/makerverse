@@ -87,7 +87,7 @@ const main = () => {
             };
             const options = {
                 ...bounds,
-                title: `${pkg.name} ${pkg.version}`
+                title: `${pkg.name}`
             };
             const window = windowManager.openWindow(url, options);
 

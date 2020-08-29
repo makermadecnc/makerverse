@@ -1,6 +1,7 @@
 import endsWith from 'lodash/endsWith';
 import mapKeys from 'lodash/mapKeys';
 import sha1 from 'sha1';
+import { parseSemver } from 'app/lib/semvers';
 import log from 'app/lib/log';
 import pkg from '../../package.json';
 
@@ -15,7 +16,7 @@ const settings = {
     workspaces: [],
     name: pkg.name,
     productName: pkg.productName,
-    version: pkg.version,
+    version: parseSemver(pkg.version),
     webroot: webroot,
     log: {
         level: 'debug' // trace, debug, info, warn, error
