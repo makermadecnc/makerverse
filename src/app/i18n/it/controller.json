@@ -1,14 +1,10 @@
 {
-    "Grbl": {
-        "activeState": {
-            "idle": "Inattivo",
-            "run": "Movimento",
-            "hold": "Pausa",
-            "door": "Finecorsa",
-            "home": "Home",
-            "sleep": "",
-            "alarm": "Allarme",
-            "check": "Controllo"
-        }
-    }
+    "idle": "",
+    "run": "",
+    "hold": "",
+    "door": "",
+    "home": "",
+    "sleep": "",
+    "alarm": "",
+    "check": ""
 }

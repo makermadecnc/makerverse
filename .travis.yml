@@ -59,17 +59,27 @@ jobs:
 # [Job] [Linux]
 - name: "Linux"
   os: linux
+  script:
+  - npm run build-latest
+  - npm run build:linux-ia32
+  - npm run build:linux-x64
 # [Job] [OSX]
 - name: "MacOS"
   os: osx
   osx_image: xcode8.3
   before_install:
   - brew update
+  script:
+  - npm run build-latest
+  - npm run build:mac-x64
   # before_deploy:
   # - scripts/add-osx-cert.sh
 # [Job] [Windows]
 - name: "Windows"
   os: windows
+  script:
+  - npm run build-latest
+  - npm run build:win-x64
 
 # --------------------------------------------------------------------------------------------------
 # Default job settings, when not overwritten by specific jobs.
@@ -84,10 +94,11 @@ node_js:
 
 before_script:
 - chmod -R +x scripts/
+- echo "Building $CI_SEMVER (v. $CI_VERSION)"
 
 env:
   global:
-    - CI_VERSION=`git describe --tags | sed 's/-\(.*\)//'`
+    - CI_VERSION=`git describe --tags --abbrev=0`
     - CI_SEMVER=`./scripts/semver.sh $CI_VERSION`
     - TRAVIS_TAG=$CI_VERSION
     - PRODUCT_NAME=Makerverse
@@ -103,65 +114,6 @@ cache:
     - releases
 
 install: npm install
-script:
-  - echo "Building $CI_SEMVER (v. $CI_VERSION)"
-  - npm run build-latest
-after_success:
-  - PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
-  - PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
-  - RELEASE_TAG=${CI_VERSION}
-  - echo "$RELEASE_NAME ($RELEASE_FILE)"
-  - mkdir -p releases
-  - |
-    # build:mac-x64
-    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      # https://github.com/electron-userland/electron-builder/issues/398
-      security import "scripts/certs/Certum-Code-Signing-CA-SHA2.cer" -k ~/Library/Keychains/login.keychain -T /usr/bin/codesign;
-      # https://github.com/electron-userland/electron-osx-sign/issues/83
-      # Temporarily Bypass Gatekeeper
-      sudo spctl --master-disable;
-      sudo spctl --status;
-      npm run build:mac-x64;
-      ls -al output output/*;
-    fi
-  - |
-    # build:linux-ia32
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      npm run build:linux-ia32;
-      ls -al output output/*;
-      cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-i386.AppImage" "releases/${RELEASE_FILE}-linux-i386.AppImage";
-      cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_i386.deb" "releases/${RELEASE_FILE}-linux-i386.deb";
-      cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.i686.rpm" "releases/${RELEASE_FILE}-linux.i686.rpm";
-      pushd releases;
-      ln -sf ../output/linux-ia32-unpacked "${RELEASE_FILE}-linux-ia32";
-      tar zcfh "${RELEASE_FILE}-linux-ia32.tar.gz" "${RELEASE_FILE}-linux-ia32";
-      rm -f "${RELEASE_FILE}-linux-ia32";
-      popd;
-      ls -al releases/*;
-    fi
-  - |
-    # build:linux-x64
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      npm run build:linux-x64;
-      ls -al output output/*;
-      cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.AppImage" "releases/${RELEASE_FILE}-linux-x86_64.AppImage";
-      cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_amd64.deb" "releases/${RELEASE_FILE}-linux-amd64.deb";
-      cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.x86_64.rpm" "releases/${RELEASE_FILE}-linux.x86_64.rpm";
-      pushd releases;
-      ln -sf ../output/linux-unpacked "${RELEASE_FILE}-linux-x64";
-      tar zcfh "${RELEASE_FILE}-linux-x64.tar.gz" "${RELEASE_FILE}-linux-x64";
-      rm -f "${RELEASE_FILE}-linux-x64";
-      popd;
-      ls -al releases/*;
-    fi
-  - |
-    # build:windows
-    if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-      npm run build:win-x64;
-      ls -al output output/*;
-      cp -af "output/${PRODUCT_NAME} Setup ${PACKAGE_VERSION}.exe" "releases/${RELEASE_FILE}.exe";
-      ls -al releases/*;
-    fi
 addons:
   apt:
     packages:
@@ -181,5 +133,6 @@ deploy:
     secure: NFvrOvBDkBwvJWANXEbkRtrFE0msZF+269Q4VHWL44izsIF/uTooIPt5FlMBvsroiDunwA6Zs/kX8Nnrf/D1zePybNu9zf8JarJuCzZuu80pWSn2aJQHCqH6mKkprSa6BoqxnptJG7Qdr0e16FaSOiDNE68DRhFYztlLZynf4EdD6k40UkP0k+6+v1Wg6qkNNykexP6SZDOzDBTyOLH3KVYvQdTaaiNL6+B1/HYWVF+D+QwGQVp2/k7FDUkaPJMY+1FLmjGuu/5Snl6I9+HqOEkS0zyrob/9DDZx158KhrfnTfx4IKmACA9lGo1eVFb1ZngupA7VYp329kHd7FVYWFbY1lcc2FdBP74xhilzJ4S1wtvDL6FTRbwTai0B7/c0Tsad31e2/2zucldv7Xh2UAzeCv4SPyihFA7cMpzqXncRH9N/JTTArspn9fFXbGsvU1Xo+0GppMHO0PQf77vjUoT7v6wPyE5OYcd9n1/xrTNTX9mttBF864qYEi8gGdZXaIN5ziaVvmaeYXOFuFww+hmRFGuBlNGueTdsHndAKW8oxPKjcQziiTpjuoWokXjp7zg2UUp9F5azihHo1whPmjNNnzfC8Vu2OHgXb3Nj2ugm1NXMRhTKyRt6Lsa8rKL8ZW8J3WpD65Jcm0Wq42q9JfOOgVn/+vf0olKu5wGT0rc=
   overwrite: true
   name: "[CI] $RELEASE_NAME"
-  body: "$(scripts/changelog.sh)"
+  # Travis does not support multi-line change logs / formatting.
+  # body: "$(scripts/changelog.sh)"
   prerelease: true

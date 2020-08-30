@@ -1,14 +1,10 @@
 {
-    "Grbl": {
-        "activeState": {
-            "idle": "Idle",
-            "run": "Çalışıyor",
-            "hold": "Kilitle",
-            "door": "Kapı",
-            "home": "Başlangıç",
-            "sleep": "Uyku",
-            "alarm": "Alarm",
-            "check": "Kontrol"
-        }
-    }
+    "idle": "",
+    "run": "",
+    "hold": "",
+    "door": "",
+    "home": "",
+    "sleep": "",
+    "alarm": "",
+    "check": ""
 }

@@ -1,14 +1,10 @@
 {
-    "Grbl": {
-        "activeState": {
-            "idle": "Készenlét",
-            "run": "Futtatás",
-            "hold": "Tartás",
-            "door": "Ajtó",
-            "home": "Nullpont",
-            "sleep": "",
-            "alarm": "Riasztás",
-            "check": "Ellenörzés"
-        }
-    }
+    "idle": "",
+    "run": "",
+    "hold": "",
+    "door": "",
+    "home": "",
+    "sleep": "",
+    "alarm": "",
+    "check": ""
 }

@@ -43,8 +43,6 @@
     "mkdirp": "~0.5.1",
     "morgan": "~1.9.1",
     "range_check": "~1.4.0",
-    "registry-auth-token": "~3.4.0",
-    "registry-url": "~5.1.0",
     "rimraf": "~2.6.3",
     "serialport": "~7.1.5",
     "serve-favicon": "~2.5.0",

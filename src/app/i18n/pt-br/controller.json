@@ -1,14 +1,10 @@
 {
-    "Grbl": {
-        "activeState": {
-            "idle": "inativo",
-            "run": "rodar",
-            "hold": "manter",
-            "door": "porta",
-            "home": "origem",
-            "sleep": "dormir",
-            "alarm": "alarme",
-            "check": "checar"
-        }
-    }
+    "idle": "",
+    "run": "",
+    "hold": "",
+    "door": "",
+    "home": "",
+    "sleep": "",
+    "alarm": "",
+    "check": ""
 }

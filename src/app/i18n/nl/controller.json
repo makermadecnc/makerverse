@@ -1,14 +1,10 @@
 {
-    "Grbl": {
-        "activeState": {
-            "idle": "stationair",
-            "run": "bezig",
-            "hold": "pauze",
-            "door": "deur",
-            "home": "naar huis",
-            "sleep": "slaap",
-            "alarm": "alarm",
-            "check": "nakijken"
-        }
-    }
+    "idle": "",
+    "run": "",
+    "hold": "",
+    "door": "",
+    "home": "",
+    "sleep": "",
+    "alarm": "",
+    "check": ""
 }

@@ -1,5 +1,7 @@
 # Makerverse
 
+[![Build Status](https://travis-ci.com/makermadecnc/makerverse.svg?branch=master)](https://travis-ci.com/makermadecnc/makerverse)
+
 A full-featured web-based controller platform for CNC & 3DP machines.
 
 ## Getting Started
