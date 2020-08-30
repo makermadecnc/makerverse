@@ -5,6 +5,7 @@ root="${__dirname}/../"
 output="${root}output"
 releases="${root}releases"
 semver=$(./scripts/semver.sh)
+vers=`git describe --tags --abbrev=0`
 
 PRODUCT_NAME=Makerverse
 PACKAGE_NAME=`node -e "console.log(require('${root}/src/package.json').name)"`
@@ -65,7 +66,7 @@ copy_release_file() {
     echo "ERROR: Release file missing: $fp"
     exit 1
   else
-    pn="${PACKAGE_NAME}-${2}-${semver}.${3}"
+    pn="makerverse-app-${2}-${vers}.${3}"
     echo "$pn"
     cp "$fp" "${releases}/${pn}"
   fi
@@ -76,7 +77,7 @@ compress_release_dir() {
   s="${1}"
   n="${2}"
   ln -sf "../output/${s}" "${PACKAGE_NAME}-${n}"
-  tar zcfh "${PACKAGE_NAME}-${n}.tar.gz" "${PACKAGE_NAME}-${n}"
+  tar zcfh "${PACKAGE_NAME}-${n}-${vers}.tar.gz" "${PACKAGE_NAME}-${n}"
   rm -f "${PACKAGE_NAME}-${n}"
   popd
 }
@@ -103,8 +104,8 @@ if [ "$1" = "--linux" ]; then
   fi
 elif [ "$1" = "--mac" ]; then
   echo "--- Mac bundle ---"
-  copy_release_file "${PRODUCT_NAME}-${PUBLIC_VERSION}" "macos" "pkg"
-  copy_release_file "${PRODUCT_NAME}-${PUBLIC_VERSION}" "macos" "dmg"
+  copy_release_file "${PRODUCT_NAME}-${semver}" "macos" "pkg"
+  # copy_release_file "${PRODUCT_NAME}-${semver}" "macos" "dmg"
 elif [ "$1" = "--win" ]; then
   echo "--- Windows bundle ---"
   copy_release_file "${PRODUCT_NAME} Setup ${semver}" "windows" "exe"

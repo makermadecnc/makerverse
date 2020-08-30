@@ -9,3 +9,8 @@ package-lock.json
 /output
 /releases
 windows-store
+filesystem.img
+/packer_cache
+/rpi
+bootstrap.log
+raspberry-pi.img

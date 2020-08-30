@@ -14,10 +14,15 @@ There are several ways to run Makerverse.
 
 ### Stand-Alone Application
 
-In the Release, find the appropriate file:
+In the Release, find the appropriate file, beginning with `makerverse-app-` and ending with...
 
 - **Windows**: `.exe`
-- **MacOS**: `.dmg` (_coming soon_)
+- **MacOS**: `.pkg`
+- **Linux**: _various_
+
+After installing, these applications run a UI (app), which is really a dedicated web browser (called Electron). Connect your machine directly to the computer via the USB port, and you're ready to go.
+
+When installing on Windows & MacOS, you will need to bypass/accept the security systems because the app is not yet "signed." Basically this means we're working on making it AppStore compatible.
 
 ### Web Server
 
@@ -25,11 +30,45 @@ With this approach, you can connect to the Makerverse app from any web browser o
 
 _Note: for security reasons, you can only access the Makerverse app from a browser on the same device by default. To enable access from other machines, enable the `allowRemoteAccess` flag (see Configuration). Be sure that you understand the security implications of this decision._
 
-#### Command Line Installation
+#### Docker Image
 
-You will need `node` (**Node.js**) version `12.xx.y`. Downloads can be [found here](https://nodejs.org/en/download/) (including [via package managers](https://nodejs.org/en/download/package-manager/)).
+_If you are experienced with Docker already_, pull from `makerverse/core:latest` (multi-arch image, including `amd64`, `armv7`, and `arm64`). The application is launched from the `/home/node` directory, where the root of this repository resides. Consider mounting a `~/.cncrc` file into `/home/node/.cncrc`, or widgets into `/home/node/widgets`, for example.
 
-Either `git clone` this repository (preferred), or download and unzip the Source Code from the Release. Enter the source code directory from the command line and run:
+_If you're new to Docker_, start by installing it. Just like with Node.js, it is recommended to use the Windows / MacOS [installers](https://www.docker.com/products/docker-desktop), when applicable. On Linux/Raspberry Pi, there's a one-line installer available:
+
+```
+curl -sSL https://get.docker.com | sh
+```
+
+Then, run the container. For example:
+```
+docker run --privileged --rm -p 8000:8000 makerverse/core:latest
+```
+
+Note: if you get a permission error, use `sudo docker ...`.
+
+Example: persist your settings onto your Raspberry Pi:
+```
+touch /home/pi/.cncrc
+docker run --privileged --rm -v /home/pi/.cncrc:/home/node/.cncrc -p 8000:8000 makerverse/core:latest
+```
+
+#### Pre-Built Raspberry Pi Image
+
+_Coming soon._
+
+#### Build from Source
+
+This is the fallback option to run Makerverse as a Web Server. If none of the above work for you, it is always possible to run Makerverse as a **node.js** application.
+
+You will need `node` (**Node.js**) version `12.xx.y`. Downloads for Windows, Mac, and Linux can be [found here](https://nodejs.org/en/download/) (including [via package managers](https://nodejs.org/en/download/package-manager/)). On a Raspberry Pi or Debian Linux system, use the following:
+
+```
+curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
+sudo apt-get install -y nodejs
+```
+
+Next, either `git clone` this repository (preferred), or download and unzip the Source Code from the Release. Enter the source code directory from the command line and run:
 
 ```
 chmod +x ./bin/launch
@@ -52,14 +91,6 @@ systemctl --user start makerverse.service
 ```
 
 To view logs, use `journalctl -xe`.
-
-#### Docker Image
-
-Pull from `skilescm/makerverse:latest` (multi-arch image, including `amd64`, `armv7`, and `arm64`). The application is launched from the `/home/node` directory, where the root of this repository resides. Consider mounting widgets into `/home/node/widgets`, for example.
-
-#### Pre-Built Raspberry Pi Image
-
-_Coming soon._
 
 ## Configuration
 

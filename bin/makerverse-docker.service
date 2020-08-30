@@ -1,0 +1,13 @@
+[Unit]
+Description=Makerverse Systemd service
+
+[Service]
+Type=simple
+WorkingDirectory=%h
+ExecStart=docker
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target
