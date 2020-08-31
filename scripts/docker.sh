@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -e pipefail
 
 # https://medium.com/@quentin.mcgaw/cross-architecture-docker-builds-with-travis-ci-arm-s390x-etc-8f754e20aaef
 
@@ -24,7 +24,9 @@ fi
 echo "Building $DOCKER_REPO:$TAG for $BUILD_PLATFORMS"
 
 # Login to Docker
-echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &> /dev/null
+echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+
+echo "Logged in to Docker."
 
 # n.b., this ALWAYS pushes the resulting image. This is because the --load flag does not
 # support multi-arch. https://github.com/docker/buildx/issues/59

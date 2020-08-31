@@ -53,6 +53,8 @@ touch /home/pi/.cncrc
 docker run --privileged --rm -v /home/pi/.cncrc:/home/node/.cncrc -p 8000:8000 makerverse/core:latest
 ```
 
+See the `bin/makerverse-docker.service` to run the Docker image automatically at boot. First, tweak the command arguments (volumes and ports) to your liking. Then, copy it to `/etc/systemd/system/` on the device. Finally, use `sudo systemctl enable makerverse-docker.service` and `sudo systemctl start makerverse-docker.service`.
+
 #### Pre-Built Raspberry Pi Image
 
 _Coming soon._
