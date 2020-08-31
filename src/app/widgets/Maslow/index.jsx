@@ -68,6 +68,7 @@ class MaslowWidget extends PureComponent {
         closeModal: () => {
             this.setState({
                 modal: {
+                    ...this.state.modal,
                     name: MODAL_NONE,
                     params: {}
                 }

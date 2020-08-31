@@ -27,7 +27,7 @@ import urljoin from './lib/urljoin';
 
 const log = logger('init');
 
-// Default contents of .cncrc, deep-merged with file contents.
+// Default contents of .makerverse, deep-merged with file contents.
 const rcDefault = {
     state: {
         checkForUpdates: true,

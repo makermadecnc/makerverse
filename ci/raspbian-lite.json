@@ -29,7 +29,9 @@
       }
     ],
     "image_setup_extra": [
-      ["cp", "/build/bin/makerverse-docker.service", "$MOUNTPOINT/etc/systemd/system/"]
+      ["mkdir", "$MOUNTPOINT/home/pi/makerverse"],
+      ["cp", "/build/.makerverse.docker", "$MOUNTPOINT/home/pi/.makerverse"],
+      ["cp", "-r", "/build/bin", "$MOUNTPOINT/home/pi/makerverse/"]
     ],
     "image_chroot_env": ["PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"],
     "qemu_binary_source_path": "/usr/bin/qemu-arm-static",
@@ -40,6 +42,12 @@
       "type": "shell",
       "inline": [
         "sudo touch /boot/ssh",
+        "sudo sed -i \"s/raspberrypi/makerverse/\" /etc/hostname",
+        "sudo sed -i \"s/raspberrypi/makerverse/\" /etc/hosts",
+        "sudo echo 'KERNEL==\"ttyUSB[0-9]*\",MODE=\"0666\"' >> /etc/udev/rules.d/49-makerverse.rules",
+        "sudo echo 'KERNEL==\"ttyACM[0-9]*\",MODE=\"0666\"' >> /etc/udev/rules.d/49-makerverse.rules",
+        "sudo hostname makerverse",
+        "sudo chown pi:pi /home/pi/.makerverse",
         "mkdir -p /home/pi/gcode"
       ]
     },
@@ -50,10 +58,7 @@
         "sudo usermod -aG docker pi",
         "sudo systemctl enable docker",
         "sudo systemctl start docker",
-        "while [[ ! $(sudo docker images) ]]; do echo 'waiting for docker to start...'; sleep 5; done",
-        "sudo docker pull makerverse/core:latest",
-        "sudo systemd enable makerverse-docker.service",
-        "sudo systemd start makerverse-docker.service"
+        "cd /home/pi/makerverse && bash bin/build-service.sh install pi"
       ]
     }
   ]

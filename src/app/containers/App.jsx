@@ -30,7 +30,7 @@ class App extends PureComponent {
             );
         }
 
-        trackPage(location.pathname);
+        trackPage(location);
 
         return (
             <div>

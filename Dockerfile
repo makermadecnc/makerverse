@@ -20,4 +20,4 @@ ADD --chown=node:node . /home/node
 RUN npm install
 
 EXPOSE 8000
-CMD ["/home/node/bin/docker-entrypoint"]
+ENTRYPOINT ["/home/node/bin/docker-entrypoint"]

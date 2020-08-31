@@ -8,6 +8,7 @@ import api from 'app/api';
 import io from 'socket.io-client';
 import Controller from 'cncjs-controller';
 import store from '../store';
+import analytics from './analytics';
 import {
     MASLOW,
     GRBL,
@@ -69,7 +70,7 @@ class Workspaces {
         });
     }
 
-    // record comes from an API response, loaded from .cncrc
+    // record comes from an API response, loaded from .makerverse
     constructor(record) {
         this._record = record;
         this.addControllerEvents(this._controllerEvents);
@@ -193,6 +194,11 @@ class Workspaces {
             log.debug(`Established a connection to the serial port "${port}"`);
             this._connecting = false;
             this._connected = true;
+            analytics.event({
+                category: 'controller',
+                action: 'open',
+                label: this.controllerAttributes.type,
+            });
         },
         'serialport:close': (options) => {
             const { port } = options;
@@ -203,6 +209,11 @@ class Workspaces {
             log.debug(`The serial port "${port}" is disconected`);
             this._connecting = false;
             this._connected = false;
+            analytics.event({
+                category: 'controller',
+                action: 'close',
+                label: this.controllerAttributes.type,
+            });
         },
         'serialport:error': (options) => {
             const { port } = options;
@@ -213,6 +224,10 @@ class Workspaces {
             log.error(`Error opening serial port "${port}"`);
             this._connecting = false;
             this._connected = false;
+            analytics.exception({
+                description: 'error opening serial port',
+                fatal: false,
+            });
         },
         'controller:state': (type, state) => {
             log.debug(type, 'state changed', state);

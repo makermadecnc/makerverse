@@ -1,4 +1,6 @@
 #!/bin/bash
+set -eo pipefail
+
 mkdir -p rpi
 vers=`git describe --tags --abbrev=0`
 
@@ -19,7 +21,7 @@ cf="raspbian-${edition}.json"
 
 mkdir -p "output"
 docker run --rm --privileged -v /dev:/dev -v ${PWD}:/build \
-  mkaczanowski/packer-builder-arm build "ci/$cf" -extra-system-packages=unzip
+  mkaczanowski/packer-builder-arm build "ci/$cf"
 
 of="output/raspbian-${edition}.img"
 if [ ! -f "$of" ]; then
@@ -32,7 +34,7 @@ mkdir -p "releases"
 if [ ! -z "$CI_SEMVER" ]; then
   # On the CI, run pishrink to compress the upload.
   ls -la "$of"
-  sudo scripts/pishrink.sh -z "$of" "releases/makerverse-raspbian-${edition}-${vers}.img.zip"
+  sudo scripts/pishrink.sh -z "$of" "releases/makerverse-raspbian-${edition}-${vers}.img"
 fi
 
 # rm -rf "${match}"

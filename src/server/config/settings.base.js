@@ -2,13 +2,19 @@ import path from 'path';
 import pkg from '../../package.json';
 import { languages } from '../../../build.config';
 
-const RC_FILE = '.cncrc';
-const SESSION_PATH = '.cncjs-sessions';
+const RC_FILE = '.makerverse';
+const SESSION_PATH = '.makerverse-sessions';
 
 // Secret
 const secret = pkg.version;
 
-const getUserHome = () => (process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']);
+const getUserHome = () => {
+    const makerverseHome = process.env.MAKERVERSE_HOME;
+    if (typeof makerverseHome === 'string' && makerverseHome.length > 0) {
+        return makerverseHome;
+    }
+    return process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+};
 
 export default {
     home: getUserHome(),
@@ -16,7 +22,7 @@ export default {
     verbosity: 0,
     version: pkg.version,
 
-    // The secret key is loaded from the config file (defaults to "~/.cncrc")
+    // The secret key is loaded from the config file (defaults to "~/.makerverse")
     // @see "src/app/index.js"
     secret: secret,
 

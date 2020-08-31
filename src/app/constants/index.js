@@ -10,14 +10,6 @@ export const AXIS_C = 'c';
 // Imperial System
 export const IMPERIAL_UNITS = 'in';
 export const IMPERIAL_STEPS = [
-    0.0001,
-    0.0002,
-    0.0003,
-    0.0005,
-    0.001,
-    0.002,
-    0.003,
-    0.005,
     0.01,
     0.02,
     0.03,
@@ -29,21 +21,19 @@ export const IMPERIAL_STEPS = [
     1, // Default
     2,
     3,
-    5,
+    4,
+    6,
+    8,
     10,
-    20
+    15,
+    20,
+    30,
+    40
 ];
 
 // Metric System
 export const METRIC_UNITS = 'mm';
 export const METRIC_STEPS = [
-    0.001,
-    0.002,
-    0.003,
-    0.005,
-    0.01,
-    0.02,
-    0.03,
     0.05,
     0.1,
     0.2,
@@ -53,11 +43,16 @@ export const METRIC_STEPS = [
     2,
     3,
     5,
+    7,
     10,
+    15,
     20,
     30,
+    40,
     50,
+    75,
     100,
+    150,
     200,
     300,
     500

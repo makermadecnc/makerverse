@@ -13,6 +13,7 @@ import combokeys from 'app/lib/combokeys';
 import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
 import Workspaces from 'app/lib/workspaces';
+import analytics from 'app/lib/analytics';
 import { in2mm, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
@@ -77,6 +78,14 @@ class AxesWidget extends PureComponent {
     expand = () => {
         this.setState({ minimized: false });
     };
+
+    event(opts) {
+        analytics.event({
+            ...opts,
+            category: 'interaction',
+            action: 'axes',
+        });
+    }
 
     config = new WidgetConfig(this.props.widgetId);
 
@@ -183,10 +192,12 @@ class AxesWidget extends PureComponent {
             this.workspace.controller.command('gcode', 'G91'); // relative
             this.workspace.controller.command('gcode', 'G0 ' + s);
             this.workspace.controller.command('gcode', 'G90'); // absolute
+            this.event({ label: 'move' });
         },
         move: (params = {}) => {
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             this.workspace.controller.command('gcode', 'G0 ' + s);
+            this.event({ label: 'jog' });
         },
         toggleMDIMode: () => {
             this.setState(state => ({
@@ -214,6 +225,7 @@ class AxesWidget extends PureComponent {
         },
         selectStep: (value = '') => {
             const step = Number(value);
+            this.event({ label: `${step}${this.state.jog.units}` });
             this.setState(state => ({
                 jog: {
                     ...state.jog,

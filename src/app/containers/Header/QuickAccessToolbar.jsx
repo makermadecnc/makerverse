@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
+import analytics from 'app/lib/analytics';
 import styles from './index.styl';
 
 class QuickAccessToolbar extends PureComponent {
@@ -16,24 +17,38 @@ class QuickAccessToolbar extends PureComponent {
         return Workspaces.all[this.props.workspaceId];
     }
 
+    event(opts) {
+        analytics.event({
+            ...opts,
+            category: 'interaction',
+            action: 'quickaccess',
+        });
+    }
+
     command = {
         'cyclestart': () => {
             this.workspace.controller.command('cyclestart');
+            this.event({ label: 'cyclestart' });
         },
         'feedhold': () => {
             this.workspace.controller.command('feedhold');
+            this.event({ label: 'feedhold' });
         },
         'homing': () => {
             this.workspace.controller.command('homing');
+            this.event({ label: 'homing' });
         },
         'sleep': () => {
             this.workspace.controller.command('sleep');
+            this.event({ label: 'sleep' });
         },
         'unlock': () => {
             this.workspace.controller.command('unlock');
+            this.event({ label: 'unlock' });
         },
         'reset': () => {
             this.workspace.controller.command('reset');
+            this.event({ label: 'reset' });
         }
     };
 

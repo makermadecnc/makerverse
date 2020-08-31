@@ -1,15 +1,17 @@
 #!/bin/bash
-set -e pipefail
+set -eo pipefail
 
 # https://medium.com/@quentin.mcgaw/cross-architecture-docker-builds-with-travis-ci-arm-s390x-etc-8f754e20aaef
 
 BUILD_PLATFORMS=${DOCKER_BUILD_PLATFORMS:-linux/amd64,linux/arm64,linux/arm/v7}
 DOCKER_REPO="makerverse/core"
 
+echo "Docker '$@' for $BUILD_PLATFORMS"
+
 if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
-  if [ "$1" != "deploy" ]; then
+  if [ "$1" = "build" ]; then
     # Master branch has a deploy step. Others use the build as the deploy.
-    echo "Skipping Docker build until deploy step."
+    echo "Skipping Docker build until Deploy step on master branch."
     exit 0
   fi
   TAG="latest"
@@ -21,7 +23,7 @@ else
   fi
 fi
 
-echo "Building $DOCKER_REPO:$TAG for $BUILD_PLATFORMS"
+echo "Docker building $DOCKER_REPO:$TAG"
 
 # Login to Docker
 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin

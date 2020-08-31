@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [[ ! $(which systemctl) ]]; then
+  echo "This computer is not capable of running a dedicated Makerverse server."
+  echo "Please install on a Raspberry Pi, Ubuntu, or other Debian computer."
+  echo "Alternatively, download the client application for your OS."
+  echo "For help, see: https://github.com/makermadecnc/makerverse"
+  exit 1
+fi
+
+if [[ "$(whoami)" = "root" ]]; then
+  echo "Please do not run this script as root."
+  exit 1
+fi
+
+un=$(whoami)
+sudo bin/build-service.sh "$1" "$un"

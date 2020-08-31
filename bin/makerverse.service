@@ -1,10 +1,11 @@
 [Unit]
 Description=Makerverse Systemd service
+After=docker.service
 
 [Service]
 Type=simple
 WorkingDirectory=%h/makerverse
-ExecStart=npm start
+ExecStart=%h/makerverse/bin/launch
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 TimeoutStopSec=10

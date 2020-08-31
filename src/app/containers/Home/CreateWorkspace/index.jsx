@@ -11,6 +11,7 @@ import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import auth from 'app/lib/auth';
 import Workspaces from 'app/lib/workspaces';
+import analytics from 'app/lib/analytics';
 import {
     MASLOW,
 } from 'app/constants';
@@ -177,6 +178,11 @@ class CreateWorkspace extends PureComponent {
                 ports: ports
             }));
             log.debug(`Established a connection to ${controllerType} on the serial port "${port}"`);
+            analytics.event({
+                category: 'controller',
+                action: 'open',
+                label: controllerType,
+            });
         },
         'serialport:close': (options) => {
             const { port } = options;
@@ -201,6 +207,10 @@ class CreateWorkspace extends PureComponent {
             }));
 
             log.error(`Error opening serial port "${port}"`);
+            analytics.exception({
+                description: 'error opening serial port',
+                fatal: false,
+            });
         },
         'controller:settings': (type, controllerSettings) => {
             if (type === MASLOW) {
@@ -213,6 +223,19 @@ class CreateWorkspace extends PureComponent {
                 }
             } else {
                 this.setState({ version: `${type} device` });
+            }
+            if (this.state.version) {
+                analytics.event({
+                    category: 'controller',
+                    action: 'identified',
+                    label: this.state.version,
+                });
+            } else {
+                analytics.event({
+                    category: 'controller',
+                    action: 'unidentified',
+                    label: type,
+                });
             }
         }
     };

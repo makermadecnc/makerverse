@@ -46,7 +46,7 @@ program
     .option('-p, --port <port>', `Set listen port (default: ${defaultPort})`, defaultPort)
     .option('-H, --host <host>', `Set listen address or hostname (default: ${defaultHost})`, defaultHost)
     .option('-b, --backlog <backlog>', 'Set listen backlog (default: 511)', 511)
-    .option('-c, --config <filename>', 'Set config file (default: ~/.cncrc)')
+    .option('-c, --config <filename>', 'Set config file (default: ~/.makerverse)')
     .option('-v, --verbose', 'Increase the verbosity level (-v, -vv, -vvv)', increaseVerbosityLevel, 0)
     .option('-m, --mount <route-path>:<target>', 'Add a mount point for serving static files', parseMountPoint, [])
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')

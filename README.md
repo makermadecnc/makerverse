@@ -26,13 +26,35 @@ When installing on Windows & MacOS, you will need to bypass/accept the security 
 
 ### Web Server
 
-With this approach, you can connect to the Makerverse app from any web browser on the same network. Choose from the below installation options, given your hardware and knowledge.
+With this approach, you can connect to the Makerverse app from any web browser on the same network.
 
 _Note: for security reasons, you can only access the Makerverse app from a browser on the same device by default. To enable access from other machines, enable the `allowRemoteAccess` flag (see Configuration). Be sure that you understand the security implications of this decision._
 
+#### Launch Script
+
+There is a launch script located in this repository at `bin/launch`. Just run it from a command prompt on almost any machine.
+
+The launch script is used elsewhere, like from the pre-built Raspberry Pi image and from the Linux service. The launch script can launch the app either via Docker (default) or by manually compiling NodeJS. To see all options, type `bin/launch --help`. If you would like to permanently change the launch method from Docker to Node, you can export the environment variable `MAKERVRSE_LAUNCH_METHOD=node`.
+
+#### Pre-Built Raspberry Pi Image
+
+Download the `makerverse-raspbian-lite-x.y.z.img..gz` file from the latest releases. Unzip the file and flash the `.img` to your SD card with your preferred application (e.g., Balena Etcher). SSH will already be enabled, and the default username/password (`pi`/`raspbian`) have been left unchanged. The hostname defaults to `makerverse`, so if your router supports it you can connect to the pi at `ssh pi@makerverse.local` and `http://makerverse.local:8000`. As soon as you are ablem to, SSH in to the Raspberry Pi and run `sudo raspi-config` to change the password.
+
+The Makerverse application will start automatically on port `8000`. However, especially during the first boot, it will take some time to download the latest updates (_about 600 MB, and can take ~10 minutes on older devices or slower connections_).
+
+Handy commands:
+- Check if Makerverse is running: `sudo systemctl status makerverse`
+- Restart (and update!) Makerverse: `sudo systemctl restart makerverse`
+- See Makerverse server logs: `docker logs makerverse`
+- See all system logs (find problems with boot): `journalctl -xe`
+
+#### Linux Service
+
+On a Raspberry Pi, Ubuntu, and other Linux machines you can use systemd to run Makerverse as a service. This is the same as how the pre-built Raspberry Pi image works, above, except you can install the service yourself on any Debian machine. This means it will start automatically on boot, and run in the background. This is already pre-configured on the Raspberry Pi image, but for other systems first ensure that you are able to start the application correctly via `bin/launch`. Then run `bin/server install` to create the service. Refer to the commands from the last section for help debugging.
+
 #### Docker Image
 
-_If you are experienced with Docker already_, pull from `makerverse/core:latest` (multi-arch image, including `amd64`, `armv7`, and `arm64`). The application is launched from the `/home/node` directory, where the root of this repository resides. Consider mounting a `~/.cncrc` file into `/home/node/.cncrc`, or widgets into `/home/node/widgets`, for example.
+_If you are experienced with Docker already_, pull from `makerverse/core:latest` (multi-arch image, including `amd64`, `armv7`, and `arm64`). The application is launched from the `/home/node` directory, where the root of this repository resides. Consider mounting a `~/.makerverse` file into `/home/node/.makerverse`, or widgets into `/home/node/widgets`, for example.
 
 _If you're new to Docker_, start by installing it. Just like with Node.js, it is recommended to use the Windows / MacOS [installers](https://www.docker.com/products/docker-desktop), when applicable. On Linux/Raspberry Pi, there's a one-line installer available:
 
@@ -49,15 +71,11 @@ Note: if you get a permission error, use `sudo docker ...`.
 
 Example: persist your settings onto your Raspberry Pi:
 ```
-touch /home/pi/.cncrc
-docker run --privileged --rm -v /home/pi/.cncrc:/home/node/.cncrc -p 8000:8000 makerverse/core:latest
+touch /home/pi/.makerverse
+docker run --privileged --rm -v /dev:/dev -v /home/pi/.makerverse:/home/node/.makerverse -p 8000:8000 makerverse/core:latest
 ```
 
 See the `bin/makerverse-docker.service` to run the Docker image automatically at boot. First, tweak the command arguments (volumes and ports) to your liking. Then, copy it to `/etc/systemd/system/` on the device. Finally, use `sudo systemctl enable makerverse-docker.service` and `sudo systemctl start makerverse-docker.service`.
-
-#### Pre-Built Raspberry Pi Image
-
-_Coming soon._
 
 #### Build from Source
 
@@ -73,32 +91,20 @@ sudo apt-get install -y nodejs
 Next, either `git clone` this repository (preferred), or download and unzip the Source Code from the Release. Enter the source code directory from the command line and run:
 
 ```
-chmod +x ./bin/launch
-bash ./bin/launch
+npm install
+npm run build-latest
+bin/makerverse
 ```
 
-The first time you run, this will take a while. This "run" script is doing the necessary installs and updates. Once it starts, open `http://localhost:8000` **on the same device**. You should find the web application. If you'd like to access it from a different device, see the Configuration section.
+The first time you run, this will take a while. The first two lines are installing other software, and then building the Makerverse app, which take longer the first time. Once it starts, open `http://localhost:8000` **on the same device**. You should find the web application. If you'd like to access it from a different device, see the Configuration section.
 
-To update the application, first acquire the new source code (`git pull` or download the latest release and unzip on top of the existing directory). Then, just run the `./bin/launch` script again to launch the application.
-
-#### Start at Boot (Service)
-
-On a Raspberry Pi, Ubuntu, or other Debian Linux machine you can use systemd to run Makerverse as a service. From the makerverse directory:
-
-```
-mkdir -p ~/.config/systemd/user/
-cp ./bin/makerverse.service ~/.config/systemd/user/
-systemctl --user enable makerverse.service
-systemctl --user start makerverse.service
-```
-
-To view logs, use `journalctl -xe`.
+To update the application, first acquire the new source code (`git pull` or download the latest release and unzip on top of the existing directory). Then, just run the commands above again to launch the application.
 
 ## Configuration
 
 ### The Settings File
 
-Settings are loaded from the `$HOME/.cncrc` file (e.g., `/home/pi/.cncrc`); a [sample file is located here](https://github.com/makermadecnc/makerverse/blob/master/examples/.cncrc).
+Settings are loaded from the `$HOME/.makerverse` file (e.g., `/home/pi/.makerverse`); a [sample file is located here](https://github.com/makermadecnc/makerverse/blob/master/examples/.makerverse).
 
 ### Supported Controllers
 
@@ -157,7 +163,7 @@ Options:
   -p, --port <port>                   Set listen port (default: 8000) (default: 8000)
   -H, --host <host>                   Set listen address or hostname (default: 0.0.0.0) (default: "0.0.0.0")
   -b, --backlog <backlog>             Set listen backlog (default: 511) (default: 511)
-  -c, --config <filename>             Set config file (default: ~/.cncrc)
+  -c, --config <filename>             Set config file (default: ~/.makerverse)
   -v, --verbose                       Increase the verbosity level (-v, -vv, -vvv)
   -m, --mount <route-path>:<target>   Add a mount point for serving static files (default: [])
   -w, --watch-directory <path>        Watch a directory for changes

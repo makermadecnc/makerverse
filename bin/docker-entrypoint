@@ -5,5 +5,5 @@ if [[ "$NODE_ENV" == "development" ]]; then
   echo "Development mode enabled."
   npm run dev
 else
-  ./bin/makerverse "$@"
+  node ./bin/makerverse "$@"
 fi

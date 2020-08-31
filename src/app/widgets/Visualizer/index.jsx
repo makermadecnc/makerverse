@@ -18,6 +18,7 @@ import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
+import analytics from 'app/lib/analytics';
 import WidgetConfig from '../WidgetConfig';
 import PrimaryToolbar from './PrimaryToolbar';
 import SecondaryToolbar from './SecondaryToolbar';
@@ -179,6 +180,13 @@ class VisualizerWidget extends PureComponent {
     state = this.getInitialState();
 
     actions = {
+        event: (opts) => {
+            analytics.event({
+                ...opts,
+                category: 'interaction',
+                action: 'visualizer',
+            });
+        },
         dismissNotification: () => {
             this.setState((state) => ({
                 notification: {
@@ -225,6 +233,7 @@ class VisualizerWidget extends PureComponent {
                     ready: false
                 }
             }));
+            this.actions.event({ label: 'loadFile' });
 
             this.workspace.controller.command('watchdir:load', file, (err, data) => {
                 if (err) {
@@ -256,6 +265,7 @@ class VisualizerWidget extends PureComponent {
                     ready: false
                 }
             }));
+            this.actions.event({ label: 'uploadFile' });
 
             this.workspace.controller.command('gcode:load', name, gcode, context, (err, data) => {
                 if (err) {
@@ -363,6 +373,7 @@ class VisualizerWidget extends PureComponent {
                 zmin: 0,
                 zmax: 0
             };
+            this.actions.event({ label: 'unloadGcode' });
 
             this.setState((state) => ({
                 gcode: {
@@ -392,11 +403,13 @@ class VisualizerWidget extends PureComponent {
 
             if (workflow.state === WORKFLOW_STATE_IDLE) {
                 this.workspace.controller.command('gcode:start');
+                this.actions.event({ label: 'start' });
                 return;
             }
 
             if (workflow.state === WORKFLOW_STATE_PAUSED) {
                 const { notification } = this.state;
+                this.actions.event({ label: 'resume' });
 
                 // M6 Tool Change
                 if (notification.type === NOTIFICATION_M6_TOOL_CHANGE) {
@@ -438,18 +451,21 @@ class VisualizerWidget extends PureComponent {
         handlePause: () => {
             const { workflow } = this.state;
             console.assert(includes([WORKFLOW_STATE_RUNNING], workflow.state));
+            this.actions.event({ label: 'pause' });
 
             this.workspace.controller.command('gcode:pause');
         },
         handleStop: () => {
             const { workflow } = this.state;
             console.assert(includes([WORKFLOW_STATE_PAUSED], workflow.state));
+            this.actions.event({ label: 'stop' });
 
             this.workspace.controller.command('gcode:stop', { force: true });
         },
         handleClose: () => {
             const { workflow } = this.state;
             console.assert(includes([WORKFLOW_STATE_IDLE], workflow.state));
+            this.actions.event({ label: 'unload' });
 
             this.workspace.controller.command('gcode:unload');
 
