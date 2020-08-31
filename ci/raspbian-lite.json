@@ -28,6 +28,9 @@
         "mountpoint": "/"
       }
     ],
+    "image_setup_extra": [
+      ["cp", "/build/bin/makerverse-docker.service", "$MOUNTPOINT/etc/systemd/system/"]
+    ],
     "image_chroot_env": ["PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"],
     "qemu_binary_source_path": "/usr/bin/qemu-arm-static",
     "qemu_binary_destination_path": "/usr/bin/qemu-arm-static"
@@ -45,7 +48,12 @@
       "inline": [
         "curl -sSL https://get.docker.com | sh",
         "sudo usermod -aG docker pi",
-        "docker pull makerverse/core:latest"
+        "sudo systemctl enable docker",
+        "sudo systemctl start docker",
+        "while [[ ! $(sudo docker images) ]]; do echo 'waiting for docker to start...'; sleep 5; done",
+        "sudo docker pull makerverse/core:latest",
+        "sudo systemd enable makerverse-docker.service",
+        "sudo systemd start makerverse-docker.service"
       ]
     }
   ]

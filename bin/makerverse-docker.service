@@ -4,7 +4,7 @@ Description=Makerverse Systemd service
 [Service]
 Type=simple
 WorkingDirectory=%h
-ExecStart=docker
+ExecStart=docker pull makerverse/core:latest && docker run --privileged --rm -v %h/.cncrc:/home/node/.cncrc -v %h/gcode:/home/node/gcode -p 8000:8000 makerverse/core:latest
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 TimeoutStopSec=10
