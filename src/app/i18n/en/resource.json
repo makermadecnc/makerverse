@@ -527,5 +527,10 @@
     "Kinematics": "Kinematics",
     "Edition": "Edition",
     "Version": "Version",
-    "Protocol": "Protocol"
+    "Protocol": "Protocol",
+    "Reset Calibration Settings": "Reset Calibration Settings",
+    "Wipe Settings": "Wipe Settings",
+    "Are you sure?": "Are you sure?",
+    "This will reset all machine & calibration settings (eeprom).": "This will reset all machine & calibration settings (eeprom).",
+    "Accept": "Accept"
 }

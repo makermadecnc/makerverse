@@ -85,8 +85,7 @@ class InformationModal extends PureComponent {
                                         top: 10
                                     }}
                                     onClick={event => {
-                                        this.workspace.controller.writeln('$#'); // Parameters
-                                        this.workspace.controller.writeln('$$'); // Settings
+                                        this.workspace.controller.command('about');
                                     }}
                                 >
                                     <i className="fa fa-refresh" />

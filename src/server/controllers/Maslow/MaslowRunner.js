@@ -11,6 +11,7 @@ import MaslowLineParserResultSettings from './MaslowLineParserResultSettings';
 import MaslowLineParserResultStartup from './MaslowLineParserResultStartup';
 import MaslowLineParserResultPositionalError from './MaslowLineParserResultPositionalError';
 import MaslowLineParserResultVersion from './MaslowLineParserResultVersion';
+import MaslowLineParserResultOption from './MaslowLineParserResultOption';
 
 class MaslowRunner extends events.EventEmitter {
     constructor(controller) {
@@ -37,6 +38,10 @@ class MaslowRunner extends events.EventEmitter {
         }
         if (type === MaslowLineParserResultStatus) {
             this.emit('status', payload);
+            return;
+        }
+        if (type === MaslowLineParserResultOption) {
+            this.emit('status', { opt: payload.message });
             return;
         }
         if (type === MaslowLineParserResultOk) {

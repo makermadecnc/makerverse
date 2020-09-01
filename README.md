@@ -10,7 +10,10 @@ You can always find the latest versions on the [Releases page](https://github.co
 
 ![screenshot](https://raw.githubusercontent.com/makermadecnc/makerverse/master/screenshot.png)
 
-There are several ways to run Makerverse.
+There are **two primary ways** to run Makerverse.
+
+- **Stand-Alone Application**: easy to install on Mac and Windows, but can only be used from that computer.
+- **Web Server**: works on any computer; can be accessed from any web browser; has automatic updates.
 
 ### Stand-Alone Application
 
@@ -40,17 +43,19 @@ The launch script is used elsewhere, like from the pre-built Raspberry Pi image 
 
 Download the `makerverse-raspbian-lite-x.y.z.img..gz` file from the latest releases. Unzip the file and flash the `.img` to your SD card with your preferred application (e.g., Balena Etcher). SSH will already be enabled, and the default username/password (`pi`/`raspbian`) have been left unchanged. The hostname defaults to `makerverse`, so if your router supports it you can connect to the pi at `ssh pi@makerverse.local` and `http://makerverse.local:8000`. As soon as you are ablem to, SSH in to the Raspberry Pi and run `sudo raspi-config` to change the password.
 
-The Makerverse application will start automatically on port `8000`. However, especially during the first boot, it will take some time to download the latest updates (_about 600 MB, and can take ~10 minutes on older devices or slower connections_).
+The Makerverse application will start automatically on port `8000`. However, especially during the first boot, it will take some time to download (_~600MB_) and unpack the application. On a Raspberry Pi 3 B+ Rev.1.3 (about the  worst device which can handle Makerverse), this has been known to take 20-30 minutes. A RPi4 on a decent internet connection should only take a few minutes.
+
+Tip: read the "Handy commands" in the next section!
+
+#### Linux Service
+
+On a Raspberry Pi, Ubuntu, and other Linux machines you can use systemd to run Makerverse as a service. This is the same as how the pre-built Raspberry Pi image works, above, except you can install the service yourself on any Debian machine. This means it will start automatically on boot, and run in the background. This is already pre-configured on the Raspberry Pi image, but for other systems first ensure that you are able to start the application correctly via `bin/launch`. Once you're sure the server is running the way you want it, terminate the server. Now run `bin/server install` to create the service. Refer to the commands from the last section for help using the service.
 
 Handy commands:
 - Check if Makerverse is running: `sudo systemctl status makerverse`
 - Restart (and update!) Makerverse: `sudo systemctl restart makerverse`
 - See Makerverse server logs: `docker logs makerverse`
 - See all system logs (find problems with boot): `journalctl -xe`
-
-#### Linux Service
-
-On a Raspberry Pi, Ubuntu, and other Linux machines you can use systemd to run Makerverse as a service. This is the same as how the pre-built Raspberry Pi image works, above, except you can install the service yourself on any Debian machine. This means it will start automatically on boot, and run in the background. This is already pre-configured on the Raspberry Pi image, but for other systems first ensure that you are able to start the application correctly via `bin/launch`. Then run `bin/server install` to create the service. Refer to the commands from the last section for help debugging.
 
 #### Docker Image
 
@@ -99,6 +104,12 @@ bin/makerverse
 The first time you run, this will take a while. The first two lines are installing other software, and then building the Makerverse app, which take longer the first time. Once it starts, open `http://localhost:8000` **on the same device**. You should find the web application. If you'd like to access it from a different device, see the Configuration section.
 
 To update the application, first acquire the new source code (`git pull` or download the latest release and unzip on top of the existing directory). Then, just run the commands above again to launch the application.
+
+## Hardware (Firmware)
+
+Makerverse supports any machine which uses common protocols (Grbl).
+
+To use it with the.
 
 ## Configuration
 

@@ -139,16 +139,19 @@ class MaslowMemory {
 
     updateStatus(payload) {
         this.load(); // Ensure disk memory is loaded.
+        const hasMPos = _.has(payload, 'mpos');
+        const hasWPos = _.has(payload, 'wpos');
+
         if (this.controller.hardware.isMaslowClassic()) {
             // Do not set the work position on the Maslow Classic. It will be set in-memory.
-            if (_.has(payload, 'mpos')) {
+            if (hasMPos) {
                 payload.wpos = {
                     x: Number(payload.mpos.x) - this.fromMM(this.storage.config.status.wco.x),
                     y: Number(payload.mpos.y) - this.fromMM(this.storage.config.status.wco.y),
                     z: Number(payload.mpos.z) - this.fromMM(this.storage.config.status.wco.z)
                 };
             }
-        } else if (_.has(payload, 'mpos') && !_.has(payload, 'wpos')) {
+        } else if (hasMPos && !hasWPos) {
             // Grbl v1.1
             // WCO:0.000,10.000,2.500
             // A current work coordinate offset is now sent to easily convert
@@ -159,7 +162,7 @@ class MaslowMemory {
                 const wco = _.get((payload.wco || this.storage.config.status.wco), axis, 0);
                 payload.wpos[axis] = (Number(mpos) - Number(wco)).toFixed(digits);
             });
-        } else if (_.has(payload, 'wpos') && !_.has(payload, 'mpos')) {
+        } else if (hasWPos && !hasMPos) {
             payload.mpos = payload.mpos || {};
             _.each(payload.wpos, (wpos, axis) => {
                 const digits = decimalPlaces(wpos);
@@ -168,7 +171,7 @@ class MaslowMemory {
             });
         }
 
-        if (_.has(payload, 'mpos')) {
+        if (hasMPos) {
             if (payload.activeState === MASLOW_ACTIVE_STATE_IDLE && this.lastMachinePosition) {
                 // If the Maslow claims it is idle but it has moved since the last status report,
                 // then enforce the RUN state.
@@ -224,9 +227,12 @@ class MaslowMemory {
     // Generic Gcode command
     handleCommand(cmd) {
         this.log.silly(`MaslowMemory translating command: ${cmd}`);
-        if (cmd === '$X' || cmd === '\x18') {
-            // Unlock/Reset: clear alarm & error text
-            this.updateStatus({ activeState: MASLOW_ACTIVE_STATE_IDLE, error: null, alarm: null });
+
+        if (cmd === '$X') { // Unlock
+            this.updateStatus({ error: null });
+        }
+        if (cmd === '\x18') { // Reset
+            this.updateStatus({ alarm: null, activeState: MASLOW_ACTIVE_STATE_IDLE });
         }
         if (!this.controller.hardware.isMaslowClassic()) {
             // Only the Maslow Classic needs in-memory storage.

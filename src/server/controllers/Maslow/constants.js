@@ -84,7 +84,7 @@ export const MASLOW_ERRORS = [
     {
         code: 3,
         message: 'Invalid statement',
-        description: 'Maslow \$\' system command was not recognized or supported.'
+        description: 'Grbl \$\' system command was not recognized or supported.'
     },
     {
         code: 4,
@@ -109,12 +109,12 @@ export const MASLOW_ERRORS = [
     {
         code: 8,
         message: 'Not idle',
-        description: 'Maslow \'$\' command cannot be used unless Maslow is IDLE. Ensures smooth operation during a job.'
+        description: 'Grbl \'$\' command cannot be used unless Grbl is IDLE. Ensures smooth operation during a job.'
     },
     {
         code: 9,
         message: 'G-code lock',
-        description: 'G-code commands are locked out during alarm or jog state.'
+        description: 'G-code commands are locked out during alarm or jog state. After connecting or resetting, you must unlock the machine.'
     },
     {
         code: 10,
@@ -129,7 +129,7 @@ export const MASLOW_ERRORS = [
     {
         code: 12,
         message: 'Step rate > 30kHz',
-        description: 'Maslow \'$\' setting value cause the step rate to exceed the maximum supported.'
+        description: 'Grbl \'$\' setting value cause the step rate to exceed the maximum supported.'
     },
     {
         code: 13,
@@ -250,6 +250,13 @@ export const MASLOW_ERRORS = [
         code: 38,
         message: 'Invalid gcode ID:38',
         description: 'Tool number greater than max supported value.'
+    },
+    // Maslow additions ::
+    {
+        code: 39,
+        message: 'Calibration Required',
+        description: 'The machine failed to compute its position. Calibration required.',
+        suppress: true, // Don't echo it back to the controller.
     }
 ];
 
@@ -264,7 +271,7 @@ export const MASLOW_ALARMS = [
     {
         code: 2,
         message: 'Soft limit',
-        description: 'Soft limit alarm. G-code motion target exceeds machine travel. Machine position retained. Alarm may be safely unlocked.'
+        description: 'Soft limit alarm. G-code motion target exceeds machine travel. Machine position retained. Reset required to unlock.'
     },
     {
         code: 3,

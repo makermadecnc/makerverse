@@ -83,7 +83,7 @@ class ConsoleWidget extends PureComponent {
 
             if (this.terminal) {
                 const { productName, version } = settings;
-                this.terminal.writeln(color.white.bold(`${productName} ${version} [${this.workspace.controller.type}]`));
+                this.terminal.writeln(color.white.bold(`${productName} ${version.readable} [${this.workspace.controller.type}]`));
                 this.terminal.writeln(color.white(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: color.yellowBright(port), baudrate: color.blueBright(baudrate) })));
             }
         },

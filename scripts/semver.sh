@@ -1,6 +1,5 @@
 #!/bin/bash
-tag=${1:-`git describe --tags`}
-version=`echo $tag | sed 's/-\(.*\)//'`
+version=${1:-`git describe --tags --abbrev=0`}
 
 if [ -z "$TRAVIS_PULL_REQUEST_BRANCH" ]; then
   branch=${TRAVIS_BRANCH:-dev}

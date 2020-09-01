@@ -26,6 +26,10 @@ class MaslowCalibration {
         this.update({ ...calibrationDefaults, ...(opts || {}) });
     }
 
+    loadControllerSettings(controllerSettings) {
+        this.kin.loadControllerSettings(controllerSettings);
+    }
+
     update(opts) {
         this.opts = { ...this.opts, ...opts };
         this.recomputeIdeals();

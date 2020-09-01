@@ -460,10 +460,12 @@ class MaslowController {
             }
 
             if (error) { // Grbl v1.1
-                this.emit('serialport:read', `error:${code} (${error.message})`);
                 this.memory.updateStatus({ error: error });
+                if (!error.suppress) { // Noisy and/or pseudo-errors are not sent to controller.
+                    this.emit('serialport:read', `error:${code} (${error.message})`);
+                }
             } else { // Grbl v0.9
-                this.emit('serialport:read', res.raw);
+                this.emitError(res.raw);
             }
 
             // Feeder
@@ -514,13 +516,15 @@ class MaslowController {
             const setting = this.hardware.setGrbl(name, value, message);
             this.log.debug(`setting ${setting.name}=${setting.value}`);
 
-            if (setting.message && setting.units) {
-                this.emit('serialport:read', `${setting.name}=${setting.value} (${setting.message}, ${setting.units})`);
-            } else if (setting.message) {
-                this.emit('serialport:read', `${setting.name}=${setting.value} (${setting.message})`);
-            } else {
-                this.emit('serialport:read', `${setting.name}=${setting.value}`);
-            }
+            // Don't echo the settings back to the client. The UI should now handle it, and
+            // it's confusing when they only show up on first connection.
+            // if (setting.message && setting.units) {
+            //     this.emit('serialport:read', `${setting.name}=${setting.value} (${setting.message}, ${setting.units})`);
+            // } else if (setting.message) {
+            //     this.emit('serialport:read', `${setting.name}=${setting.value} (${setting.message})`);
+            // } else {
+            //     this.emit('serialport:read', `${setting.name}=${setting.value}`);
+            // }
         });
 
         this.runner.on('firmware', (res) => {
@@ -593,7 +597,6 @@ class MaslowController {
             // Maslow Classic does not support querying for status reports.
             // Doing so will result in an error: in response.
             if (this.isOpen() && !this.hardware.isMaslowClassic()) {
-                this.log.silly('Querying machine status');
                 this.actionMask.queryStatusReport = true;
                 this.actionTime.queryStatusReport = now;
                 this.connection.write('?');
@@ -632,7 +635,6 @@ class MaslowController {
             }
 
             if (this.isOpen() && !this.hardware.isMaslowClassic()) {
-                this.log.silly('Querying parser state');
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
@@ -1009,6 +1011,7 @@ class MaslowController {
             // workflow state
             socket.emit('workflow:state', this.workflow.state);
         }
+        socket.emit('serialport:read', 'Connection was already open.');
     }
 
     removeConnection(socket) {
@@ -1171,6 +1174,21 @@ class MaslowController {
                 this.event.trigger('sleep');
 
                 this.writeln('$SLP');
+            },
+            'wipe': () => {
+                this.event.trigger('wipe');
+                // Turn off status reports until they get turned back on automatically.
+                // The About command is noisy, and consumes the serial port.
+                this.actionMask.queryStatusReport = true;
+                this.actionMask.queryParserState.state = true;
+
+                this.writeln('$RST=*');
+            },
+            'about': () => {
+                const cmds = this.hardware.aboutCommands;
+                while (cmds.length > 0) {
+                    this.writeln(cmds.shift());
+                }
             },
             'unlock': () => {
                 this.writeln('$X');

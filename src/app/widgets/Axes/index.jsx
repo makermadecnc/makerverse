@@ -957,6 +957,7 @@ class AxesWidget extends PureComponent {
                 >
                     {state.modal.name === MODAL_SETTINGS && (
                         <Settings
+                            workspaceId={this.workspace.id}
                             config={config}
                             onSave={() => {
                                 const axes = config.get('axes', DEFAULT_AXES);

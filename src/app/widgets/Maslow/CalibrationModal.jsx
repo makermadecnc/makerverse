@@ -8,6 +8,7 @@ import { Nav, NavItem } from 'app/components/Navs';
 import Space from 'app/components/Space';
 import i18n from 'app/lib/i18n';
 import Workspaces from 'app/lib/workspaces';
+import analytics from 'app/lib/analytics';
 import MaslowCalibration from 'app/lib/Maslow/MaslowCalibration';
 import styles from './index.styl';
 
@@ -24,6 +25,14 @@ class CalibrationModal extends PureComponent {
 
     get workspace() {
         return Workspaces.all[this.props.workspaceId];
+    }
+
+    event(opts) {
+        analytics.event({
+            ...opts,
+            category: 'interaction',
+            action: 'calibration',
+        });
     }
 
     calibration = new MaslowCalibration(this.workspace.controller, {
@@ -64,7 +73,25 @@ class CalibrationModal extends PureComponent {
         setSizes: false,
         calibrating: -1,
         result: false,
+        wiping: false,
+        wiped: false,
     };
+
+    controllerEvents = {
+        'controller:settings': (type, controllerSettings) => {
+            log.info(`Controller settings updated; reloading calibration ${controllerSettings}`);
+            this.calibration.loadControllerSettings(controllerSettings);
+            this.setState(this.internalState);
+        }
+    };
+
+    componentDidMount() {
+        this.workspace.addControllerEvents(this.controllerEvents);
+    }
+
+    componentWillUnmount() {
+        this.workspace.removeControllerEvents(this.controllerEvents);
+    }
 
     handleMeasurement(idx, val) {
         this.setState({ measurements: { ...this.state.measurements, [idx]: val } });
@@ -74,7 +101,27 @@ class CalibrationModal extends PureComponent {
         this.setState({ calibrating: percent });
     }
 
+    writeLines(lines, delay = 2500) {
+        if (lines.length <= 0) {
+            return;
+        }
+        this.workspace.controller.writeln(lines.shift());
+        setTimeout(() => {
+            this.writeLines(lines, delay);
+        }, delay);
+    }
+
+    wipe() {
+        this.event({ label: 'wipe' });
+        this.workspace.controller.command('wipe');
+        setTimeout(() => {
+            this.workspace.controller.command('about');
+        }, 5000);
+        this.setState({ wiping: false, wiped: true });
+    }
+
     calibrate() {
+        this.event({ label: 'calculate' });
         this.workspace.hasOnboarded = true;
         const input = this.state.measurements;
         const measurements = Object.keys(input).map((i) => {
@@ -91,6 +138,7 @@ class CalibrationModal extends PureComponent {
     }
 
     applyCalibrationResults() {
+        this.event({ label: 'apply' });
         const settings = this.calibration.kin.getSettingsMap();
         const sks = Object.keys(settings);
         const result = this.state.result;
@@ -142,6 +190,7 @@ class CalibrationModal extends PureComponent {
     }
 
     setMachineSizes() {
+        this.event({ label: 'resize' });
         this.workspace.hasOnboarded = true;
         this.unlock();
         this.writeSetting('machineWidth', this.calibration.kin.opts.machineWidth);
@@ -153,6 +202,7 @@ class CalibrationModal extends PureComponent {
     }
 
     defineHome(opts) {
+        this.event({ label: 'home' });
         this.workspace.hasOnboarded = true;
         const chainLengths = this.calibration.kin.positionToChain(0, this.toMM(this.state.yHome));
         this.calibration.kin.opts.origChainLength = Math.round((chainLengths[0] + chainLengths[1]) / 2);
@@ -244,6 +294,8 @@ class CalibrationModal extends PureComponent {
             result,
             sledRadius,
             yHome,
+            wiping,
+            wiped,
         } = this.state;
         const isCalibrating = calibrating >= 0;
         const hasCalibrationResult = !!result;
@@ -642,28 +694,64 @@ class CalibrationModal extends PureComponent {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <span style={{ float: 'left' }}>
-                        Units:
-                        <select
-                            className={styles.mmInput}
-                            style={{ marginRight: '10px' }}
-                            name="units"
-                            value={units}
-                            onChange={(event) => {
-                                this.updateCalibrationOpts({
-                                    measuredInches: event.target.value === 'in'
-                                });
-                                // Reload state from calibration/kinematics to account for unit change.
-                                this.setState(this.internalState);
-                            }}
-                        >
-                            <option value="mm">{i18n._('mm')}</option>
-                            <option value="in">{i18n._('in')}</option>
-                        </select>
-                        <a href="http://bit.ly/maslow-calibration" target="_blank" rel="noopener noreferrer">
-                            Calibration Help
-                        </a>
-                    </span>
+                    {wiping && (
+                        <span style={{ float: 'left' }}>
+                            <Button
+                                style={{ marginRight: '10px' }}
+                                onClick={() => this.setState({ wiping: false })}
+                            >
+                                {i18n._('Cancel')}
+                            </Button>
+                            <strong>
+                                {i18n._('Are you sure?')}
+                                {' '}
+                            </strong>
+                            {i18n._('This will reset all machine & calibration settings (eeprom).')}
+                            <Button
+                                style={{ marginLeft: '10px' }}
+                                onClick={() => this.wipe()}
+                            >
+                                {i18n._('Accept')}
+                            </Button>
+                        </span>
+                    )}
+                    {!wiping && (
+                        <span style={{ float: 'left' }}>
+                            {wiped && (
+                                <span style={{ float: 'left' }}>
+                                    Settings have been wiped.
+                                </span>
+                            )}
+                            {!wiped && (
+                                <Button
+                                    style={{ marginRight: '40px' }}
+                                    onClick={() => this.setState({ wiping: true })}
+                                >
+                                    {i18n._('Wipe Settings')}
+                                </Button>
+                            )}
+                            Units:{' '}
+                            <select
+                                className={styles.mmInput}
+                                style={{ marginRight: '10px' }}
+                                name="units"
+                                value={units}
+                                onChange={(event) => {
+                                    this.updateCalibrationOpts({
+                                        measuredInches: event.target.value === 'in'
+                                    });
+                                    // Reload state from calibration/kinematics to account for unit change.
+                                    this.setState(this.internalState);
+                                }}
+                            >
+                                <option value="mm">{i18n._('mm')}</option>
+                                <option value="in">{i18n._('in')}</option>
+                            </select>
+                            <a href="http://bit.ly/maslow-calibration" target="_blank" rel="noopener noreferrer">
+                                Calibration Help
+                            </a>
+                        </span>
+                    )}
                     <Button onClick={actions.closeModal}>
                         {i18n._('Close')}
                     </Button>
