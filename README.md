@@ -105,6 +105,12 @@ The first time you run, this will take a while. The first two lines are installi
 
 To update the application, first acquire the new source code (`git pull` or download the latest release and unzip on top of the existing directory). Then, just run the commands above again to launch the application.
 
+## Hardware (Firmware)
+
+Makerverse supports any machine which uses common protocols (Grbl).
+
+To use it with the.
+
 ## Configuration
 
 ### The Settings File

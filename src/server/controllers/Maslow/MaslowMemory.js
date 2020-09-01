@@ -190,14 +190,6 @@ class MaslowMemory {
             payload.activeState = MASLOW_ACTIVE_STATE_ALARM;
         }
 
-        // Check if the positional error should be cleared.
-        const hasPError = _.get(payload, 'feedback.positionError', false);
-        const hadPError = _.get(this.status, 'feedback.positionError', false);
-        if (!hasPError && hadPError && (hasMPos || hasWPos)) {
-            // Have an error to clear, and got a MPos which clears it.
-            _.set(payload, 'feedback.positionError', false);
-        }
-
         // Check if the receive buffer is available in the status report
         // @see https://github.com/cncjs/cncjs/issues/115
         // @see https://github.com/cncjs/cncjs/issues/133

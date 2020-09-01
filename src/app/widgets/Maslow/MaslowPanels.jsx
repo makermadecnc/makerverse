@@ -7,6 +7,8 @@ import i18n from 'app/lib/i18n';
 import Panel from 'app/components/Panel';
 import Toggler from 'app/components/Toggler';
 import Space from 'app/components/Space';
+import { Button } from 'app/components/Buttons';
+import { ToastNotification } from 'app/components/Notifications';
 import styles from './index.styl';
 import {
     MODAL_CALIBRATION
@@ -39,6 +41,7 @@ class MaslowPanels extends PureComponent {
         const activeState = _.get(controllerState, 'status.activeState') || none;
         const feedrate = _.get(controllerState, 'status.feedrate', _.get(parserState, 'feedrate', none));
         const spindle = _.get(controllerState, 'status.spindle', _.get(parserState, 'spindle', none));
+        const positionError = _.get(controllerState, 'status.feedback.positionError', false);
         const tool = _.get(parserState, 'tool', none);
         const buf = _.get(controllerState, 'status.buf', {});
         const modal = _.mapValues(parserState.modal || {}, mapGCodeToText);
@@ -103,6 +106,22 @@ class MaslowPanels extends PureComponent {
 
         return (
             <div>
+                {positionError && (
+                    <ToastNotification
+                        style={{ marginBottom: '10px' }}
+                        type="warning"
+                        dismissible={false}
+                    >
+                        The Maslow cannot find its position. Calibration may have been corrupted.
+                        <Button
+                            btnSize="medium"
+                            btnStyle="flat"
+                            onClick={event => this.reset()}
+                        >
+                            {i18n._('Reset Calibration Settings')}
+                        </Button>
+                    </ToastNotification>
+                )}
                 {!_.isEmpty(buf) && (
                     <Panel className={styles.panel}>
                         <Panel.Heading className={styles['panel-heading']}>

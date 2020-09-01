@@ -527,5 +527,6 @@
     "Kinematics": "Kinematics",
     "Edition": "Edition",
     "Version": "Version",
-    "Protocol": "Protocol"
+    "Protocol": "Protocol",
+    "Reset Calibration Settings": "Reset Calibration Settings"
 }

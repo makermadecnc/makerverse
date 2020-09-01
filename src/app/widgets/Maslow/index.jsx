@@ -277,6 +277,7 @@ class MaslowWidget extends PureComponent {
             ...this.actions
         };
         const connected = this.isConnectedToMaslow;
+        console.log('renderstate', this.state);
 
         return (
             <Widget fullscreen={isFullscreen}>

@@ -24,11 +24,12 @@ class MaslowLineParserResultError {
     static parseErrorStrings(line) {
         const errs = {
             'Buffer Overflow!': 11, // Maslow Classic: STATUS_OVERFLOW
+            'Unable to find valid machine position for chain lengths': 39,
         };
         const errStrs = Object.keys(errs);
         for (let i = 0; i < errStrs.length; i++) {
             const str = errStrs[i];
-            if (str === line) {
+            if (line.includes(str)) {
                 // Return the error code.
                 return errs[str];
             }

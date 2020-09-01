@@ -250,6 +250,13 @@ export const MASLOW_ERRORS = [
         code: 38,
         message: 'Invalid gcode ID:38',
         description: 'Tool number greater than max supported value.'
+    },
+    // Maslow additions ::
+    {
+        code: 39,
+        message: 'Calibration Required',
+        description: 'The machine failed to compute its position. Calibration required.',
+        suppress: true, // Don't echo it back to the controller.
     }
 ];
 

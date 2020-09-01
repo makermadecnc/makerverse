@@ -460,10 +460,12 @@ class MaslowController {
             }
 
             if (error) { // Grbl v1.1
-                this.emit('serialport:read', `error:${code} (${error.message})`);
                 this.memory.updateStatus({ error: error });
+                if (!error.suppress) { // Noisy and/or pseudo-errors are not sent to controller.
+                    this.emit('serialport:read', `error:${code} (${error.message})`);
+                }
             } else { // Grbl v0.9
-                this.emit('serialport:read', res.raw);
+                this.emitError(res.raw);
             }
 
             // Feeder

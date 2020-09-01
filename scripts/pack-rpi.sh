@@ -1,21 +1,20 @@
 #!/bin/bash
 set -eo pipefail
-
-mkdir -p rpi
 vers=`git describe --tags --abbrev=0`
 
 edition="$1"
 if [ "$edition" = "full" ]; then
-#   fn="raspbian-full.zip"
-#   url="https://downloads.raspberrypi.org/raspios_armhf_latest"
-#   match="rpi/*-full.img"
-  echo "Raspbian (Full)"
+  name="Raspbian (Full)"
 else
-#   fn="raspbian-lite.zip"
-#   url="https://downloads.raspberrypi.org/raspios_lite_armhf_latest"
-#   match="rpi/*-lite.img"
-  echo "Raspbian (Lite)"
+  name="Raspbian (Lite)"
   edition="lite"
+fi
+
+if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
+  echo "Building ${name} v${vers}"
+else
+  echo "Skipping building ${name} until deployment."
+  exit 0
 fi
 cf="raspbian-${edition}.json"
 
@@ -29,37 +28,8 @@ if [ ! -f "$of" ]; then
   exit 1
 fi
 
-mkdir -p "releases"
-
 if [ ! -z "$CI_SEMVER" ]; then
   # On the CI, run pishrink to compress the upload.
-  ls -la "$of"
+  mkdir -p "releases"
   sudo scripts/pishrink.sh -z "$of" "releases/makerverse-raspbian-${edition}-${vers}.img"
 fi
-
-# rm -rf "${match}"
-
-# fd="$(pwd)/rpi/$fn"
-# if [ ! -f "$fd" ]; thenu
-#   echo "Downloading $fn"
-#   wget -O "$fd" "$url"
-# fi
-
-# echo "Unzipping $fd"
-# pushd rpi
-# unzip "$fn"
-# popd
-# img="$(pwd)/$(ls ${match})"
-
-# if [ ! -f "$img" ]; then
-#   echo "Failed to get img from $url"
-#   exit 1
-# fi
-
-# echo "Using imge: $img"
-# ./scripts/rpi-img-install.sh "$(pwd)" "$img"
-
-# ./scripts/pishrink.sh
-# mv "$img" "releases/makerverse-raspbian-${semver}.zip"
-
-# gzip -9 /your/path/to/clone-shrink.img

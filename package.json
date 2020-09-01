@@ -51,7 +51,7 @@
     "start": "./bin/makerverse",
     "start-electron": "electron ./dist/makerverse/main",
     "watch-dev": "cross-env NODE_ENV=development webpack-cli --watch --config webpack.config.server.development.js",
-    "start-dev": "cross-env NODE_ENV=development ./bin/makerverse -vvv -p 8000",
+    "start-dev": "cross-env NODE_ENV=development ./bin/makerverse -vv -p 8000",
     "dev": "npm run build-dev && npm run start-dev",
     "hot-dev": "cross-env NODE_ENV=development nodemon -w src/server -x ./bin/makerverse",
     "prod": "npm run build-prod && NODE_ENV=production ./bin/makerverse",
