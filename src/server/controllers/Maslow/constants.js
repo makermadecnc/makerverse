@@ -114,7 +114,7 @@ export const MASLOW_ERRORS = [
     {
         code: 9,
         message: 'G-code lock',
-        description: 'G-code commands are locked out during alarm or jog state.'
+        description: 'G-code commands are locked out during alarm or jog state. After connecting or resetting, you must unlock the machine.'
     },
     {
         code: 10,
@@ -271,7 +271,7 @@ export const MASLOW_ALARMS = [
     {
         code: 2,
         message: 'Soft limit',
-        description: 'Soft limit alarm. G-code motion target exceeds machine travel. Machine position retained. Alarm may be safely unlocked.'
+        description: 'Soft limit alarm. G-code motion target exceeds machine travel. Machine position retained. Reset required to unlock.'
     },
     {
         code: 3,

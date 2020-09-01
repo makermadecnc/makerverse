@@ -19,6 +19,10 @@ const AboutContainer = ({ version }) => {
             <div className={styles.productDetails}>
                 <div className={styles.aboutProductName}>
                     {`${settings.productName} v${version.currentVersion.readable}`}
+                    <hr />
+                </div>
+                <div className={styles.aboutProductDescription}>
+                    Build #{version.currentVersion.build}
                 </div>
                 <div className={styles.aboutProductDescription}>
                     A collarboration between MakerMade and OpenWorkShop.

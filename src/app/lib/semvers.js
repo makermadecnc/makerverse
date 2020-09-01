@@ -9,19 +9,22 @@ const parseSemver = (v) => {
     const min = semver.minor(v);
     const pat = semver.patch(v);
     const pub = `${maj}.${min}.${pat}`;
+    const branch = prerelease[0] !== 'master' ? prerelease[0] : null;
+    const build = prerelease[1] || 0;
+
     let readable = pub;
-    if (prerelease[0] && prerelease[0] !== 'master') {
-        readable += ` [${prerelease[0]}]`;
+    if (branch) {
+        readable += ` [${branch}]`;
     }
-    if (prerelease[1]) {
-        readable += ` #${prerelease[1]}`;
+    if (build) {
+        readable += ` #${build}`;
     }
     return {
         major: maj,
         minor: min,
         patch: pat,
-        branch: prerelease[0],
-        build: prerelease[1],
+        branch: branch,
+        build: build,
         full: v, // The full version string
         public: pub, // The public, easy to read string
         readable: readable, // long, human readable full version string

@@ -227,9 +227,12 @@ class MaslowMemory {
     // Generic Gcode command
     handleCommand(cmd) {
         this.log.silly(`MaslowMemory translating command: ${cmd}`);
-        if (cmd === '$X' || cmd === '\x18') {
-            // Unlock/Reset: clear alarm & error text
-            this.updateStatus({ activeState: MASLOW_ACTIVE_STATE_IDLE, error: null, alarm: null });
+
+        if (cmd === '$X') { // Unlock
+            this.updateStatus({ error: null });
+        }
+        if (cmd === '\x18') { // Reset
+            this.updateStatus({ alarm: null, activeState: MASLOW_ACTIVE_STATE_IDLE });
         }
         if (!this.controller.hardware.isMaslowClassic()) {
             // Only the Maslow Classic needs in-memory storage.

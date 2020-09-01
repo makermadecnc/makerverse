@@ -35,6 +35,17 @@ class MaslowHardware {
         return this.firmware && this.firmware.name === MASLOW_FIRMWARE_DUE;
     }
 
+    get aboutCommands() {
+        const ret = ['$$'];
+        if (this.isMaslowClassic()) {
+            ret.push('B05');
+        }
+        if (this.isMaslowDue()) {
+            ret.push('$#');
+        }
+        return ret;
+    }
+
     async writeInitCommands(writeFn) {
         writeFn('$$');
         if (this.isMaslowClassic()) {

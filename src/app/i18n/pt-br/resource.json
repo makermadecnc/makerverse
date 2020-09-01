@@ -528,5 +528,9 @@
     "Edition": "",
     "Version": "",
     "Protocol": "",
-    "Reset Calibration Settings": ""
+    "Reset Calibration Settings": "",
+    "Wipe Settings": "",
+    "Are you sure?": "",
+    "This will reset all machine & calibration settings (eeprom).": "",
+    "Accept": ""
 }

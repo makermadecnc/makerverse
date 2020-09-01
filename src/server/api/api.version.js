@@ -20,9 +20,10 @@ export const getLatestVersion = (req, res) => {
             const { body: data = [] } = { ..._res };
             const rel = _.findIndex(data, { draft: false, prerelease: false });
             const pre = _.findIndex(data, { draft: false, prerelease: true });
+            const hasNewerPrerelease = pre >= 0 && pre < rel;
 
             res.send({
-                prerelease: data[pre],
+                prerelease: data[hasNewerPrerelease ? pre : rel],
                 release: data[rel],
             });
         });

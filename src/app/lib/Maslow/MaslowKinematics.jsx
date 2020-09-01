@@ -30,12 +30,12 @@ class MaslowKinematics {
 
     constructor(controller) {
         this.controller = controller;
-        this.loadControllerSettings(controller);
+        this.loadControllerSettings(controller.settings);
     }
 
     getSettingsMap(settings) {
         const opts = {};
-        settings = settings || this.controller.settings;
+        settings = settings || this.controllerSettings;
         Object.keys(settings.grbl).forEach((code) => {
             const g = settings.grbl[code];
             const msg = `${g.message}, ${g.units}`.toLowerCase();
@@ -74,8 +74,9 @@ class MaslowKinematics {
         return opts;
     }
 
-    loadControllerSettings(controller) {
-        const settings = this.getSettingsMap(controller.settings);
+    loadControllerSettings(controllerSettings) {
+        this.controllerSettings = controllerSettings;
+        const settings = this.getSettingsMap(controllerSettings);
         const opts = {};
         Object.keys(settings).forEach((key) => {
             opts[key] = Number(settings[key].value);

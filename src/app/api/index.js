@@ -4,6 +4,7 @@ import semver from 'semver';
 import superagentUse from 'superagent-use';
 import settings from 'app/config/settings';
 import { parseSemver } from 'app/lib/semvers';
+import log from 'app/lib/log';
 import store from '../store';
 
 const bearer = (request) => {
@@ -56,6 +57,9 @@ const getLatestVersion = (prereleases) => new Promise((resolve, reject) => {
         .get('/api/version/latest')
         .end((err, res) => {
             if (err) {
+                reject(res);
+            } else if (!res.body.release || !res.body.prerelease) {
+                log.warn('missing version data');
                 reject(res);
             } else {
                 const usePre = prereleases && semver.lt(res.body.release.tag_name, res.body.prerelease.tag_name);
