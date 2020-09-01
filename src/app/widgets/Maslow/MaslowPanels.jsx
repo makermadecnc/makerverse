@@ -75,11 +75,23 @@ class MaslowPanels extends PureComponent {
 
         if (fn === 'MaslowClassic') {
             if (fv < 51.28) {
-                return <div className={styles.noConnection}>Please upgrade to Holey firmware (51.28 or later).</div>;
+                return (
+                    <div className={styles.noConnection}>
+                        Please upgrade your Maslow Holey firmware (51.28 or later).
+                        <hr />
+                        Download the latest firmware <a href="https://github.com/WebControlCNC/Firmware/tree/release/holey" target="_blank" rel="noopener noreferrer">from Github</a>.
+                    </div>
+                );
             }
         } else if (fn === 'MaslowDue') {
-            if (fv < 20200811) {
-                return <div className={styles.noConnection}>Please upgrade your Maslow Due firmware (20200811 or later).</div>;
+            if (fv < 20200901) {
+                return (
+                    <div className={styles.noConnection}>
+                        Please upgrade your Maslow Due firmware (20200901 or later).
+                        <hr />
+                        Download the latest firmware <a href="https://github.com/makermadecnc/MaslowDue" target="_blank" rel="noopener noreferrer">from Github</a>.
+                    </div>
+                );
             }
         } else {
             return (

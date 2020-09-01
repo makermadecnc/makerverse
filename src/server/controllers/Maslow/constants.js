@@ -84,7 +84,7 @@ export const MASLOW_ERRORS = [
     {
         code: 3,
         message: 'Invalid statement',
-        description: 'Maslow \$\' system command was not recognized or supported.'
+        description: 'Grbl \$\' system command was not recognized or supported.'
     },
     {
         code: 4,
@@ -109,7 +109,7 @@ export const MASLOW_ERRORS = [
     {
         code: 8,
         message: 'Not idle',
-        description: 'Maslow \'$\' command cannot be used unless Maslow is IDLE. Ensures smooth operation during a job.'
+        description: 'Grbl \'$\' command cannot be used unless Grbl is IDLE. Ensures smooth operation during a job.'
     },
     {
         code: 9,
@@ -129,7 +129,7 @@ export const MASLOW_ERRORS = [
     {
         code: 12,
         message: 'Step rate > 30kHz',
-        description: 'Maslow \'$\' setting value cause the step rate to exceed the maximum supported.'
+        description: 'Grbl \'$\' setting value cause the step rate to exceed the maximum supported.'
     },
     {
         code: 13,
