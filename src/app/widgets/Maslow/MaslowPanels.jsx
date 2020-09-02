@@ -87,10 +87,10 @@ class MaslowPanels extends PureComponent {
                 );
             }
         } else if (fn === 'MaslowDue') {
-            if (fv < 20200902) {
+            if (fv < 20200905) {
                 return (
                     <div className={styles.noConnection}>
-                        Please upgrade your Maslow Due firmware (20200902 or later).
+                        Please upgrade your Maslow Due firmware (20200905 or later).
                         <hr />
                         Download the latest firmware <a href="https://github.com/makermadecnc/MaslowDue" target="_blank" rel="noopener noreferrer">from Github</a>.
                     </div>

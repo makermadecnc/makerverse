@@ -173,15 +173,19 @@ class CalibrationModal extends PureComponent {
         this.workspace.controller.command('reset');
     }
 
+    moveToCenter() {
+        this.unlock();
+        this.workspace.controller.writeln('G90');
+        this.workspace.controller.writeln('G0 X0 Y0');
+    }
+
     moveToPosition(index) {
         const gcode = this.calibration.generateGcodePoint(index);
         log.debug(`Moving to position ${index}`);
         this.unlock();
-        log.debug(JSON.stringify(this.workspace.controller.state));
         gcode.forEach((cmd) => {
             this.workspace.controller.writeln(cmd);
         });
-        log.debug(JSON.stringify(this.workspace.controller.state));
     }
 
     writeSetting(name, value) {
@@ -688,6 +692,15 @@ class CalibrationModal extends PureComponent {
                                             {'Watch the console output; it can help to learn the gcode & grbl commands, as well as spot problems.'}
                                         </span>
                                     )}
+                                    <br />
+                                    <Button
+                                        btnSize="medium"
+                                        btnStyle="flat"
+                                        onClick={event => this.moveToCenter()}
+                                    >
+                                        <i className="fa fa-bullseye" />
+                                        {i18n._('Move to Center')}
+                                    </Button>
                                 </div>
                             </div>
                         )}
