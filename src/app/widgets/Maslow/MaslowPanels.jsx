@@ -14,6 +14,9 @@ import {
     MODAL_CALIBRATION
 } from './constants';
 
+const MASLOW_MIN_FIRMWARE_CLASSIC = 51.28;
+const MASLOW_MIN_FIRMWARE_DUE = 20200905;
+
 class MaslowPanels extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
@@ -30,6 +33,26 @@ class MaslowPanels extends PureComponent {
     receiveBufferMax = 128;
 
     receiveBufferMin = 0;
+
+    renderError(top, classicLink, dueLink) {
+        const firmwareLink = classicLink || dueLink;
+        return (
+            <div className={styles.noConnection}>
+                {top}
+                {firmwareLink && <hr />}
+                {classicLink && (
+                    <div>
+                        Download the <a href="https://github.com/WebControlCNC/Firmware/tree/release/holey" target="_blank" rel="noopener noreferrer">Arduino Mega (Holey) firmware</a>.
+                    </div>
+                )}
+                {dueLink && (
+                    <div>
+                        Download the <a href="https://github.com/makermadecnc/MaslowDue" target="_blank" rel="noopener noreferrer">Arduino Due (M2) firmware</a>.
+                    </div>
+                )}
+            </div>
+        );
+    }
 
     render() {
         const { state, actions } = this.props;
@@ -66,42 +89,30 @@ class MaslowPanels extends PureComponent {
         const fn = controllerSettings.firmware ? controllerSettings.firmware.name : null;
 
         if (!fn || fn.length <= 0) {
-            return (
-                <div className={styles.noConnection}>
+            return this.renderError((
+                <span>
                     No compatible device detected.
-                    <br />
-                    For Maslows using the Mega board, upgrade to Holey firmware (v51.28 or later).
-                    For Maslows using the Due board,
-                </div>
-            );
-        }
-
-        if (fn === 'MaslowClassic') {
-            if (fv < 51.28) {
-                return (
-                    <div className={styles.noConnection}>
-                        Please upgrade your Maslow Holey firmware (51.28 or later).
-                        <hr />
-                        Download the latest firmware <a href="https://github.com/WebControlCNC/Firmware/tree/release/holey" target="_blank" rel="noopener noreferrer">from Github</a>.
-                    </div>
-                );
+                    <br /><br />
+                    The firmware is not reporting any known Maslow versions.
+                    This is common if you plugged in a regular Grbl device, like the M2 with factory firmware.
+                </span>),
+            true, true);
+        } else if (fn === 'MaslowClassic') {
+            if (fv < MASLOW_MIN_FIRMWARE_CLASSIC) {
+                return this.renderError(`Please upgrade your Maslow Holey firmware (${MASLOW_MIN_FIRMWARE_CLASSIC} or later).`, true, false);
             }
         } else if (fn === 'MaslowDue') {
-            if (fv < 20200905) {
-                return (
-                    <div className={styles.noConnection}>
-                        Please upgrade your Maslow Due firmware (20200905 or later).
-                        <hr />
-                        Download the latest firmware <a href="https://github.com/makermadecnc/MaslowDue" target="_blank" rel="noopener noreferrer">from Github</a>.
-                    </div>
-                );
+            if (fv < MASLOW_MIN_FIRMWARE_DUE) {
+                return this.renderError(`Please upgrade your Maslow Due firmware (${MASLOW_MIN_FIRMWARE_DUE} or later).`, false, true);
             }
         } else {
-            return (
-                <div className={styles.noConnection}>
-                    {fn + ' is not a Maslow.'}
-                </div>
-            );
+            return this.renderError(
+                <span>
+                    {fn + 'is not a Maslow.'}
+                    <br /><br />
+                    {`The firmware reported it was of type ${fn}, but 'Maslow' was expected.`}
+                    Please use an Arduino Due or Mega with the appropriate firmware.
+                </span>, true, true);
         }
 
         return (
