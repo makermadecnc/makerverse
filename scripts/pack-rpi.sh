@@ -10,11 +10,13 @@ else
   edition="lite"
 fi
 
-if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
-  echo "Building ${name} v${vers}"
-else
-  echo "Skipping building ${name} until deployment."
-  exit 0
+if [[ ! -z "$CI_SEMVER" ]]; then
+  if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
+    echo "Building ${name} v${vers}"
+  else
+    echo "Skipping building ${name} until deployment."
+    exit 0
+  fi
 fi
 cf="raspbian-${edition}.json"
 

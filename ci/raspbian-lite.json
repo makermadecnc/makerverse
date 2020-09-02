@@ -2,8 +2,8 @@
   "variables": {},
   "builders": [{
     "type": "arm",
-    "file_urls" : ["https://downloads.raspberrypi.org/raspbian/images/raspbian-2019-09-30/2019-09-26-raspbian-buster.zip"],
-    "file_checksum_url": "https://downloads.raspberrypi.org/raspbian/images/raspbian-2019-09-30/2019-09-26-raspbian-buster.zip.sha256",
+    "file_urls" : ["https://downloads.raspberrypi.org/raspios_lite_armhf_latest"],
+    "file_checksum": "4522df4a29f9aac4b0166fbfee9f599dab55a997c855702bfe35329c13334668",
     "file_checksum_type": "sha256",
     "file_target_extension": "zip",
     "image_build_method": "resize",
