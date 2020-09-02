@@ -213,24 +213,27 @@ class CreateWorkspace extends PureComponent {
             });
         },
         'controller:settings': (type, controllerSettings) => {
+            let v = null;
             if (type === MASLOW) {
                 if (controllerSettings.firmware && controllerSettings.firmware.name.length > 0) {
-                    this.setState({ version: `${controllerSettings.firmware.name} v${controllerSettings.firmware.version}` });
+                    v = `${controllerSettings.firmware.name} v${controllerSettings.firmware.version}`;
                 }
             } else if (_.has(controllerSettings, 'version')) {
                 if (controllerSettings.version && controllerSettings.version.length > 0) {
-                    this.setState({ version: `${type} v${controllerSettings.version}` });
+                    v = `${type} v${controllerSettings.version}`;
                 }
             } else {
-                this.setState({ version: `${type} device` });
+                v = `${type} device`;
             }
-            if (this.state.version) {
+            if (v) {
+                this.setState({ version: v, hasSettings: true });
                 analytics.event({
                     category: 'controller',
                     action: 'identified',
                     label: this.state.version,
                 });
             } else {
+                this.setState({ hasSettings: true });
                 analytics.event({
                     category: 'controller',
                     action: 'unidentified',
@@ -273,6 +276,7 @@ class CreateWorkspace extends PureComponent {
             connecting: false,
             connected: false,
             creating: false,
+            hasSettings: false,
             version: null,
             ports: [],
             baudrates: _.reverse(_.sortBy(_.uniq(this.controller.baudrates.concat(defaultBaudrates)))),
@@ -336,7 +340,8 @@ class CreateWorkspace extends PureComponent {
         const { baudrate } = { ...options };
 
         this.setState(state => ({
-            connecting: true
+            connecting: true,
+            hasSettings: false,
         }));
 
         this.controller.openPort(port, {
@@ -374,14 +379,29 @@ class CreateWorkspace extends PureComponent {
     }
 
     render() {
-        const { minimized, isFullscreen, connected, version, name, alertMessage } = this.state;
+        const { minimized, isFullscreen, connected, version, name, alertMessage, hasSettings } = this.state;
         const state = {
             ...this.state
         };
         const actions = {
             ...this.actions
         };
-        const wrn = version ? '' : 'Querying hardware. If this message persists, the controllerType or baudRate may be wrong.';
+        let wrn = 'Querying hardware... the only reason this message would not go away is if you chose the wrong Baud Rate, or the device does not have compatible firmware installed.';
+        if (hasSettings) {
+            if (!version) {
+                wrn = (
+                    <span>
+                        This device is not running compatible Maslow firmware.
+                        <br />
+                        Download the <a href="https://github.com/WebControlCNC/Firmware/tree/release/holey" target="_blank" rel="noopener noreferrer">Arduino Mega (Holey) firmware</a>.
+                        <br />
+                        Download the <a href="https://github.com/makermadecnc/MaslowDue" target="_blank" rel="noopener noreferrer">Arduino Due (M2) firmware</a>.
+                    </span>
+                );
+            } else {
+                wrn = '';
+            }
+        }
 
         if (this._mounting) {
             return <div>Connecting...</div>;
