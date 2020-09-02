@@ -61,6 +61,8 @@ class CalibrationModal extends PureComponent {
             motorOffsetY: this.fromMM(this.calibration.kin.opts.motorOffsetY, inches),
             distBetweenMotors: this.fromMM(this.calibration.kin.opts.distBetweenMotors, inches),
             sledRadius: this.fromMM(this.calibration.opts.sledRadius, inches),
+            sledWeight: this.fromMM(this.calibration.kin.opts.sledWeight, inches),
+            chainLength: this.fromMM(this.calibration.kin.opts.chainLength, inches),
         };
     }
 
@@ -70,7 +72,7 @@ class CalibrationModal extends PureComponent {
         activeTab: 'machine',
         yHome: 0,
         definedHome: false,
-        setSizes: false,
+        setMachineSettings: false,
         calibrating: -1,
         result: false,
         wiping: false,
@@ -193,15 +195,17 @@ class CalibrationModal extends PureComponent {
         this.workspace.controller.writeln(`${setting.name}=${value}`);
     }
 
-    setMachineSizes() {
+    setMachineSettings() {
         this.event({ label: 'resize' });
         this.workspace.hasOnboarded = true;
         this.unlock();
         this.writeSetting('machineWidth', this.calibration.kin.opts.machineWidth);
         this.writeSetting('machineHeight', this.calibration.kin.opts.machineHeight);
+        this.writeSetting('chainLength', this.calibration.kin.opts.chainLength);
+        this.writeSetting('sledWeight', this.calibration.kin.opts.sledWeight);
         this.setState({
             ...this.state,
-            setSizes: true,
+            setMachineSettings: true,
         });
     }
 
@@ -292,8 +296,10 @@ class CalibrationModal extends PureComponent {
             machineHeight,
             distBetweenMotors,
             measuredInches,
+            sledWeight,
+            chainLength,
             calibrating,
-            setSizes,
+            setMachineSettings,
             definedHome,
             result,
             sledRadius,
@@ -319,6 +325,7 @@ class CalibrationModal extends PureComponent {
         const units = isImperial ? 'in' : 'mm';
         const edgeDistanceKey = isPrecisionTab ? 'cutEdgeDistance' : 'edgeDistance';
         const edgeDistance = this.state[edgeDistanceKey];
+        const nonstandardSize = Math.abs(2438.4 - machineWidth) > 0.1 || Math.abs(1219.2 - machineHeight) > 0.1;
 
         return (
             <Modal
@@ -390,42 +397,77 @@ class CalibrationModal extends PureComponent {
                                     {'For help, or to change units, see the lower-left corner of this dialog.'}
                                 </div>
                                 <div className={styles.bottom}>
-                                    Width:
-                                    <input
-                                        type="text"
-                                        name="machineWidth"
-                                        className={styles.mmInput}
-                                        value={machineWidth}
-                                        onChange={e => {
-                                            this.updateKinematics({ machineWidth: this.toMM(e.target.value) || 0 });
-                                            this.setState({ machineWidth: e.target.value });
-                                        }}
-                                    />
-                                    Height:
-                                    <input
-                                        type="text"
-                                        name="machineHeight"
-                                        className={styles.mmInput}
-                                        value={machineHeight}
-                                        onChange={e => {
-                                            this.updateKinematics({ machineHeight: this.toMM(e.target.value) || 0 });
-                                            this.setState({ machineHeight: e.target.value });
-                                        }}
-                                    />
-                                    {!setSizes && (
-                                        <Button
-                                            btnSize="medium"
-                                            btnStyle="flat"
-                                            onClick={event => this.setMachineSizes()}
-                                        >
-                                            <i className="fa fa-check" />
-                                            {i18n._('Next Step')}
-                                        </Button>
-                                    )}
-                                    {setSizes && (
+                                    <div>
+                                        These values on this tab should only be changed if you have a nonstandard setup.
+                                    </div>
+                                    <div>
+                                        Width:
+                                        <input
+                                            type="text"
+                                            name="machineWidth"
+                                            className={styles.mmInput}
+                                            value={machineWidth}
+                                            onChange={e => {
+                                                this.updateKinematics({ machineWidth: this.toMM(e.target.value) || 0 });
+                                                this.setState({ machineWidth: e.target.value });
+                                            }}
+                                        />
+                                        Height:
+                                        <input
+                                            type="text"
+                                            name="machineHeight"
+                                            className={styles.mmInput}
+                                            value={machineHeight}
+                                            onChange={e => {
+                                                this.updateKinematics({ machineHeight: this.toMM(e.target.value) || 0 });
+                                                this.setState({ machineHeight: e.target.value });
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        Full Length of Each Chain:
+                                        <input
+                                            type="text"
+                                            name="chainLength"
+                                            className={styles.mmInput}
+                                            value={chainLength}
+                                            onChange={e => {
+                                                this.updateKinematics({ chainLength: this.toMM(e.target.value) || 0 });
+                                                this.setState({ chainLength: e.target.value });
+                                            }}
+                                        />
+                                        Sled Weight:
+                                        <input
+                                            type="text"
+                                            name="sledWeight"
+                                            className={styles.mmInput}
+                                            value={sledWeight}
+                                            onChange={e => {
+                                                this.updateKinematics({ sledWeight: this.toMM(e.target.value) || 0 });
+                                                this.setState({ sledWeight: e.target.value });
+                                            }}
+                                        />
+                                        (Newtons)
+                                    </div>
+                                    {nonstandardSize && (
                                         <div>
-                                            {'Note: if at any point you need to restart calibration, close and re-open the connection first.'}
-                                            <br />
+                                            Note: you have entered a size different than a standard Maslow (4x8 feet).
+                                        </div>
+                                    )}
+                                    {!setMachineSettings && (
+                                        <div style={{ position: 'absolute', bottom: '10px', right: '10px' }}>
+                                            <Button
+                                                btnSize="medium"
+                                                btnStyle="flat"
+                                                onClick={event => this.setMachineSettings()}
+                                            >
+                                                <i className="fa fa-check" />
+                                                {i18n._('Next Step')}
+                                            </Button>
+                                        </div>
+                                    )}
+                                    {setMachineSettings && (
+                                        <div>
                                             {'When you are ready, make your way through each of the tabs, from left to right.'}
                                         </div>
                                     )}

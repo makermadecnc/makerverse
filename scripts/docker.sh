@@ -14,7 +14,12 @@ if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
     echo "Skipping Docker build until Deploy step on master branch."
     exit 0
   fi
-  TAG="latest"
+  if [[ $(echo $CI_VERSION | grep '-') ]]; then
+    # Prerelease venrsions have a feature branch
+    TAG="prerelease"
+  else
+    TAG="latest"
+  fi
 else
   if [ "$TRAVIS_BRANCH" = "master" ]; then
     TAG="ci"

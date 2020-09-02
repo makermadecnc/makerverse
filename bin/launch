@@ -11,6 +11,7 @@ if [[ -z "$MAKERVERSE_GIT_DIR" ]]; then
   fi
 fi
 MAKERVERSE_LAUNCH_METHOD=${MAKERVERSE_LAUNCH_METHOD:-docker}
+MAKERVERSE_SETTINGS_FILE="${MAKERVERSE_HOME}/.makerverse"
 
 # Scan dependency versions
 if [[ $(which node) ]]; then
@@ -28,9 +29,22 @@ else
   dv=""
 fi
 
+# Are prereleases on?
+channel="latest"
+if [[ -f "$MAKERVERSE_SETTINGS_FILE" ]]; then
+  if [[ $(cat "$MAKERVERSE_SETTINGS_FILE" | grep "\"prereleases\": true") ]]; then
+    channel="prerelease"
+  fi
+fi
+
 # Set defaults & arguments
 git_repo="https://github.com/makermadecnc/makerverse.git"
-docker_img="makerverse/core:latest"
+if [[ ! -z "$MAKERVERSE_VERSION" ]]; then
+  docker_img="makerverse/core:$MAKERVERSE_VERSION"
+else
+  docker_img="makerverse/core:${channel}"
+fi
+
 _arg_update="on"
 # Set default launch method when none provided.
 if [[ ! -z "$dv" ]]; then
@@ -85,19 +99,23 @@ installPrompt() {
   echo "Run this script again once the install is complete."
 }
 
+createSettings() {
+  if [[ ! -f "$MAKERVERSE_SETTINGS_FILE" ]]; then
+    echo "No settings found at ${MAKERVERSE_SETTINGS_FILE}. This may be the first time Makerverse has run."
+    if [[ -d "$MAKERVERSE_SETTINGS_FILE" ]]; then
+      rm -rf "$MAKERVERSE_SETTINGS_FILE"
+    fi
+    url="https://raw.githubusercontent.com/makermadecnc/makerverse/master/$1"
+    wget -q "$url" -O "$MAKERVERSE_SETTINGS_FILE"
+  fi
+}
+
 # Main launch method
 launch() {
   echo "Makerverse launching from ${MAKERVERSE_HOME}"
-  mvf="$MAKERVERSE_HOME/.makerverse"
-  if [[ ! -f "$mvf" ]]; then
-    echo "No settings found at ${mvf}. This may be the first time Makerverse has run."
-    if [[ -d "$mvf" ]]; then
-      rm -rf "$mvf"
-    fi
-    echo "{}" > "$mvf"
-  fi
 
   if [ "$1" = "node" ]; then
+    createSettings ".makerverse.default"
     # Update Makerverse, build, and run the Node.js application directly.
     if [[ "$nv" =~ "v12." ]]; then
       echo "NodeJS $nv detected"
@@ -117,6 +135,7 @@ launch() {
     npm run build-prod
     node ./bin/makerverse
   elif [ "$1" = "docker" ] || [ "$1" = "" ]; then
+    createSettings ".makerverse.docker"
     # Launch via a docker image
     if [[ "$dv" = "-" ]]; then
       echo "Docker is not running."
@@ -136,7 +155,7 @@ launch() {
     docker kill makerverse || true
     echo "Launching $docker_img..."
     docker run --rm --privileged --name makerverse -v /dev:/dev -p 8000:8000 \
-      -v "$MAKERVERSE_HOME/.makerverse:/home/node/.cncrc" \
+      -v "$MAKERVERSE_SETTINGS_FILE:/home/node/.cncrc" \
       "$docker_img"
   else
     echo "Invalid launch method: ${launch}"

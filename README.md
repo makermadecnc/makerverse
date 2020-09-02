@@ -37,11 +37,13 @@ _Note: for security reasons, you can only access the Makerverse app from a brows
 
 There is a launch script located in this repository at `bin/launch`. Just run it from a command prompt on almost any machine.
 
-The launch script is used elsewhere, like from the pre-built Raspberry Pi image and from the Linux service. The launch script can launch the app either via Docker (default) or by manually compiling NodeJS. To see all options, type `bin/launch --help`. If you would like to permanently change the launch method from Docker to Node, you can export the environment variable `MAKERVRSE_LAUNCH_METHOD=node`.
+The Launch Script is going to try to run Makerverse via Docker (by default). See the "Docker Image" section for help.
 
 #### Pre-Built Raspberry Pi Image
 
-Download the `makerverse-raspbian-lite-x.y.z.img..gz` file from the latest releases. Unzip the file and flash the `.img` to your SD card with your preferred application (e.g., Balena Etcher). SSH will already be enabled, and the default username/password (`pi`/`raspbian`) have been left unchanged. The hostname defaults to `makerverse`, so if your router supports it you can connect to the pi at `ssh pi@makerverse.local` and `http://makerverse.local:8000`. As soon as you are ablem to, SSH in to the Raspberry Pi and run `sudo raspi-config` to change the password.
+This is the easiest approach. It does all the work of setting up the Linux Service and Docker Image (below) for you.
+
+Download the `makerverse-raspbian-lite-x.y.z.img.gz` file from the latest releases. Unzip the file and flash the `.img` to your SD card with your preferred application (e.g., Balena Etcher). SSH will already be enabled, and the default username/password (`pi`/`raspbian`) have been left unchanged. The hostname defaults to `makerverse`, so if your router supports it you can connect to the pi at `ssh pi@makerverse.local` and `http://makerverse.local:8000`. As soon as you are ablem to, SSH in to the Raspberry Pi and run `sudo raspi-config` to change the password.
 
 The Makerverse application will start automatically on port `8000`. However, especially during the first boot, it will take some time to download (_~600MB_) and unpack the application. On a Raspberry Pi 3 B+ Rev.1.3 (about the  worst device which can handle Makerverse), this has been known to take 20-30 minutes. A RPi4 on a decent internet connection should only take a few minutes.
 
@@ -49,9 +51,14 @@ Tip: read the "Handy commands" in the next section!
 
 #### Linux Service
 
-On a Raspberry Pi, Ubuntu, and other Linux machines you can use systemd to run Makerverse as a service. This is the same as how the pre-built Raspberry Pi image works, above, except you can install the service yourself on any Debian machine. This means it will start automatically on boot, and run in the background. This is already pre-configured on the Raspberry Pi image, but for other systems first ensure that you are able to start the application correctly via `bin/launch`. Once you're sure the server is running the way you want it, terminate the server. Now run `bin/server install` to create the service. Refer to the commands from the last section for help using the service.
+On a Raspberry Pi, Ubuntu, and other Linux machines you can use systemd to run Makerverse as a service. This is the same as how the pre-built Raspberry Pi image works, above, except you can install the service yourself on any Debian machine. This means it will start automatically on boot, and run in the background. This is already pre-configured on the Raspberry Pi image, but for other systems:
+
+- First ensure that you are able to start the application correctly via `bin/launch`. See the Docker Image section, below, if you have trouble.
+- Once you're sure the server is running the way you want it, terminate the server.
+- Now run `bin/server install` to create the service.
 
 Handy commands:
+
 - Check if Makerverse is running: `sudo systemctl status makerverse`
 - Restart (and update!) Makerverse: `sudo systemctl restart makerverse`
 - See Makerverse server logs: `docker logs makerverse`
@@ -61,26 +68,29 @@ Handy commands:
 
 _If you are experienced with Docker already_, pull from `makerverse/core:latest` (multi-arch image, including `amd64`, `armv7`, and `arm64`). The application is launched from the `/home/node` directory, where the root of this repository resides. Consider mounting a `~/.makerverse` file into `/home/node/.makerverse`, or widgets into `/home/node/widgets`, for example.
 
-_If you're new to Docker_, start by installing it. Just like with Node.js, it is recommended to use the Windows / MacOS [installers](https://www.docker.com/products/docker-desktop), when applicable. On Linux/Raspberry Pi, there's a one-line installer available:
+_If you're new to Docker_, start by installing it. It is recommended to use the Windows / MacOS [installers](https://www.docker.com/products/docker-desktop), when applicable. You should simply be able to run the `makerverse/core:latest` Docker image via the Docker UI. For Linux users, here are the same commands used to install and configure Docker on the _Raspberry Pi Pre-Built Image_ (above):
 
+Install docker:
 ```
 curl -sSL https://get.docker.com | sh
 ```
 
-Then, run the container. For example:
+And then grant your current user access to Docker, and start it:
 ```
-docker run --privileged --rm -p 8000:8000 makerverse/core:latest
+sudo usermod -aG docker "$(whoami)"
+sudo systemctl enable docker
+sudo systemctl start docker
+````
+
+You will also probably need to grant Docker read-access to your USB devices:
+```
+sudo echo 'KERNEL==\"ttyUSB[0-9]*\",MODE=\"0666\"' >> /etc/udev/rules.d/49-makerverse.rules
+sudo echo 'KERNEL==\"ttyACM[0-9]*\",MODE=\"0666\"' >> /etc/udev/rules.d/49-makerverse.rules
 ```
 
-Note: if you get a permission error, use `sudo docker ...`.
+Finally, you should test that the `bin/launch` script starts correctly and you can connect to Makerverse.
 
-Example: persist your settings onto your Raspberry Pi:
-```
-touch /home/pi/.makerverse
-docker run --privileged --rm -v /dev:/dev -v /home/pi/.makerverse:/home/node/.makerverse -p 8000:8000 makerverse/core:latest
-```
-
-See the `bin/makerverse-docker.service` to run the Docker image automatically at boot. First, tweak the command arguments (volumes and ports) to your liking. Then, copy it to `/etc/systemd/system/` on the device. Finally, use `sudo systemctl enable makerverse-docker.service` and `sudo systemctl start makerverse-docker.service`.
+If that works, jump up to the "Linux Service" section, above, to make it run automatically on boot.
 
 #### Build from Source
 

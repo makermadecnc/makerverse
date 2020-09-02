@@ -532,5 +532,6 @@
     "Wipe Settings": "Wipe Settings",
     "Are you sure?": "Are you sure?",
     "This will reset all machine & calibration settings (eeprom).": "This will reset all machine & calibration settings (eeprom).",
-    "Accept": "Accept"
+    "Accept": "Accept",
+    "Move to Center": "Move to Center"
 }
