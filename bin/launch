@@ -164,7 +164,7 @@ launch() {
     echo "Launching $docker_img..."
     docker run --rm --privileged --name makerverse -v /dev:/dev \
       -p "${MAKERVERSE_PORT}:8000" \
-      -v "$MAKERVERSE_SETTINGS_FILE:/home/node/.cncrc" \
+      -v "$MAKERVERSE_SETTINGS_FILE:/home/node/.makerverse" \
       -v "$MAKERVERSE_GIT_DIR:/home/node/makerverse" \
       "$docker_img"
   else

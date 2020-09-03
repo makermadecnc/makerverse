@@ -66,7 +66,18 @@ jobs:
   services:
     - docker
   script:
-  - scripts/pack-rpi.sh
+  - scripts/pack-rpi.sh lite
+# [Job] Raspberry Pi Image built with Docker
+- name: "Raspbian Desktop"
+  language: shell
+  sudo: required
+  os: linux
+  dist: bionic
+  install: []
+  services:
+    - docker
+  script:
+  - scripts/pack-rpi.sh desktop
 # [Job] Linux (Electron App)
 - name: "Linux"
   os: linux

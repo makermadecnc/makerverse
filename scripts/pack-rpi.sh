@@ -3,8 +3,9 @@ set -eo pipefail
 vers=`git describe --tags --abbrev=0`
 
 edition="$1"
-if [ "$edition" = "full" ]; then
-  name="Raspbian (Full)"
+if [ "$edition" = "desktop" ]; then
+  name="Raspbian (Desktop)"
+  edition="desktop"
 else
   name="Raspbian (Lite)"
   edition="lite"
