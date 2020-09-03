@@ -214,34 +214,27 @@ class CreateWorkspace extends PureComponent {
         },
         'controller:settings': (type, controllerSettings) => {
             let v = null;
-            log.debug('Got controller settings', controllerSettings);
-            if (type === MASLOW) {
-                if (controllerSettings.firmware && controllerSettings.firmware.name.length > 0) {
-                    v = `${controllerSettings.firmware.name} v${controllerSettings.firmware.version}`;
-                }
-            } else if (_.has(controllerSettings, 'version')) {
-                if (controllerSettings.version && controllerSettings.version.length > 0) {
-                    v = `${type} v${controllerSettings.version}`;
-                }
+            log.debug('Got', type, 'settings:', controllerSettings);
+            const protocolVersion = _.get(controllerSettings, 'protocol.version') || '';
+            const protocolName = _.get(controllerSettings, 'protocol.name') || '';
+            const version = _.get(controllerSettings, 'version') || '';
+            if (protocolVersion.length > 0 && protocolName.length > 0) {
+                v = `${protocolName} v${protocolVersion}`;
+            } else if (version.length > 0) {
+                v = `${type} v${version}`;
             } else {
-                v = `${type} device`;
+                v = `${type} v???`;
             }
-            if (v) {
-                this.setState({ version: v, hasSettings: true });
-                analytics.event({
-                    category: 'controller',
-                    action: 'identified',
-                    label: this.state.version,
-                });
-            } else {
-                this.setState({ hasSettings: true });
-                analytics.event({
-                    category: 'controller',
-                    action: 'unidentified',
-                    label: type,
-                });
-            }
-        }
+            this.setState({ version: v, hasSettings: true });
+            analytics.event({
+                category: 'controller',
+                action: 'identified',
+                label: v,
+            });
+        },
+        'serialport:read': (data) => {
+            log.debug('serialport read', data);
+        },
     };
 
     componentDidMount() {
@@ -379,8 +372,24 @@ class CreateWorkspace extends PureComponent {
         });
     }
 
+    renderFirmwareWarning(version, controllerType) {
+        return (
+            <span>
+                {`Device uses ${version}, which is not compatible with ${controllerType}.`}
+                {controllerType === MASLOW && (
+                    <span>
+                        <br />
+                        Download the <a href="https://github.com/WebControlCNC/Firmware/tree/release/holey" target="_blank" rel="noopener noreferrer">Arduino Mega (Holey) firmware</a>.
+                        <br />
+                        Download the <a href="https://github.com/makermadecnc/MaslowDue" target="_blank" rel="noopener noreferrer">Arduino Due (M2) firmware</a>.
+                    </span>
+                )}
+            </span>
+        );
+    }
+
     render() {
-        const { minimized, isFullscreen, connected, version, name, alertMessage, hasSettings } = this.state;
+        const { minimized, isFullscreen, connected, version, name, alertMessage, hasSettings, controllerType } = this.state;
         const state = {
             ...this.state
         };
@@ -389,16 +398,8 @@ class CreateWorkspace extends PureComponent {
         };
         let wrn = 'Querying hardware... the only reason this message would not go away is if you chose the wrong Baud Rate, or the device does not have compatible firmware installed.';
         if (hasSettings) {
-            if (!version) {
-                wrn = (
-                    <span>
-                        This device is not running compatible Maslow firmware.
-                        <br />
-                        Download the <a href="https://github.com/WebControlCNC/Firmware/tree/release/holey" target="_blank" rel="noopener noreferrer">Arduino Mega (Holey) firmware</a>.
-                        <br />
-                        Download the <a href="https://github.com/makermadecnc/MaslowDue" target="_blank" rel="noopener noreferrer">Arduino Due (M2) firmware</a>.
-                    </span>
-                );
+            if (!version || !version.toLowerCase().includes(controllerType.toLowerCase)) {
+                wrn = this.renderFirmwareWarning(version, controllerType);
             } else {
                 wrn = '';
             }
@@ -462,8 +463,12 @@ class CreateWorkspace extends PureComponent {
                                         this.setState({ name: e.target.value });
                                     }}
                                 />
-                                {wrn}
                             </div>
+                            {wrn && (
+                                <div style={{ fontStyle: 'italic', marginTop: '20px' }}>
+                                    {wrn}
+                                </div>
+                            )}
                             <hr />
                             <div>
                                 <div

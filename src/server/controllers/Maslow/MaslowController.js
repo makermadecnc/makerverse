@@ -542,13 +542,16 @@ class MaslowController {
         });
 
         this.runner.on('startup', (res) => {
-            this.log.debug('startup complete');
+            this.log.debug(`startup complete: ${res.name} ${res.version}`);
             this.emit('serialport:read', res.raw);
 
             this.hardware.protocol = {
                 'name': res.name,
                 'version': res.version,
             };
+
+            // Make sure the client has our settings on startup/connect.
+            this.emit('controller:settings', MASLOW, this.settings);
 
             // The startup message always prints upon startup, after a reset, or at program end.
             // Setting the initial state when Maslow has completed re-initializing all systems.
@@ -707,6 +710,10 @@ class MaslowController {
                 }
             }
         }, 250);
+    }
+
+    sendSettings() {
+
     }
 
     async initController() {

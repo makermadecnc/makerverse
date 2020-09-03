@@ -109,7 +109,7 @@ before_script:
 
 env:
   global:
-    - CI_VERSION=`git describe --tags --abbrev=0` # 1.2.3 (or 1.2.4-preleease-name)
+    - CI_VERSION=`git describe --tags --abbrev=0 | sed "s/^v//"` # 1.2.3 (or 1.2.4-preleease-name)
     - CI_SEMVER=`./scripts/semver.sh $CI_VERSION` # 1.2.3-prelease-name.build
     - TRAVIS_TAG=$CI_VERSION
     - PRODUCT_NAME=Makerverse
