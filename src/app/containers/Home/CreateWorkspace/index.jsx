@@ -214,6 +214,7 @@ class CreateWorkspace extends PureComponent {
         },
         'controller:settings': (type, controllerSettings) => {
             let v = null;
+            log.debug('Got controller settings', controllerSettings);
             if (type === MASLOW) {
                 if (controllerSettings.firmware && controllerSettings.firmware.name.length > 0) {
                     v = `${controllerSettings.firmware.name} v${controllerSettings.firmware.version}`;

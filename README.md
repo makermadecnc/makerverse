@@ -82,11 +82,15 @@ sudo systemctl enable docker
 sudo systemctl start docker
 ````
 
-You will also probably need to grant Docker read-access to your USB devices:
+At this point, you probably need to logout (or quit the SSH session) and log back in again. You should have just given your current user (e.g., `pi`) access to Docker. To check that this is true, you can do `docker container ls`. Notice this time we did **not** use `sudo`. As long as it doesn't give an error about permissions, your current user now has access to Docker.
+
+You will also probably need to grant Docker read-access to your USB devices. Do a `sudo nano /etc/udev/rules.d/49-makerverse.rules` to create a file with the following contents:
 ```
-sudo echo 'KERNEL==\"ttyUSB[0-9]*\",MODE=\"0666\"' >> /etc/udev/rules.d/49-makerverse.rules
-sudo echo 'KERNEL==\"ttyACM[0-9]*\",MODE=\"0666\"' >> /etc/udev/rules.d/49-makerverse.rules
+KERNEL=="ttyUSB[0-9]*",MODE="0666"
+KERNEL=="ttyACM[0-9]*",MODE="0666"
 ```
+
+Unplug any USB ports connected to CNC machine, and then re-connect them. The rule we just added will now take effect forevermore, giving Makerverse access to the USB ports.
 
 Finally, you should test that the `bin/launch` script starts correctly and you can connect to Makerverse.
 
