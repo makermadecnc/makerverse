@@ -1,0 +1,6 @@
+#!/bin/bash
+MAKERVERSE_PROTOCOL="${MAKERVERSE_PROTOCOL:-http}"
+MAKERVERSE_HOST="${MAKERVERSE_HOST:-localhost}"
+MAKERVERSE_PORT="${MAKERVERSE_PORT:-8000}"
+url="${MAKERVERSE_PROTOCOL}://${MAKERVERSE_HOST}:${MAKERVERSE_PORT}/"
+../scripts/kiosk.sh "https://house.snowy-cabin.com/" -f "--noerrdialogs --disable-infobars --ignore-certificate-errors --force-device-scale-factor=0.8"
