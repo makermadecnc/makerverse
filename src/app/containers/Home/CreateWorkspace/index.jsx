@@ -398,7 +398,7 @@ class CreateWorkspace extends PureComponent {
         };
         let wrn = 'Querying hardware... the only reason this message would not go away is if you chose the wrong Baud Rate, or the device does not have compatible firmware installed.';
         if (hasSettings) {
-            if (!version || !version.toLowerCase().includes(controllerType.toLowerCase)) {
+            if (!version || !version.toLowerCase().includes(controllerType.toLowerCase())) {
                 wrn = this.renderFirmwareWarning(version, controllerType);
             } else {
                 wrn = '';
