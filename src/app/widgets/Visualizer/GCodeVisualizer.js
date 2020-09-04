@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import colornames from 'colornames';
 import Toolpath from 'gcode-toolpath';
 import * as THREE from 'three';
@@ -32,7 +33,10 @@ class GCodeVisualizer {
 
     // Convert the gcode coordinate system into the appropriate position, i.e., WPos.
     localizePoint(point) {
-        const wco = this.controllerState.status.wco;
+        const wco = _.get(this.controllerState, 'status.wco');
+        if (!wco) {
+            return point;
+        }
         return {
             x: point.x + Number(wco.x),
             y: point.y + Number(wco.y),
