@@ -129,14 +129,11 @@ class CreateWorkspace extends PureComponent {
         const usedPorts = Object.keys(Workspaces.all).map((k) => {
             return Workspaces.all[k].controllerAttributes.port;
         });
-        const portList = [];
         ports.forEach((p) => {
-            if (!usedPorts.includes(p.port)) {
-                portList.push(p);
-            }
+            p.inUse = usedPorts.includes(p.port);
         });
         this.setState({
-            ports: portList
+            ports: ports
         });
     }
 
@@ -213,29 +210,40 @@ class CreateWorkspace extends PureComponent {
             });
         },
         'controller:settings': (type, controllerSettings) => {
-            let v = null;
             log.debug('Got', type, 'settings:', controllerSettings);
-            const protocolVersion = _.get(controllerSettings, 'protocol.version') || '';
-            const protocolName = _.get(controllerSettings, 'protocol.name') || '';
-            const version = _.get(controllerSettings, 'version') || '';
-            if (protocolVersion.length > 0 && protocolName.length > 0) {
-                v = `${protocolName} v${protocolVersion}`;
-            } else if (version.length > 0) {
-                v = `${type} v${version}`;
-            } else {
-                v = `${type} v???`;
-            }
-            this.setState({ version: v, hasSettings: true });
+            const firmware = this.getVersion(controllerSettings.firmware || {});
+            const protocol = this.getVersion(controllerSettings.protocol || {});
+            const isValid = `${firmware} ${protocol}`.toLowerCase().includes(type.toLowerCase());
+
+            this.setState({
+                version: {
+                    isValid: isValid,
+                    firmware: firmware,
+                    protocol: protocol,
+                },
+                hasSettings: true
+            });
             analytics.event({
                 category: 'controller',
-                action: 'identified',
-                label: v,
+                action: 'firmware',
+                label: firmware,
+            });
+            analytics.event({
+                category: 'controller',
+                action: 'protocol',
+                label: protocol,
             });
         },
         'serialport:read': (data) => {
             log.debug('serialport read', data);
         },
     };
+
+    getVersion(values) {
+        const name = values.name && values.name.length > 0 ? values.name : '?';
+        const vers = values.version && values.version.length > 0 ? values.version : '?';
+        return `${name} v${vers}`;
+    }
 
     componentDidMount() {
         this._mounting = true;
@@ -398,7 +406,7 @@ class CreateWorkspace extends PureComponent {
         };
         let wrn = 'Querying hardware... the only reason this message would not go away is if you chose the wrong Baud Rate, or the device does not have compatible firmware installed.';
         if (hasSettings) {
-            if (!version || !version.toLowerCase().includes(controllerType.toLowerCase())) {
+            if (!version || !version.isValid) {
                 wrn = this.renderFirmwareWarning(version, controllerType);
             } else {
                 wrn = '';
@@ -469,14 +477,22 @@ class CreateWorkspace extends PureComponent {
                                     {wrn}
                                 </div>
                             )}
+                            {version && (
+                                <div style={{ fontStyle: 'italic', marginTop: '20px' }}>
+                                    <span>
+                                        {i18n._('Firmware')}: {version.firmware || ''}
+                                    </span>
+                                    <br />
+                                    <span>
+                                        {i18n._('Protocol')}: {version.protocol || ''}
+                                    </span>
+                                </div>
+                            )}
                             <hr />
                             <div>
                                 <div
                                     style={{ float: 'right' }}
                                 >
-                                    <span style={{ paddingRight: '10px', position: 'relative', top: '5px' }}>
-                                        {version || ''}
-                                    </span>
                                     <button
                                         type="button"
                                         style={{ float: 'right' }}

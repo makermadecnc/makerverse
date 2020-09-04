@@ -28,9 +28,7 @@ class MaslowHardware {
     grbl = {};
 
     isMaslowClassic() {
-        const classicPcb = this.firmware && this.firmware.name === MASLOW_FIRMWARE_CLASSIC;
-        const megaGrbl = this.protocol && this.protocol.version === '1.00';
-        return classicPcb || megaGrbl;
+        return this.firmware && this.firmware.name === MASLOW_FIRMWARE_CLASSIC;
     }
 
     isMaslowDue() {
