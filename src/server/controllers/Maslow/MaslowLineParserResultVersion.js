@@ -38,7 +38,9 @@ class MaslowLineParserResultVersion {
     static parseMaslowClassic(line) {
         const fw = line.match(/^Firmware Version (.+)$/);
         const pcb = line.match(/^PCB v(.+) Detected$/);
-        if (!fw && !pcb) {
+        // Look for other lines indicative of the Maslow Classic
+        const mc = line.indexOf('FAKE_SERVO off') >= 0 || line.indexOf('[Forward Calculating Position]') >= 0;
+        if (!fw && !pcb && !mc) {
             return null;
         }
         const ret = {

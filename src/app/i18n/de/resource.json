@@ -533,5 +533,6 @@
     "Are you sure?": "",
     "This will reset all machine & calibration settings (eeprom).": "",
     "Accept": "",
-    "Move to Center": ""
+    "Move to Center": "",
+    "Firmware": ""
 }
