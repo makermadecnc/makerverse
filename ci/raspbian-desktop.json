@@ -31,7 +31,8 @@
     "image_setup_extra": [
       ["mkdir", "$MOUNTPOINT/home/pi/makerverse"],
       ["cp", "/build/.makerverse.docker", "$MOUNTPOINT/home/pi/.makerverse"],
-      ["cp", "-r", "/build/bin", "$MOUNTPOINT/home/pi/makerverse/"]
+      ["cp", "-r", "/build/bin", "$MOUNTPOINT/home/pi/makerverse/"],
+      ["cp", "-r", "/build/scripts", "$MOUNTPOINT/home/pi/makerverse/"]
     ],
     "image_chroot_env": ["PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"],
     "qemu_binary_source_path": "/usr/bin/qemu-arm-static",
@@ -49,6 +50,13 @@
         "sudo hostname makerverse",
         "sudo chown pi:pi /home/pi/.makerverse",
         "mkdir -p /home/pi/gcode"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo mkdir -p /home/pi/.config/lxsession/LXDE-pi/",
+        "sudo echo \"@bash /home/pi/makerverse/bin/tablet\" /home/pi/.config/lxsession/LXDE-pi/autostart"
       ]
     },
     {
