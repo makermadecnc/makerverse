@@ -79,7 +79,7 @@ export default (options) => {
                 {
                     label: 'Learn More',
                     click: () => {
-                        shell.openExternal('https://makerverse.com/help');
+                        shell.openExternal('https://makerverse.com/');
                     }
                 }
             ]

@@ -1011,6 +1011,7 @@ class Settings extends PureComponent {
                 },
                 checkForUpdates: true,
                 prereleases: false,
+                allowRemoteAccess: !!(settings.allowRemoteAccess),
                 lang: i18next.language
             },
             // Workspaces

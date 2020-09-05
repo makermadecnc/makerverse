@@ -1,8 +1,11 @@
 ---
-layout: page
+layout: default
 title: About
 permalink: /about/
+nav_order: 9
 ---
+
+# About Makerverse
 
 This is a fork of the [CNCjs project](https://github.com/cncjs/cncjs) which spawned from the Maslow CNC ecosystem. Several members of the Maslow community worked together to make the Maslow and M2 (Due) firmware compatible with CNCjs. At the same time, the CNCjs project development was paused due to extenuating circumstances. As a result, Makerverse evolved its own vision of an application which supports a wide variety of CNC & 3DP hardware with a clean interface and powerful widgets.
 
