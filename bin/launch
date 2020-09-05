@@ -162,7 +162,7 @@ launch() {
     echo "Killing prior instances..."
     docker kill makerverse || true
     echo "Launching $docker_img..."
-    docker run --rm --privileged --network host --name makerverse \
+    docker run --rm --privileged --name makerverse \
       -p "${MAKERVERSE_PORT}:8000" \
       -v /dev:/dev \
       -v "$MAKERVERSE_HOME/gcode:/home/node/gcode" \
