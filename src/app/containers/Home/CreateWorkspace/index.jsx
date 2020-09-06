@@ -383,7 +383,7 @@ class CreateWorkspace extends PureComponent {
     renderFirmwareWarning(version, controllerType) {
         return (
             <span>
-                {`Device uses ${version}, which is not compatible with ${controllerType}.`}
+                {`The machine has not yet reported any firmware which is compatible with ${controllerType}. It may still be starting up.`}
                 {controllerType === MASLOW && (
                     <span>
                         <br />

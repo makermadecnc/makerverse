@@ -58,24 +58,8 @@ class MarlinRunner extends events.EventEmitter {
             return;
         }
         if (type === MarlinLineParserResultFirmware) {
-            const {
-                firmwareName,
-                protocolVersion,
-                machineType,
-                extruderCount,
-                uuid
-            } = payload;
-            const nextSettings = {
-                ...this.settings,
-                firmwareName,
-                protocolVersion,
-                machineType,
-                extruderCount,
-                uuid
-            };
-            if (!_.isEqual(this.settings, nextSettings)) {
-                this.settings = nextSettings; // enforce change
-            }
+            this.settings = { ...this.settings, ...payload };
+            delete this.settings.raw;
 
             this.emit('firmware', payload);
             return;

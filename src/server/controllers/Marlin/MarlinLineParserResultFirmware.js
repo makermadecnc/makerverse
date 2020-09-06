@@ -6,19 +6,22 @@ class MarlinLineParserResultFirmware {
             return null;
         }
 
-        const payload = {};
+        const payload = {
+            firmware: {},
+            protocol: { name: 'Marlin' }
+        };
 
         { // FIRMWARE_NAME
             const r = line.match(/FIRMWARE_NAME:([a-zA-Z\_\-]+(\s+[\d\.]+)?)/);
             if (r) {
-                payload.firmwareName = r[1];
+                payload.firmware.name = r[1];
             }
         }
 
         { // PROTOCOL_VERSION
             const r = line.match(/PROTOCOL_VERSION:([\d\.]+)/);
             if (r) {
-                payload.protocolVersion = r[1];
+                payload.protocol.version = r[1];
             }
         }
 

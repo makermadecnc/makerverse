@@ -574,14 +574,12 @@ class SmoothieController {
             if (this.settings !== this.runner.settings) {
                 this.settings = this.runner.settings;
                 this.emit('controller:settings', SMOOTHIE, this.settings);
-                this.emit('Smoothie:settings', this.settings); // Backward compatibility
             }
 
             // Smoothie state
             if (this.state !== this.runner.state) {
                 this.state = this.runner.state;
                 this.emit('controller:state', SMOOTHIE, this.state);
-                this.emit('Smoothie:state', this.state); // Backward compatibility
             }
 
             // Check the ready flag

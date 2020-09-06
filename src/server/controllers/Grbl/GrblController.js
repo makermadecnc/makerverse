@@ -660,14 +660,12 @@ class GrblController {
             if (this.settings !== this.runner.settings) {
                 this.settings = this.runner.settings;
                 this.emit('controller:settings', GRBL, this.settings);
-                this.emit('Grbl:settings', this.settings); // Backward compatibility
             }
 
             // Grbl state
             if (this.state !== this.runner.state) {
                 this.state = this.runner.state;
                 this.emit('controller:state', GRBL, this.state);
-                this.emit('Grbl:state', this.state); // Backward compatibility
             }
 
             // Check the ready flag
