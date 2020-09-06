@@ -34,5 +34,5 @@ fi
 if [ ! -z "$CI_SEMVER" ]; then
   # On the CI, run pishrink to compress the upload.
   mkdir -p "releases"
-  sudo scripts/pishrink.sh -z "$of" "releases/makerverse-raspbian-${edition}-${vers}.img"
+  sudo scripts/pishrink.sh -z "$of" "releases/makerverse-raspberry-pi-os-${edition}-${vers}.img"
 fi

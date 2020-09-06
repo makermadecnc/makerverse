@@ -57,7 +57,7 @@ jobs:
     provider: script
     script: scripts/docker.sh deploy
 # [Job] Raspberry Pi Image built with Docker
-- name: "Raspbian Lite"
+- name: "Raspberry Pi OS Lite"
   language: shell
   sudo: required
   os: linux
@@ -68,7 +68,7 @@ jobs:
   script:
   - scripts/pack-rpi.sh lite
 # [Job] Raspberry Pi Image built with Docker
-- name: "Raspbian Desktop"
+- name: "Raspberry Pi OS Desktop"
   language: shell
   sudo: required
   os: linux
