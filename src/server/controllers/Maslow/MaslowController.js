@@ -465,7 +465,7 @@ class MaslowController {
                     this.emit('serialport:read', `error:${code} (${error.message})`);
                 }
             } else { // Grbl v0.9
-                this.emitError(res.raw);
+                this.emit('serialport:read', res.raw);
             }
 
             // Feeder

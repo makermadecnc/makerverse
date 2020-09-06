@@ -117,7 +117,7 @@ class CalibrationModal extends PureComponent {
         this.event({ label: 'wipe' });
         this.workspace.controller.command('wipe');
         setTimeout(() => {
-            this.workspace.controller.command('about');
+            window.location.reload();
         }, 5000);
         this.setState({ wiping: false, wiped: true });
     }

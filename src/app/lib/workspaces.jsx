@@ -230,11 +230,11 @@ class Workspaces {
             });
         },
         'controller:state': (type, state) => {
-            log.debug(type, 'state changed', state);
+            // log.debug(type, 'state changed', state);
             this._controllerState = state;
         },
         'controller:settings': (type, settings) => {
-            log.debug(type, 'settings changed', settings);
+            // log.debug(type, 'settings changed', settings);
             this._controllerSettings = settings;
         }
     };

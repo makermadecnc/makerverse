@@ -10,5 +10,10 @@ MAKERVERSE_PORT="${MAKERVERSE_PORT:-8000}"
 MAKERVERSE_KIOSK_SCALE="${MAKERVERSE_KIOSK_SCALE:-1.0}"
 url="${MAKERVERSE_PROTOCOL}://${MAKERVERSE_HOST}:${MAKERVERSE_PORT}/"
 
+while [[ ! $(curl -s $url) ]]; do
+  echo "Waiting for $url"
+  sleep 1;
+done
+
 bash ${MAKERVERSE_SRC_DIR}/scripts/kiosk.sh "$url" \
   -f "--noerrdialogs --disable-infobars --ignore-certificate-errors --force-device-scale-factor=${MAKERVERSE_KIOSK_SCALE}"
