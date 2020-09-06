@@ -616,14 +616,12 @@ class TinyGController {
             if (this.settings !== this.runner.settings) {
                 this.settings = this.runner.settings;
                 this.emit('controller:settings', TINYG, this.settings);
-                this.emit('TinyG:settings', this.settings); // Backward compatibility
             }
 
             // TinyG state
             if (this.state !== this.runner.state) {
                 this.state = this.runner.state;
                 this.emit('controller:state', TINYG, this.state);
-                this.emit('TinyG:state', this.state); // Backward compatibility
             }
 
             // Check the ready flag

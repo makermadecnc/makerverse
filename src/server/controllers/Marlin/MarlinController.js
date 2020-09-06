@@ -576,7 +576,7 @@ class MarlinController {
             // Marlin readiness.  On initial power-up, Marlin might
             // miss that first M115 as it boots, so we send this
             // possibly-redundant M115 when we see 'start'.
-            this.connection.write('M115\n', {
+            this.connection.write(' M115\n', {
                 source: WRITE_SOURCE_SERVER
             });
         });
@@ -592,6 +592,10 @@ class MarlinController {
                 // Initialize controller
                 this.event.trigger('controller:ready');
             }
+
+            this.settings = { ...this.settings, firmware: res };
+            delete this.settings.firmware.raw;
+            this.emit('controller:settings', MARLIN, this.settings);
         });
 
         this.runner.on('pos', (res) => {
@@ -721,14 +725,12 @@ class MarlinController {
             if (this.settings !== this.runner.settings) {
                 this.settings = this.runner.settings;
                 this.emit('controller:settings', MARLIN, this.settings);
-                this.emit('Marlin:settings', this.settings); // Backward compatibility
             }
 
             // Marlin state
             if (this.state !== this.runner.state) {
                 this.state = this.runner.state;
                 this.emit('controller:state', MARLIN, this.state);
-                this.emit('Marlin:state', this.state); // Backward compatibility
             }
 
             // Check the ready flag
@@ -925,7 +927,7 @@ class MarlinController {
 
             // M115: Get firmware version and capabilities
             // The response to this will take us to the ready state
-            this.connection.write('M115\n', {
+            this.connection.write(' M115\n', {
                 source: WRITE_SOURCE_SERVER
             });
 
@@ -1004,12 +1006,10 @@ class MarlinController {
         if (!_.isEmpty(this.settings)) {
             // controller settings
             socket.emit('controller:settings', MARLIN, this.settings);
-            socket.emit('Marlin:settings', this.settings); // Backward compatibility
         }
         if (!_.isEmpty(this.state)) {
             // controller state
             socket.emit('controller:state', MARLIN, this.state);
-            socket.emit('Marlin:state', this.state); // Backward compatibility
         }
         if (this.feeder) {
             // feeder status

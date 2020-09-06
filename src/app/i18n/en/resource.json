@@ -538,5 +538,6 @@
     "enabled": "enabled",
     "disabled": "disabled",
     "Software Updates": "Software Updates",
-    "Web Server": "Web Server"
+    "Web Server": "Web Server",
+    "Save": "Save"
 }

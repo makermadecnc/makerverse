@@ -7,7 +7,8 @@ fi
 MAKERVERSE_PROTOCOL="${MAKERVERSE_PROTOCOL:-http}"
 MAKERVERSE_HOST="${MAKERVERSE_HOST:-localhost}"
 MAKERVERSE_PORT="${MAKERVERSE_PORT:-8000}"
+MAKERVERSE_KIOSK_SCALE="${MAKERVERSE_KIOSK_SCALE:-1.0}"
 url="${MAKERVERSE_PROTOCOL}://${MAKERVERSE_HOST}:${MAKERVERSE_PORT}/"
 
 bash ${MAKERVERSE_SRC_DIR}/scripts/kiosk.sh "$url" \
-  -f "--noerrdialogs --disable-infobars --ignore-certificate-errors --force-device-scale-factor=0.8"
+  -f "--noerrdialogs --disable-infobars --ignore-certificate-errors --force-device-scale-factor=${MAKERVERSE_KIOSK_SCALE}"

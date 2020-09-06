@@ -30,6 +30,8 @@ As soon as you are ablem to, SSH in to the Raspberry Pi and run `sudo raspi-conf
 
 Tip: read the "Handy commands" in the "Linux Service" section!
 
-## Tablet (Kiosk Mode)
+## Desktop (Kiosk Mode)
 
-The Desktop edition is meant to be used as a shopfloor tablet. It will automatically launch Chromium in "Kiosk" mode, loading the Makerverse application in a full-screen web browser. Makerverse is still running as a Web Server in the background, so other clients can also simultaneously connect.
+When running the Desktop version, you will still need to follow on-screen instructions after the first boot to configure your Raspberry Pi. If you don't have an extra keyboard/mouse, just SSH and use `sudo raspi-config` to turn on the VNC in `Interfacing Options`. Then use an app like VNC Viewer to connect from your computer.
+
+The Desktop edition is meant to be used as a shopfloor tablet. Once configured, it will automatically launch Chromium in "Kiosk" mode, loading the Makerverse application in a full-screen web browser. Makerverse is still running as a Web Server in the background, so other clients can also simultaneously connect.
