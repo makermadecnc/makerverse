@@ -1,6 +1,13 @@
 #!/bin/bash
+# Figure out where the git checkout directory lives, if any:
+if [[ -z "$MAKERVERSE_SRC_DIR" ]]; then
+  # Otherwise, the parent directory of this script should (hopefully) work.
+  MAKERVERSE_SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
+fi
 MAKERVERSE_PROTOCOL="${MAKERVERSE_PROTOCOL:-http}"
 MAKERVERSE_HOST="${MAKERVERSE_HOST:-localhost}"
 MAKERVERSE_PORT="${MAKERVERSE_PORT:-8000}"
 url="${MAKERVERSE_PROTOCOL}://${MAKERVERSE_HOST}:${MAKERVERSE_PORT}/"
-../scripts/kiosk.sh "https://house.snowy-cabin.com/" -f "--noerrdialogs --disable-infobars --ignore-certificate-errors --force-device-scale-factor=0.8"
+
+bash ${MAKERVERSE_SRC_DIR}/scripts/kiosk.sh "$url" \
+  -f "--noerrdialogs --disable-infobars --ignore-certificate-errors --force-device-scale-factor=0.8"

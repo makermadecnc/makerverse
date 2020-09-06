@@ -46,4 +46,4 @@ Locale | Language | Status | Contributors
 
 ## License
 
-Licensed under the [MIT License](https://raw.githubusercontent.com/cncjs/cncjs/master/LICENSE).
+Licensed under the [GNU GPL v3](https://raw.githubusercontent.com/makermadecnc/makerverse/master/LICENSE).

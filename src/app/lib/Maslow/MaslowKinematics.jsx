@@ -1,3 +1,5 @@
+import MaslowSettings from './MaslowSettings';
+
 const maslowDefaultOpts = {
     chainLength: 3360,
     distBetweenMotors: 2978.4,
@@ -28,58 +30,19 @@ class MaslowKinematics {
 
     opts = maslowDefaultOpts;
 
+    settings = new MaslowSettings();
+
     constructor(controller) {
         this.controller = controller;
         this.loadControllerSettings(controller.settings);
     }
 
-    getSettingsMap(settings) {
-        const opts = {};
-        settings = settings || this.controllerSettings;
-        Object.keys(settings.grbl).forEach((code) => {
-            const g = settings.grbl[code];
-            const msg = `${g.message}, ${g.units}`.toLowerCase();
-            if (msg.startsWith('machine height')) {
-                opts.machineHeight = g;
-            } else if (msg.startsWith('machine width')) {
-                opts.machineWidth = g;
-            } else if (msg.startsWith('motor height')) {
-                opts.motorOffsetY = g;
-            } else if (msg.startsWith('motor distance')) {
-                opts.distBetweenMotors = g;
-            } else if (msg.startsWith('sled width')) {
-                opts.sledWidth = g;
-            } else if (msg.startsWith('sled height')) {
-                opts.sledHeight = g;
-            } else if (msg.startsWith('kinematics type')) {
-                opts.kinematicsType = g;
-            } else if (msg.startsWith('rotation radius')) {
-                opts.rotationDiskRadius = g;
-            } else if (msg.startsWith('calibration chain length')) {
-                opts.origChainLength = g;
-            } else if (msg.startsWith('full length of chain')) {
-                opts.chainLength = g;
-            } else if (msg.startsWith('chain over sprocket')) {
-                opts.chainOverSprocket = g;
-            } else if (msg.startsWith('chain tolerance, left chain')) {
-                opts.leftChainTolerance = g;
-            } else if (msg.startsWith('chain tolerance, right chain')) {
-                opts.rightChainTolerance = g;
-            } else if (msg.startsWith('chain stretch factor')) {
-                opts.chainElongationFactor = g;
-            } else if (msg.startsWith('sled weight') || msg.startsWith('weight of sled')) {
-                opts.sledWeight = g;
-            }
-        });
-        return opts;
-    }
-
     loadControllerSettings(controllerSettings) {
         this.controllerSettings = controllerSettings;
-        const settings = this.getSettingsMap(controllerSettings);
+        this.settings.update(controllerSettings);
         const opts = {};
-        Object.keys(settings).forEach((key) => {
-            opts[key] = Number(settings[key].value);
+        Object.keys(this.settings.map).forEach((key) => {
+            opts[key] = Number(this.settings.map[key].value);
         });
         this.recomputeGeometry(opts);
         this.positionToChain(this.lastPosition.x, this.lastPosition.y); // save chain lengths

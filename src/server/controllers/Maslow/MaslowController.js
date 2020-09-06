@@ -712,10 +712,6 @@ class MaslowController {
         }, 250);
     }
 
-    sendSettings() {
-
-    }
-
     async initController() {
         // https://github.com/cncjs/cncjs/issues/206
         // $13=0 (report in mm)
@@ -1388,7 +1384,7 @@ class MaslowController {
         size -= BUFFER_PAD;
         if (size !== this.sender.sp.bufferSize) {
             this.sender.sp.bufferSize = size;
-            this.log.debug(`adjusting buffer to ${this.sender.sp.state.dataLength}/${size}`);
+            this.log.silly(`adjusting buffer to ${this.sender.sp.state.dataLength}/${size}`);
         }
     }
 

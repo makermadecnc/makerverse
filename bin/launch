@@ -3,20 +3,16 @@ set -eo pipefail
 
 MAKERVERSE_HOME=${MAKERVERSE_HOME:-${HOME}}
 # Figure out where the git checkout directory lives, if any:
-if [[ -z "$MAKERVERSE_GIT_DIR" ]]; then
-  if [[ $(which git) ]] && [[ $(git remote get-url origin) =~ "makerverse.git" ]]; then
-    # If launched from a Makerverse git directory.
-    MAKERVERSE_GIT_DIR="$(pwd)"
-  else
-    # Otherwise, the parent directory of this script should (hopefully) work.
-    MAKERVERSE_GIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
-  fi
+if [[ -z "$MAKERVERSE_SRC_DIR" ]]; then
+  # Otherwise, the parent directory of this script should (hopefully) work.
+  MAKERVERSE_SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
 fi
-if [[ ! -d "$MAKERVERSE_GIT_DIR" ]]; then
-  echo "Could not find the Makerverse installation at $MAKERVERSE_GIT_DIR"
+if [[ ! -d "$MAKERVERSE_SRC_DIR" ]]; then
+  echo "Could not find the Makerverse installation at $MAKERVERSE_SRC_DIR"
   echo "Please try downloading or cloning the project at this location."
   exit 1
 fi
+MAKERVERSE_GIT_DIR="${MAKERVERSE_SRC_DIR}"
 MAKERVERSE_LAUNCH_METHOD=${MAKERVERSE_LAUNCH_METHOD:-docker}
 MAKERVERSE_SETTINGS_FILE="${MAKERVERSE_HOME}/.makerverse"
 MAKERVERSE_PORT="${MAKERVERSE_PORT:-8000}"
@@ -167,7 +163,7 @@ launch() {
       -v /dev:/dev \
       -v "$MAKERVERSE_HOME/gcode:/home/node/gcode" \
       -v "$MAKERVERSE_SETTINGS_FILE:/home/node/.makerverse" \
-      -v "$MAKERVERSE_GIT_DIR:/home/node/makerverse" \
+      -v "$MAKERVERSE_SRC_DIR:/home/node/makerverse" \
       "$docker_img"
   else
     echo "Invalid launch method: ${launch}"

@@ -319,9 +319,15 @@ class MaslowMemory {
         }
         const prefix = r[1];
         const line = r[2];
-        const suffix = r[3];
+        let suffix = r[3];
+
+        if (suffix.includes('\r') && !suffix.includes('\n')) {
+            // Carriage return bug fix. The newline *must* be present for some controllers.
+            suffix = suffix.replace('\r', '\r\n');
+        }
 
         const translated = this.handleGrblSetting(line) ?? this.handleCommand(line);
+        this.log.debug(`> '${prefix}' (${prefix.length}) '${translated}' '${suffix}' (${suffix.length})`);
         return prefix + translated + suffix;
     }
 

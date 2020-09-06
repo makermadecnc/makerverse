@@ -534,5 +534,9 @@
     "This will reset all machine & calibration settings (eeprom).": "This will reset all machine & calibration settings (eeprom).",
     "Accept": "Accept",
     "Move to Center": "Move to Center",
-    "Firmware": "Firmware"
+    "Firmware": "Firmware",
+    "enabled": "enabled",
+    "disabled": "disabled",
+    "Software Updates": "Software Updates",
+    "Web Server": "Web Server"
 }

@@ -49,14 +49,21 @@
         "sudo echo 'KERNEL==\"ttyACM[0-9]*\",MODE=\"0666\"' >> /etc/udev/rules.d/49-makerverse.rules",
         "sudo hostname makerverse",
         "sudo chown pi:pi /home/pi/.makerverse",
+        "sudo chown pi:pi -R /home/pi/makerverse",
         "mkdir -p /home/pi/gcode"
       ]
     },
     {
       "type": "shell",
       "inline": [
-        "sudo mkdir -p /home/pi/.config/lxsession/LXDE-pi/",
-        "sudo echo \"@bash /home/pi/makerverse/bin/tablet\" /home/pi/.config/lxsession/LXDE-pi/autostart"
+        "mkdir -p /home/pi/.config/lxsession/LXDE-pi/",
+        "echo \"@bash /home/pi/makerverse/bin/tablet\" > /home/pi/.config/lxsession/LXDE-pi/autostart"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo apt-get update -y"
       ]
     },
     {

@@ -4,10 +4,12 @@ import React, { PureComponent } from 'react';
 import { ProgressBar } from 'react-bootstrap';
 import mapGCodeToText from 'app/lib/gcode-text';
 import i18n from 'app/lib/i18n';
+import MaslowSettings from 'app/lib/Maslow/MaslowSettings';
 import Panel from 'app/components/Panel';
 import Toggler from 'app/components/Toggler';
 import Space from 'app/components/Space';
 import { Button } from 'app/components/Buttons';
+import Workspaces from 'app/lib/workspaces';
 import { ToastNotification } from 'app/components/Notifications';
 import styles from './index.styl';
 import {
@@ -19,8 +21,18 @@ const MASLOW_MIN_FIRMWARE_DUE = 20200905;
 
 class MaslowPanels extends PureComponent {
     static propTypes = {
+        workspaceId: PropTypes.string.isRequired,
         state: PropTypes.object,
         actions: PropTypes.object
+    };
+
+    // Public methods
+    get workspace() {
+        return Workspaces.all[this.props.workspaceId];
+    }
+
+    state = {
+        'settingsEdits': {}
     };
 
     // https://github.com/grbl/grbl/wiki/Interfacing-with-Grbl
@@ -33,6 +45,8 @@ class MaslowPanels extends PureComponent {
     receiveBufferMax = 128;
 
     receiveBufferMin = 0;
+
+    settings = new MaslowSettings();
 
     renderError(top, classicLink, dueLink) {
         const firmwareLink = classicLink || dueLink;
@@ -54,8 +68,16 @@ class MaslowPanels extends PureComponent {
         );
     }
 
+    saveSetting(key) {
+        const { settingsEdits } = this.state;
+        const controllerSettings = this.props.state.controller.settings || {};
+        const val = _.has(settingsEdits, key) ? settingsEdits[key] : controllerSettings.grbl[key].value;
+        this.workspace.controller.writeln(`${key}=${val}`);
+    }
+
     render() {
         const { state, actions } = this.props;
+        const { settingsEdits } = this.state;
         const none = '–';
         const panel = state.panel;
         const controllerState = state.controller.state || {};
@@ -81,6 +103,8 @@ class MaslowPanels extends PureComponent {
             }
             return 'danger';
         })(buf.rx);
+
+        this.settings.update(controllerSettings);
 
         this.plannerBufferMax = Math.max(this.plannerBufferMax, buf.planner) || this.plannerBufferMax;
         this.receiveBufferMax = Math.max(this.receiveBufferMax, buf.rx) || this.receiveBufferMax;
@@ -112,7 +136,8 @@ class MaslowPanels extends PureComponent {
                     <br /><br />
                     {`The firmware reported it was of type ${fn}, but 'Maslow' was expected.`}
                     Please use an Arduino Due or Mega with the appropriate firmware.
-                </span>, true, true);
+                </span>, true, true
+            );
         }
 
         return (
@@ -196,6 +221,18 @@ class MaslowPanels extends PureComponent {
                         )}
                     </Panel>
                 )}
+                {!this.settings.isValid && (
+                    <span style={{ fontStyle: 'italic' }}>
+                        {'Problems detected with Maslow settings:'}
+                        <ul>
+                            {this.settings.errors.map((err) => {
+                                return (
+                                    <li key={err}>{err}</li>
+                                );
+                            })}
+                        </ul>
+                    </span>
+                )}
                 <Panel className={styles.panel}>
                     <Panel.Heading className={styles['panel-heading']}>
                         <Toggler
@@ -214,21 +251,49 @@ class MaslowPanels extends PureComponent {
                     </Panel.Heading>
                     {panel.settings.expanded && (
                         <Panel.Body>
+                            <span style={{ fontStyle: 'italic' }}>
+                                Hover over setting names for information.
+                            </span>
+                            <hr />
                             {Object.keys(controllerSettings.grbl).map((key) => {
-                                const val = controllerSettings.grbl[key];
-                                const name = (val.message && val.message.length > 0) ? val.message : val.name;
-                                const title = `${val.name}: ${val.message}`;
+                                const grbl = controllerSettings.grbl[key];
+                                const name = (grbl.message && grbl.message.length > 0) ? grbl.message : grbl.name;
+                                const title = `${grbl.name}: ${grbl.message}`;
                                 return (
                                     <div key={key} className="row no-gutters">
-                                        <div className="col col-xs-8">
+                                        <div className="col col-xs-5">
                                             <div className={styles.textEllipsis} title={title}>
                                                 {name}
                                             </div>
                                         </div>
                                         <div className="col col-xs-4">
-                                            <div className={styles.well}>
-                                                {val.value}
-                                            </div>
+                                            <input
+                                                type="text"
+                                                className={styles.setting}
+                                                value={settingsEdits[key] || grbl.value}
+                                                onChange={(e) => {
+                                                    this.setState({
+                                                        settingsEdits: {
+                                                            [key]: e.target.value
+                                                        }
+                                                    });
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="col col-xs-1" style={{ textAlign: 'right', fontStyle: 'italic', fontSize: '-2em' }}>
+                                            {grbl.units}
+                                        </div>
+                                        <div className="col col-xs-2" style={{ textAlign: 'right' }}>
+                                            <button
+                                                type="button"
+                                                className="btn btn-sm btn-default"
+                                                onClick={() => {
+                                                    this.saveSetting(key);
+                                                }}
+                                                title={i18n._('Save')}
+                                            >
+                                                <i className="fa fa-save" />
+                                            </button>
                                         </div>
                                     </div>
                                 );

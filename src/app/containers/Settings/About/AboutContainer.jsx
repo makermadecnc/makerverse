@@ -6,7 +6,7 @@ import i18n from 'app/lib/i18n';
 import styles from './index.styl';
 
 const AboutContainer = ({ version }) => {
-    const wiki = 'https://makerverse.com/';
+    const wiki = 'http://www.makerverse.com/';
 
     return (
         <div className={styles.aboutContainer}>

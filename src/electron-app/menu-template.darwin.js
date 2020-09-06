@@ -104,7 +104,7 @@ export default (options) => {
                 {
                     label: 'Learn More',
                     click: () => {
-                        shell.openExternal('https://makerverse.com/');
+                        shell.openExternal('http://www.makerverse.com/');
                     }
                 }
             ]
