@@ -48,7 +48,14 @@
         "sudo echo 'KERNEL==\"ttyACM[0-9]*\",MODE=\"0666\"' >> /etc/udev/rules.d/49-makerverse.rules",
         "sudo hostname makerverse",
         "sudo chown pi:pi /home/pi/.makerverse",
+        "sudo chown pi:pi -R /home/pi/makerverse",
         "mkdir -p /home/pi/gcode"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo apt-get update -y"
       ]
     },
     {

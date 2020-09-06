@@ -9,6 +9,7 @@ import Settings from './Settings';
 import styles from './App.styl';
 import Workspaces from '../lib/workspaces';
 import { checkPath } from '../lib/paths';
+import settings from '../config/settings';
 
 class App extends PureComponent {
     static propTypes = {
@@ -28,6 +29,13 @@ class App extends PureComponent {
                     }}
                 />
             );
+        }
+
+        const workspace = Workspaces.findByPath(location.pathname);
+        if (workspace) {
+            document.title = `${workspace.name} | ${settings.productName}`;
+        } else {
+            document.title = settings.productName;
         }
 
         trackPage(location);

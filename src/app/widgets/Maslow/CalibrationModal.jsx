@@ -141,7 +141,7 @@ class CalibrationModal extends PureComponent {
 
     applyCalibrationResults() {
         this.event({ label: 'apply' });
-        const settings = this.calibration.kin.getSettingsMap();
+        const settings = this.calibration.kin.settings.map;
         const sks = Object.keys(settings);
         const result = this.state.result;
         this.unlock();
@@ -191,7 +191,7 @@ class CalibrationModal extends PureComponent {
     }
 
     writeSetting(name, value) {
-        const setting = this.calibration.kin.getSettingsMap()[name];
+        const setting = this.calibration.kin.settings.map[name];
         this.workspace.controller.writeln(`${setting.name}=${value}`);
     }
 

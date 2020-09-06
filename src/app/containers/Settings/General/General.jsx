@@ -17,6 +17,7 @@ class General extends PureComponent {
 
     fields = {
         checkForUpdates: null,
+        allowRemoteAccess: null,
         prereleases: null,
     };
 
@@ -52,6 +53,7 @@ class General extends PureComponent {
     render() {
         const { state, stateChanged } = this.props;
         const lang = get(state, 'lang', 'en');
+        const raEnabled = state.allowRemoteAccess ? i18n._('enabled') : i18n._('disabled');
 
         if (state.api.loading) {
             return (
@@ -66,6 +68,7 @@ class General extends PureComponent {
         return (
             <form style={{ marginTop: -10 }}>
                 <div className={styles.formFields}>
+                    <h4>{i18n._('Software Updates')}</h4>
                     <div className={styles.formGroup}>
                         <div className="checkbox">
                             <label>
@@ -96,8 +99,14 @@ class General extends PureComponent {
                     </div>
                 </div>
                 <div className={styles.formFields}>
+                    <h4>{i18n._('Web Server')}</h4>
+                    <span style={{ fontStyle: 'italic' }} >
+                        Remote access is <strong>{raEnabled}</strong> in your .makerverse config file.
+                    </span>
+                </div>
+                <div className={styles.formFields}>
+                    <h4>{i18n._('Language')}</h4>
                     <div className={styles.formGroup}>
-                        <label>{i18n._('Language')}</label>
                         <select
                             className={classNames(
                                 'form-control',

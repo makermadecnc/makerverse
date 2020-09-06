@@ -1,19 +1,25 @@
 import Settings from 'app/containers/Settings';
 import Workspaces from './workspaces';
 
-const checkPath = (location) => {
-    const workspacePaths = Object.keys(Workspaces.all).map((workspaceId) => {
-        return Workspaces.all[workspaceId].path;
-    });
-    const staticPaths = Settings.paths.concat([
+const isStaticPath = (location) => {
+    return Settings.paths.concat([
         '/home',
         '/settings',
-    ]);
-    const isWorkspace = workspacePaths.includes(location.pathname);
-    const isStaticPath = staticPaths.includes(location.pathname);
-    return isWorkspace || isStaticPath;
+    ]).includes(location.pathname);
+};
+
+const isWorkspacePath = (location) => {
+    return Object.keys(Workspaces.all).map((workspaceId) => {
+        return Workspaces.all[workspaceId].path;
+    }).includes(location.pathname);
+};
+
+const checkPath = (location) => {
+    return isWorkspacePath(location) || isStaticPath(location);
 };
 
 export {
-    checkPath
+    isWorkspacePath,
+    isStaticPath,
+    checkPath,
 };

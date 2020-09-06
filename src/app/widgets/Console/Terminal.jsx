@@ -363,7 +363,7 @@ class TerminalWrapper extends PureComponent {
     }
 
     writeln(data) {
-        if (!data) {
+        if (!data || !this.term) {
             return;
         }
         this.term.eraseRight(0, this.term.buffer.y);

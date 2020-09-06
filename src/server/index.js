@@ -40,25 +40,27 @@ const rcDefault = {
     }
 };
 
+const setVerbosity = (verbosity) => {
+    // https://github.com/winstonjs/winston#logging-levels
+    if (verbosity === 1) {
+        set(settings, 'verbosity', verbosity);
+        setLevel('verbose');
+    }
+    if (verbosity === 2) {
+        set(settings, 'verbosity', verbosity);
+        setLevel('debug');
+    }
+    if (verbosity === 3) {
+        set(settings, 'verbosity', verbosity);
+        setLevel('silly');
+    }
+};
+
 const createServer = (options, callback) => {
     options = { ...options };
 
     { // verbosity
-        const verbosity = options.verbosity;
-
-        // https://github.com/winstonjs/winston#logging-levels
-        if (verbosity === 1) {
-            set(settings, 'verbosity', verbosity);
-            setLevel('verbose');
-        }
-        if (verbosity === 2) {
-            set(settings, 'verbosity', verbosity);
-            setLevel('debug');
-        }
-        if (verbosity === 3) {
-            set(settings, 'verbosity', verbosity);
-            setLevel('silly');
-        }
+        setVerbosity(options.verbosity);
     }
 
     const rcfile = path.resolve(options.configFile || settings.rcfile);
@@ -69,6 +71,12 @@ const createServer = (options, callback) => {
 
     // rcfile
     settings.rcfile = rcfile;
+
+    { // change logging level
+        if (config.has('verbosity')) {
+            setVerbosity(config.get('verbosity'));
+        }
+    }
 
     { // secret
         if (!config.get('secret')) {

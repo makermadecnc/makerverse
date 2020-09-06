@@ -407,7 +407,7 @@ class Header extends PureComponent {
                             <MenuItem divider />
                             }
                             <MenuItem
-                                href="https:/makerverse.com/help"
+                                href="https:/makerverse.com/"
                                 target="_blank"
                             >
                                 {i18n._('Help')}
