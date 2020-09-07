@@ -750,6 +750,7 @@ class CalibrationModal extends PureComponent {
                                                 className={styles.selectInput}
                                                 onChange={e => {
                                                     this.updateCalibrationOpts({ sledType: e.target.value });
+                                                    this.setState({ sledType: e.target.value });
                                                 }}
                                             >
                                                 {Object.keys(MaslowCalibration.sleds).map((k) => {
