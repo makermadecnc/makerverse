@@ -517,7 +517,6 @@
     "Webcam Widget": "Webcam Widget",
     "View a webcam from within the app to monitor progress.": "View a webcam from within the app to monitor progress.",
     "Baud Rate": "Baud Rate",
-    "Machine Settings": "Machine Settings",
     "Define Home": "Define Home",
     "Edge Calibration": "Edge Calibration",
     "Precision Calibration": "Precision Calibration",
@@ -539,5 +538,7 @@
     "disabled": "disabled",
     "Software Updates": "Software Updates",
     "Web Server": "Web Server",
-    "Save": "Save"
+    "Save": "Save",
+    "Machine": "Machine",
+    "Frame": "Frame"
 }
