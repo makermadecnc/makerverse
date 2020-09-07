@@ -5,13 +5,13 @@ const calibrationDefaults = {
     safeTravel: 3,
     motorXAccuracy: 5,
     motorYAccuracy: 5,
-    sledRadius: 228.6,
     edgeDistance: 0,
     cutEdgeDistance: 25.4,
     origChainLength: 1790,
     measuredInches: false,
     cutDepth: 3,
     cutHoles: false,
+    sledType: 'Standard Circle',
 };
 
 /**
@@ -19,6 +19,11 @@ const calibrationDefaults = {
  */
 class MaslowCalibration {
     opts = {};
+
+    static sleds = {
+        'Standard Circle': { top: 9 * 25.4, left: 9 * 25.4, right: 9 * 25.4, bottom: 9 * 25.4, desc: '18 inch diameter circle' },
+        'MetalMaslow': { top: 13.65 * 25.4, left: 14.65 * 25.4, right: 14.65 * 25.4, bottom: 15.65 * 25.4, desc: '14.64 inch square, off-center' },
+    };
 
     constructor(controller, opts) {
         this.controller = controller;
@@ -191,34 +196,40 @@ class MaslowCalibration {
         return Math.round(v * factor) / factor;
     }
 
+    get sledDimensions() {
+        if (this.opts.cutHoles) {
+            return { top: 0, left: 0, bottom: 0, right: 0 };
+        }
+        return MaslowCalibration.sleds[this.opts.sledType] || MaslowCalibration.sleds['Standard Circle'];
+    }
+
     calculateMeasurementCoordinates(ms, xError) {
         const mm = this.opts.measuredInches ? 25.4 : 1;
         const h = this.kin.opts.machineHeight;
         const w = this.kin.opts.machineWidth;
-        const r = (this.opts.cutHoles ? 0 : this.opts.sledRadius);
+        const s = this.sledDimensions;
         return [
-            { x: (xError), y: (h / 2 - ms[0] * mm - r) },
-            { x: xError + (w / 2 - ms[2] * mm - r), y: (h / 2 - ms[1] * mm - r) },
-            { x: xError + (w / 2 - ms[3] * mm - r), y: (ms[4] * mm + r - h / 2) },
-            { x: (xError), y: (ms[5] * mm + r - h / 2) },
-            { x: xError + (ms[7] * mm + r - w / 2), y: (ms[6] * mm + r - h / 2) },
-            { x: xError + (ms[8] * mm + r - w / 2), y: (h / 2 - ms[9] * mm - r) },
+            { x: (xError), y: (h / 2 - ms[0] * mm - s.top) },
+            { x: xError + (w / 2 - ms[2] * mm - s.right), y: (h / 2 - ms[1] * mm - s.top) },
+            { x: xError + (w / 2 - ms[3] * mm - s.right), y: (ms[4] * mm + s.bottom - h / 2) },
+            { x: (xError), y: (ms[5] * mm + s.bottom - h / 2) },
+            { x: xError + (ms[7] * mm + s.left - w / 2), y: (ms[6] * mm + s.bottom - h / 2) },
+            { x: xError + (ms[8] * mm + s.left - w / 2), y: (h / 2 - ms[9] * mm - s.top) },
         ];
     }
 
     calculateIdealCoordinates() {
         const ed = this.opts.cutHoles ? this.opts.cutEdgeDistance : this.opts.edgeDistance;
-        const inset = (this.opts.cutHoles ? 0 : this.opts.sledRadius) + ed;
-        const aH1x = -(this.kin.opts.machineWidth / 2.0 - inset);
-        const aH1y = (this.kin.opts.machineHeight / 2.0 - inset);
-        const aH2x = 0;
+        const s = this.sledDimensions;
+        const aH1x = (this.kin.opts.machineWidth / 2.0 - ed);
+        const aH1y = (this.kin.opts.machineHeight / 2.0 - ed);
         return [
-            { x: aH2x, y: aH1y },
-            { x: -aH1x, y: aH1y },
-            { x: -aH1x, y: -aH1y },
-            { x: aH2x, y: -aH1y },
-            { x: aH1x, y: -aH1y },
-            { x: aH1x, y: aH1y },
+            { x: 0, y: aH1y - s.top },
+            { x: aH1x - s.right, y: aH1y - s.top },
+            { x: aH1x - s.right, y: -aH1y + s.bottom },
+            { x: 0, y: -aH1y + s.bottom },
+            { x: -aH1x + s.left, y: -aH1y + s.bottom },
+            { x: -aH1x + s.left, y: aH1y - s.top },
         ];
     }
 

@@ -517,7 +517,6 @@
     "Webcam Widget": "",
     "View a webcam from within the app to monitor progress.": "",
     "Baud Rate": "",
-    "Machine Settings": "",
     "Define Home": "",
     "Edge Calibration": "",
     "Precision Calibration": "",
@@ -539,5 +538,7 @@
     "disabled": "",
     "Software Updates": "",
     "Web Server": "",
-    "Save": ""
+    "Save": "",
+    "Machine": "",
+    "Frame": ""
 }

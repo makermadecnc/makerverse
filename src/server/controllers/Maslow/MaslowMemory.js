@@ -313,7 +313,7 @@ class MaslowMemory {
     // Filter anything that will be written to the serial port, translating the command
     writeFilter(data) {
         this.load(); // Ensure disk memory is loaded.
-        const r = data.match(/^(\s*)([^\s]+)(\s*)$/);
+        const r = data.match(/^(\s*)([^\n^\r]+)(\s*)$/);
         if (!r) {
             return data;
         }
@@ -327,7 +327,6 @@ class MaslowMemory {
         }
 
         const translated = this.handleGrblSetting(line) ?? this.handleCommand(line);
-        this.log.debug(`> '${prefix}' (${prefix.length}) '${translated}' '${suffix}' (${suffix.length})`);
         return prefix + translated + suffix;
     }
 
