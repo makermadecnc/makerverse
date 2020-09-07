@@ -22,7 +22,7 @@ class MaslowCalibration {
 
     static sleds = {
         'Standard Circle': { top: 9 * 25.4, left: 9 * 25.4, right: 9 * 25.4, bottom: 9 * 25.4, desc: '18 inch diameter circle' },
-        'MetalMaslow': { top: 13.65 * 25.4, left: 14.65 * 25.4, right: 14.65 * 25.4, bottom: 15.65 * 25.4, desc: '14.64 inch square, off-center' },
+        'MetalMaslow': { top: 6.325 * 25.4, left: 7.325 * 25.4, right: 7.325 * 25.4, bottom: 8.325 * 25.4, desc: '14.64 inch square, off-center' },
     };
 
     constructor(controller, opts) {
