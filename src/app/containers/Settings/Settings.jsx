@@ -110,7 +110,7 @@ class Settings extends PureComponent {
 
                 api.getState()
                     .then((res) => {
-                        const { checkForUpdates, prereleases } = { ...res.body };
+                        const { checkForUpdates, prereleases, allowRemoteAccess } = { ...res.body };
 
                         const nextState = {
                             ...this.state.general,
@@ -121,6 +121,7 @@ class Settings extends PureComponent {
                             },
                             // followed by data
                             checkForUpdates: !!checkForUpdates,
+                            allowRemoteAccess: !!allowRemoteAccess,
                             prereleases: !!prereleases,
                             lang: i18next.language
                         };

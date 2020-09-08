@@ -17,7 +17,6 @@ class General extends PureComponent {
 
     fields = {
         checkForUpdates: null,
-        allowRemoteAccess: null,
         prereleases: null,
     };
 

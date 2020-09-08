@@ -434,10 +434,20 @@ class MaslowWidget extends PureComponent {
                         )}
                     >
                         {state.modal.name === MODAL_CONTROLLER &&
-                        <InformationModal workspaceId={this.workspace.id} state={state} actions={actions} />
+                        <InformationModal
+                            workspaceId={this.workspace.id}
+                            state={state}
+                            actions={actions}
+                        />
                         }
                         {state.modal.name === MODAL_CALIBRATION &&
-                        <CalibrationModal workspaceId={this.workspace.id} state={state} actions={actions} />
+                        <CalibrationModal
+                            workspaceId={this.workspace.id}
+                            state={state}
+                            activeTab={state.modal.params.activeTab}
+                            calibrated={state.modal.params.calibrated}
+                            actions={actions}
+                        />
                         }
                         <MaslowPanels
                             workspaceId={this.workspace.id}

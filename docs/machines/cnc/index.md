@@ -1,8 +1,9 @@
 ---
 layout: default
-title: CNC Routers
+title: CNC
 parent: Machines
 nav_order: 1
+has_children: true
 ---
 
 # CNC
