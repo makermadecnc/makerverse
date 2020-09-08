@@ -11,6 +11,9 @@ import Workspaces from 'app/lib/workspaces';
 import analytics from 'app/lib/analytics';
 import MaslowCalibration from 'app/lib/Maslow/MaslowCalibration';
 import styles from './index.styl';
+import {
+    MODAL_CALIBRATION
+} from './constants';
 
 const defaultMeasurements = {
     0: '', 1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: ''
@@ -19,6 +22,8 @@ const defaultMeasurements = {
 class CalibrationModal extends PureComponent {
     static propTypes = {
         workspaceId: PropTypes.string.isRequired,
+        activeTab: PropTypes.string,
+        calibrated: PropTypes.bool,
         state: PropTypes.object,
         actions: PropTypes.object
     };
@@ -71,12 +76,13 @@ class CalibrationModal extends PureComponent {
     state = {
         ...this.internalState,
         measurements: defaultMeasurements,
-        activeTab: 'machine',
+        activeTab: this.props.activeTab || 'machine',
         yHome: 0,
         definedHome: false,
         setMachineSettings: false,
         setFrameSettings: false,
         calibrating: -1,
+        calibrated: !!this.props.calibrated,
         result: false,
         wiping: false,
         wiped: false,
@@ -84,7 +90,7 @@ class CalibrationModal extends PureComponent {
 
     controllerEvents = {
         'controller:settings': (type, controllerSettings) => {
-            log.info(`Controller settings updated; reloading calibration ${controllerSettings}`);
+            log.info('Controller settings updated; reloading calibration', controllerSettings);
             this.calibration.loadControllerSettings(controllerSettings);
             this.setState(this.internalState);
         }
@@ -104,16 +110,6 @@ class CalibrationModal extends PureComponent {
 
     updateCalibrationResults(percent) {
         this.setState({ calibrating: percent });
-    }
-
-    writeLines(lines, delay = 2500) {
-        if (lines.length <= 0) {
-            return;
-        }
-        this.workspace.controller.writeln(lines.shift());
-        setTimeout(() => {
-            this.writeLines(lines, delay);
-        }, delay);
     }
 
     wipe() {
@@ -142,21 +138,28 @@ class CalibrationModal extends PureComponent {
         }, 100);
     }
 
+    nextCalibration() {
+        this.workspace.reOpenPort(() => {
+            this.props.actions.openModal(MODAL_CALIBRATION, {
+                activeTab: this.state.activeTab,
+                calibrated: true,
+            });
+        });
+    }
+
     applyCalibrationResults() {
         this.event({ label: 'apply' });
         const settings = this.calibration.kin.settings.map;
         const sks = Object.keys(settings);
         const result = this.state.result;
-        this.unlock();
+        const grblSettings = {};
         Object.keys(result.optimized).forEach((k) => {
             if (!sks.includes(k)) {
                 return;
             }
-            const name = settings[k].name;
-            const val = result.optimized[k];
-            const cmd = `${name}=${val}`;
-            this.workspace.controller.writeln(cmd);
+            grblSettings[settings[k].name] = result.optimized[k];
         });
+        this.workspace.writeSettings(grblSettings, () => this.nextCalibration());
         this.setState({ ...this.state, result: null });
     }
 
@@ -193,18 +196,23 @@ class CalibrationModal extends PureComponent {
         });
     }
 
-    writeSetting(name, value) {
-        const setting = this.calibration.kin.settings.map[name];
-        this.workspace.controller.writeln(`${setting.name}=${value}`);
+    writeSettings(map, callback = null) {
+        const grblMap = {};
+        Object.keys(map).forEach((key) => {
+            const setting = this.calibration.kin.settings.map[key];
+            grblMap[setting.name] = map[key];
+        });
+        this.workspace.writeSettings(grblMap, callback);
     }
 
     setMachineSettings() {
         this.event({ label: 'resize' });
         this.workspace.hasOnboarded = true;
-        this.unlock();
-        this.writeSetting('chainOverSprocket', this.calibration.kin.opts.chainOverSprocket);
-        this.writeSetting('chainLength', this.calibration.kin.opts.chainLength);
-        this.writeSetting('sledWeight', this.calibration.kin.opts.sledWeight);
+        this.writeSettings({
+            chainOverSprocket: this.calibration.kin.opts.chainOverSprocket,
+            chainLength: this.calibration.kin.opts.chainLength,
+            sledWeight: this.calibration.kin.opts.sledWeight,
+        });
         this.setState({
             ...this.state,
             setMachineSettings: true,
@@ -214,9 +222,10 @@ class CalibrationModal extends PureComponent {
     setFrameSettings() {
         this.event({ label: 'resize' });
         this.workspace.hasOnboarded = true;
-        this.unlock();
-        this.writeSetting('machineWidth', this.calibration.kin.opts.machineWidth);
-        this.writeSetting('machineHeight', this.calibration.kin.opts.machineHeight);
+        this.writeSettings({
+            machineWidth: this.calibration.kin.opts.machineWidth,
+            machineHeight: this.calibration.kin.opts.machineHeight,
+        });
         this.setState({
             ...this.state,
             setFrameSettings: true,
@@ -228,10 +237,11 @@ class CalibrationModal extends PureComponent {
         this.workspace.hasOnboarded = true;
         const chainLengths = this.calibration.kin.positionToChain(0, this.toMM(this.state.yHome));
         this.calibration.kin.opts.origChainLength = Math.round((chainLengths[0] + chainLengths[1]) / 2);
-        this.unlock();
-        this.writeSetting('origChainLength', this.calibration.kin.opts.origChainLength);
-        this.writeSetting('motorOffsetY', this.calibration.kin.opts.motorOffsetY);
-        this.writeSetting('distBetweenMotors', this.calibration.kin.opts.distBetweenMotors);
+        this.writeSettings({
+            origChainLength: this.calibration.kin.opts.origChainLength,
+            motorOffsetY: this.calibration.kin.opts.motorOffsetY,
+            distBetweenMotors: this.calibration.kin.opts.distBetweenMotors,
+        });
         this.workspace.controller.command('gcode', '$H');
         this.setState({
             ...this.state,
@@ -332,6 +342,7 @@ class CalibrationModal extends PureComponent {
             rotationDiskRadius,
             chainOverSprocket,
             sledType,
+            calibrated,
         } = this.state;
         const isCalibrating = calibrating >= 0;
         const hasCalibrationResult = !!result;
@@ -568,7 +579,7 @@ class CalibrationModal extends PureComponent {
                                     <br />
                                     {'Enter approximate measurements, within 5mm tolerance. Then, press "Define Home."'}
                                     <br />
-                                    motorOffsetY:
+                                    Motor Height:
                                     <input
                                         type="text"
                                         name="motorOffsetY"
@@ -579,7 +590,7 @@ class CalibrationModal extends PureComponent {
                                             this.setState({ motorOffsetY: e.target.value });
                                         }}
                                     />
-                                    distBetweenMotors:
+                                    Motor Width:
                                     <input
                                         type="text"
                                         name="distBetweenMotors"
@@ -809,12 +820,23 @@ class CalibrationModal extends PureComponent {
                                     )}
                                     {isCalibrating && (i18n._('Calibrating') + '...')}
                                     {!canCalibrate && !isCalibrating && !hasCalibrationResult && (
-                                        <span style={{ fontStyle: 'italic' }}>
-                                            {'Once all measurements have been entered, the "Calibrate" button will appear.'}
-                                            <br /><br />
-                                            {'Tip: try to keep the Console visible in the background of this modal. '}
-                                            {'Watch the console output; it can help to learn the gcode & grbl commands, as well as spot problems.'}
-                                        </span>
+                                        <div>
+                                            {calibrated && (
+                                                <span style={{ fontStyle: 'italic' }}>
+                                                    {'Calibration results have been applied.'}
+                                                    <br /><br />
+                                                    {'You can run calibration again now, or close this dialog.'}
+                                                </span>
+                                            )}
+                                            {!calibrated && (
+                                                <span style={{ fontStyle: 'italic' }}>
+                                                    {'Once all measurements have been entered, the "Calibrate" button will appear.'}
+                                                    <br /><br />
+                                                    {'Tip: try to keep the Console visible in the background of this modal. '}
+                                                    {'Watch the console output; it can help to learn the gcode & grbl commands, as well as spot problems.'}
+                                                </span>
+                                            )}
+                                        </div>
                                     )}
                                     <br />
                                     <Button
@@ -884,7 +906,7 @@ class CalibrationModal extends PureComponent {
                                 <option value="mm">{i18n._('mm')}</option>
                                 <option value="in">{i18n._('in')}</option>
                             </select>
-                            <a href="http://bit.ly/maslow-calibration" target="_blank" rel="noopener noreferrer">
+                            <a href="http://www.makerverse.com/machines/cnc/maslow/" target="_blank" rel="noopener noreferrer">
                                 Calibration Help
                             </a>
                         </span>

@@ -53,7 +53,7 @@ class MaslowPanels extends PureComponent {
         return (
             <div className={styles.noConnection}>
                 {top}
-                {firmwareLink && <hr />}
+                {firmwareLink && <hr style={{ marginTop: '10px', marginBottom: '10px' }} />}
                 {classicLink && (
                     <div>
                         Download the <a href="https://github.com/WebControlCNC/Firmware/tree/release/holey" target="_blank" rel="noopener noreferrer">Arduino Mega (Holey) firmware</a>.
@@ -71,8 +71,9 @@ class MaslowPanels extends PureComponent {
     saveSetting(key) {
         const { settingsEdits } = this.state;
         const controllerSettings = this.props.state.controller.settings || {};
-        const val = _.has(settingsEdits, key) ? settingsEdits[key] : controllerSettings.grbl[key].value;
-        this.workspace.controller.writeln(`${key}=${val}`);
+        this.workspace.writeSettings({
+            [key]: _.has(settingsEdits, key) ? settingsEdits[key] : controllerSettings.grbl[key].value,
+        });
     }
 
     render() {
@@ -158,6 +159,20 @@ class MaslowPanels extends PureComponent {
                         </Button>
                     </ToastNotification>
                 )}
+                <button
+                    type="button"
+                    className="btn btn-default"
+                    style={{ width: '100%' }}
+                    onClick={() => {
+                        actions.openModal(MODAL_CALIBRATION);
+                    }}
+                    title={i18n._('Calibrate')}
+                >
+                    <i className="fa fa-bullseye" />
+                    <Space width="8" />
+                    {i18n._('Calibrate')}
+                </button>
+                <hr style={{ marginTop: '10px', marginBottom: '10px' }} />
                 {!_.isEmpty(buf) && (
                     <Panel className={styles.panel}>
                         <Panel.Heading className={styles['panel-heading']}>
@@ -254,7 +269,7 @@ class MaslowPanels extends PureComponent {
                             <span style={{ fontStyle: 'italic' }}>
                                 Hover over setting names for information.
                             </span>
-                            <hr />
+                            <hr style={{ marginTop: '10px', marginBottom: '10px' }} />
                             {Object.keys(controllerSettings.grbl).map((key) => {
                                 const grbl = controllerSettings.grbl[key];
                                 const name = (grbl.message && grbl.message.length > 0) ? grbl.message : grbl.name;
@@ -521,18 +536,6 @@ class MaslowPanels extends PureComponent {
                         </Panel.Body>
                     )}
                 </Panel>
-                <button
-                    type="button"
-                    className="btn btn-default"
-                    onClick={() => {
-                        actions.openModal(MODAL_CALIBRATION);
-                    }}
-                    title={i18n._('Calibrate')}
-                >
-                    <i className="fa fa-bullseye" />
-                    <Space width="8" />
-                    {i18n._('Calibrate')}
-                </button>
             </div>
         );
     }

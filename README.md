@@ -4,6 +4,8 @@
 
 A full-featured web-based controller platform for CNC & 3DP machines.
 
+![Makerverse](/screenshot.png)
+
 ## Documentation
 
 - [Installation](http://makerverse.com/installation/)

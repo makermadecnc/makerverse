@@ -9,6 +9,8 @@ nav_exclude: true
 
 A full-featured web-based controller platform for CNC & 3DP machines.
 
+![Screenshot](/assets/screenshot.png)
+
 ## Quickstart
 
 - Follow the [installation](/installation/) guide.

@@ -56,6 +56,7 @@ class Workspace extends PureComponent {
     state = {
         mounted: false,
         port: '',
+        blockingText: '',
         modal: {
             name: MODAL_NONE,
             params: {}
@@ -341,8 +342,13 @@ class Workspace extends PureComponent {
         });
     };
 
+    onBlockingText(text) {
+        this.setState({ blockingText: text });
+    }
+
     componentDidMount() {
         this.workspace.addControllerEvents(this.controllerEvents);
+        this.workspace.addListener('block', this.onBlockingText.bind(this));
         this.addResizeEventListener();
 
         setTimeout(() => {
@@ -353,6 +359,7 @@ class Workspace extends PureComponent {
 
     componentWillUnmount() {
         this.workspace.removeControllerEvents(this.controllerEvents);
+        this.workspace.removeListener('block', this.onBlockingText);
         this.removeResizeEventListener();
     }
 
@@ -386,6 +393,7 @@ class Workspace extends PureComponent {
         } = this.state;
         const hidePrimaryContainer = !showPrimaryContainer;
         const hideSecondaryContainer = !showSecondaryContainer;
+        const blockingText = this.workspace.blockingText;
 
         if (!this.workspace) {
             return <div />;
@@ -660,6 +668,13 @@ class Workspace extends PureComponent {
                         </div>
                     </div>
                 </Dropzone>
+                {blockingText && (
+                    <div className={ styles.mask }>
+                        <div className={ styles.maskOverlay }>
+                            {blockingText}
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }

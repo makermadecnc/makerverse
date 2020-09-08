@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import log from 'app/lib/log';
+import events from 'events';
 import Limits from 'app/lib/limits';
 import series from 'app/lib/promise-series';
 import auth from 'app/lib/auth';
@@ -13,12 +14,14 @@ import {
     MASLOW,
     GRBL,
     MARLIN,
+    WORKFLOW_STATE_IDLE,
+    GRBL_ACTIVE_STATE_IDLE,
 } from '../constants';
 
 /*
  * Each "Workspace" is a tab in the UI.
  */
-class Workspaces {
+class Workspaces extends events.EventEmitter {
     static all = {};
 
     static findByPath(path) {
@@ -72,6 +75,7 @@ class Workspaces {
 
     // record comes from an API response, loaded from .makerverse
     constructor(record) {
+        super();
         this._record = record;
         this.addControllerEvents(this._controllerEvents);
     }
@@ -163,6 +167,76 @@ class Workspaces {
     }
 
     // ---------------------------------------------------------------------------------------------
+
+    _blockingText = null;
+
+    // When the Workspace wants to display a message indicating that interaction is disabled.
+    get blockingText() {
+        return this._blockingText;
+    }
+
+    set blockingText(text) {
+        this._blockingText = text;
+        this.emit('block', text);
+    }
+
+    get isReady() {
+        return _.get(this.controller.state, 'status.activeState') === GRBL_ACTIVE_STATE_IDLE &&
+            this.controller.workflow.state === WORKFLOW_STATE_IDLE;
+    }
+
+    // Given a code: value map, write all the settings.
+    writeSettings(map, callback = null, delay = 2000) {
+        const cmds = [];
+        if (!this.isReady) {
+            cmds.push('reset');
+            cmds.push('unlock');
+        }
+        const lines = [];
+        Object.keys(map).forEach((code) => {
+            lines.push(`${code}=${map[code]}`);
+        });
+
+        this.blockingText = 'Preparing Machine...';
+        this.writeCommands(cmds, () => {
+            this.blockingText = 'Applying Settings...';
+            this.writeLines(lines, () => {
+                this.blockingText = 'Refreshing Settings...';
+                this.controller.writeln('$$');
+                setTimeout(() => {
+                    this.blockingText = null;
+                    if (callback) {
+                        callback();
+                    }
+                }, delay);
+            }, delay);
+        }, delay);
+    }
+
+    writeCommands(lines, callback = null, delay = 2000) {
+        this._writer(this.controller.command.bind(this.controller), lines, callback, delay);
+    }
+
+    writeLines(lines, callback = null, delay = 2000) {
+        this._writer(this.controller.writeln.bind(this.controller), lines, callback, delay);
+    }
+
+    _writer(func, lines, callback, delay) {
+        if (lines.length <= 0) {
+            if (callback) {
+                callback();
+            }
+            return;
+        }
+        const line = lines.shift();
+        log.debug(line);
+        func(line);
+        setTimeout(() => {
+            this._writer(func, lines, callback, delay);
+        }, delay);
+    }
+
+    // ---------------------------------------------------------------------------------------------
     // Workspaces own controllers, which each represent a single connection to the hardware.
     // WIP: controller is still a global, but it gets (dis/re)connected when switching workspaces.
     // ---------------------------------------------------------------------------------------------
@@ -234,7 +308,7 @@ class Workspaces {
             this._controllerState = state;
         },
         'controller:settings': (type, settings) => {
-            // log.debug(type, 'settings changed', settings);
+            log.debug(type, 'settings changed', settings);
             this._controllerSettings = settings;
         }
     };
@@ -259,6 +333,12 @@ class Workspaces {
         return this._connecting;
     }
 
+    reOpenPort(callback) {
+        this.closePort(() => {
+            this.openPort(callback);
+        });
+    }
+
     openPort(callback) {
         if (this._connected) {
             if (callback) {
@@ -267,6 +347,8 @@ class Workspaces {
             return;
         }
         const atts = this.controllerAttributes;
+        this._connecting = true;
+        this._connected = false;
         this.controller.openPort(atts.port, {
             controllerType: atts.type,
             baudrate: atts.baudRate,
@@ -284,6 +366,11 @@ class Workspaces {
     }
 
     closePort(callback) {
+        if (!this._connecting && !this._connected) {
+            if (callback) {
+                callback(null);
+            }
+        }
         this._connecting = false;
         this._connected = false;
         this.controller.closePort(this.controllerAttributes.port, (err) => {
