@@ -18,6 +18,7 @@ import {
 
 const MASLOW_MIN_FIRMWARE_CLASSIC = 51.28;
 const MASLOW_MIN_FIRMWARE_DUE = 20200905;
+const MASLOW_CUR_FIRMWARE_DUE = 20200909;
 
 class MaslowPanels extends PureComponent {
     static propTypes = {
@@ -113,6 +114,8 @@ class MaslowPanels extends PureComponent {
         const fv = controllerSettings.firmware ? (Number(controllerSettings.firmware.version) || 0) : 0;
         const fn = controllerSettings.firmware ? controllerSettings.firmware.name : null;
 
+        let banner = null;
+
         if (!fn || fn.length <= 0) {
             return this.renderError((
                 <span>
@@ -129,6 +132,9 @@ class MaslowPanels extends PureComponent {
         } else if (fn === 'MaslowDue') {
             if (fv < MASLOW_MIN_FIRMWARE_DUE) {
                 return this.renderError(`Please upgrade your Maslow Due firmware (${MASLOW_MIN_FIRMWARE_DUE} or later).`, false, true);
+            }
+            if (fv < MASLOW_CUR_FIRMWARE_DUE) {
+                banner = this.renderError('There is an update available for your Maslow Due firmware.', false, true);
             }
         } else {
             return this.renderError(
@@ -157,6 +163,15 @@ class MaslowPanels extends PureComponent {
                         >
                             {i18n._('Reset Calibration Settings')}
                         </Button>
+                    </ToastNotification>
+                )}
+                {banner && (
+                    <ToastNotification
+                        style={{ marginBottom: '10px' }}
+                        type="warning"
+                        dismissible={false}
+                    >
+                        {banner}
                     </ToastNotification>
                 )}
                 <button

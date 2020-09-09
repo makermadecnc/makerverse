@@ -258,6 +258,9 @@ class MaslowMemory {
 
             // Prevent accidentally changing machine positions:
             cmds[0] = '';
+        } else if (c === 'G28.3') {
+            params[0] = 'G10'; // Maslow Classic uses WPos to set MPos
+            cmds[0] = params.join(' ');
         } else if (c === 'G0' || c === 'G1') {
             // Adjust absolute movement for the work position
             if (_.get(this.storage.config, 'parserstate.modal.distance') === 'G90') {
