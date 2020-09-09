@@ -10,10 +10,12 @@ has_children: true
 
 ## Maslow
 
-- [Maslow Mega](https://github.com/WebControlCNC/Firmware/tree/release/holey)
-- [Maslow Due](https://github.com/makermadecnc/MaslowDue)
+_Please read the [Maslow-specific instructions](/machines/cnc/maslow)._
 
-### Tested On
+- [Maslow Mega](https://github.com/WebControlCNC/Firmware/tree/release/holey) (Baud Rate: 38400)
+- [Maslow Due](https://github.com/makermadecnc/MaslowDue) (Baud Rate: 57600)
+
+#### Tested On
 
 - MakerMade JumpStart Kit
 - MakerMade M2
@@ -27,4 +29,4 @@ has_children: true
 
 ### Tested On
 
-- SainSmart Genmitsu 3180 Pro
+- SainSmart Genmitsu 3180 Pro (Baud Rate: 115200)

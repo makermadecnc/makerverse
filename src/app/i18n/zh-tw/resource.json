@@ -15,7 +15,6 @@
     "Help": "輔助",
     "Report an issue": "回報問題",
     "Cycle Start": "循環啟動",
-    "Feedhold": "進給保持",
     "Homing": "原點復歸",
     "Sleep": "睡眠",
     "Unlock": "解除鎖定",
@@ -455,8 +454,6 @@
     "Show Cutting Tool": "",
     "Ready to start": "",
     "Calibrate": "",
-    "Set current position as machine home": "",
-    "Set Home": "",
     "Clear system alarm": "",
     "Reset board connection": "",
     "Controls Widget": "",
@@ -466,7 +463,6 @@
     "Move machine right & up": "",
     "Raise bit": "",
     "Move machine left": "",
-    "Move machine to home": "",
     "Move machine right": "",
     "Move bit to zero": "",
     "Move machine left & down": "",
@@ -517,7 +513,6 @@
     "Webcam Widget": "",
     "View a webcam from within the app to monitor progress.": "",
     "Baud Rate": "",
-    "Define Home": "",
     "Edge Calibration": "",
     "Precision Calibration": "",
     "Next Step": "",
@@ -540,5 +535,7 @@
     "Web Server": "",
     "Save": "",
     "Machine": "",
-    "Frame": ""
+    "Frame": "",
+    "Move machine to 0/0": "",
+    "Set Chains": ""
 }

@@ -9,6 +9,14 @@ nav_order: 3
 
 This should only be used by developers or those who cannot use Docker.
 
+## Git
+
+Start by cloning the git repository:
+
+```
+git clone https://github.com/makermadecnc/makerverse.git
+```
+
 ## Node.js
 
 You will need `node` (**Node.js**) version `12.xx.y`. Downloads for Windows, Mac, and Linux can be [found here](https://nodejs.org/en/download/) (including [via package managers](https://nodejs.org/en/download/package-manager/)). On a Raspberry Pi or Debian Linux system, use the following:
@@ -18,19 +26,34 @@ curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
 sudo apt-get install -y nodejs
 ```
 
-## NPM Installation
+## Build and Run
 
-Next, either `git clone` this repository (preferred), or download and unzip the Source Code from the Release. Enter the source code directory from the command line and run:
+### Dependencies
+
+Enter the source code directory from the command line and run:
 
 ```
 npm install
+```
+
+This will download and install all required software. It generally only needs to be done once (unless a major update happens).
+
+### Production Build
+
+To build and run the production application:
+
+```
 npm run build-latest
 bin/makerverse
 ```
 
-The first time you run, this will take a while. The first two lines are installing other software, and then building the Makerverse app, which take longer the first time. Once it starts, open `http://localhost:8000` **on the same device**. You should find the web application. If you'd like to access it from a different device, see the Configuration section.
+### Development Mode
 
-To update the application, first acquire the new source code (`git pull` or download the latest release and unzip on top of the existing directory). Then, just run the commands above again to launch the application.
+Instead of the Production Build, you can start the webserver in development mode with hot-reloading for the frontend (UI):
+
+```
+npm run dev
+```
 
 ## Troubleshooting Node.js
 
@@ -79,3 +102,9 @@ Options:
   --allow-remote-access               Allow remote access to the server (default: false)
   -h, --help                          output usage information
 ```
+
+## Updating
+
+- Use `git pull` to update the source code.
+- You probably don't need to update dependencies, but it doesn't hurt to run the **Dependencies** step again.
+- Follow either the **Production Build** or **Development Mode** step.

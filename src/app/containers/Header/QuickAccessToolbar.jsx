@@ -1,7 +1,9 @@
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Workspaces from 'app/lib/workspaces';
+import { Tooltip } from 'app/components/Tooltip';
 import i18n from 'app/lib/i18n';
 import analytics from 'app/lib/analytics';
 import styles from './index.styl';
@@ -26,14 +28,6 @@ class QuickAccessToolbar extends PureComponent {
     }
 
     command = {
-        'cyclestart': () => {
-            this.workspace.controller.command('cyclestart');
-            this.event({ label: 'cyclestart' });
-        },
-        'feedhold': () => {
-            this.workspace.controller.command('feedhold');
-            this.event({ label: 'feedhold' });
-        },
         'homing': () => {
             this.workspace.controller.command('homing');
             this.event({ label: 'homing' });
@@ -52,71 +46,45 @@ class QuickAccessToolbar extends PureComponent {
         }
     };
 
+    renderButtonFeature(key, title, desc, icon, btnType, disabled = false) {
+        const feature = this.workspace.getFeature(key, { title: title, description: desc || title, icon: icon });
+        if (!feature) {
+            return '';
+        }
+        const button = (
+            <button
+                type="button"
+                className={'btn btn-' + (disabled ? 'link-disabled' : btnType)}
+                onClick={this.command[key]}
+                disabled={!!disabled}
+            >
+                {feature.icon && <i className={'fa ' + feature.icon} />}
+                {feature.icon && <Space width="8" />}
+                {i18n._(feature.title)}
+            </button>
+        );
+        return disabled ? button : (
+            <Tooltip
+                placement="bottom"
+                style={{ color: '#fff' }}
+                content={i18n._(feature.description)}
+            >
+                {button}
+            </Tooltip>
+        );
+    }
+
     render() {
+        const { controllerState } = this.props.state;
+        const activeState = _.get(controllerState, 'status.activeState', '').toLowerCase();
         return (
             <div className={styles.quickAccessToolbar}>
                 <ul className="nav navbar-nav">
                     <li className="btn-group btn-group-sm" role="group">
-                        <button
-                            type="button"
-                            className="btn btn-default"
-                            onClick={this.command.cyclestart}
-                            title={i18n._('Cycle Start')}
-                        >
-                            <i className="fa fa-repeat" />
-                            <Space width="8" />
-                            {i18n._('Cycle Start')}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-default"
-                            onClick={this.command.feedhold}
-                            title={i18n._('Feedhold')}
-                        >
-                            <i className="fa fa-hand-paper-o" />
-                            <Space width="8" />
-                            {i18n._('Feedhold')}
-                        </button>
-                    </li>
-                    <li className="btn-group btn-group-sm" role="group">
-                        <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={this.command.homing}
-                            title={i18n._('Set current position as machine home')}
-                        >
-                            {i18n._('Set Home')}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-success"
-                            onClick={this.command.sleep}
-                            title={i18n._('Sleep')}
-                        >
-                            <i className="fa fa-bed" />
-                            <Space width="8" />
-                            {i18n._('Sleep')}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-warning"
-                            onClick={this.command.unlock}
-                            title={i18n._('Clear system alarm')}
-                        >
-                            <i className="fa fa-unlock-alt" />
-                            <Space width="8" />
-                            {i18n._('Unlock')}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-danger"
-                            onClick={this.command.reset}
-                            title={i18n._('Reset board connection')}
-                        >
-                            <i className="fa fa-undo" />
-                            <Space width="8" />
-                            {i18n._('Reset')}
-                        </button>
+                        { this.renderButtonFeature('homing', 'Set Home', 'Set current position as machine home', 'fa-home', 'primary') }
+                        { this.renderButtonFeature('sleep', 'Sleep', 'Put machine to sleep', 'fa-bed', 'success', activeState !== 'idle') }
+                        { this.renderButtonFeature('unlock', 'Unlock', 'Clear system alarm', 'fa-unlock-alt', 'warning', activeState !== 'alarm') }
+                        { this.renderButtonFeature('reset', 'Reset', 'Reset board connection', 'fa-undo', 'danger') }
                     </li>
                 </ul>
             </div>

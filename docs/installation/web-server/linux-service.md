@@ -12,22 +12,25 @@ On a Raspberry Pi, Ubuntu, and other Linux machines you can use systemd to run M
 
 _Note: these steps are already performed on the Raspberry Pi image._
 
-- First ensure that you are able to start the application correctly via `bin/launch`. See the Docker section if you have trouble.
+- First ensure that you are able to start the application correctly via `bin/launch`.
+- See the [Docker](/installation/web-server/docker/) section if you have trouble.
 - Once you're sure the server is running the way you want it, terminate the server.
 - Now run `bin/server install` to create the service.
 
-## Handy Commands
+## Useful Commands
 
-Since Makerverse runs as a service, you can use all the standard systemd commands. Type `sudo systemctl [command] makerverse`, replacing **[command]** with one of the following:
+Since Makerverse runs as a service, you can use all the standard **systemd** commands.
 
-- `start`: Run the application
-- `enable`: Start the application automatically
-- `status`: See application health
-- `restart`: Restart the application
-- `stop`: Stop the application
-- `disable`: Do not start the application automatically
+Type `sudo systemctl [command] makerverse`, replacing **[command]** with one of the following:
 
-## Debugging
+- `start`: Run the application.
+- `enable`: Start the application automatically.
+- `status`: See application health.
+- `restart`: Restart the application.
+- `stop`: Stop the application.
+- `disable`: Do not start the application automatically.
+
+## Troubleshooting
 
 The following commands are helpful if something is not working:
 
@@ -35,3 +38,7 @@ The following commands are helpful if something is not working:
 - Restart (and update!) Makerverse: `sudo systemctl restart makerverse`
 - See Makerverse server logs: `docker logs makerverse`
 - See all system logs (find problems with boot): `journalctl -xe`
+
+## Updating
+
+Use `sudo systemctl restart makerverse`. The Makerverse web server will keep running the old version while it downloads the updates and restarts the server. You can check on the update progress with `journalctl -xe`. After a few minutes, refreshing the "About" screen should show the new version.

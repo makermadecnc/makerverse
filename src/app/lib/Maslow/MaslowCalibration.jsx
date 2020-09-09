@@ -188,7 +188,9 @@ class MaslowCalibration {
     }
 
     dist(p1, p2) {
-        return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+        const x = Number(p1.x) - Number(p2.x);
+        const y = Number(p1.y) - Number(p2.y);
+        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
     }
 
     round(v, dec = 6) {
@@ -242,15 +244,14 @@ class MaslowCalibration {
         return ret;
     }
 
-    // Gcode to set the work position to the home position, aka, 0,0
-    get setWposToMposCmd() {
-        const mpos = this.controller.state.status.mpos;
-        return `G10 L20 P1 X${mpos.x} Y${mpos.y}`;
-    }
-
     generateGcodePoint(pointIndex, gcode = ['G21', 'G90']) {
         const p = this.idealCoordinates[pointIndex];
-        gcode.push(this.setWposToMposCmd);
+        const mpos = this.controller.state.status.mpos;
+        const wpos = this.controller.state.status.wpos;
+        if (this.dist(mpos, wpos) >= 0.1) {
+            // Set WPos = MPos when they differ.
+            gcode.push(`G10 L20 P1 X${mpos.x} Y${mpos.y}`);
+        }
         gcode.push(`G0 X${p.x} Y${p.y}`);
         if (this.opts.cutHoles) {
             gcode.push(`G0 Z-${this.opts.cutDepth}`);

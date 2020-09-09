@@ -165,6 +165,23 @@ class Workspaces extends events.EventEmitter {
         this._record = { ...this._record, values };
         api.workspaces.update(this.id, values);
     }
+    // ---------------------------------------------------------------------------------------------
+    // FEATURES
+    // Allow for the API to enable/disable anything in this workspace.
+    // ---------------------------------------------------------------------------------------------
+
+    get features() {
+        return this._record.features || {};
+    }
+
+    getFeature(key, defaults) {
+        const f = this.features[key];
+        if (f === false) {
+            // Disabled feature.
+            return null;
+        }
+        return { ...defaults, ...(typeof f !== 'object' ? {} : f) };
+    }
 
     // ---------------------------------------------------------------------------------------------
 

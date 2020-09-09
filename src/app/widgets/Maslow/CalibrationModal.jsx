@@ -266,7 +266,7 @@ class CalibrationModal extends PureComponent {
         let pre = '';
         if (result.xError > 0) {
             pre += `When you Defined Home, it appears your X coordinate was off by about ${result.xError}mm from the center of the stock.`;
-            pre += 'Consider closing this modal, ensuring the sled is centered, and starting from Define Home again. Otherwise... ';
+            pre += 'Consider closing this modal, ensuring the sled is centered, and starting from Set Chains again. Otherwise... ';
         }
         if (result.change.avgErrDist > 0 || result.change.maxErrDist > 0) {
             return pre + 'The error margin went up. This should not happen. Please start over from the beginning.';
@@ -279,7 +279,7 @@ class CalibrationModal extends PureComponent {
                 return pre + 'Results are good; precision calibration may improve them further';
             }
         } else if (result.optimized.totalErrDist <= 30 && result.optimized.avgErrDist <= 10) {
-            return pre + 'Your machine could be calibrated further. Try starting the entire calibration process again.';
+            return pre + 'Your machine could be calibrated further. Try starting the entire calibration process again. If it does not improve, review the help.';
         } else {
             return pre + 'Your machine is still pretty un-calibrated. Try starting the calibration process again. If it does not improve, review the help.';
         }
@@ -416,7 +416,7 @@ class CalibrationModal extends PureComponent {
                     >
                         <NavItem eventKey="machine">{i18n._('Machine')}</NavItem>
                         <NavItem eventKey="frame">{i18n._('Frame')}</NavItem>
-                        <NavItem eventKey="home">{i18n._('Define Home')}</NavItem>
+                        <NavItem eventKey="home">{i18n._('Set Chains')}</NavItem>
                         <NavItem eventKey="edge">{i18n._('Edge Calibration')}</NavItem>
                         <NavItem eventKey="precision">{i18n._('Precision Calibration')}</NavItem>
                     </Nav>
@@ -558,7 +558,7 @@ class CalibrationModal extends PureComponent {
                                     )}
                                     {setFrameSettings && (
                                         <div>
-                                            {'Now proceed to the "Define Home" tab.'}
+                                            {'Now proceed to the "Set Chains" tab.'}
                                         </div>
                                     )}
                                 </div>
@@ -577,7 +577,7 @@ class CalibrationModal extends PureComponent {
                                 <div className={styles.bottom}>
                                     {'Measure motorOffsetY coplanar with the workspace. For distBetweenMotors, measure between the centers of the sprockets.'}
                                     <br />
-                                    {'Enter approximate measurements, within 5mm tolerance. Then, press "Define Home."'}
+                                    {'Enter approximate measurements, within 5mm tolerance. Then, press "Set Chains".'}
                                     <br />
                                     Motor Height:
                                     <input
@@ -617,7 +617,7 @@ class CalibrationModal extends PureComponent {
                                         onClick={event => this.defineHome()}
                                     >
                                         <i className="fa fa-check" />
-                                        {i18n._('Define Home')}
+                                        {i18n._('Set Chains')}
                                     </Button>
                                     {definedHome && (
                                         <span>

@@ -28,10 +28,14 @@ These are merely customized versions of [the official Raspberry Pi OS images of 
 
 As soon as you are ablem to, SSH in to the Raspberry Pi and run `sudo raspi-config` to change the password. The Makerverse application will start automatically on port `8000`. However, especially during the first boot, it will take some time to download (_~600MB_) and unpack the application. On a Raspberry Pi 3 B+ Rev.1.3 (about the  worst device which can handle Makerverse), this has been known to take 20-30 minutes. A RPi4 on a decent internet connection should only take a few minutes.
 
-Tip: read the "Handy commands" in the "Linux Service" section!
+_**Tip**: read the [useful commands in the Linux Service section](/installation/web-server/linux-service/#useful-commands)!_
 
 ## Desktop (Kiosk Mode)
 
 When running the Desktop version, you will still need to follow on-screen instructions after the first boot to configure your Raspberry Pi. If you don't have an extra keyboard/mouse, just SSH and use `sudo raspi-config` to turn on the VNC in `Interfacing Options`. Then use an app like VNC Viewer to connect from your computer.
 
 The Desktop edition is meant to be used as a shopfloor tablet. Once configured, it will automatically launch Chromium in "Kiosk" mode, loading the Makerverse application in a full-screen web browser. Makerverse is still running as a Web Server in the background, so other clients can also simultaneously connect.
+
+## Updating
+
+See: how to [update the linux service installation](/installation/web-server/linux-service/#updating).

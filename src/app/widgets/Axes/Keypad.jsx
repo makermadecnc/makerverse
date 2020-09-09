@@ -270,9 +270,9 @@ class Keypad extends PureComponent {
                                             className={cx(styles.btnKeypad, styles['btn-xy'])}
                                             onClick={() => actions.move({ X: 0, Y: 0 })}
                                             disabled={!canClickXY}
-                                            title={i18n._('Move machine to home')}
+                                            title={i18n._('Move machine to 0/0')}
                                         >
-                                            <i className="fa fa-home" />
+                                            <i className="fa fa-crosshairs" />
                                         </Button>
                                     </div>
                                 </div>
@@ -307,7 +307,7 @@ class Keypad extends PureComponent {
                                             disabled={!canClickZ}
                                             title={i18n._('Move bit to zero')}
                                         >
-                                            <i className="fa fa-home" />
+                                            <i className="fa fa-crosshairs" />
                                         </Button>
                                     </div>
                                 </div>
