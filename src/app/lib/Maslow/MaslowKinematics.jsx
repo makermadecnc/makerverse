@@ -37,15 +37,19 @@ class MaslowKinematics {
         this.loadControllerSettings(controller.settings);
     }
 
-    loadControllerSettings(controllerSettings) {
-        this.controllerSettings = controllerSettings;
-        this.settings.update(controllerSettings);
+    reloadFromSettings() {
         const opts = {};
         Object.keys(this.settings.map).forEach((key) => {
             opts[key] = Number(this.settings.map[key].value);
         });
         this.recomputeGeometry(opts);
         this.positionToChain(this.lastPosition.x, this.lastPosition.y); // save chain lengths
+    }
+
+    loadControllerSettings(controllerSettings) {
+        this.controllerSettings = controllerSettings;
+        this.settings.update(controllerSettings);
+        this.reloadFromSettings();
     }
 
     chainToPosition(chainALength, chainBLength, xGuess, yGuess) {

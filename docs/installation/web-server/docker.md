@@ -41,14 +41,33 @@ KERNEL=="ttyACM[0-9]*",MODE="0666"
 
 Unplug any USB ports connected to a machine, and then re-connect them. The rule we just added will now take effect forevermore, giving Makerverse access to the USB ports.
 
-## Running Makerverse
+## Launching Makerverse
 
-The `bin/launch` script is the easiest way to run Makerverse. For most users, you should simply type `bin/launch` in the terminal to start the application. You should be able to connect to Makerverse via port `8000` on the IP address of the computer. For example, `http://localhost:8000` (when on the same computer), or `http://192.168.0.100:8000` (if connecting to a computer with the IP address `192.168.0.100`). Once this works, Linux users may optionally move on to the "Linux Service" section to run the application automatically.
+The `bin/launch` script is the easiest way to run Makerverse. For most users, you should simply type `bin/launch` in the terminal to start the application.
+
+After a few minutes, you should be able to connect to Makerverse via port `8000` on the IP address of the computer. For example, `http://localhost:8000` (when on the same computer), or `http://192.168.0.100:8000` (if connecting to a computer with the IP address `192.168.0.100`). Once this works, Linux users may optionally move on to the [Linux Service](/installation/web-server/linux-service/) section to run the application automatically.
+
+## Run Manually
 
 If you prefer to run the Docker image directly instead of using `bin/launch`, you should do the following:
 
-- Pull  the `makerverse/core` image, the `:latest`, `:prerelease`, or specific version number (e.g., `v1.1.0`) tag.
+- Pull the `makerverse/core` image tagged `:latest`, `:prerelease`, or specific version number.
 - Use `--privileged` mode and `-v /dev:/dev` for USB access.
 - Mount your `.makerverse` config file at `/home/node/.makerverse`.
 - Mount your gcode files at `/home/node/gcode`.
 - Map the external port to `8000` (`-p 8000:8000`).
+
+For example:
+```
+docker run --rm --privileged --name makerverse \
+  -p "8000:8000" \
+  -v /dev:/dev \
+  -v "$HOME/gcode:/home/node/gcode" \
+  -v "$HOME/.makerverse:/home/node/.makerverse" \
+  -v "$HOME/makerverse:/home/node/makerverse" \
+  "makerverse/core:latest"
+```
+
+## Updating
+
+Each time the `bin/launch` script is run, it will automatically update the application by pulling the latest docker image. If you use the [linux service](/installation/web-server/linux-service/#updating), this happens each time you restart the service.

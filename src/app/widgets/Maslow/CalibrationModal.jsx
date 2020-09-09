@@ -86,6 +86,7 @@ class CalibrationModal extends PureComponent {
         result: false,
         wiping: false,
         wiped: false,
+        chainError: null,
     };
 
     controllerEvents = {
@@ -96,8 +97,18 @@ class CalibrationModal extends PureComponent {
         }
     };
 
+    updateActiveTab() {
+        const tab = this.state.activeTab;
+        const isPrecisionTab = tab === 'precision';
+        const isEdgeTab = tab === 'edge';
+        if (isPrecisionTab || isEdgeTab) {
+            this.updateCalibrationOpts({ cutHoles: isPrecisionTab });
+        }
+    }
+
     componentDidMount() {
         this.workspace.addControllerEvents(this.controllerEvents);
+        this.updateActiveTab();
     }
 
     componentWillUnmount() {
@@ -213,10 +224,7 @@ class CalibrationModal extends PureComponent {
             chainLength: this.calibration.kin.opts.chainLength,
             sledWeight: this.calibration.kin.opts.sledWeight,
         });
-        this.setState({
-            ...this.state,
-            setMachineSettings: true,
-        });
+        this.setState({ ...this.state, setMachineSettings: true });
     }
 
     setFrameSettings() {
@@ -226,38 +234,46 @@ class CalibrationModal extends PureComponent {
             machineWidth: this.calibration.kin.opts.machineWidth,
             machineHeight: this.calibration.kin.opts.machineHeight,
         });
-        this.setState({
-            ...this.state,
-            setFrameSettings: true,
-        });
+        this.setState({ ...this.state, setFrameSettings: true });
     }
 
-    defineHome(opts) {
+    resetCalibration() {
+        this.event({ label: 'reset' });
+        this.workspace.hasOnboarded = true;
+        this.writeSettings({
+            leftChainTolerance: 0,
+            rightChainTolerance: 0,
+        });
+        this.setState({ ...this.state, resetCalibration: true, definedHome: false, chainError: null });
+    }
+
+    defineHome() {
         this.event({ label: 'home' });
         this.workspace.hasOnboarded = true;
+
         const chainLengths = this.calibration.kin.positionToChain(0, this.toMM(this.state.yHome));
-        this.calibration.kin.opts.origChainLength = Math.round((chainLengths[0] + chainLengths[1]) / 2);
+        const chainDiff = Math.abs(chainLengths[0] - chainLengths[1]);
+        const { leftChainTolerance, rightChainTolerance } = this.calibration.kin.opts;
+        const previouslyCalibrated = leftChainTolerance !== 0 || rightChainTolerance !== 0;
+        if (previouslyCalibrated && chainDiff >= 1) {
+            this.setState({ ...this.state, chainError: chainLengths[1] - chainLengths[0] });
+            return;
+        }
+        const origChainLength = Math.round((chainLengths[0] + chainLengths[1]) / 2);
+        this.updateKinematics({ origChainLength: origChainLength });
         this.writeSettings({
             origChainLength: this.calibration.kin.opts.origChainLength,
             motorOffsetY: this.calibration.kin.opts.motorOffsetY,
             distBetweenMotors: this.calibration.kin.opts.distBetweenMotors,
+        }, () => {
+            this.workspace.controller.command('homing');
         });
-        this.workspace.controller.command('gcode', '$H');
-        this.setState({
-            ...this.state,
-            origChainLength: this.calibration.kin.opts.origChainLength,
-            definedHome: true,
-        });
+        this.setState({ ...this.state, definedHome: true, chainError: null });
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const tab = this.state.activeTab;
-        const isPrecisionTab = tab === 'precision';
-        const isEdgeTab = tab === 'edge';
-        if (prevState.activeTab !== tab && (isPrecisionTab || isEdgeTab)) {
-            this.updateCalibrationOpts({
-                cutHoles: isPrecisionTab,
-            });
+        if (prevState.activeTab !== this.state.activeTab) {
+            this.updateActiveTab();
         }
     }
 
@@ -266,7 +282,7 @@ class CalibrationModal extends PureComponent {
         let pre = '';
         if (result.xError > 0) {
             pre += `When you Defined Home, it appears your X coordinate was off by about ${result.xError}mm from the center of the stock.`;
-            pre += 'Consider closing this modal, ensuring the sled is centered, and starting from Define Home again. Otherwise... ';
+            pre += 'Consider closing this modal, ensuring the sled is centered, and starting from Set Chains again. Otherwise... ';
         }
         if (result.change.avgErrDist > 0 || result.change.maxErrDist > 0) {
             return pre + 'The error margin went up. This should not happen. Please start over from the beginning.';
@@ -279,7 +295,7 @@ class CalibrationModal extends PureComponent {
                 return pre + 'Results are good; precision calibration may improve them further';
             }
         } else if (result.optimized.totalErrDist <= 30 && result.optimized.avgErrDist <= 10) {
-            return pre + 'Your machine could be calibrated further. Try starting the entire calibration process again.';
+            return pre + 'Your machine could be calibrated further. Try starting the entire calibration process again. If it does not improve, review the help.';
         } else {
             return pre + 'Your machine is still pretty un-calibrated. Try starting the calibration process again. If it does not improve, review the help.';
         }
@@ -343,6 +359,7 @@ class CalibrationModal extends PureComponent {
             chainOverSprocket,
             sledType,
             calibrated,
+            chainError,
         } = this.state;
         const isCalibrating = calibrating >= 0;
         const hasCalibrationResult = !!result;
@@ -364,6 +381,9 @@ class CalibrationModal extends PureComponent {
         const edgeDistance = this.state[edgeDistanceKey];
         const nonstandardSize = Math.abs(2438.4 - machineWidth) > 0.1 || Math.abs(1219.2 - machineHeight) > 0.1;
         const chainOffBottom = chainOverSprocket === 2 ? '2' : '1';
+        const { leftChainTolerance, rightChainTolerance } = this.calibration.kin.opts;
+        const offCenter = Math.abs(leftChainTolerance - rightChainTolerance) >= 0.001;
+        const canApplyCalibration = this.workspace.isReady;
 
         return (
             <Modal
@@ -416,7 +436,7 @@ class CalibrationModal extends PureComponent {
                     >
                         <NavItem eventKey="machine">{i18n._('Machine')}</NavItem>
                         <NavItem eventKey="frame">{i18n._('Frame')}</NavItem>
-                        <NavItem eventKey="home">{i18n._('Define Home')}</NavItem>
+                        <NavItem eventKey="home">{i18n._('Set Chains')}</NavItem>
                         <NavItem eventKey="edge">{i18n._('Edge Calibration')}</NavItem>
                         <NavItem eventKey="precision">{i18n._('Precision Calibration')}</NavItem>
                     </Nav>
@@ -558,7 +578,7 @@ class CalibrationModal extends PureComponent {
                                     )}
                                     {setFrameSettings && (
                                         <div>
-                                            {'Now proceed to the "Define Home" tab.'}
+                                            {'Now proceed to the "Set Chains" tab.'}
                                         </div>
                                     )}
                                 </div>
@@ -568,63 +588,94 @@ class CalibrationModal extends PureComponent {
                             <div className={styles.tabFull}>
                                 <div className={styles.center} style={ this.getBkImageStyle('calibration_motor.png') } />
                                 <div className={styles.top}>
-                                    {'Your "Home" position is at the center of the workspace, where Machine Position (MPos) = 0, 0, 0.'}
-                                    <br />
-                                    {'Make sure your sled is as close as possible to this point before proceeding.'}
-                                    <br />
-                                    {'You may need to close this dialog and jog/shuttle the sled into position.'}
-                                </div>
-                                <div className={styles.bottom}>
-                                    {'Measure motorOffsetY coplanar with the workspace. For distBetweenMotors, measure between the centers of the sprockets.'}
-                                    <br />
-                                    {'Enter approximate measurements, within 5mm tolerance. Then, press "Define Home."'}
-                                    <br />
-                                    Motor Height:
-                                    <input
-                                        type="text"
-                                        name="motorOffsetY"
-                                        className={styles.mmInput}
-                                        value={motorOffsetY}
-                                        onChange={e => {
-                                            this.updateKinematics({ motorOffsetY: this.toMM(e.target.value) || 0 });
-                                            this.setState({ motorOffsetY: e.target.value });
-                                        }}
-                                    />
-                                    Motor Width:
-                                    <input
-                                        type="text"
-                                        name="distBetweenMotors"
-                                        className={styles.mmInput}
-                                        value={distBetweenMotors}
-                                        onChange={e => {
-                                            this.updateKinematics({ distBetweenMotors: this.toMM(e.target.value) || 0 });
-                                            this.setState({ distBetweenMotors: e.target.value });
-                                        }}
-                                    />
-                                    Y Position (advanced):
-                                    <input
-                                        type="text"
-                                        name="yHome"
-                                        className={styles.mmInput}
-                                        value={yHome}
-                                        onChange={e => {
-                                            this.setState({ ...this.state, yHome: e.target.value || 0 });
-                                        }}
-                                    />
-                                    <Button
-                                        btnSize="medium"
-                                        btnStyle="flat"
-                                        onClick={event => this.defineHome()}
-                                    >
-                                        <i className="fa fa-check" />
-                                        {i18n._('Define Home')}
-                                    </Button>
-                                    {definedHome && (
-                                        <span>
-                                            Homed!
-                                        </span>
+                                    {chainError && (
+                                        <div>
+                                            {'Setting chains failed!'}
+                                            <br />
+                                            {'Your machine has already begun calibration, and the new chain position differs from the old.'}
+                                        </div>
+                                    )}
+                                    {!chainError && (
+                                        <div>
+                                            {'Your "Home" position is at the center of the workspace, where Machine Position (MPos) = 0, 0, 0.'}
+                                            <br />
+                                            {'Make sure your sled is as close as possible to this point before proceeding.'}
+                                            <br />
+                                            {'You may need to close this dialog and jog/shuttle the sled into position.'}
+                                        </div>
                                     )}
                                 </div>
+                                {offCenter && (
+                                    <div className={styles.bottom}>
+                                        <div>
+                                            {'Your machine appears to have been previously calibrated.'}
+                                            <br />
+                                            {'To change the chains, you must first clear the effects of edge/precision calibration.'}
+                                        </div>
+                                        <Button
+                                            btnSize="medium"
+                                            btnStyle="flat"
+                                            onClick={event => this.resetCalibration()}
+                                        >
+                                            <i className="fa fa-warning" />
+                                            Reset Chain Tolerances
+                                        </Button>
+                                    </div>
+                                )}
+                                {!offCenter && (
+                                    <div className={styles.bottom}>
+                                        <div>
+                                            {'Measure motorOffsetY coplanar with the workspace. For distBetweenMotors, measure between the centers of the sprockets.'}
+                                            <br />
+                                            {'Enter approximate measurements, within 5mm tolerance. Then, press "Set Chains".'}
+                                        </div>
+                                        Motor Height:
+                                        <input
+                                            type="text"
+                                            name="motorOffsetY"
+                                            className={styles.mmInput}
+                                            value={motorOffsetY}
+                                            onChange={e => {
+                                                this.updateKinematics({ motorOffsetY: this.toMM(e.target.value) || 0 });
+                                                this.setState({ motorOffsetY: e.target.value });
+                                            }}
+                                        />
+                                        Motor Width:
+                                        <input
+                                            type="text"
+                                            name="distBetweenMotors"
+                                            className={styles.mmInput}
+                                            value={distBetweenMotors}
+                                            onChange={e => {
+                                                this.updateKinematics({ distBetweenMotors: this.toMM(e.target.value) || 0 });
+                                                this.setState({ distBetweenMotors: e.target.value });
+                                            }}
+                                        />
+                                        Y Position (advanced):
+                                        <input
+                                            type="text"
+                                            name="yHome"
+                                            className={styles.mmInput}
+                                            value={yHome}
+                                            onChange={e => {
+                                                this.setState({ ...this.state, yHome: e.target.value || 0 });
+                                            }}
+                                        />
+                                        <Button
+                                            btnSize="medium"
+                                            btnStyle="flat"
+                                            onClick={event => this.defineHome()}
+                                        >
+                                            <i className="fa fa-check" />
+                                            {i18n._('Set Chains')}
+                                        </Button>
+                                        {definedHome && (
+                                            <span>
+                                                Homed!
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         )}
                         {isCalibrationTab && (
@@ -725,16 +776,26 @@ class CalibrationModal extends PureComponent {
                                         <div
                                             style={{ position: 'absolute', right: '0px', bottom: '0px', width: '40%' }}
                                         >
+                                            These results must be applied to take effect!
+                                            <hr style={{ marginTop: '10px', marginBottom: '10px' }} />
                                             {this.getCalibrationRecommendation(result)}
                                             <br />
-                                            <Button
-                                                btnSize="lg"
-                                                btnStyle="flat"
-                                                onClick={event => this.applyCalibrationResults()}
-                                            >
-                                                <i className="fa fa-check" />
-                                                {i18n._('Apply Calibration Results')}
-                                            </Button>
+                                            <br />
+                                            {canApplyCalibration && (
+                                                <Button
+                                                    btnSize="lg"
+                                                    btnStyle="flat"
+                                                    onClick={event => this.applyCalibrationResults()}
+                                                >
+                                                    <i className="fa fa-check" />
+                                                    {i18n._('Apply Calibration Results')}
+                                                </Button>
+                                            )}
+                                            {!canApplyCalibration && (
+                                                <span style={{ fontWeight: 'bold' }}>
+                                                    The machine needs to be idle and unlocked to apply calibration results.
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 )}
@@ -839,14 +900,16 @@ class CalibrationModal extends PureComponent {
                                         </div>
                                     )}
                                     <br />
-                                    <Button
-                                        btnSize="medium"
-                                        btnStyle="flat"
-                                        onClick={event => this.moveToCenter()}
-                                    >
-                                        <i className="fa fa-bullseye" />
-                                        {i18n._('Move to Center')}
-                                    </Button>
+                                    {!hasCalibrationResult && (
+                                        <Button
+                                            btnSize="medium"
+                                            btnStyle="flat"
+                                            onClick={event => this.moveToCenter()}
+                                        >
+                                            <i className="fa fa-bullseye" />
+                                            {i18n._('Move to Center')}
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         )}

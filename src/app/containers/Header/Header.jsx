@@ -163,6 +163,9 @@ class Header extends PureComponent {
                     }
                 });
             }
+        },
+        'controller:state': (type, controllerState) => {
+            this.setState({ 'controllerState': controllerState });
         }
     };
 
@@ -185,6 +188,7 @@ class Header extends PureComponent {
             lastUpdate: '',
             updateAvailable: false,
             updateUrl: null,
+            controllerState: this.workspace ? this.workspace.controller.state : {},
         };
     }
 

@@ -15,7 +15,6 @@
     "Help": "Help",
     "Report an issue": "Report an issue",
     "Cycle Start": "Cycle Start",
-    "Feedhold": "Feedhold",
     "Homing": "Set Home",
     "Sleep": "Sleep",
     "Unlock": "Unlock",
@@ -455,8 +454,6 @@
     "Show Cutting Tool": "Show Cutting Tool",
     "Ready to start": "Ready to start",
     "Calibrate": "Calibrate",
-    "Set current position as machine home": "Set current position as machine home",
-    "Set Home": "Set Home",
     "Clear system alarm": "Clear system alarm",
     "Reset board connection": "Reset board connection",
     "Controls Widget": "Controls Widget",
@@ -466,7 +463,6 @@
     "Move machine right & up": "Move machine right & up",
     "Raise bit": "Raise bit",
     "Move machine left": "Move machine left",
-    "Move machine to home": "Move machine to home",
     "Move machine right": "Move machine right",
     "Move bit to zero": "Move bit to zero",
     "Move machine left & down": "Move machine left & down",
@@ -517,7 +513,6 @@
     "Webcam Widget": "Webcam Widget",
     "View a webcam from within the app to monitor progress.": "View a webcam from within the app to monitor progress.",
     "Baud Rate": "Baud Rate",
-    "Define Home": "Define Home",
     "Edge Calibration": "Edge Calibration",
     "Precision Calibration": "Precision Calibration",
     "Next Step": "Next Step",
@@ -540,5 +535,7 @@
     "Web Server": "Web Server",
     "Save": "Save",
     "Machine": "Machine",
-    "Frame": "Frame"
+    "Frame": "Frame",
+    "Move machine to 0/0": "Move machine to 0/0",
+    "Set Chains": "Set Chains"
 }

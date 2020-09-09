@@ -993,6 +993,25 @@ class DisplayPanel extends PureComponent {
         );
     };
 
+    renderTaskbarFeature = (featureKey, title, icon, disabled, action) => {
+        const feature = this.workspace.getFeature(featureKey, { title: title });
+        return feature ? (
+            <TaskbarButton
+                disabled={disabled}
+                onClick={action}
+            >
+                <Tooltip
+                    placement="bottom"
+                    content={i18n._(feature.title)}
+                    disabled={disabled}
+                    hideOnClick
+                >
+                    <Image src={icon} width="14" height="14" />
+                </Tooltip>
+            </TaskbarButton>
+        ) : '';
+    };
+
     renderAxis = (axis) => {
         const { canClick, units, machinePosition, workPosition, jog } = this.props;
         const { actions } = this.props;
@@ -1002,6 +1021,7 @@ class DisplayPanel extends PureComponent {
         const mpos = machinePosition[axis] || '0.000';
         const wpos = workPosition[axis] || '0.000';
         const axisLabel = axis.toUpperCase();
+        const axisKey = axis.toLowerCase();
         const displayUnits = {
             [AXIS_E]: lengthUnits,
             [AXIS_X]: lengthUnits,
@@ -1039,39 +1059,15 @@ class DisplayPanel extends PureComponent {
                 </td>
                 <td className={styles.machinePosition}>
                     <PositionLabel value={mpos} />
-                    <Taskbar>
+                    <Taskbar style={{ minHeight: '27px' }}>
                         <div className="clearfix">
                             <div className="pull-right">
-                                <TaskbarButton
-                                    disabled={!canZeroOutMachine}
-                                    onClick={() => {
-                                        this.workspace.controller.command('gcode', `G28.3 ${axisLabel}0`);
-                                    }}
-                                >
-                                    <Tooltip
-                                        placement="bottom"
-                                        content={i18n._('Zero Out Machine')}
-                                        disabled={!canZeroOutMachine}
-                                        hideOnClick
-                                    >
-                                        <Image src={iconPin} width="14" height="14" />
-                                    </Tooltip>
-                                </TaskbarButton>
-                                <TaskbarButton
-                                    disabled={!canHomeMachine}
-                                    onClick={() => {
-                                        this.workspace.controller.command('gcode', `G28.2 ${axisLabel}0`);
-                                    }}
-                                >
-                                    <Tooltip
-                                        placement="bottom"
-                                        content={i18n._('Home Machine')}
-                                        disabled={!canHomeMachine}
-                                        hideOnClick
-                                    >
-                                        <Image src={iconHome} width="14" height="14" />
-                                    </Tooltip>
-                                </TaskbarButton>
+                                {this.renderTaskbarFeature(`mpos_set_home_${axisKey}`, `Set machine's ${axisLabel} position to zero`, iconPin, !canZeroOutMachine, () => {
+                                    this.workspace.controller.command('gcode', `G28.3 ${axisLabel}0`);
+                                })}
+                                {this.renderTaskbarFeature(`mpos_go_home_${axisKey}`, `Home the ${axisLabel} axis`, iconHome, !canHomeMachine, () => {
+                                    this.workspace.controller.command('gcode', `G28.2 ${axisLabel}0`);
+                                })}
                             </div>
                         </div>
                     </Taskbar>
@@ -1092,7 +1088,7 @@ class DisplayPanel extends PureComponent {
                     {!showPositionInput &&
                     <PositionLabel value={wpos} />
                     }
-                    <Taskbar>
+                    <Taskbar style={{ minHeight: '27px' }}>
                         <div className="clearfix">
                             <div className="pull-right">
                                 <TaskbarButton
@@ -1127,21 +1123,9 @@ class DisplayPanel extends PureComponent {
                                         <Image src={iconPlus} width="14" height="14" />
                                     </Tooltip>
                                 </TaskbarButton>
-                                <TaskbarButton
-                                    disabled={!canZeroOutWorkOffsets}
-                                    onClick={() => {
-                                        actions.setWorkOffsets(axis, 0);
-                                    }}
-                                >
-                                    <Tooltip
-                                        placement="bottom"
-                                        content={i18n._('Zero Out Work Offsets')}
-                                        disabled={!canZeroOutWorkOffsets}
-                                        hideOnClick
-                                    >
-                                        <Image src={iconPin} width="14" height="14" />
-                                    </Tooltip>
-                                </TaskbarButton>
+                                {this.renderTaskbarFeature(`wpos_set_home_${axisKey}`, `Set the work position's ${axisLabel} axis to zero`, iconPin, !canZeroOutWorkOffsets, () => {
+                                    actions.setWorkOffsets(axis, 0);
+                                })}
                                 <TaskbarButton
                                     active={showPositionInput}
                                     disabled={!canModifyWorkPosition}

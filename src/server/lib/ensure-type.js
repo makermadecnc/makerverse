@@ -21,3 +21,7 @@ export const ensureNumber = (value, defaultValue = 0) => {
 
     return (typeof value === 'number') ? value : Number(value);
 };
+
+export const ensureObject = (value, defaultValue = {}) => {
+    return (typeof value === 'object') ? value : defaultValue;
+};

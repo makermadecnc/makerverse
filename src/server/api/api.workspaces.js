@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import settings from '../config/settings';
-import { ensureNumber, ensureString, ensureBoolean } from '../lib/ensure-type';
+import { ensureNumber, ensureString, ensureBoolean, ensureObject } from '../lib/ensure-type';
 import logger from '../lib/logger';
 import slugify from '../lib/slugify';
 import config from '../services/configstore';
@@ -10,9 +10,25 @@ import {
     ERR_NOT_FOUND,
     ERR_INTERNAL_SERVER_ERROR
 } from '../constants';
+import { MASLOW } from '../controllers/Maslow/constants';
 
 const log = logger('api:workspaces');
 const CONFIG_KEY = 'workspaces';
+
+const defaultFeatures = {
+    [MASLOW]: {
+        homing: {
+            title: 'Reset Chains',
+            description: 'Inform the Maslow that the chains (not the sled) are in the exact same position as they were when you used "Set Chains".',
+            icon: 'fa-link',
+        },
+        mpos_set_home_x: false,
+        mpos_set_home_y: false,
+        mpos_go_home_x: false,
+        mpos_go_home_y: false,
+        mpos_go_home_z: false,
+    }
+};
 
 const getSanitizedRecords = () => {
     const records = _.castArray(config.get(CONFIG_KEY, []));
@@ -53,7 +69,7 @@ const getSanitizedRecords = () => {
 };
 
 const ensureWorkspace = (payload) => {
-    const { name, onboarded, controller, limits } = { ...payload };
+    const { name, onboarded, controller, limits, features } = { ...payload };
     const { port, baudRate, reconnect, controllerType, rtscts } = { ...controller };
     const { xmin = 0, xmax = 0, ymin = 0, ymax = 0, zmin = 0, zmax = 0 } = { ...limits };
     const id = payload.id || slugify(name);
@@ -79,6 +95,7 @@ const ensureWorkspace = (payload) => {
             zmin: ensureNumber(zmin) || 0,
             zmax: ensureNumber(zmax) || 0,
         },
+        features: ensureObject(features, defaultFeatures[controllerType] || {}),
     };
 };
 
@@ -180,6 +197,7 @@ export const update = (req, res) => {
             ['limits.ymax', ensureNumber],
             ['limits.zmin', ensureNumber],
             ['limits.zmax', ensureNumber],
+            ['features', ensureObject],
         ].forEach(it => {
             const [key, ensureType] = it;
             const defaultValue = _.get(record, key);

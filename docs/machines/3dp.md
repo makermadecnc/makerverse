@@ -13,4 +13,4 @@ nav_order: 2
 
 ### Tested On:
 
-- Prusa MK3S
+- Prusa MK3S (Baud Rate: 115200)
