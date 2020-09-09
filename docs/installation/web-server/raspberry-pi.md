@@ -14,7 +14,7 @@ It does all the work of setting up the Linux Service and Docker Image (below) fo
 
 ## Choose Release
 
-There are two download options in the [Latest Release](github.com/makermadecnc/makerverse/releases/latest/):
+There are two download options in the [Latest Release](https://github.com/makermadecnc/makerverse/releases/latest/):
 
 - `makerverse-raspberry-pi-os-lite-x.y.z.img.gz`
 - `makerverse-raspberry-pi-os-desktop-x.y.z.img.gz`
