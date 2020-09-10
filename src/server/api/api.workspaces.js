@@ -11,6 +11,7 @@ import {
     ERR_INTERNAL_SERVER_ERROR
 } from '../constants';
 import { MASLOW } from '../controllers/Maslow/constants';
+import { GRBL } from '../controllers/Grbl/constants';
 
 const log = logger('api:workspaces');
 const CONFIG_KEY = 'workspaces';
@@ -28,6 +29,59 @@ const defaultFeatures = {
         mpos_go_home_y: false,
         mpos_go_home_z: false,
     }
+};
+
+const defaultAxes = {
+    // accuracy: [mm] serves to calculate minimum movement in the axis
+    // precision: [int] number of decimals for rounding
+    [MASLOW]: {
+        x: {
+            accuracy: 1,
+            precision: 0,
+            min: -1219.2,
+            max: 1219.2,
+        },
+        y: {
+            accuracy: 1,
+            precision: 0,
+            min: -609.6,
+            max: 609.6,
+        },
+        z: {
+            accuracy: 0.1,
+            precision: 1,
+            min: -25.4,
+            max: 12.0,
+        },
+    },
+    [GRBL]: {
+        x: {
+            accuracy: 0.1,
+            precision: 2,
+        },
+        y: {
+            accuracy: 0.1,
+            precision: 2,
+        },
+        z: {
+            accuracy: 0.1,
+            precision: 2,
+        },
+    },
+    '': {
+        x: {
+            accuracy: 0.001,
+            precision: 3,
+        },
+        y: {
+            accuracy: 0.001,
+            precision: 3,
+        },
+        z: {
+            accuracy: 0.001,
+            precision: 3,
+        },
+    },
 };
 
 const getSanitizedRecords = () => {
@@ -68,12 +122,25 @@ const getSanitizedRecords = () => {
     return records;
 };
 
+const ensureAxis = (payload) => {
+    const { min, max, precision, accuracy } = { ...payload };
+    return {
+        precision: ensureNumber(precision) || 0,
+        accuracy: ensureNumber(accuracy) || 0,
+        min: ensureNumber(min) || 0,
+        max: ensureNumber(max) || 0,
+    };
+};
+
 const ensureWorkspace = (payload) => {
-    const { name, onboarded, controller, limits, features } = { ...payload };
+    const { name, onboarded, controller, features, axes } = { ...payload };
     const { port, baudRate, reconnect, controllerType, rtscts } = { ...controller };
-    const { xmin = 0, xmax = 0, ymin = 0, ymax = 0, zmin = 0, zmax = 0 } = { ...limits };
     const id = payload.id || slugify(name);
     const path = payload.path || `/${id}`;
+    const ax = { ...(defaultAxes[controllerType] || defaultAxes['']), ...ensureObject(axes) };
+    Object.keys(ax).forEach((axis) => {
+        ax[axis] = ensureAxis(ax[axis]);
+    });
 
     return {
         id,
@@ -87,14 +154,7 @@ const ensureWorkspace = (payload) => {
             rtscts: ensureBoolean(rtscts),
             reconnect: ensureBoolean(reconnect),
         },
-        limits: {
-            xmin: ensureNumber(xmin) || 0,
-            xmax: ensureNumber(xmax) || 0,
-            ymin: ensureNumber(ymin) || 0,
-            ymax: ensureNumber(ymax) || 0,
-            zmin: ensureNumber(zmin) || 0,
-            zmax: ensureNumber(zmax) || 0,
-        },
+        axes: ax,
         features: ensureObject(features, defaultFeatures[controllerType] || {}),
     };
 };
@@ -170,6 +230,15 @@ export const read = (req, res) => {
     res.send(ensureWorkspace(record));
 };
 
+const validateAxis = (axis) => {
+    return [
+        [`axes.${axis}.min`, ensureNumber],
+        [`axes.${axis}.max`, ensureNumber],
+        [`axes.${axis}.precision`, ensureNumber],
+        [`axes.${axis}.accuracy`, ensureNumber],
+    ];
+};
+
 export const update = (req, res) => {
     const id = req.params.id;
     const records = getSanitizedRecords();
@@ -185,20 +254,21 @@ export const update = (req, res) => {
     try {
         const nextRecord = req.body;
 
-        [ // [key, ensureType]
+        let validators = [ // [key, ensureType]
             ['name', ensureString],
             ['onboarded', ensureBoolean],
             ['controller.controllerType', ensureString],
             ['controller.port', ensureString],
             ['controller.baudRate', ensureNumber],
-            ['limits.xmin', ensureNumber],
-            ['limits.xmax', ensureNumber],
-            ['limits.ymin', ensureNumber],
-            ['limits.ymax', ensureNumber],
-            ['limits.zmin', ensureNumber],
-            ['limits.zmax', ensureNumber],
             ['features', ensureObject],
-        ].forEach(it => {
+            ['axes', ensureObject],
+        ];
+        const knownAxes = _.get(record, 'axes', {});
+        Object.keys(knownAxes).forEach((axis) => {
+            validators = validators.concat(validateAxis(axis));
+        });
+
+        validators.forEach(it => {
             const [key, ensureType] = it;
             const defaultValue = _.get(record, key);
             const value = _.get(nextRecord, key, defaultValue);

@@ -5,9 +5,7 @@ const PositionLabel = ({ value }) => {
     value = String(value);
     return (
         <div style={{ fontSize: 24, padding: 5, textAlign: 'right' }}>
-            <span>{value.split('.')[0]}</span>
-            <span>.</span>
-            <span>{value.split('.')[1]}</span>
+            <span>{value}</span>
         </div>
     );
 };

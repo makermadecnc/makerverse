@@ -258,7 +258,6 @@ class Visualizer extends Component {
             if (needUpdatePosition) {
                 this.updateCuttingToolPosition();
                 this.updateCuttingPointerPosition();
-                this.updateLimitsPosition();
             }
         }
 
@@ -418,7 +417,7 @@ class Visualizer extends Component {
         this.updateScene();
     }
 
-    createLimitsCuboid(limits) {
+    createLimitsCuboid() {
         const color = colornames('indianred');
         const opacity = 0.5;
         const transparent = true;
@@ -427,10 +426,13 @@ class Visualizer extends Component {
         const gapSize = 1; // The size of the gap.
         const linewidth = 1; // Controls line thickness.
         const scale = 1; // The scale of the dashed part of a line.
-        return new Cuboid({
-            dx: limits.xrange,
-            dy: limits.yrange,
-            dz: limits.zrange,
+        const ranges = {
+            dx: this.workspace.getAxisSettings('x').range,
+            dy: this.workspace.getAxisSettings('y').range,
+            dz: this.workspace.getAxisSettings('z').range,
+        };
+        const cb = {
+            ...ranges,
             color,
             opacity,
             transparent,
@@ -439,7 +441,8 @@ class Visualizer extends Component {
             dashSize,
             gapSize,
             scale,
-        });
+        };
+        return new Cuboid(cb);
     }
 
     createCoordinateSystem(units) {
@@ -658,7 +661,7 @@ class Visualizer extends Component {
                 geometry.rotateX(-Math.PI / 2);
 
                 // Scale the geometry data.
-                geometry.scale(0.5, 0.5, 0.5);
+                geometry.scale(5, 5, 5);
 
                 // Compute the bounding box.
                 geometry.computeBoundingBox();
@@ -684,7 +687,7 @@ class Visualizer extends Component {
                 this.cuttingTool.visible = objects.cuttingTool.visible;
 
                 this.group.add(this.cuttingTool);
-
+                this.updateCuttingToolPosition();
                 // Update the scene
                 this.updateScene();
             });
@@ -698,15 +701,15 @@ class Visualizer extends Component {
             this.cuttingPointer.name = 'CuttingPointer';
             this.cuttingPointer.visible = !objects.cuttingTool.visible;
             this.group.add(this.cuttingPointer);
+            this.updateCuttingPointerPosition();
         }
 
         { // Limits
-            this.limits = this.createLimitsCuboid(this.workspace.limits);
+            this.limits = this.createLimitsCuboid();
             this.limits.name = 'Limits';
             this.limits.visible = objects.limits.visible;
             this.group.add(this.limits);
-
-            this.updateLimitsPosition();
+            this.limits.position.set(0, 0, 0); // always extend from machine origin.
         }
 
         this.scene.add(this.group);
@@ -848,19 +851,20 @@ class Visualizer extends Component {
         this.cuttingTool.rotateZ(-(rpm / 60 * degrees)); // rotate in clockwise direction
     }
 
+    mposToLocalPoint(mpos) {
+        const pivotPoint = this.pivotPoint.get();
+        return this.workspace.mapAxes((axis) => {
+            return mpos[axis.key] - pivotPoint[axis.key];
+        });
+    }
+
     // Update cutting tool position
     updateCuttingToolPosition() {
         if (!this.cuttingTool) {
             return;
         }
-
-        const pivotPoint = this.pivotPoint.get();
-        const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
-        const x0 = wpox - pivotPoint.x;
-        const y0 = wpoy - pivotPoint.y;
-        const z0 = wpoz - pivotPoint.z;
-
-        this.cuttingTool.position.set(x0, y0, z0);
+        const mpos = this.mposToLocalPoint(this.machinePosition);
+        this.cuttingTool.position.set(mpos.x, mpos.y, mpos.z);
     }
 
     // Update cutting pointer position
@@ -868,31 +872,8 @@ class Visualizer extends Component {
         if (!this.cuttingPointer) {
             return;
         }
-
-        const pivotPoint = this.pivotPoint.get();
-        const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
-        const x0 = wpox - pivotPoint.x;
-        const y0 = wpoy - pivotPoint.y;
-        const z0 = wpoz - pivotPoint.z;
-
-        this.cuttingPointer.position.set(x0, y0, z0);
-    }
-
-    // Update limits position
-    updateLimitsPosition() {
-        if (!this.limits) {
-            return;
-        }
-
-        const limits = this.workspace.limits;
-        const pivotPoint = this.pivotPoint.get();
-        const { x: mpox, y: mpoy, z: mpoz } = this.machinePosition;
-        const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
-        const x0 = ((limits.xmin + limits.xmax) / 2) - (mpox - wpox) - pivotPoint.x;
-        const y0 = ((limits.ymin + limits.ymax) / 2) - (mpoy - wpoy) - pivotPoint.y;
-        const z0 = ((limits.zmin + limits.zmax) / 2) - (mpoz - wpoz) - pivotPoint.z;
-
-        this.limits.position.set(x0, y0, z0);
+        const mpos = this.mposToLocalPoint(this.machinePosition);
+        this.cuttingPointer.position.set(mpos.x, mpos.y, mpos.z);
     }
 
     // Make the controls look at the specified position
@@ -934,19 +915,21 @@ class Visualizer extends Component {
             bbox.min.z + (dZ / 2)
         );
 
+        console.log('bb', dX, dY, dZ);
+
         // Set the pivot point to the center of the loaded object
         this.pivotPoint.set(center.x, center.y, center.z);
 
         // Update position
         this.updateCuttingToolPosition();
         this.updateCuttingPointerPosition();
-        this.updateLimitsPosition();
 
         if (this.viewport && dX > 0 && dY > 0) {
             // The minimum viewport is 50x50mm
             const width = Math.max(dX, 50);
             const height = Math.max(dY, 50);
             const target = new THREE.Vector3(0, 0, bbox.max.z);
+            console.log('bb2', width, height, target);
             this.viewport.set(width, height, target);
         }
 
@@ -975,9 +958,9 @@ class Visualizer extends Component {
             this.controls.reset();
         }
 
-        if (this.viewport) {
-            this.viewport.reset();
-        }
+        // if (this.viewport) {
+        //     this.viewport.reset();
+        // }
 
         // Update the scene
         this.updateScene();

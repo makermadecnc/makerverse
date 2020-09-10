@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import log from 'app/lib/log';
 import events from 'events';
-import Limits from 'app/lib/limits';
+import WorkspaceAxis from 'app/lib/workspace-axis';
 import series from 'app/lib/promise-series';
 import auth from 'app/lib/auth';
 import promisify from 'app/lib/promisify';
@@ -165,6 +165,56 @@ class Workspaces extends events.EventEmitter {
         this._record = { ...this._record, values };
         api.workspaces.update(this.id, values);
     }
+    // ---------------------------------------------------------------------------------------------
+    // AXES
+    // Each machine may have its own precision, accurancy, etc. for each axis.
+    // ---------------------------------------------------------------------------------------------
+
+    _axes = {};
+
+    get axes() {
+        return this.mapAxes();
+    }
+
+    getAxisSettings(axis) {
+        if (!_.has(this._axes, axis)) {
+            this._axes[axis] = new WorkspaceAxis(this, axis, this._record.axes[axis]);
+        }
+        return this._axes[axis];
+    }
+
+    // Iterate all axes; callback receives axis object.
+    // Return values from the callback (or else, the settings objects themselves) are mapped into
+    // the response, keyed by the same axisKey.
+    mapAxes(callback = null) {
+        const ret = {};
+        Object.keys(this._record.axes).forEach((axisKey) => {
+            const axis = this.getAxisSettings(axisKey);
+            if (callback) {
+                ret[axisKey] = callback(axis);
+            } else {
+                ret[axisKey] = axis;
+            }
+        });
+        return ret;
+    }
+
+    getAxisSteps(axis) {
+        const settings = this.getAxisSettings(axis);
+        const min = settings.accuracy;
+        const minDigits = `${min}`.replace('.', '').length;
+        const max = settings.range || 500;
+        const maxDigits = `${max}`.replace('.', '').length;
+        const digitRange = maxDigits - minDigits;
+        const steps = [];
+        let v = min;
+        for (let i = 0; i < digitRange; i++) {
+            steps.push(v);
+            v *= 10;
+        }
+        return steps;
+    }
+
     // ---------------------------------------------------------------------------------------------
     // FEATURES
     // Allow for the API to enable/disable anything in this workspace.
@@ -468,13 +518,6 @@ class Workspaces extends events.EventEmitter {
         const secondaryWidgets = this.secondaryWidgets.map(widgetId => widgetId.split(':')[0]);
         const inactiveWidgets = _.difference(allWidgets, centerWidgets, primaryWidgets, secondaryWidgets);
         return inactiveWidgets;
-    }
-
-    get limits() {
-        if (!this._limits) {
-            this._limits = new Limits(this._record.limits);
-        }
-        return this._limits;
     }
 
     // A workspace uses local storage to keep user-level customizations.
