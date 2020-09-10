@@ -3,48 +3,47 @@ import * as THREE from 'three';
 class GridLine {
     group = new THREE.Object3D();
 
-    colorCenterLine = new THREE.Color(0x444444);
+    colorMajor = new THREE.Color(0x444444);
 
-    colorGrid = new THREE.Color(0x888888);
+    colorMinor = new THREE.Color(0x888888);
 
-    constructor(sizeX, stepX, sizeY, stepY, colorCenterLine, colorGrid) {
-        colorCenterLine = new THREE.Color(colorCenterLine) || this.colorCenterLine;
-        colorGrid = new THREE.Color(colorGrid) || this.colorGrid;
+    constructor(isImperial, axes) {
+        const colorMajor = this.colorMajor;
+        const colorMinor = this.colorMinor;
 
-        sizeY = (typeof sizeY === 'undefined') ? sizeX : sizeY;
-        stepY = (typeof stepY === 'undefined') ? stepX : stepY;
-
-        for (let i = -1 * sizeX; i <= sizeX; i += stepX) {
+        axes.x.eachGridLine((xPos, isMajor) => {
             const geometry = new THREE.Geometry();
             const material = new THREE.LineBasicMaterial({
                 vertexColors: THREE.VertexColors
             });
-            const color = (i === 0) ? colorCenterLine : colorGrid;
+            material.opacity = isMajor ? 0.5 : 0.15;
+            const colorGrid = isMajor ? colorMajor : colorMinor;
 
             geometry.vertices.push(
-                new THREE.Vector3(-sizeX, i, 0),
-                new THREE.Vector3(sizeX, i, 0),
+                new THREE.Vector3(xPos, axes.y.min, 0),
+                new THREE.Vector3(xPos, axes.y.max, 0),
             );
-            geometry.colors.push(color, color);
+            geometry.colors.push(colorGrid, colorGrid);
 
             this.group.add(new THREE.Line(geometry, material));
-        }
+        }, isImperial);
 
-        for (let i = -1 * sizeY; i <= sizeY; i += stepY) {
+        axes.y.eachGridLine((yPos, isMajor) => {
             const geometry = new THREE.Geometry();
             const material = new THREE.LineBasicMaterial({
                 vertexColors: THREE.VertexColors
             });
-            const color = (i === 0) ? colorCenterLine : colorGrid;
+            material.opacity = isMajor ? 0.5 : 0.15;
+            const colorGrid = isMajor ? colorMajor : colorMinor;
 
             geometry.vertices.push(
-                new THREE.Vector3(i, -sizeY, 0),
-                new THREE.Vector3(i, sizeY, 0),
+                new THREE.Vector3(axes.x.min, yPos, 0),
+                new THREE.Vector3(axes.x.max, yPos, 0),
             );
-            geometry.colors.push(color, color);
+            geometry.colors.push(colorGrid, colorGrid);
 
             this.group.add(new THREE.Line(geometry, material));
-        }
+        }, isImperial);
 
         return this.group;
     }

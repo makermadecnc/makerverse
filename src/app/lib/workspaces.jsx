@@ -176,24 +176,19 @@ class Workspaces extends events.EventEmitter {
         return this.mapAxes();
     }
 
-    getAxisSettings(axis) {
-        if (!_.has(this._axes, axis)) {
-            this._axes[axis] = new WorkspaceAxis(this, axis, this._record.axes[axis]);
-        }
-        return this._axes[axis];
-    }
-
     // Iterate all axes; callback receives axis object.
     // Return values from the callback (or else, the settings objects themselves) are mapped into
     // the response, keyed by the same axisKey.
     mapAxes(callback = null) {
         const ret = {};
         Object.keys(this._record.axes).forEach((axisKey) => {
-            const axis = this.getAxisSettings(axisKey);
+            if (!_.has(this._axes, axisKey)) {
+                this._axes[axisKey] = new WorkspaceAxis(this, axisKey, this._record.axes[axisKey]);
+            }
             if (callback) {
-                ret[axisKey] = callback(axis);
+                ret[axisKey] = callback(this._axes[axisKey]);
             } else {
-                ret[axisKey] = axis;
+                ret[axisKey] = this._axes[axisKey];
             }
         });
         return ret;

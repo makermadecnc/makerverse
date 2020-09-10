@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import colornames from 'colornames';
 import Toolpath from 'gcode-toolpath';
 import * as THREE from 'three';
@@ -13,8 +12,7 @@ const motionColor = {
 };
 
 class GCodeVisualizer {
-    constructor(controllerState) {
-        this.controllerState = controllerState;
+    constructor() {
         this.group = new THREE.Object3D();
         this.geometry = new THREE.Geometry();
 
@@ -31,27 +29,12 @@ class GCodeVisualizer {
         return this;
     }
 
-    // Convert the gcode coordinate system into the appropriate position, i.e., WPos.
-    localizePoint(point) {
-        const wco = _.get(this.controllerState, 'status.wco');
-        if (!wco) {
-            return point;
-        }
-        return {
-            x: point.x + Number(wco.x),
-            y: point.y + Number(wco.y),
-            z: point.z + Number(wco.z),
-        };
-    }
-
     render(gcode) {
         const toolpath = new Toolpath({
             // @param {object} modal The modal object.
             // @param {object} v1 A 3D vector of the start point.
             // @param {object} v2 A 3D vector of the end point.
             addLine: (modal, v1, v2) => {
-                v1 = this.localizePoint(v1);
-                v2 = this.localizePoint(v2);
                 const { motion } = modal;
                 const color = motionColor[motion] || defaultColor;
                 this.geometry.vertices.push(new THREE.Vector3(v2.x, v2.y, v2.z));
@@ -62,9 +45,6 @@ class GCodeVisualizer {
             // @param {object} v2 A 3D vector of the end point.
             // @param {object} v0 A 3D vector of the fixed point.
             addArcCurve: (modal, v1, v2, v0) => {
-                v0 = this.localizePoint(v0);
-                v1 = this.localizePoint(v1);
-                v2 = this.localizePoint(v2);
                 const { motion, plane } = modal;
                 const isClockwise = (motion === 'G2');
                 const radius = Math.sqrt(

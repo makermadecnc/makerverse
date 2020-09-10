@@ -1,4 +1,7 @@
 import _ from 'lodash';
+import colornames from 'colornames';
+
+const INCH = 25.4;
 
 class WorkspaceAxis {
     static empty = {
@@ -16,18 +19,28 @@ class WorkspaceAxis {
 
     // Convert a value on the axis to a string, rounding it to the appropriate precision.
     getAxisValueString(val, isImperial = null) {
-        if (isImperial === null) {
-            isImperial = this._workspace.isImperialUnits;
-        }
         // Since inches are ~= 1 order of magnitude less precise than millimeters...
-        const precision = this.precision + (isImperial ? 1 : 0);
+        const precision = this.precision + (this._checkImperialUnits(isImperial) ? 1 : 0);
         const str = Number(val || 0).toFixed(precision);
         return precision > 0 ? str : str.split('.')[0];
+    }
+
+    // When used without an argument, uses the workspace setting.
+    _checkImperialUnits(isImperial = null) {
+        return isImperial === null ? this.workspace.isImperialUnits : !!isImperial;
+    }
+
+    get workspace() {
+        return this._workspace;
     }
 
     // x, y, z
     get key() {
         return this._axis;
+    }
+
+    get name() {
+        return this.key.toUpperCase();
     }
 
     _getNumber(key) {
@@ -36,12 +49,12 @@ class WorkspaceAxis {
 
     // Limits: minimum value
     get min() {
-        return this._getNumber('min');
+        return Math.min(this._getNumber('min'), 0);
     }
 
     // Limits: maximum value
     get max() {
-        return this._getNumber('max');
+        return Math.max(this._getNumber('max'), 1);
     }
 
     // Center point between min & max
@@ -67,6 +80,36 @@ class WorkspaceAxis {
 
     get hasLimits() {
         return this.range !== 0;
+    }
+
+    // How much mm to add to each axis around the edges?
+    get pad() {
+        return 50;
+    }
+
+    // Color for the axis when shown in the visualizer.
+    get color() {
+        return colornames('green');
+        // const defs = { x: 'red', y: 'green', z: 'blue' };
+        // return defs[this.key] || 'gray';
+    }
+
+    getAxisLength(imperialUnits = null) {
+        const div = this._checkImperialUnits(imperialUnits) ? INCH : 1;
+        return this.range / div;
+    }
+
+    // Iterate all cells in the axis, invoking the callback with the position, as well as boolean majorStep?
+    // Guaranteed to use even steps, as well as contain a zero position.
+    eachGridLine(callback, imperialUnits = null) {
+        const isImperialUnits = this._checkImperialUnits(imperialUnits);
+        const step = isImperialUnits ? INCH : 10;
+        const majorStep = isImperialUnits ? (12) : 10;
+        const numNegativeSteps = Math.ceil(-this.min / step);
+        const numPositiveSteps = Math.ceil(this.max / step);
+        for (let i = -numNegativeSteps; i <= numPositiveSteps; i += 1) {
+            callback(i * step, (Math.abs(i) % majorStep) === 0);
+        }
     }
 }
 

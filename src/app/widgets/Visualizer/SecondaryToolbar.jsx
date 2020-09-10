@@ -99,9 +99,9 @@ class SecondaryToolbar extends PureComponent {
 
     render() {
         const { is3DView, cameraMode, cameraPosition, camera } = this.props;
-        const xAxis = this.workspace.getAxisSettings('x');
-        const yAxis = this.workspace.getAxisSettings('y');
-        const zAxis = this.workspace.getAxisSettings('z');
+        const xAxis = this.workspace.axes.x;
+        const yAxis = this.workspace.axes.y;
+        const zAxis = this.workspace.axes.z;
 
         return (
             <FlexContainer fluid>

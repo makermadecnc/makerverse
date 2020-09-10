@@ -30,14 +30,6 @@ import {
     CAMERA_MODE_ROTATE
 } from './constants';
 
-const IMPERIAL_GRID_COUNT = 48; // 32 in
-const IMPERIAL_GRID_SPACING = 25.4; // 1 in
-const IMPERIAL_AXIS_LENGTH = IMPERIAL_GRID_SPACING * 12; // 12 in
-const METRIC_GRID_COUNT = 120; // 60 cm
-const METRIC_GRID_SPACING = 10; // 10 mm
-const METRIC_AXIS_LENGTH = METRIC_GRID_SPACING * 30; // 300 mm
-const CAMERA_VIEWPORT_WIDTH = 300; // 300 mm
-const CAMERA_VIEWPORT_HEIGHT = 300; // 300 mm
 const PERSPECTIVE_FOV = 70;
 const PERSPECTIVE_NEAR = 0.001;
 const PERSPECTIVE_FAR = 2000;
@@ -258,6 +250,7 @@ class Visualizer extends Component {
             if (needUpdatePosition) {
                 this.updateCuttingToolPosition();
                 this.updateCuttingPointerPosition();
+                this.updateVisualizerPosition();
             }
         }
 
@@ -387,6 +380,8 @@ class Visualizer extends Component {
         const width = this.getVisibleWidth();
         const height = this.getVisibleHeight();
 
+        console.log('resize', width, height, this.workspace.axes);
+
         if (width === 0 || height === 0) {
             log.warn(`The width (${width}) and height (${height}) cannot be a zero value`);
         }
@@ -406,7 +401,11 @@ class Visualizer extends Component {
         // Initialize viewport at the first time of resizing renderer
         if (!this.viewport) {
             // Defaults to 300x300mm
-            this.viewport = new Viewport(this.camera, CAMERA_VIEWPORT_WIDTH, CAMERA_VIEWPORT_HEIGHT);
+            const viewportDimensions = {
+                x: this.workspace.axes.x.range || 300,
+                y: this.workspace.axes.y.range || 300,
+            };
+            this.viewport = new Viewport(this.camera, viewportDimensions.x, viewportDimensions.y);
         }
 
         this.controls.handleResize();
@@ -427,9 +426,9 @@ class Visualizer extends Component {
         const linewidth = 1; // Controls line thickness.
         const scale = 1; // The scale of the dashed part of a line.
         const ranges = {
-            dx: this.workspace.getAxisSettings('x').range,
-            dy: this.workspace.getAxisSettings('y').range,
-            dz: this.workspace.getAxisSettings('z').range,
+            dx: this.workspace.axes.x.range,
+            dy: this.workspace.axes.y.range,
+            dz: this.workspace.axes.z.range,
         };
         const cb = {
             ...ranges,
@@ -445,22 +444,27 @@ class Visualizer extends Component {
         return new Cuboid(cb);
     }
 
+    axisLabel(axis, positive = true) {
+        const pos = positive ? (axis.max + axis.pad) : (axis.min - axis.pad);
+        return new TextSprite({
+            x: axis.key === 'x' ? pos : 0,
+            y: axis.key === 'y' ? pos : 0,
+            z: axis.key === 'z' ? pos : 0,
+            size: 20,
+            text: axis.name,
+            color: axis.color,
+        });
+    }
+
     createCoordinateSystem(units) {
-        const axisLength = (units === IMPERIAL_UNITS) ? IMPERIAL_AXIS_LENGTH : METRIC_AXIS_LENGTH;
-        const gridCount = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_COUNT : METRIC_GRID_COUNT;
-        const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
+        const isImperial = units === IMPERIAL_UNITS;
+        const axes = this.workspace.axes;
+
         const group = new THREE.Group();
         { // Coordinate Grid
-            const gridLine = new GridLine(
-                gridCount * gridSpacing,
-                gridSpacing,
-                gridCount * gridSpacing,
-                gridSpacing,
-                colornames('blue'), // center line
-                colornames('gray 44') // grid
-            );
+            const gridLine = new GridLine(isImperial, axes);
             _each(gridLine.children, (o) => {
-                o.material.opacity = 0.15;
+                // o.material.opacity = 0.15;
                 o.material.transparent = true;
                 o.material.depthWrite = false;
             });
@@ -469,84 +473,54 @@ class Visualizer extends Component {
         }
 
         { // Coordinate Axes
-            const coordinateAxes = new CoordinateAxes(axisLength);
+            const coordinateAxes = new CoordinateAxes(axes);
             coordinateAxes.name = 'CoordinateAxes';
             group.add(coordinateAxes);
         }
 
         { // Axis Labels
-            const axisXLabel = new TextSprite({
-                x: axisLength + 10,
-                y: 0,
-                z: 0,
-                size: 20,
-                text: 'X',
-                color: colornames('red')
-            });
-            const axisYLabel = new TextSprite({
-                x: 0,
-                y: axisLength + 10,
-                z: 0,
-                size: 20,
-                text: 'Y',
-                color: colornames('green')
-            });
-            const axisZLabel = new TextSprite({
-                x: 0,
-                y: 0,
-                z: axisLength + 10,
-                size: 20,
-                text: 'Z',
-                color: colornames('blue')
-            });
-
-            group.add(axisXLabel);
-            group.add(axisYLabel);
-            group.add(axisZLabel);
+            group.add(this.axisLabel(axes.x));
+            group.add(this.axisLabel(axes.y));
+            group.add(this.axisLabel(axes.z));
         }
 
         return group;
     }
 
-    createGridLineNumbers(units) {
-        const gridCount = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_COUNT : METRIC_GRID_COUNT;
-        const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
-        const textSize = (units === IMPERIAL_UNITS) ? (25.4 / 3) : (10 / 3);
-        const textOffset = (units === IMPERIAL_UNITS) ? (25.4 / 5) : (10 / 5);
-        const group = new THREE.Group();
+    createGridLineNumbers(group, axisKey, units) {
+        const isImperial = units === IMPERIAL_UNITS;
+        const axis = this.workspace.axes[axisKey];
 
-        for (let i = -gridCount; i <= gridCount; ++i) {
-            if (i !== 0) {
-                const textLabel = new TextSprite({
-                    x: i * gridSpacing,
-                    y: textOffset,
-                    z: 0,
-                    size: textSize,
-                    text: (units === IMPERIAL_UNITS) ? i : i * 10,
-                    textAlign: 'center',
-                    textBaseline: 'bottom',
-                    color: colornames('red'),
-                    opacity: 0.5
-                });
-                group.add(textLabel);
+        const textSize = isImperial ? (25.4 / 3) : (10 / 3);
+        const textOffset = isImperial ? (25.4 / 5) : (10 / 5);
+
+        axis.eachGridLine((i, majorStep) => {
+            if (Math.abs(i) <= 1 || !majorStep) {
+                // Skip center line and non-major steps to keep UI clean.
+                return;
             }
-        }
-        for (let i = -gridCount; i <= gridCount; ++i) {
-            if (i !== 0) {
-                const textLabel = new TextSprite({
-                    x: -textOffset,
-                    y: i * gridSpacing,
-                    z: 0,
-                    size: textSize,
-                    text: (units === IMPERIAL_UNITS) ? i : i * 10,
-                    textAlign: 'right',
-                    textBaseline: 'middle',
-                    color: colornames('green'),
-                    opacity: 0.5
-                });
-                group.add(textLabel);
+            const coords = { x: 0, y: 0, z: 0 };
+            if (axisKey === 'x') {
+                coords.x = i;
+                coords.y = textOffset;
+            } else if (axisKey === 'y') {
+                coords.x = -textOffset;
+                coords.y = i;
+            } else if (axisKey === 'z') {
+                coords.z = i;
             }
-        }
+            const v = isImperial ? (i / 25.4) : i;
+            const textLabel = new TextSprite({
+                ...coords,
+                size: textSize,
+                text: axis.getAxisValueString(v, isImperial),
+                textAlign: 'center',
+                textBaseline: 'bottom',
+                color: axis.color,
+                opacity: 0.5
+            });
+            group.add(textLabel);
+        }, isImperial);
 
         return group;
     }
@@ -636,7 +610,9 @@ class Visualizer extends Component {
 
         { // Imperial Grid Line Numbers
             const visible = objects.gridLineNumbers.visible;
-            const imperialGridLineNumbers = this.createGridLineNumbers(IMPERIAL_UNITS);
+            const imperialGridLineNumbers = new THREE.Group();
+            this.createGridLineNumbers(imperialGridLineNumbers, 'x', IMPERIAL_UNITS);
+            this.createGridLineNumbers(imperialGridLineNumbers, 'y', IMPERIAL_UNITS);
             imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
             imperialGridLineNumbers.visible = visible && (units === IMPERIAL_UNITS);
             this.group.add(imperialGridLineNumbers);
@@ -644,7 +620,9 @@ class Visualizer extends Component {
 
         { // Metric Grid Line Numbers
             const visible = objects.gridLineNumbers.visible;
-            const metricGridLineNumbers = this.createGridLineNumbers(METRIC_UNITS);
+            const metricGridLineNumbers = new THREE.Group();
+            this.createGridLineNumbers(metricGridLineNumbers, 'x', METRIC_UNITS);
+            this.createGridLineNumbers(metricGridLineNumbers, 'y', METRIC_UNITS);
             metricGridLineNumbers.name = 'MetricGridLineNumbers';
             metricGridLineNumbers.visible = visible && (units === METRIC_UNITS);
             this.group.add(metricGridLineNumbers);
@@ -876,6 +854,16 @@ class Visualizer extends Component {
         this.cuttingPointer.position.set(mpos.x, mpos.y, mpos.z);
     }
 
+    // Move the visualizer to the work position
+    updateVisualizerPosition() {
+        if (!this.rendered) {
+            return;
+        }
+        const mpos = this.machinePosition;
+        const wpos = this.workPosition;
+        this.rendered.position.set(mpos.x - wpos.x, mpos.y - wpos.y, mpos.z - wpos.z);
+    }
+
     // Make the controls look at the specified position
     lookAt(x, y, z) {
         this.controls.target.x = x;
@@ -899,13 +887,13 @@ class Visualizer extends Component {
         // Remove previous G-code object
         this.unload();
 
-        this.visualizer = new GCodeVisualizer(this.workspace.controllerState);
+        this.visualizer = new GCodeVisualizer();
+        this.rendered = this.visualizer.render(gcode);
+        this.rendered.name = 'Visualizer';
+        this.group.add(this.rendered);
 
-        const obj = this.visualizer.render(gcode);
-        obj.name = 'Visualizer';
-        this.group.add(obj);
-
-        const bbox = getBoundingBox(obj);
+        const bbox = getBoundingBox(this.rendered);
+        const axes = this.workspace.axes;
         const dX = bbox.max.x - bbox.min.x;
         const dY = bbox.max.y - bbox.min.y;
         const dZ = bbox.max.z - bbox.min.z;
@@ -923,11 +911,12 @@ class Visualizer extends Component {
         // Update position
         this.updateCuttingToolPosition();
         this.updateCuttingPointerPosition();
+        this.updateVisualizerPosition();
 
         if (this.viewport && dX > 0 && dY > 0) {
             // The minimum viewport is 50x50mm
-            const width = Math.max(dX, 50);
-            const height = Math.max(dY, 50);
+            const width = Math.max(dX + axes.x.pad * 2, 50);
+            const height = Math.max(dY + axes.y.pad * 2, 50);
             const target = new THREE.Vector3(0, 0, bbox.max.z);
             console.log('bb2', width, height, target);
             this.viewport.set(width, height, target);
@@ -940,9 +929,9 @@ class Visualizer extends Component {
     }
 
     unload() {
-        const visualizerObject = this.group.getObjectByName('Visualizer');
-        if (visualizerObject) {
-            this.group.remove(visualizerObject);
+        if (this.rendered) {
+            this.group.remove(this.rendered);
+            this.rendered = null;
         }
 
         if (this.visualizer) {

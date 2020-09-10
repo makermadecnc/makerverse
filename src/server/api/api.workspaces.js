@@ -58,28 +58,40 @@ const defaultAxes = {
         x: {
             accuracy: 0.1,
             precision: 2,
+            min: -300,
+            max: 300,
         },
         y: {
             accuracy: 0.1,
             precision: 2,
+            min: -300,
+            max: 300,
         },
         z: {
             accuracy: 0.1,
             precision: 2,
+            min: -30,
+            max: 30,
         },
     },
     '': {
         x: {
             accuracy: 0.001,
             precision: 3,
+            min: -300,
+            max: 300,
         },
         y: {
             accuracy: 0.001,
             precision: 3,
+            min: -300,
+            max: 300,
         },
         z: {
             accuracy: 0.001,
             precision: 3,
+            min: -30,
+            max: 30,
         },
     },
 };
