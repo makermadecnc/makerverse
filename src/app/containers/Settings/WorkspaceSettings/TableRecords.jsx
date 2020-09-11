@@ -25,6 +25,36 @@ class TableRecords extends PureComponent {
         actions: PropTypes.object
     };
 
+    renderAxis(name, axis) {
+        return (
+            <FlexContainer fluid gutterWidth={0}>
+                <Row>
+                    <Col width="auto">
+                        <div>
+                            <Axis value={name} sub="min" />
+                            {` = ${axis.min}`}
+                        </div>
+                        <div>
+                            <Axis value={name} sub="max" />
+                            {` = ${axis.max}`}
+                        </div>
+                    </Col>
+                    <Col width="auto" style={{ width: 16 }} />
+                    <Col width="auto">
+                        <div>
+                            <Axis value={name} sub="precision" />
+                            {` = ${axis.precision}`}
+                        </div>
+                        <div>
+                            <Axis value={name} sub="accuracy" />
+                            {` = ${axis.accuracy}`}
+                        </div>
+                    </Col>
+                </Row>
+            </FlexContainer>
+        );
+    }
+
     render() {
         const { state, actions } = this.props;
 
@@ -118,45 +148,19 @@ class TableRecords extends PureComponent {
                         }
                     },
                     {
-                        title: i18n._('Limits'),
-                        key: 'limits',
-                        render: (value, row, index) => {
-                            return (
-                                <FlexContainer fluid gutterWidth={0}>
-                                    <Row>
-                                        <Col width="auto">
-                                            <div>
-                                                <Axis value="X" sub="min" />
-                                                {` = ${_get(row, 'limits.xmin')}`}
-                                            </div>
-                                            <div>
-                                                <Axis value="Y" sub="min" />
-                                                {` = ${_get(row, 'limits.ymin')}`}
-                                            </div>
-                                            <div>
-                                                <Axis value="Z" sub="min" />
-                                                {` = ${_get(row, 'limits.zmin')}`}
-                                            </div>
-                                        </Col>
-                                        <Col width="auto" style={{ width: 16 }} />
-                                        <Col width="auto">
-                                            <div>
-                                                <Axis value="X" sub="max" />
-                                                {` = ${_get(row, 'limits.xmax')}`}
-                                            </div>
-                                            <div>
-                                                <Axis value="Y" sub="max" />
-                                                {` = ${_get(row, 'limits.ymax')}`}
-                                            </div>
-                                            <div>
-                                                <Axis value="Z" sub="max" />
-                                                {` = ${_get(row, 'limits.zmax')}`}
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                </FlexContainer>
-                            );
-                        }
+                        title: 'X',
+                        key: 'x',
+                        render: (value, row, index) => this.renderAxis('X', row.axes.x),
+                    },
+                    {
+                        title: 'Y',
+                        key: 'y',
+                        render: (value, row, index) => this.renderAxis('Y', row.axes.y),
+                    },
+                    {
+                        title: 'Z',
+                        key: 'z',
+                        render: (value, row, index) => this.renderAxis('Z', row.axes.z),
                     },
                     /*
                     {
