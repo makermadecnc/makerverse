@@ -842,7 +842,7 @@ class VisualizerWidget extends PureComponent {
             }
             if (type === MASLOW) {
                 const { status, parserstate } = { ...controllerState };
-                const { mpos } = status;
+                const { mpos, wpos } = status;
                 const { modal = {} } = { ...parserstate };
                 const units = {
                     'G20': IMPERIAL_UNITS,
@@ -867,7 +867,7 @@ class VisualizerWidget extends PureComponent {
                     // Work position are reported in mm ($13=0) or inches ($13=1)
                     workPosition: mapValues({
                         ...state.workPosition,
-                        ...mpos
+                        ...wpos
                     }, val => {
                         return ($13 > 0) ? in2mm(val) : val;
                     })

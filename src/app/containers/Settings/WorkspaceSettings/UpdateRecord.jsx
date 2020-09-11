@@ -23,49 +23,47 @@ class UpdateRecord extends Component {
 
     state = this.getInitialState();
 
+    sanitizeAxis(axis) {
+        return {
+            min: Number(_get(axis, 'min')) || 0,
+            max: Number(_get(axis, 'max')) || 0,
+            precision: Number(_get(axis, 'precision')) || 0,
+            accuracy: Number(_get(axis, 'accuracy')) || 0,
+        };
+    }
+
+    sanitizeValues(values) {
+        return {
+            name: _get(values, 'name', ''),
+            axes: {
+                x: this.sanitizeAxis(_get(values, 'axes.x', {})),
+                y: this.sanitizeAxis(_get(values, 'axes.y', {})),
+                z: this.sanitizeAxis(_get(values, 'axes.z', {})),
+            },
+        };
+    }
+
     getInitialState() {
         const values = this.props.state.modal.params;
 
-        return {
-            values: {
-                name: _get(values, 'name', ''),
-                limits: {
-                    xmin: Number(_get(values, 'limits.xmin')) || 0,
-                    xmax: Number(_get(values, 'limits.xmax')) || 0,
-                    ymin: Number(_get(values, 'limits.ymin')) || 0,
-                    ymax: Number(_get(values, 'limits.ymax')) || 0,
-                    zmin: Number(_get(values, 'limits.zmin')) || 0,
-                    zmax: Number(_get(values, 'limits.zmax')) || 0,
-                }
-            }
-        };
+        return { values: this.sanitizeValues(values) };
     }
 
     onSubmit = (values) => {
         const { id } = this.props.state.modal.params;
         const { updateRecord } = this.props.actions;
 
-        updateRecord(id, {
-            name: _get(values, 'name', ''),
-            limits: {
-                xmin: Number(_get(values, 'limits.xmin')) || 0,
-                xmax: Number(_get(values, 'limits.xmax')) || 0,
-                ymin: Number(_get(values, 'limits.ymin')) || 0,
-                ymax: Number(_get(values, 'limits.ymax')) || 0,
-                zmin: Number(_get(values, 'limits.zmin')) || 0,
-                zmax: Number(_get(values, 'limits.zmax')) || 0,
-            }
-        });
+        updateRecord(id, this.sanitizeValues(values));
     };
 
-    renderLimits = () => (
+    renderAxis = (axisKey) => (
         <FlexContainer fluid gutterWidth={0}>
             <Row>
                 <Col>
-                    <Field name="limits.xmin">
+                    <Field name={`axes.${axisKey}.min`}>
                         {({ input, meta }) => (
                             <FormGroup>
-                                <label><Axis value="X" sub="min" /></label>
+                                <label><Axis value={axisKey.toUpperCase()} sub="min" /></label>
                                 <Input {...input} type="number" />
                                 {meta.touched && meta.error && <Error>{meta.error}</Error>}
                             </FormGroup>
@@ -74,10 +72,10 @@ class UpdateRecord extends Component {
                 </Col>
                 <Col width="auto" style={{ width: 16 }} />
                 <Col>
-                    <Field name="limits.xmax">
+                    <Field name={`axes.${axisKey}.max`}>
                         {({ input, meta }) => (
                             <FormGroup>
-                                <label><Axis value="X" sub="max" /></label>
+                                <label><Axis value={axisKey.toUpperCase()} sub="max" /></label>
                                 <Input {...input} type="number" />
                                 {meta.touched && meta.error && <Error>{meta.error}</Error>}
                             </FormGroup>
@@ -87,10 +85,10 @@ class UpdateRecord extends Component {
             </Row>
             <Row>
                 <Col>
-                    <Field name="limits.ymin">
+                    <Field name={`axes.${axisKey}.precision`}>
                         {({ input, meta }) => (
                             <FormGroup>
-                                <label><Axis value="Y" sub="min" /></label>
+                                <label><Axis value={axisKey.toUpperCase()} sub="precision" /></label>
                                 <Input {...input} type="number" />
                                 {meta.touched && meta.error && <Error>{meta.error}</Error>}
                             </FormGroup>
@@ -99,35 +97,10 @@ class UpdateRecord extends Component {
                 </Col>
                 <Col width="auto" style={{ width: 16 }} />
                 <Col>
-                    <Field name="limits.ymax">
+                    <Field name={`axes.${axisKey}.accuracy`}>
                         {({ input, meta }) => (
                             <FormGroup>
-                                <label><Axis value="Y" sub="max" /></label>
-                                <Input {...input} type="number" />
-                                {meta.touched && meta.error && <Error>{meta.error}</Error>}
-                            </FormGroup>
-                        )}
-                    </Field>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <Field name="limits.zmin">
-                        {({ input, meta }) => (
-                            <FormGroup>
-                                <label><Axis value="Z" sub="min" /></label>
-                                <Input {...input} type="number" />
-                                {meta.touched && meta.error && <Error>{meta.error}</Error>}
-                            </FormGroup>
-                        )}
-                    </Field>
-                </Col>
-                <Col width="auto" style={{ width: 16 }} />
-                <Col>
-                    <Field name="limits.zmax">
-                        {({ input, meta }) => (
-                            <FormGroup>
-                                <label><Axis value="Z" sub="max" /></label>
+                                <label><Axis value={axisKey.toUpperCase()} sub="accuracy" /></label>
                                 <Input {...input} type="number" />
                                 {meta.touched && meta.error && <Error>{meta.error}</Error>}
                             </FormGroup>
@@ -178,9 +151,21 @@ class UpdateRecord extends Component {
                                     </Field>
                                 </SectionGroup>
                                 <SectionGroup style={{ marginBottom: 0 }}>
-                                    <SectionTitle>{i18n._('Limits')}</SectionTitle>
+                                    <SectionTitle>X</SectionTitle>
                                     <Margin left={24}>
-                                        {this.renderLimits()}
+                                        {this.renderAxis('x')}
+                                    </Margin>
+                                </SectionGroup>
+                                <SectionGroup style={{ marginBottom: 0 }}>
+                                    <SectionTitle>Y</SectionTitle>
+                                    <Margin left={24}>
+                                        {this.renderAxis('y')}
+                                    </Margin>
+                                </SectionGroup>
+                                <SectionGroup style={{ marginBottom: 0 }}>
+                                    <SectionTitle>Z</SectionTitle>
+                                    <Margin left={24}>
+                                        {this.renderAxis('z')}
                                     </Margin>
                                 </SectionGroup>
                             </Modal.Body>

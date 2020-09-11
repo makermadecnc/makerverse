@@ -1,4 +1,3 @@
-import colornames from 'colornames';
 import * as THREE from 'three';
 
 const buildAxis = (src, dst, color, dashed) => {
@@ -45,18 +44,18 @@ class CoordinateAxes {
     // Creates an axisHelper with lines of length size.
     // @param {number} size Define the size of the line representing the axes.
     // @see [Drawing the Coordinate Axes]{@http://soledadpenades.com/articles/three-js-tutorials/drawing-the-coordinate-axes/}
-    constructor(size) {
-        const red = colornames('red');
-        const green = colornames('green');
-        const blue = colornames('blue');
+    constructor(axes) {
+        const xcol = axes.x.color;
+        const ycol = axes.y.color;
+        const zcol = axes.z.color;
 
         this.group.add(
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(size, 0, 0), red, false), // +X
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(-size, 0, 0), red, true), // -X
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, size, 0), green, false), // +Y
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -size, 0), green, true), // -Y
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, size), blue, false), // +Z
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -size), blue, true) // -Z
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(axes.x.max, 0, 0), xcol, false), // +X
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(axes.x.min, 0, 0), xcol, true), // -X
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, axes.y.max, 0), ycol, false), // +Y
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, axes.y.min, 0), ycol, true), // -Y
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, axes.z.max), zcol, false), // +Z
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, axes.z.min), zcol, true) // -Z
         );
 
         return this.group;

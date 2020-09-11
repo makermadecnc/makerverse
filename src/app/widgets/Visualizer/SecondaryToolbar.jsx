@@ -99,8 +99,9 @@ class SecondaryToolbar extends PureComponent {
 
     render() {
         const { is3DView, cameraMode, cameraPosition, camera } = this.props;
-        const limits = this.workspace.limits;
-        const showLimits = limits && limits.isValid;
+        const xAxis = this.workspace.axes.x;
+        const yAxis = this.workspace.axes.y;
+        const zAxis = this.workspace.axes.z;
 
         return (
             <FlexContainer fluid>
@@ -264,17 +265,15 @@ class SecondaryToolbar extends PureComponent {
                         )}
                     </Col>
                     <Col width="auto">
-                        {showLimits && (
-                            <div className={styles.limits}>
-                                <span>
-                                    [min] x: {limits.xmin}, y: {limits.ymin}, z: {limits.zmin}
-                                </span>
-                                <br />
-                                <span>
-                                    [max] x: {limits.xmax}, y: {limits.ymax}, z: {limits.zmax}
-                                </span>
-                            </div>
-                        )}
+                        <div className={styles.limits}>
+                            <span>
+                                [min] x: {xAxis.min}, y: {yAxis.min}, z: {zAxis.min}
+                            </span>
+                            <br />
+                            <span>
+                                [max] x: {xAxis.max}, y: {yAxis.max}, z: {zAxis.max}
+                            </span>
+                        </div>
                     </Col>
                 </Row>
             </FlexContainer>

@@ -774,6 +774,7 @@ class CalibrationModal extends PureComponent {
                                         <div
                                             style={{ position: 'absolute', right: '0px', bottom: '0px', width: '40%' }}
                                         >
+                                            <h4>New Accuracy: {Math.max(1, Math.round(result.optimized.maxErrDist * 10) / 10)}mm</h4>
                                             These results must be applied to take effect!
                                             <hr style={{ marginTop: '10px', marginBottom: '10px' }} />
                                             {this.getCalibrationRecommendation(result)}

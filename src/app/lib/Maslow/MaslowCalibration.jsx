@@ -252,6 +252,9 @@ class MaslowCalibration {
             // Set WPos = MPos when they differ.
             gcode.push(`G10 L20 P1 X${mpos.x} Y${mpos.y}`);
         }
+        if (this.opts.cutHoles) {
+            gcode.push(`G0 Z${this.opts.safeTravel}`);
+        }
         gcode.push(`G0 X${p.x} Y${p.y}`);
         if (this.opts.cutHoles) {
             gcode.push(`G0 Z-${this.opts.cutDepth}`);

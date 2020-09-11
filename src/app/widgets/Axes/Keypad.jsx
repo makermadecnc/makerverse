@@ -513,7 +513,7 @@ class Keypad extends PureComponent {
                                     <Repeatable
                                         disabled={!canStepBackward}
                                         style={{ marginRight: 2.5 }}
-                                        repeatDelay={500}
+                                        repeatDelay={1000}
                                         repeatInterval={Math.floor(1000 / 15)}
                                         onHold={actions.stepBackward}
                                         onRelease={actions.stepBackward}
@@ -533,7 +533,7 @@ class Keypad extends PureComponent {
                                     <Repeatable
                                         disabled={!canStepForward}
                                         style={{ marginLeft: 2.5 }}
-                                        repeatDelay={500}
+                                        repeatDelay={1000}
                                         repeatInterval={Math.floor(1000 / 15)}
                                         onHold={actions.stepForward}
                                         onRelease={actions.stepForward}

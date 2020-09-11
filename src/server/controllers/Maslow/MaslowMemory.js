@@ -178,7 +178,8 @@ class MaslowMemory {
                 const lp = this.lastMachinePosition;
                 const mp = payload.mpos;
                 const diff = Math.abs(mp.x - lp.x) + Math.abs(mp.y - lp.y) + Math.abs(mp.z - lp.z);
-                if (this.toMM(diff) > 1) {
+                if (this.toMM(diff) >= 2) {
+                    // mininmum movement is large so as to ignore small Maslow calculation changes.
                     payload.activeState = MASLOW_ACTIVE_STATE_RUN;
                 }
             }
