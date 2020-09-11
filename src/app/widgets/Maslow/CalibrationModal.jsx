@@ -80,6 +80,7 @@ class CalibrationModal extends PureComponent {
         yHome: 0,
         definedHome: false,
         setMachineSettings: false,
+        setWorkspaceSettings: false,
         setFrameSettings: false,
         calibrating: -1,
         calibrated: !!this.props.calibrated,
@@ -227,14 +228,14 @@ class CalibrationModal extends PureComponent {
         this.setState({ ...this.state, setMachineSettings: true });
     }
 
-    setFrameSettings() {
+    setWorkspaceSettings() {
         this.event({ label: 'resize' });
         this.workspace.hasOnboarded = true;
         this.writeSettings({
             machineWidth: this.calibration.kin.opts.machineWidth,
             machineHeight: this.calibration.kin.opts.machineHeight,
         });
-        this.setState({ ...this.state, setFrameSettings: true });
+        this.setState({ ...this.state, setWorkspaceSettings: true });
     }
 
     resetCalibration() {
@@ -247,28 +248,32 @@ class CalibrationModal extends PureComponent {
         this.setState({ ...this.state, resetCalibration: true, definedHome: false, chainError: null });
     }
 
-    defineHome() {
-        this.event({ label: 'home' });
+    setFrameSettings() {
+        this.event({ label: 'frame' });
         this.workspace.hasOnboarded = true;
 
-        const chainLengths = this.calibration.kin.positionToChain(0, this.toMM(this.state.yHome));
-        const chainDiff = Math.abs(chainLengths[0] - chainLengths[1]);
-        const { leftChainTolerance, rightChainTolerance } = this.calibration.kin.opts;
-        const previouslyCalibrated = leftChainTolerance !== 0 || rightChainTolerance !== 0;
-        if (previouslyCalibrated && chainDiff >= 1) {
-            this.setState({ ...this.state, chainError: chainLengths[1] - chainLengths[0] });
-            return;
-        }
-        const origChainLength = Math.round((chainLengths[0] + chainLengths[1]) / 2);
-        this.updateKinematics({ origChainLength: origChainLength });
+        // const chainLengths = this.calibration.kin.positionToChain(0, this.toMM(this.state.yHome));
+        // const chainDiff = Math.abs(chainLengths[0] - chainLengths[1]);
+        // const { leftChainTolerance, rightChainTolerance } = this.calibration.kin.opts;
+        // const previouslyCalibrated = leftChainTolerance !== 0 || rightChainTolerance !== 0;
+        // if (previouslyCalibrated && chainDiff >= 1) {
+        //     this.setState({ ...this.state, chainError: chainLengths[1] - chainLengths[0] });
+        //     return;
+        // }
+        // const origChainLength = Math.round((chainLengths[0] + chainLengths[1]) / 2);
+        // this.updateKinematics({ origChainLength: origChainLength });
+        // this.writeSettings({
+        //     origChainLength: this.calibration.kin.opts.origChainLength,
+        //     motorOffsetY: this.calibration.kin.opts.motorOffsetY,
+        //     distBetweenMotors: this.calibration.kin.opts.distBetweenMotors,
+        // }, () => {
+        //     this.workspace.controller.command('homing');
+        // });
         this.writeSettings({
-            origChainLength: this.calibration.kin.opts.origChainLength,
             motorOffsetY: this.calibration.kin.opts.motorOffsetY,
             distBetweenMotors: this.calibration.kin.opts.distBetweenMotors,
-        }, () => {
-            this.workspace.controller.command('homing');
         });
-        this.setState({ ...this.state, definedHome: true, chainError: null });
+        this.setState({ ...this.state, setFrameSettings: true }); //, chainError: null });
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -310,6 +315,26 @@ class CalibrationModal extends PureComponent {
         };
     }
 
+    renderAlreadyCalibrated() {
+        return (
+            <div className={styles.bottom}>
+                <div>
+                    {'Your machine appears to have been previously calibrated.'}
+                    <br />
+                    {'To change the frame, you must first clear the effects of edge/precision calibration.'}
+                </div>
+                <Button
+                    btnSize="medium"
+                    btnStyle="flat"
+                    onClick={event => this.resetCalibration()}
+                >
+                    <i className="fa fa-warning" />
+                    Reset Chain Tolerances
+                </Button>
+            </div>
+        );
+    }
+
     render() {
         const { actions } = this.props;
         const edge = '0%';
@@ -349,10 +374,11 @@ class CalibrationModal extends PureComponent {
             chainLength,
             calibrating,
             setMachineSettings,
+            setWorkspaceSettings,
             setFrameSettings,
             definedHome,
             result,
-            yHome,
+            // yHome,
             wiping,
             wiped,
             rotationDiskRadius,
@@ -383,6 +409,7 @@ class CalibrationModal extends PureComponent {
         const chainOffBottom = chainOverSprocket === 2 ? '2' : '1';
         const { leftChainTolerance, rightChainTolerance } = this.calibration.kin.opts;
         const offCenter = Math.abs(leftChainTolerance - rightChainTolerance) >= 0.001;
+        const alreadyStartedCalibration = offCenter;
         const canApplyCalibration = this.workspace.isReady;
 
         return (
@@ -435,8 +462,10 @@ class CalibrationModal extends PureComponent {
                         style={{ marginBottom: 10 }}
                     >
                         <NavItem eventKey="machine">{i18n._('Machine')}</NavItem>
+                        <NavItem eventKey="stock">{i18n._('Stock')}</NavItem>
                         <NavItem eventKey="frame">{i18n._('Frame')}</NavItem>
-                        <NavItem eventKey="home">{i18n._('Set Chains')}</NavItem>
+                        <NavItem eventKey="chains">{i18n._('Chains')}</NavItem>
+                        <NavItem eventKey="sled">{i18n._('Sled')}</NavItem>
                         <NavItem eventKey="edge">{i18n._('Edge Calibration')}</NavItem>
                         <NavItem eventKey="precision">{i18n._('Precision Calibration')}</NavItem>
                     </Nav>
@@ -509,7 +538,7 @@ class CalibrationModal extends PureComponent {
                                         (mm)
                                     </div>
                                     {!setMachineSettings && (
-                                        <div style={{ position: 'absolute', bottom: '10px', right: '10px' }}>
+                                        <div className={styles.nextStep}>
                                             <Button
                                                 btnSize="medium"
                                                 btnStyle="flat"
@@ -521,22 +550,27 @@ class CalibrationModal extends PureComponent {
                                         </div>
                                     )}
                                     {setMachineSettings && (
-                                        <div>
+                                        <div className={styles.nextStep}>
                                             {'When you are ready, make your way through each of the tabs, from left to right.'}
                                         </div>
                                     )}
                                 </div>
                             </div>
                         )}
-                        {activeTab === 'frame' && (
+                        {activeTab === 'stock' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.center} style={ this.getBkImageStyle('calibration_dimensions.png') } />
                                 <div className={styles.top}>
-                                    {'Please review your workspace settings and ensure the stock is centered between the motors.'}
+                                    {'Please be certain of the size of your stock before pressing "Next Step."'}
+                                    <br />
+                                    {'Most Maslows use 8\'x4\' plywood. Later calibration steps will rely on this measurement being accurate.'}
                                 </div>
                                 <div className={styles.bottom}>
                                     <div>
-                                        Width:
+                                        {'Note: if your sled is not yet attached, it will be done later in Calibration.'}
+                                    </div>
+                                    <div>
+                                        Stock Width:
                                         <input
                                             type="text"
                                             name="machineWidth"
@@ -547,7 +581,7 @@ class CalibrationModal extends PureComponent {
                                                 this.setState({ machineWidth: e.target.value });
                                             }}
                                         />
-                                        Height:
+                                        Stock Height:
                                         <input
                                             type="text"
                                             name="machineHeight"
@@ -564,27 +598,27 @@ class CalibrationModal extends PureComponent {
                                             Note: you have entered a size different than a standard Maslow (4x8 feet).
                                         </div>
                                     )}
-                                    {!setFrameSettings && (
-                                        <div style={{ position: 'absolute', bottom: '10px', right: '10px' }}>
+                                    {!setWorkspaceSettings && (
+                                        <div className={styles.nextStep}>
                                             <Button
                                                 btnSize="medium"
                                                 btnStyle="flat"
-                                                onClick={event => this.setFrameSettings()}
+                                                onClick={event => this.setWorkspaceSettings()}
                                             >
                                                 <i className="fa fa-check" />
                                                 {i18n._('Next Step')}
                                             </Button>
                                         </div>
                                     )}
-                                    {setFrameSettings && (
-                                        <div>
-                                            {'Now proceed to the "Set Chains" tab.'}
+                                    {setWorkspaceSettings && (
+                                        <div className={styles.nextStep}>
+                                            {'Now proceed to the "Frame" tab.'}
                                         </div>
                                     )}
                                 </div>
                             </div>
                         )}
-                        {activeTab === 'home' && (
+                        {activeTab === 'frame' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.center} style={ this.getBkImageStyle('calibration_motor.png') } />
                                 <div className={styles.top}>
@@ -597,35 +631,17 @@ class CalibrationModal extends PureComponent {
                                     )}
                                     {!chainError && (
                                         <div>
-                                            {'Make sure your sled is as close as possible to the center of stock before proceeding.'}
-                                            <br />
-                                            {'You may need to close this dialog and jog/shuttle the sled into position.'}
+                                            {'Enter approximate measurements, within 6mm (1/4") tolerance. Then, press "Set Frame".'}
                                         </div>
                                     )}
                                 </div>
-                                {offCenter && (
+                                {alreadyStartedCalibration && this.renderAlreadyCalibrated()}
+                                {!alreadyStartedCalibration && (
                                     <div className={styles.bottom}>
                                         <div>
-                                            {'Your machine appears to have been previously calibrated.'}
+                                            {'Use the center of the sprocket (motor axis) for both motor measurements.'}
                                             <br />
-                                            {'To change the chains, you must first clear the effects of edge/precision calibration.'}
-                                        </div>
-                                        <Button
-                                            btnSize="medium"
-                                            btnStyle="flat"
-                                            onClick={event => this.resetCalibration()}
-                                        >
-                                            <i className="fa fa-warning" />
-                                            Reset Chain Tolerances
-                                        </Button>
-                                    </div>
-                                )}
-                                {!offCenter && (
-                                    <div className={styles.bottom}>
-                                        <div>
-                                            {'Measure motorOffsetY coplanar with the workspace. For distBetweenMotors, measure between the centers of the sprockets.'}
-                                            <br />
-                                            {'Enter approximate measurements, within 5mm tolerance. Then, press "Set Chains".'}
+                                            {'Measure motor height coplanar with the stock.'}
                                         </div>
                                         Motor Height:
                                         <input
@@ -649,26 +665,86 @@ class CalibrationModal extends PureComponent {
                                                 this.setState({ distBetweenMotors: e.target.value });
                                             }}
                                         />
-                                        Y Position (advanced):
+                                        {!setFrameSettings && (
+                                            <Button
+                                                btnSize="medium"
+                                                btnStyle="flat"
+                                                className={styles.nextStep}
+                                                onClick={event => this.setFrameSettings()}
+                                            >
+                                                <i className="fa fa-check" />
+                                                {i18n._('Set Frame')}
+                                            </Button>
+                                        )}
+                                        {setFrameSettings && (
+                                            <span className={styles.nextStep}>
+                                                Now, move on to Chains.
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        {activeTab === 'chains' && (
+                            <div className={styles.tabFull}>
+                                <div className={styles.center} style={ this.getBkImageStyle('calibration_overview.png') } />
+                                <div className={styles.top}>
+                                    {chainError && (
+                                        <div>
+                                            {'Setting chains failed!'}
+                                            <br />
+                                            {'Your machine has already begun calibration, and the new chain position differs from the old.'}
+                                        </div>
+                                    )}
+                                    {!chainError && (
+                                        <div>
+                                            {'Your chains need to be marked at a well-known length.'}
+                                            <br />
+                                            {'This is the most important step for successful calibration.'}
+                                        </div>
+                                    )}
+                                </div>
+                                {alreadyStartedCalibration && this.renderAlreadyCalibrated()}
+                                {!alreadyStartedCalibration && (
+                                    <div className={styles.bottom}>
+                                        <div>
+                                            {''}
+                                        </div>
+                                        <strong>Chain</strong>:
+                                        <select
+                                            value={chainOffBottom}
+                                            className={styles.selectInput}
+                                            onChange={e => {
+                                                this.updateKinematics({ chainOverSprocket: e.target.value });
+                                                this.setState({ chainLength: e.target.value });
+                                            }}
+                                        >
+                                            <option value="1">Off Top</option>
+                                            <option value="2">Off Bottom</option>
+                                        </select>
+                                        Full Length:
                                         <input
                                             type="text"
-                                            name="yHome"
+                                            name="chainLength"
                                             className={styles.mmInput}
-                                            value={yHome}
+                                            value={chainLength}
                                             onChange={e => {
-                                                this.setState({ ...this.state, yHome: e.target.value || 0 });
+                                                this.updateKinematics({ chainLength: this.toMM(e.target.value) || 0 });
+                                                this.setState({ chainLength: e.target.value });
                                             }}
                                         />
+                                        (mm)
                                         <Button
                                             btnSize="medium"
                                             btnStyle="flat"
+                                            className={styles.nextStep}
                                             onClick={event => this.defineHome()}
                                         >
                                             <i className="fa fa-check" />
                                             {i18n._('Set Chains')}
                                         </Button>
                                         {definedHome && (
-                                            <span>
+                                            <span className={styles.nextStep}>
                                                 Homed!
                                             </span>
                                         )}

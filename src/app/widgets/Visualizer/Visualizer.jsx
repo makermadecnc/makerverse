@@ -859,7 +859,8 @@ class Visualizer extends Component {
         }
         const mpos = this.machinePosition;
         const wpos = this.workPosition;
-        this.rendered.position.set(mpos.x - wpos.x, mpos.y - wpos.y, mpos.z - wpos.z);
+        const pivotPoint = this.pivotPoint.get();
+        this.rendered.position.set(mpos.x - wpos.x - pivotPoint.x, mpos.y - wpos.y - pivotPoint.y, mpos.z - wpos.z - pivotPoint.z);
     }
 
     // Make the controls look at the specified position
@@ -891,7 +892,7 @@ class Visualizer extends Component {
         this.group.add(this.rendered);
 
         const bbox = getBoundingBox(this.rendered);
-        const axes = this.workspace.axes;
+        // const axes = this.workspace.axes;
         const dX = bbox.max.x - bbox.min.x;
         const dY = bbox.max.y - bbox.min.y;
         const dZ = bbox.max.z - bbox.min.z;
@@ -901,8 +902,6 @@ class Visualizer extends Component {
             bbox.min.z + (dZ / 2)
         );
 
-        console.log('bb', dX, dY, dZ);
-
         // Set the pivot point to the center of the loaded object
         this.pivotPoint.set(center.x, center.y, center.z);
 
@@ -911,14 +910,13 @@ class Visualizer extends Component {
         this.updateCuttingPointerPosition();
         this.updateVisualizerPosition();
 
-        if (this.viewport && dX > 0 && dY > 0) {
-            // The minimum viewport is 50x50mm
-            const width = Math.max(dX + axes.x.pad * 2, 50);
-            const height = Math.max(dY + axes.y.pad * 2, 50);
-            const target = new THREE.Vector3(0, 0, bbox.max.z);
-            console.log('bb2', width, height, target);
-            this.viewport.set(width, height, target);
-        }
+        // if (this.viewport && dX > 0 && dY > 0) {
+        //     // The minimum viewport is 50x50mm
+        //     const width = Math.max(dX + axes.x.pad * 2, 50);
+        //     const height = Math.max(dY + axes.y.pad * 2, 50);
+        //     const target = new THREE.Vector3(0, 0, bbox.max.z);
+        //     this.viewport.set(width, height, target);
+        // }
 
         // Update the scene
         this.updateScene();

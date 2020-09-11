@@ -415,10 +415,7 @@
     "Type": "类型",
     "Size": "大小",
     "Load G-code": "加载G-code",
-    "Upload G-code": "上传 G-code 文档",
     "Browse...": "浏览...",
-    "Resume": "重新开始",
-    "Pause": "暂停",
     "Manual Data Input": "手动输入数据",
     "MDI": "",
     "Button Width": "按钮宽度",
@@ -441,7 +438,6 @@
     "Add": "添加",
     "Custom Jog Distance (mm)": "",
     "Custom Jog Distance (inches)": "",
-    "Limits": "",
     "New Account": "新账号",
     "Hide Limits": "",
     "Show Limits": "",
@@ -534,5 +530,12 @@
     "Machine": "",
     "Frame": "",
     "Move machine to 0/0": "",
-    "Set Chains": ""
+    "Set Chains": "",
+    "Update Firmware": "",
+    "Chains": "",
+    "Set Frame": "",
+    "Stock": "",
+    "Sled": "",
+    "Uplload Program": "",
+    "Upload Program": ""
 }

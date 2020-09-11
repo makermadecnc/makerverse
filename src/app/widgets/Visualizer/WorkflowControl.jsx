@@ -1,6 +1,4 @@
 import classNames from 'classnames';
-import get from 'lodash/get';
-import includes from 'lodash/includes';
 import pick from 'lodash/pick';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
@@ -8,13 +6,10 @@ import { Dropdown, MenuItem } from 'react-bootstrap';
 import Space from 'app/components/Space';
 import i18n from 'app/lib/i18n';
 import Workspaces from 'app/lib/workspaces';
+import { Tooltip } from 'app/components/Tooltip';
 import log from 'app/lib/log';
+import analytics from 'app/lib/analytics';
 import {
-    // Grbl
-    GRBL,
-    GRBL_ACTIVE_STATE_ALARM,
-    // Marlin
-    MARLIN,
     // Workflow
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
@@ -42,6 +37,55 @@ class WorkflowControl extends PureComponent {
     handleClickUpload = (event) => {
         this.fileInputEl.value = null;
         this.fileInputEl.click();
+    };
+
+    event(opts) {
+        analytics.event({
+            ...opts,
+            category: 'interaction',
+            action: 'workflow',
+        });
+    }
+
+    command = {
+        'homing': () => {
+            this.workspace.controller.command('homing');
+            this.event({ label: 'homing' });
+        },
+        'sleep': () => {
+            this.workspace.controller.command('sleep');
+            this.event({ label: 'sleep' });
+        },
+        'unlock': () => {
+            this.workspace.controller.command('unlock');
+            this.event({ label: 'unlock' });
+        },
+        'cyclestart': () => {
+            if (this.canRun) {
+                this.props.actions.handleRun();
+                return;
+            }
+            this.workspace.controller.command('cyclestart');
+            this.event({ label: 'cyclestart' });
+        },
+        'feedhold': () => {
+            if (this.isWorkflowRunning) {
+                this.props.actions.handlePause();
+                return;
+            }
+            this.workspace.controller.command('feedhold');
+            this.event({ label: 'feedhold' });
+        },
+        'reset': () => {
+            this.workspace.controller.command('reset');
+            this.event({ label: 'reset' });
+        },
+        'stop': () => {
+            this.props.actions.handleStop();
+        },
+        'unload': () => {
+            this.props.actions.handleClose();
+        },
     };
 
     handleChangeFile = (event) => {
@@ -81,47 +125,80 @@ class WorkflowControl extends PureComponent {
         }
     };
 
-    canRun() {
-        const { state } = this.props;
-        const { port, gcode, workflow } = state;
-        const controllerType = state.controller.type;
-        const controllerState = state.controller.state;
 
-        if (!port) {
+    renderButtonFeature(key, title, desc, icon, btnType, disabled) {
+        const feature = this.workspace.getFeature(key, { title: title, description: desc || title, icon: icon });
+        btnType = disabled ? 'default' : btnType;
+        return !feature ? '' : (
+            <Tooltip
+                placement="bottom"
+                style={{ color: '#fff' }}
+                content={i18n._(feature.description)}
+                disabled={!!disabled}
+            >
+                <button
+                    type="button"
+                    className={'btn btn-sm btn-' + btnType}
+                    style={{ lineHeight: '18px' }}
+                    onClick={this.command[key]}
+                    disabled={!!disabled}
+                >
+                    {feature.icon && <i className={'fa ' + feature.icon} />}
+                    {feature.icon && feature.title && <Space width="8" />}
+                    {feature.title && i18n._(feature.title)}
+                </button>
+            </Tooltip>
+        );
+    }
+
+    get hasGcode() {
+        return !!(this.props.state.port && this.props.state.gcode.ready);
+    }
+
+    get canRun() {
+        if (!this.hasGcode) {
             return false;
-        }
-        if (!gcode.ready) {
-            return false;
-        }
-        if (!includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state)) {
-            return false;
-        }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_ALARM
-            ];
-            if (includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
         }
 
-        return true;
+        const workflow = this.props.state.workflow;
+        if (workflow.state === WORKFLOW_STATE_PAUSED) {
+            return this.workspace.activeState.isPaused || this.workspace.activeState.isReady;
+        }
+        if (workflow.state === WORKFLOW_STATE_IDLE) {
+            return this.workspace.activeState.isReady;
+        }
+
+        return false;
+    }
+
+
+    get isWorkflowPaused() {
+        return this.hasGcode && this.props.state.workflow.state === WORKFLOW_STATE_PAUSED;
+    }
+
+    get isWorkflowRunning() {
+        return this.hasGcode && this.props.state.workflow.state === WORKFLOW_STATE_RUNNING;
+    }
+
+    get isWorkflowIdle() {
+        return this.hasGcode && this.props.state.workflow.state === WORKFLOW_STATE_IDLE;
     }
 
     render() {
         const { state, actions } = this.props;
-        const { port, gcode, workflow } = state;
-        const canClick = !!port;
-        const isReady = canClick && gcode.ready;
-        const canRun = this.canRun();
-        const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflow.state);
-        const canStop = isReady && includes([WORKFLOW_STATE_PAUSED], workflow.state);
-        const canClose = isReady && includes([WORKFLOW_STATE_IDLE], workflow.state);
-        const canUpload = isReady ? canClose : (canClick && !gcode.loading);
+        const { controller } = state;
+        const activeState = this.workspace.activeState;
+        activeState.updateControllerState(controller.state);
+
+        const isRunningWorkflow = this.isWorkflowRunning;
+        const hasPausedWorkflow = this.isWorkflowPaused;
+        const isWorkflowActive = hasPausedWorkflow || isRunningWorkflow;
+        const canClose = this.isWorkflowIdle;
+        const hasError = !!activeState.error;
+        const isPaused = hasPausedWorkflow || activeState.isPaused;
+        const canPause = isRunningWorkflow || activeState.isRunning;
+        const canPlay = this.canRun || activeState.isPaused;
+        const playPauseText = isPaused ? 'Resume (Cycle Start)' : 'Run Program';
 
         return (
             <div className={styles.workflowControl}>
@@ -141,15 +218,13 @@ class WorkflowControl extends PureComponent {
                         <button
                             type="button"
                             className="btn btn-primary"
-                            title={i18n._('Upload G-code')}
+                            title={i18n._('Uplload Program')}
                             onClick={this.handleClickUpload}
-                            disabled={!canUpload}
                         >
-                            {i18n._('Upload G-code')}
+                            {i18n._('Upload Program')}
                         </button>
                         <Dropdown
                             id="upload-dropdown"
-                            disabled={!canUpload}
                         >
                             <Dropdown.Toggle
                                 bsStyle="primary"
@@ -174,42 +249,18 @@ class WorkflowControl extends PureComponent {
                         </Dropdown>
                     </div>
                     <div className="btn-group btn-group-sm">
-                        <button
-                            type="button"
-                            className="btn btn-default"
-                            title={workflow.state === WORKFLOW_STATE_PAUSED ? i18n._('Resume') : i18n._('Run')}
-                            onClick={actions.handleRun}
-                            disabled={!canRun}
-                        >
-                            <i className="fa fa-play" />
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-default"
-                            title={i18n._('Pause')}
-                            onClick={actions.handlePause}
-                            disabled={!canPause}
-                        >
-                            <i className="fa fa-pause" />
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-default"
-                            title={i18n._('Stop')}
-                            onClick={actions.handleStop}
-                            disabled={!canStop}
-                        >
-                            <i className="fa fa-stop" />
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-default"
-                            title={i18n._('Close')}
-                            onClick={actions.handleClose}
-                            disabled={!canClose}
-                        >
-                            <i className="fa fa-close" />
-                        </button>
+                        {this.renderButtonFeature('cyclestart', null, playPauseText, 'fa-play', 'success', !canPlay)}
+                        {this.renderButtonFeature('feedhold', null, 'Pause execution (feedhold)', 'fa-pause', 'warning', !canPause)}
+                        {isWorkflowActive && !canClose && this.renderButtonFeature('stop', null, 'Stop program execution (progress will be lost)', 'fa-stop', 'danger', !hasPausedWorkflow)}
+                        {canClose && this.renderButtonFeature('unload', null, 'Unload the current program', 'fa-trash', 'danger')}
+                    </div>
+                    <div className="btn-group btn-group-sm">
+                        {this.renderButtonFeature('reset', 'Reset', 'Reset board connection', 'fa-plug', 'danger')}
+                        {activeState.isIdle && this.renderButtonFeature('sleep', 'Sleep', 'Put machine to sleep', 'fa-bed', 'success')}
+                        {(activeState.hasAlarm || hasError) && this.renderButtonFeature('unlock', 'Unlock', 'Clear system alarms and errors', 'fa-unlock-alt', 'warning')}
+                    </div>
+                    <div className="pull-right btn-group btn-group-sm">
+                        {this.renderButtonFeature('homing', 'Set Home', 'Set current position as machine home', 'fa-home', 'primary')}
                     </div>
                     <Dropdown
                         className="hidden"

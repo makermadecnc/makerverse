@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import { ToastNotification } from 'app/components/Notifications';
@@ -21,9 +20,10 @@ class AlertErrorToast extends PureComponent {
 
     controllerEvents = {
         'controller:state': (type, controllerState) => {
+            this.workspace.activeState.updateControllerState(controllerState);
             this.setState({
-                error: _.get(controllerState, 'status.error'),
-                alarm: _.get(controllerState, 'status.alarm'),
+                error: this.workspace.activeState.error,
+                alarm: this.workspace.activeState.alarm,
             });
         }
     };

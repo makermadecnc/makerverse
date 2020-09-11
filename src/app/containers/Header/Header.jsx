@@ -17,7 +17,6 @@ import * as user from 'app/lib/user';
 import store from 'app/store';
 import Workspaces from 'app/lib/workspaces';
 import settings from 'app/config/settings';
-import QuickAccessToolbar from './QuickAccessToolbar';
 import styles from './index.styl';
 
 class Header extends PureComponent {
@@ -251,7 +250,7 @@ class Header extends PureComponent {
         const signedInName = store.get('session.name');
         const hideUserDropdown = !sessionEnabled;
         const showCommands = commands.length > 0;
-        const workspace = Workspaces.findByPath(location.pathname);
+        // const workspace = Workspaces.findByPath(location.pathname);
         const updateMsg = i18n._('A new version of {{name}} is available', { name: settings.productName }) + '. ' +
             i18n._('Version {{version}}', { version: latestVersion.readable }) +
             ` (${moment(lastUpdate).format('LLL')})`;
@@ -429,9 +428,6 @@ class Header extends PureComponent {
                             </MenuItem> */}
                         </NavDropdown>
                     </Nav>
-                    {workspace &&
-                    <QuickAccessToolbar workspaceId={workspace.id} state={this.state} actions={this.actions} />
-                    }
                 </Navbar.Collapse>
             </Navbar>
         );

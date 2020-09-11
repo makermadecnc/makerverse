@@ -17,9 +17,7 @@ import {
     // Units
     IMPERIAL_UNITS,
     METRIC_UNITS,
-    MASLOW,
     GRBL,
-    GRBL_ACTIVE_STATE_IDLE,
     // Marlin
     MARLIN,
     // Workflow
@@ -366,8 +364,6 @@ class ProbeWidget extends PureComponent {
 
     canClick() {
         const { port, workflow } = this.state;
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
 
         if (!port) {
             return false;
@@ -375,23 +371,9 @@ class ProbeWidget extends PureComponent {
         if (workflow.state !== WORKFLOW_STATE_IDLE) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, MASLOW], controllerType)) {
-            return false;
-        }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_IDLE
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
-        }
 
-        return true;
+        this.workspace.activeState.updateControllerState(this.state.controller.state);
+        return this.workspace.activeState.canProbe;
     }
 
     render() {

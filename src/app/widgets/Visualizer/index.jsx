@@ -30,23 +30,12 @@ import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
 import {
+    GRBL,
+    MASLOW,
+    TINYG,
     // Units
     IMPERIAL_UNITS,
     METRIC_UNITS,
-    // Grbl
-    GRBL,
-    GRBL_ACTIVE_STATE_RUN,
-    // Marlin
-    MARLIN,
-    // Smoothie
-    SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_RUN,
-    // TinyG
-    TINYG,
-    TINYG_MACHINE_STATE_RUN,
-    // Maslow
-    MASLOW,
-    MASLOW_ACTIVE_STATE_RUN,
     // Workflow
     WORKFLOW_STATE_RUNNING,
     WORKFLOW_STATE_PAUSED,
@@ -711,171 +700,51 @@ class VisualizerWidget extends PureComponent {
             }));
         },
         'controller:state': (type, controllerState) => {
+            const activeState = this.workspace.activeState;
+            activeState.updateControllerState(controllerState);
+            const units = activeState.isImperialUnits ? IMPERIAL_UNITS : METRIC_UNITS;
+
+            let mposTransform = (val) => {
+                return activeState.isImperialUnits ? in2mm(val) : val;
+            };
+            let wposTransform = mposTransform;
+
             // Grbl
-            if (type === GRBL) {
-                const { status, parserstate } = { ...controllerState };
-                const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
+            if (type === GRBL || type === MASLOW) {
                 const $13 = Number(get(this.workspace.controller.settings, 'settings.$13', 0)) || 0;
+                const reportedInches = $13 > 0;
 
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in mm ($13=0) or inches ($13=1)
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...mpos
-                    }, (val) => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in mm ($13=0) or inches ($13=1)
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, val => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    })
-                }));
-            }
-
-            // Marlin
-            if (type === MARLIN) {
-                const { pos, modal = {} } = { ...controllerState };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in current units
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...pos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in current units
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...pos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    })
-                }));
-            }
-
-            // Smoothie
-            if (type === SMOOTHIE) {
-                const { status, parserstate } = { ...controllerState };
-                const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in current units
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...mpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in current units
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    })
-                }));
+                mposTransform = (val) => {
+                    return reportedInches ? in2mm(val) : val;
+                };
+                wposTransform = mposTransform;
             }
 
             // TinyG
             if (type === TINYG) {
-                const { sr } = { ...controllerState };
-                const { mpos, wpos, modal = {} } = { ...sr };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
+                mposTransform = (val) => {
                     // https://github.com/synthetos/g2/wiki/Status-Reports
                     // Canonical machine position are always reported in millimeters with no offsets.
-                    machinePosition: {
-                        ...state.machinePosition,
-                        ...mpos
-                    },
-                    // Work position are reported in current units, and also apply any offsets.
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    })
-                }));
+                    return val;
+                };
             }
-            if (type === MASLOW) {
-                const { status, parserstate } = { ...controllerState };
-                const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-                const $13 = Number(get(this.workspace.controller.settings, 'settings.$13', 0)) || 0;
 
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in mm ($13=0) or inches ($13=1)
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...mpos
-                    }, (val) => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in mm ($13=0) or inches ($13=1)
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, val => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    })
-                }));
-            }
+            this.setState(state => ({
+                units: units,
+                controller: {
+                    ...state.controller,
+                    type: type,
+                    state: controllerState
+                },
+                machinePosition: mapValues({
+                    ...state.machinePosition,
+                    ...activeState.mpos,
+                }, wposTransform),
+                workPosition: mapValues({
+                    ...state.workPosition,
+                    ...activeState.wpos,
+                }, wposTransform),
+            }));
         }
     };
 
@@ -1010,8 +879,6 @@ class VisualizerWidget extends PureComponent {
 
     isAgitated() {
         const { workflow, disabled, objects } = this.state;
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
 
         if (workflow.state !== WORKFLOW_STATE_RUNNING) {
             return false;
@@ -1024,39 +891,9 @@ class VisualizerWidget extends PureComponent {
         if (!objects.cuttingTool.visible) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG, MASLOW], controllerType)) {
-            return false;
-        }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            if (activeState !== GRBL_ACTIVE_STATE_RUN) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
-            return false;
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            if (activeState !== SMOOTHIE_ACTIVE_STATE_RUN) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            if (machineState !== TINYG_MACHINE_STATE_RUN) {
-                return false;
-            }
-        }
-        if (controllerType === MASLOW) {
-            const activeState = get(controllerState, 'status.activeState');
-            if (activeState !== MASLOW_ACTIVE_STATE_RUN) {
-                return false;
-            }
-        }
 
-        return true;
+        this.workspace.activeState.updateControllerState(this.state.controller.state);
+        return this.workspace.activeState.isAgitated;
     }
 
     render() {

@@ -11,12 +11,12 @@ import Controller from 'cncjs-controller';
 import store from '../store';
 import analytics from './analytics';
 import Hardware from './hardware';
+import ActiveState from './active-state';
 import {
     MASLOW,
     GRBL,
     MARLIN,
     WORKFLOW_STATE_IDLE,
-    GRBL_ACTIVE_STATE_IDLE,
 } from '../constants';
 
 /*
@@ -79,7 +79,10 @@ class Workspaces extends events.EventEmitter {
         super();
         this._record = record;
         this.addControllerEvents(this._controllerEvents);
-        this.hardware = new Hardware(this.controllerAttributes.type);
+
+        const controllerType = this.controllerAttributes.type;
+        this.hardware = new Hardware(controllerType);
+        this.activeState = new ActiveState(controllerType);
     }
 
     // Convenience method which uses the slug (path without prefix slash)
@@ -124,7 +127,7 @@ class Workspaces extends events.EventEmitter {
     }
 
     get isImperialUnits() {
-        return this.isConnected && _.get(this.controller.state, 'parserstate.modal.units') === 'G20';
+        return this.isConnected && this.activeState.isImperialUnits;
     }
 
     set isActive(active) {
@@ -245,8 +248,7 @@ class Workspaces extends events.EventEmitter {
     }
 
     get isReady() {
-        return _.get(this.controller.state, 'status.activeState') === GRBL_ACTIVE_STATE_IDLE &&
-            this.controller.workflow.state === WORKFLOW_STATE_IDLE;
+        return this.activeState.isIdle && this.controller.workflow.state === WORKFLOW_STATE_IDLE;
     }
 
     // Given a code: value map, write all the settings.
@@ -369,6 +371,7 @@ class Workspaces extends events.EventEmitter {
         },
         'controller:state': (type, state) => {
             // log.debug(type, 'state changed', state);
+            this.activeState.updateControllerState(state);
             this._controllerState = state;
         },
         'controller:settings': (type, settings) => {

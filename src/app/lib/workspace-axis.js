@@ -89,7 +89,7 @@ class WorkspaceAxis {
 
     // Color for the axis when shown in the visualizer.
     get color() {
-        return colornames('green');
+        return colornames('black');
         // const defs = { x: 'red', y: 'green', z: 'blue' };
         // return defs[this.key] || 'gray';
     }

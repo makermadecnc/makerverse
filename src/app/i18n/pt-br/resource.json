@@ -415,10 +415,7 @@
     "Type": "Tipo",
     "Size": "Tamanho",
     "Load G-code": "Carregar G-code",
-    "Upload G-code": "Abrir um arquivo G-code",
     "Browse...": "Procurar...",
-    "Resume": "Continuar",
-    "Pause": "Pausar",
     "Manual Data Input": "Entrada manual de dados",
     "MDI": "MDI",
     "Button Width": "Largura do botão",
@@ -441,7 +438,6 @@
     "Add": "Adicionar",
     "Custom Jog Distance (mm)": "",
     "Custom Jog Distance (inches)": "",
-    "Limits": "",
     "New Account": "Nova Conta",
     "Hide Limits": "",
     "Show Limits": "",
@@ -534,5 +530,12 @@
     "Machine": "",
     "Frame": "",
     "Move machine to 0/0": "",
-    "Set Chains": ""
+    "Set Chains": "",
+    "Update Firmware": "",
+    "Chains": "",
+    "Set Frame": "",
+    "Stock": "",
+    "Sled": "",
+    "Uplload Program": "",
+    "Upload Program": ""
 }

@@ -132,6 +132,8 @@ class MaslowController {
     // Workflow
     workflow = null;
 
+    _lastReset = 0;
+
     constructor(engine, options) {
         if (!engine) {
             throw new Error('engine must be specified');
@@ -430,6 +432,13 @@ class MaslowController {
 
         this.runner.on('error', (res) => {
             const code = Number(res.message) || undefined;
+            if (this.isResetting() && code === 1) {
+                // Don't broadcast errors while resetting the connection.
+                // It's normal to see parser errors due to serial interference.
+                this.log.debug(`Ignoring error ${code} (resetting)`);
+                return;
+            }
+
             const error = _.find(MASLOW_ERRORS, { code: code });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
@@ -1066,10 +1075,7 @@ class MaslowController {
             },
             'gcode:unload': () => {
                 this.workflow.stop();
-
-                // Sender
                 this.sender.unload();
-
                 this.emit('gcode:unload');
                 this.event.trigger('gcode:unload');
             },
@@ -1112,11 +1118,18 @@ class MaslowController {
                         this.write('!'); // hold
                     }
 
-                    await delay(500); // delay 500ms
+                    await delay(1000); // delay 1s
 
                     activeState = _.get(this.state, 'status.activeState', '');
                     if (activeState === MASLOW_ACTIVE_STATE_HOLD) {
-                        this.write('\x18'); // ^x
+                        this.performReset();
+                    }
+
+                    await delay(2000); // delay 2s
+
+                    activeState = _.get(this.state, 'status.activeState', '');
+                    if (activeState === MASLOW_ACTIVE_STATE_HOLD) {
+                        this.performReset();
                     }
                 }
             },
@@ -1201,7 +1214,7 @@ class MaslowController {
 
                 this.feeder.reset();
 
-                this.write('\x18'); // ^x
+                this.performReset();
             },
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
@@ -1362,6 +1375,15 @@ class MaslowController {
         }
 
         handler();
+    }
+
+    performReset() {
+        this._lastReset = new Date().getTime();
+        this.write('\x18'); // ^x
+    }
+
+    isResetting() {
+        return (new Date().getTime() - this._lastReset) < 3000;
     }
 
     adjustBufferSize(size) {
