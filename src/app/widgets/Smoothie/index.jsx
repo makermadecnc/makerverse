@@ -5,6 +5,7 @@ import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
+import analytics from 'app/lib/analytics';
 import WidgetConfig from '../WidgetConfig';
 import Smoothie from './Smoothie';
 import Controller from './Controller';
@@ -56,6 +57,9 @@ class SmoothieWidget extends PureComponent {
             this.setState({ minimized: !minimized });
         },
         openModal: (name = MODAL_NONE, params = {}) => {
+            if (name && name.length > 0 && name !== MODAL_NONE) {
+                analytics.modalview(`axes/${name}`);
+            }
             this.setState({
                 modal: {
                     name: name,

@@ -6,6 +6,7 @@ import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import i18n from 'app/lib/i18n';
 import Workspaces from 'app/lib/workspaces';
+import analytics from 'app/lib/analytics';
 import ensurePositiveNumber from 'app/lib/ensure-positive-number';
 import WidgetConfig from '../WidgetConfig';
 import Marlin from './Marlin';
@@ -58,6 +59,9 @@ class MarlinWidget extends PureComponent {
             this.setState({ minimized: !minimized });
         },
         openModal: (name = MODAL_NONE, params = {}) => {
+            if (name && name.length > 0 && name !== MODAL_NONE) {
+                analytics.modalview(`marlin/${name}`);
+            }
             this.setState({
                 modal: {
                     name: name,

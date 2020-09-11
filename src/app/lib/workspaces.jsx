@@ -10,6 +10,7 @@ import io from 'socket.io-client';
 import Controller from 'cncjs-controller';
 import store from '../store';
 import analytics from './analytics';
+import Hardware from './hardware';
 import {
     MASLOW,
     GRBL,
@@ -78,6 +79,7 @@ class Workspaces extends events.EventEmitter {
         super();
         this._record = record;
         this.addControllerEvents(this._controllerEvents);
+        this.hardware = new Hardware(this.controllerAttributes.type);
     }
 
     // Convenience method which uses the slug (path without prefix slash)
@@ -371,6 +373,7 @@ class Workspaces extends events.EventEmitter {
         },
         'controller:settings': (type, settings) => {
             log.debug(type, 'settings changed', settings);
+            this.hardware.updateControllerSettings(settings);
             this._controllerSettings = settings;
         }
     };

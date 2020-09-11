@@ -104,6 +104,9 @@ class AxesWidget extends PureComponent {
             this.setState({ minimized: !minimized });
         },
         openModal: (name = MODAL_NONE, params = {}) => {
+            if (name !== MODAL_NONE) {
+                analytics.modalview(`axes/${name}`);
+            }
             this.setState({
                 modal: {
                     name: name,

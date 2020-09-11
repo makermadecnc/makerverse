@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
+import analytics from 'app/lib/analytics';
 import i18n from 'app/lib/i18n';
 import WidgetConfig from '../WidgetConfig';
 import TinyG from './TinyG';
@@ -50,6 +51,9 @@ class TinyGWidget extends PureComponent {
             this.setState({ minimized: !minimized });
         },
         openModal: (name = MODAL_NONE, params = {}) => {
+            if (name && name.length > 0 && name !== MODAL_NONE) {
+                analytics.modalview(`axes/${name}`);
+            }
             this.setState({
                 modal: {
                     name: name,

@@ -10,6 +10,7 @@ import { Tooltip } from 'app/components/Tooltip';
 import Anchor from 'app/components/Anchor';
 import Space from 'app/components/Space';
 import combokeys from 'app/lib/combokeys';
+import analytics from 'app/lib/analytics';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import * as user from 'app/lib/user';
@@ -281,9 +282,13 @@ class Header extends PureComponent {
                             content={updateMsg}
                         >
                             <div style={{ marginTop: '-15px', paddingLeft: '10px' }}>
-                                <a href={updateUrl} target="_blank" rel="noopener noreferrer">
+                                <analytics.OutboundLink
+                                    eventLabel="update"
+                                    to={updateUrl}
+                                    target="_blank"
+                                >
                                     {i18n._('New update available')}
-                                </a>
+                                </analytics.OutboundLink>
                             </div>
                         </Tooltip>
                     )}

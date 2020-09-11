@@ -8,6 +8,7 @@ import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
+import analytics from 'app/lib/analytics';
 import { in2mm, mapValueToUnits } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
 import Probe from './Probe';
@@ -74,6 +75,9 @@ class ProbeWidget extends PureComponent {
             this.setState({ minimized: !minimized });
         },
         openModal: (name = MODAL_NONE, params = {}) => {
+            if (name && name.length > 0 && name !== MODAL_NONE) {
+                analytics.modalview(`probe/${name}`);
+            }
             this.setState({
                 modal: {
                     name: name,

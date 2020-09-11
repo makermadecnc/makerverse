@@ -2,6 +2,7 @@ import findIndex from 'lodash/findIndex';
 import React, { PureComponent } from 'react';
 import uuid from 'uuid';
 import api from 'app/api';
+import analytics from 'app/lib/analytics';
 import CreateRecord from './CreateRecord';
 import UpdateRecord from './UpdateRecord';
 import TableRecords from './TableRecords';
@@ -107,6 +108,9 @@ class MDI extends PureComponent {
         },
 
         openModal: (name = '', params = {}) => {
+            if (name && name.length > 0) {
+                analytics.modalview(`mdi/${name}`);
+            }
             this.setState(state => ({
                 modal: {
                     name: name,

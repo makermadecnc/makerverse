@@ -17,6 +17,7 @@ import {
 } from 'app/api/constants';
 import settings from 'app/config/settings';
 import Breadcrumbs from 'app/components/Breadcrumbs';
+import analytics from 'app/lib/analytics';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import Workspaces from 'app/lib/workspaces';
@@ -446,6 +447,7 @@ class Settings extends PureComponent {
                     });
             },
             openModal: (name = '', params = {}) => {
+                analytics.modalview(`settings/${name}`);
                 this.setState({
                     workspaces: {
                         ...this.state.workspaces,
@@ -605,6 +607,7 @@ class Settings extends PureComponent {
                     });
             },
             openModal: (name = '', params = {}) => {
+                analytics.modalview(`settings/${name}`);
                 this.setState({
                     userAccounts: {
                         ...this.state.userAccounts,
@@ -763,6 +766,7 @@ class Settings extends PureComponent {
                     });
             },
             openModal: (name = '', params = {}) => {
+                analytics.modalview(`settings/${name}`);
                 this.setState({
                     commands: {
                         ...this.state.commands,
@@ -921,6 +925,7 @@ class Settings extends PureComponent {
                     });
             },
             openModal: (name = '', params = {}) => {
+                analytics.modalview(`settings/${name}`);
                 this.setState({
                     events: {
                         ...this.state.events,

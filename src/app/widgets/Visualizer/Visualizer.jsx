@@ -380,8 +380,6 @@ class Visualizer extends Component {
         const width = this.getVisibleWidth();
         const height = this.getVisibleHeight();
 
-        console.log('resize', width, height, this.workspace.axes);
-
         if (width === 0 || height === 0) {
             log.warn(`The width (${width}) and height (${height}) cannot be a zero value`);
         }
