@@ -415,10 +415,7 @@
     "Type": "Type",
     "Size": "Size",
     "Load G-code": "Load G-code",
-    "Upload G-code": "Upload G-code",
     "Browse...": "Browse...",
-    "Resume": "Resume",
-    "Pause": "Pause",
     "Manual Data Input": "Manual Data Input",
     "MDI": "MDI",
     "Button Width": "Button Width",
@@ -441,7 +438,6 @@
     "Add": "Add",
     "Custom Jog Distance (mm)": "Custom Jog Distance (mm)",
     "Custom Jog Distance (inches)": "Custom Jog Distance (inches)",
-    "Limits": "Limits",
     "New Account": "New Account",
     "Hide Limits": "Hide Limits",
     "Show Limits": "Show Limits",
@@ -534,5 +530,12 @@
     "Machine": "Machine",
     "Frame": "Frame",
     "Move machine to 0/0": "Move machine to 0/0",
-    "Set Chains": "Set Chains"
+    "Set Chains": "Set Chains",
+    "Update Firmware": "Update Firmware",
+    "Chains": "Chains",
+    "Set Frame": "Set Frame",
+    "Stock": "Stock",
+    "Sled": "Sled",
+    "Uplload Program": "Uplload Program",
+    "Upload Program": "Upload Program"
 }

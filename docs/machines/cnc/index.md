@@ -12,8 +12,8 @@ has_children: true
 
 _Please read the [Maslow-specific instructions](/machines/cnc/maslow)._
 
-- [Maslow Mega](https://github.com/WebControlCNC/Firmware/tree/release/holey) (Baud Rate: 38400)
-- [Maslow Due](https://github.com/makermadecnc/MaslowDue) (Baud Rate: 57600)
+- [Arduino Mega](https://github.com/WebControlCNC/Firmware/tree/release/holey): Maslow "Classic" (JumpStart Kit) (Baud Rate: 38400)
+- [Arduino Due](https://github.com/makermadecnc/MaslowDue): M2 (Baud Rate: 57600)
 
 #### Tested On
 

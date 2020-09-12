@@ -5,6 +5,7 @@ import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import i18n from 'app/lib/i18n';
 import Workspaces from 'app/lib/workspaces';
+import analytics from 'app/lib/analytics';
 import WidgetConfig from '../WidgetConfig';
 import MaslowPanels from './MaslowPanels';
 import InformationModal from './InformationModal';
@@ -57,6 +58,9 @@ class MaslowWidget extends PureComponent {
             this.setState({ minimized: !minimized });
         },
         openModal: (name = MODAL_NONE, params = {}, opts = {}) => {
+            if (name && name.length > 0 && name !== MODAL_NONE) {
+                analytics.modalview(`axes/${name}`);
+            }
             this.setState({
                 modal: {
                     ...opts,

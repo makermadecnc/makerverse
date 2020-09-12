@@ -415,10 +415,7 @@
     "Type": "Тип",
     "Size": "Размер",
     "Load G-code": "",
-    "Upload G-code": "Загрузить G-код",
     "Browse...": "",
-    "Resume": "",
-    "Pause": "Пауза",
     "Manual Data Input": "",
     "MDI": "",
     "Button Width": "",
@@ -441,7 +438,6 @@
     "Add": "Добавить",
     "Custom Jog Distance (mm)": "",
     "Custom Jog Distance (inches)": "",
-    "Limits": "",
     "New Account": "Создать учетную запись",
     "Hide Limits": "",
     "Show Limits": "",
@@ -534,5 +530,12 @@
     "Machine": "",
     "Frame": "",
     "Move machine to 0/0": "",
-    "Set Chains": ""
+    "Set Chains": "",
+    "Update Firmware": "",
+    "Chains": "",
+    "Set Frame": "",
+    "Stock": "",
+    "Sled": "",
+    "Uplload Program": "",
+    "Upload Program": ""
 }

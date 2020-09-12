@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
@@ -75,16 +74,11 @@ class QuickAccessToolbar extends PureComponent {
     }
 
     render() {
-        const { controllerState } = this.props.state;
-        const activeState = _.get(controllerState, 'status.activeState', '').toLowerCase();
         return (
             <div className={styles.quickAccessToolbar}>
                 <ul className="nav navbar-nav">
                     <li className="btn-group btn-group-sm" role="group">
                         { this.renderButtonFeature('homing', 'Set Home', 'Set current position as machine home', 'fa-home', 'primary') }
-                        { this.renderButtonFeature('sleep', 'Sleep', 'Put machine to sleep', 'fa-bed', 'success', activeState !== 'idle') }
-                        { this.renderButtonFeature('unlock', 'Unlock', 'Clear system alarm', 'fa-unlock-alt', 'warning', activeState !== 'alarm') }
-                        { this.renderButtonFeature('reset', 'Reset', 'Reset board connection', 'fa-undo', 'danger') }
                     </li>
                 </ul>
             </div>

@@ -150,6 +150,7 @@ const ensureWorkspace = (payload) => {
     const id = payload.id || slugify(name);
     const path = payload.path || `/${id}`;
     const ax = { ...(defaultAxes[controllerType] || defaultAxes['']), ...ensureObject(axes) };
+    const ft = { ...(defaultFeatures[controllerType] || {}), ...ensureObject(features) };
     Object.keys(ax).forEach((axis) => {
         ax[axis] = ensureAxis(ax[axis]);
     });
@@ -167,7 +168,7 @@ const ensureWorkspace = (payload) => {
             reconnect: ensureBoolean(reconnect),
         },
         axes: ax,
-        features: ensureObject(features, defaultFeatures[controllerType] || {}),
+        features: ft,
     };
 };
 

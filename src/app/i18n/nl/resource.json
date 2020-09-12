@@ -415,10 +415,7 @@
     "Type": "Type",
     "Size": "Grootte",
     "Load G-code": "Laad G-code",
-    "Upload G-code": "Upload G-code",
     "Browse...": "Bladeren",
-    "Resume": "Vervolg",
-    "Pause": "Pause",
     "Manual Data Input": "",
     "MDI": "",
     "Button Width": "",
@@ -441,7 +438,6 @@
     "Add": "Toevoegen",
     "Custom Jog Distance (mm)": "",
     "Custom Jog Distance (inches)": "",
-    "Limits": "",
     "New Account": "Nieuw account",
     "Hide Limits": "",
     "Show Limits": "",
@@ -534,5 +530,12 @@
     "Machine": "",
     "Frame": "",
     "Move machine to 0/0": "",
-    "Set Chains": ""
+    "Set Chains": "",
+    "Update Firmware": "",
+    "Chains": "",
+    "Set Frame": "",
+    "Stock": "",
+    "Sled": "",
+    "Uplload Program": "",
+    "Upload Program": ""
 }

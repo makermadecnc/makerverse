@@ -1,7 +1,5 @@
 import cx from 'classnames';
-import ensureArray from 'ensure-array';
 import get from 'lodash/get';
-import includes from 'lodash/includes';
 import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
@@ -14,7 +12,7 @@ import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
 import Workspaces from 'app/lib/workspaces';
 import analytics from 'app/lib/analytics';
-import { in2mm, mapPositionToUnits } from 'app/lib/units';
+import { mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import Axes from './Axes';
@@ -24,29 +22,11 @@ import ShuttleControl from './ShuttleControl';
 import {
     // Units
     IMPERIAL_UNITS,
-    IMPERIAL_STEPS,
     METRIC_UNITS,
-    METRIC_STEPS,
     // Grbl
     GRBL,
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_RUN,
     // Marlin
     MARLIN,
-    // Smoothie
-    SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_IDLE,
-    SMOOTHIE_ACTIVE_STATE_RUN,
-    // TinyG
-    TINYG,
-    TINYG_MACHINE_STATE_READY,
-    TINYG_MACHINE_STATE_STOP,
-    TINYG_MACHINE_STATE_END,
-    TINYG_MACHINE_STATE_RUN,
-    // Maslow
-    MASLOW,
-    MASLOW_ACTIVE_STATE_IDLE,
-    MASLOW_ACTIVE_STATE_RUN,
     // Workflow
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
@@ -104,6 +84,9 @@ class AxesWidget extends PureComponent {
             this.setState({ minimized: !minimized });
         },
         openModal: (name = MODAL_NONE, params = {}) => {
+            if (name !== MODAL_NONE) {
+                analytics.modalview(`axes/${name}`);
+            }
             this.setState({
                 modal: {
                     name: name,
@@ -135,22 +118,14 @@ class AxesWidget extends PureComponent {
 
             if (units === IMPERIAL_UNITS) {
                 const step = this.config.get('jog.imperial.step');
-                const imperialJogDistances = ensureArray(this.config.get('jog.imperial.distances', []));
-                const imperialJogSteps = [
-                    ...imperialJogDistances,
-                    ...IMPERIAL_STEPS
-                ];
+                const imperialJogSteps = this.workspace.imperialJogSteps;
                 const distance = Number(imperialJogSteps[step]) || 0;
                 return distance;
             }
 
             if (units === METRIC_UNITS) {
                 const step = this.config.get('jog.metric.step');
-                const metricJogDistances = ensureArray(this.config.get('jog.metric.distances', []));
-                const metricJogSteps = [
-                    ...metricJogDistances,
-                    ...METRIC_STEPS
-                ];
+                const metricJogSteps = this.workspace.metricJogSteps;
                 const distance = Number(metricJogSteps[step]) || 0;
                 return distance;
             }
@@ -187,18 +162,6 @@ class AxesWidget extends PureComponent {
             const gcode = `G10 L20 P${p} ${axis}${value}`;
             this.workspace.controller.command('gcode', gcode);
         },
-        jog: (params = {}) => {
-            const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-            this.workspace.controller.command('gcode', 'G91'); // relative
-            this.workspace.controller.command('gcode', 'G0 ' + s);
-            this.workspace.controller.command('gcode', 'G90'); // absolute
-            this.event({ label: 'move' });
-        },
-        move: (params = {}) => {
-            const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-            this.workspace.controller.command('gcode', 'G0 ' + s);
-            this.event({ label: 'jog' });
-        },
         toggleMDIMode: () => {
             this.setState(state => ({
                 mdi: {
@@ -223,18 +186,27 @@ class AxesWidget extends PureComponent {
                 }
             }));
         },
+        jog: (params = {}) => {
+            const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
+            this.workspace.controller.command('gcode', 'G91'); // relative
+            this.workspace.controller.command('gcode', 'G0 ' + s);
+            this.workspace.controller.command('gcode', 'G90'); // absolute
+            this.event({ label: 'jog' });
+        },
+        move: (params = {}) => {
+            const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
+            this.workspace.controller.command('gcode', 'G0 ' + s);
+            this.event({ label: 'move' });
+        },
         selectStep: (value = '') => {
             const step = Number(value);
-            this.event({ label: `${step}${this.state.jog.units}` });
             this.setState(state => ({
                 jog: {
                     ...state.jog,
                     imperial: {
-                        ...state.jog.imperial,
                         step: (state.units === IMPERIAL_UNITS) ? step : state.jog.imperial.step,
                     },
                     metric: {
-                        ...state.jog.metric,
                         step: (state.units === METRIC_UNITS) ? step : state.jog.metric.step
                     }
                 }
@@ -242,26 +214,18 @@ class AxesWidget extends PureComponent {
         },
         stepForward: () => {
             this.setState(state => {
-                const imperialJogSteps = [
-                    ...state.jog.imperial.distances,
-                    ...IMPERIAL_STEPS
-                ];
-                const metricJogSteps = [
-                    ...state.jog.metric.distances,
-                    ...METRIC_STEPS
-                ];
+                const imperialJogSteps = this.workspace.imperialJogSteps;
+                const metricJogSteps = this.workspace.metricJogSteps;
 
                 return {
                     jog: {
                         ...state.jog,
                         imperial: {
-                            ...state.jog.imperial,
                             step: (state.units === IMPERIAL_UNITS)
                                 ? limit(state.jog.imperial.step + 1, 0, imperialJogSteps.length - 1)
                                 : state.jog.imperial.step
                         },
                         metric: {
-                            ...state.jog.metric,
                             step: (state.units === METRIC_UNITS)
                                 ? limit(state.jog.metric.step + 1, 0, metricJogSteps.length - 1)
                                 : state.jog.metric.step
@@ -272,26 +236,18 @@ class AxesWidget extends PureComponent {
         },
         stepBackward: () => {
             this.setState(state => {
-                const imperialJogSteps = [
-                    ...state.jog.imperial.distances,
-                    ...IMPERIAL_STEPS
-                ];
-                const metricJogSteps = [
-                    ...state.jog.metric.distances,
-                    ...METRIC_STEPS
-                ];
+                const imperialJogSteps = this.workspace.imperialJogSteps;
+                const metricJogSteps = this.workspace.metricJogSteps;
 
                 return {
                     jog: {
                         ...state.jog,
                         imperial: {
-                            ...state.jog.imperial,
                             step: (state.units === IMPERIAL_UNITS)
                                 ? limit(state.jog.imperial.step - 1, 0, imperialJogSteps.length - 1)
                                 : state.jog.imperial.step,
                         },
                         metric: {
-                            ...state.jog.metric,
                             step: (state.units === METRIC_UNITS)
                                 ? limit(state.jog.metric.step - 1, 0, metricJogSteps.length - 1)
                                 : state.jog.metric.step
@@ -302,26 +258,18 @@ class AxesWidget extends PureComponent {
         },
         stepNext: () => {
             this.setState(state => {
-                const imperialJogSteps = [
-                    ...state.jog.imperial.distances,
-                    ...IMPERIAL_STEPS
-                ];
-                const metricJogSteps = [
-                    ...state.jog.metric.distances,
-                    ...METRIC_STEPS
-                ];
+                const imperialJogSteps = this.workspace.imperialJogSteps;
+                const metricJogSteps = this.workspace.metricJogSteps;
 
                 return {
                     jog: {
                         ...state.jog,
                         imperial: {
-                            ...state.jog.imperial,
                             step: (state.units === IMPERIAL_UNITS)
                                 ? (state.jog.imperial.step + 1) % imperialJogSteps.length
                                 : state.jog.imperial.step,
                         },
                         metric: {
-                            ...state.jog.metric,
                             step: (state.units === METRIC_UNITS)
                                 ? (state.jog.metric.step + 1) % metricJogSteps.length
                                 : state.jog.metric.step
@@ -468,171 +416,20 @@ class AxesWidget extends PureComponent {
             }));
         },
         'controller:state': (type, controllerState) => {
-            // Grbl
-            if (type === GRBL) {
-                const { status, parserstate } = { ...controllerState };
-                const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-                const $13 = Number(get(this.workspace.controller.settings, 'settings.$13', 0)) || 0;
+            const activeState = this.workspace.activeState;
+            activeState.updateControllerState(controllerState);
+            const units = activeState.isImperialUnits ? IMPERIAL_UNITS : METRIC_UNITS;
 
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in mm ($13=0) or inches ($13=1)
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...mpos
-                    }, (val) => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in mm ($13=0) or inches ($13=1)
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, val => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    })
-                }));
-            }
-
-            // Marlin
-            if (type === MARLIN) {
-                const { pos, modal = {} } = { ...controllerState };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position is always reported in mm
-                    machinePosition: {
-                        ...state.machinePosition,
-                        ...pos
-                    },
-                    // Work position is always reported in mm
-                    workPosition: {
-                        ...state.workPosition,
-                        ...pos
-                    }
-                }));
-            }
-
-            // Smoothie
-            if (type === SMOOTHIE) {
-                const { status, parserstate } = { ...controllerState };
-                const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in current units
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...mpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in current units
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    })
-                }));
-            }
-
-            // TinyG
-            if (type === TINYG) {
-                const { sr } = { ...controllerState };
-                const { mpos, wpos, modal = {} } = { ...sr };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // https://github.com/synthetos/g2/wiki/Status-Reports
-                    // Canonical machine position are always reported in millimeters with no offsets.
-                    machinePosition: {
-                        ...state.machinePosition,
-                        ...mpos
-                    },
-                    // Work position are reported in current units, and also apply any offsets.
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    })
-                }));
-            }
-
-            // Maslow
-            if (type === MASLOW) {
-                const { status, parserstate } = { ...controllerState };
-                const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-                const classic = get(this.workspace.controller.settings, 'firmware.name') === 'MaslowClassic';
-                const $13 = classic ? units === IMPERIAL_UNITS
-                    : Number(get(this.workspace.controller.settings, 'settings.$13', 0)) || 0;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in mm ($13=0) or inches ($13=1)
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...mpos
-                    }, (val) => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in mm ($13=0) or inches ($13=1)
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, val => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    })
-                }));
-            }
+            this.setState(state => ({
+                units: units,
+                controller: {
+                    ...state.controller,
+                    type: type,
+                    state: controllerState
+                },
+                machinePosition: this.workspace.mpos,
+                workPosition: this.workspace.wpos,
+            }));
         }
     };
 
@@ -727,11 +524,9 @@ class AxesWidget extends PureComponent {
                 keypad: this.config.get('jog.keypad'),
                 imperial: {
                     step: this.config.get('jog.imperial.step'),
-                    distances: ensureArray(this.config.get('jog.imperial.distances', []))
                 },
                 metric: {
                     step: this.config.get('jog.metric.step'),
-                    distances: ensureArray(this.config.get('jog.metric.distances', []))
                 }
             },
             mdi: {
@@ -771,8 +566,6 @@ class AxesWidget extends PureComponent {
 
     canClick() {
         const { port, workflow } = this.state;
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
 
         if (!port) {
             return false;
@@ -780,56 +573,8 @@ class AxesWidget extends PureComponent {
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG, MASLOW], controllerType)) {
-            return false;
-        }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_IDLE,
-                GRBL_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Ignore
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                SMOOTHIE_ACTIVE_STATE_IDLE,
-                SMOOTHIE_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            const states = [
-                TINYG_MACHINE_STATE_READY,
-                TINYG_MACHINE_STATE_STOP,
-                TINYG_MACHINE_STATE_END,
-                TINYG_MACHINE_STATE_RUN
-            ];
-            if (!includes(states, machineState)) {
-                return false;
-            }
-        }
-        if (controllerType === MASLOW) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                MASLOW_ACTIVE_STATE_IDLE,
-                MASLOW_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-
-        return true;
+        this.workspace.activeState.updateControllerState(this.state.controller.state);
+        return this.workspace.activeState.canShuttle;
     }
 
     render() {
@@ -961,21 +706,11 @@ class AxesWidget extends PureComponent {
                             config={config}
                             onSave={() => {
                                 const axes = config.get('axes', DEFAULT_AXES);
-                                const imperialJogDistances = ensureArray(config.get('jog.imperial.distances', []));
-                                const metricJogDistances = ensureArray(config.get('jog.metric.distances', []));
 
                                 this.setState(state => ({
                                     axes: axes,
                                     jog: {
                                         ...state.jog,
-                                        imperial: {
-                                            ...state.jog.imperial,
-                                            distances: imperialJogDistances
-                                        },
-                                        metric: {
-                                            ...state.jog.metric,
-                                            distances: metricJogDistances
-                                        }
                                     }
                                 }));
 

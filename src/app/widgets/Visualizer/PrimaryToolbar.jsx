@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import { Button } from 'app/components/Buttons';
 import Dropdown, { MenuItem } from 'app/components/Dropdown';
-import { Tooltip } from 'app/components/Tooltip';
 import I18n from 'app/components/I18n';
 import Space from 'app/components/Space';
 import Workspaces from 'app/lib/workspaces';
@@ -59,17 +58,6 @@ class PrimaryToolbar extends PureComponent {
         });
     }
 
-    command = {
-        'cyclestart': () => {
-            this.workspace.controller.command('cyclestart');
-            this.event({ label: 'cyclestart' });
-        },
-        'feedhold': () => {
-            this.workspace.controller.command('feedhold');
-            this.event({ label: 'feedhold' });
-        },
-    };
-
     renderControllerType() {
         const { state } = this.props;
         const controllerType = state.controller.type;
@@ -99,34 +87,10 @@ class PrimaryToolbar extends PureComponent {
         return defaultWCS;
     }
 
-    renderButtonFeature(key, title, desc, icon, btnType) {
-        const feature = this.workspace.getFeature(key, { title: title, description: desc || title, icon: icon });
-        return !feature ? '' : (
-            <Tooltip
-                placement="bottom"
-                style={{ color: '#fff' }}
-                content={i18n._(feature.description)}
-            >
-                <button
-                    type="button"
-                    className={'btn btn-sm btn-' + btnType}
-                    style={{ lineHeight: '18px' }}
-                    onClick={this.command[key]}
-                >
-                    {feature.icon && <i className={'fa ' + feature.icon} />}
-                    {feature.icon && <Space width="8" />}
-                    {i18n._(feature.title)}
-                </button>
-            </Tooltip>
-        );
-    }
-
 
     render() {
         const { state, actions } = this.props;
         const { disabled, gcode, projection, objects } = state;
-        const controllerState = state.controller.state;
-        const activeState = _.get(controllerState, 'status.activeState', '').toLowerCase();
         const canSendCommand = this.canSendCommand();
         const canToggleOptions = WebGL.isWebGLAvailable() && !disabled;
         const wcs = this.getWorkCoordinateSystem();
@@ -138,10 +102,6 @@ class PrimaryToolbar extends PureComponent {
                     workspaceId={this.workspace.id}
                     controller={state.controller}
                 />
-                <span style={{ paddingLeft: '10px' }}>
-                    {activeState === 'run' && this.renderButtonFeature('feedhold', 'Feedhold', 'Feedhold', 'fa-pause', 'warning')}
-                    {activeState === 'hold' && this.renderButtonFeature('cyclestart', 'Cycle Start', 'Cycle Start', 'fa-play', 'success')}
-                </span>
                 <div className="pull-right">
                     <Dropdown
                         style={{ marginRight: 5 }}

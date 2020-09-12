@@ -10,12 +10,14 @@ import io from 'socket.io-client';
 import Controller from 'cncjs-controller';
 import store from '../store';
 import analytics from './analytics';
+import Hardware from './hardware';
+import ActiveState from './active-state';
 import {
     MASLOW,
     GRBL,
     MARLIN,
+    TINYG,
     WORKFLOW_STATE_IDLE,
-    GRBL_ACTIVE_STATE_IDLE,
 } from '../constants';
 
 /*
@@ -78,6 +80,10 @@ class Workspaces extends events.EventEmitter {
         super();
         this._record = record;
         this.addControllerEvents(this._controllerEvents);
+
+        const controllerType = this.controllerAttributes.type;
+        this.hardware = new Hardware(controllerType);
+        this.activeState = new ActiveState(controllerType);
     }
 
     // Convenience method which uses the slug (path without prefix slash)
@@ -122,7 +128,7 @@ class Workspaces extends events.EventEmitter {
     }
 
     get isImperialUnits() {
-        return this.isConnected && _.get(this.controller.state, 'parserstate.modal.units') === 'G20';
+        return this.isConnected && this.activeState.isImperialUnits;
     }
 
     set isActive(active) {
@@ -167,7 +173,7 @@ class Workspaces extends events.EventEmitter {
     }
     // ---------------------------------------------------------------------------------------------
     // AXES
-    // Each machine may have its own precision, accurancy, etc. for each axis.
+    // Each machine may have its own precision, accuracy, etc. for each axis.
     // ---------------------------------------------------------------------------------------------
 
     _axes = {};
@@ -194,20 +200,65 @@ class Workspaces extends events.EventEmitter {
         return ret;
     }
 
-    getAxisSteps(axis) {
-        const settings = this.getAxisSettings(axis);
-        const min = settings.accuracy;
-        const minDigits = `${min}`.replace('.', '').length;
-        const max = settings.range || 500;
-        const maxDigits = `${max}`.replace('.', '').length;
-        const digitRange = maxDigits - minDigits;
-        const steps = [];
-        let v = min;
-        for (let i = 0; i < digitRange; i++) {
-            steps.push(v);
-            v *= 10;
+    // Find min & max units across all axes to create a single set of jog steps.
+    getJogSteps(imperialUnits = null) {
+        let axis = null;
+        const opts = { min: 9999, max: 0, imperialUnits: imperialUnits };
+        Object.keys(this.axes).forEach((ak) => {
+            const a = this._axes[ak];
+            axis = (!axis || a.precision > axis.precision) ? a : axis;
+            opts.max = Math.max(opts.max, a.range / 2);
+            opts.min = Math.min(opts.min, a.accuracy);
+        });
+        return axis ? axis.getJogSteps(opts) : null;
+    }
+
+    _imperialJogSteps = null;
+
+    get imperialJogSteps() {
+        if (!this._imperialJogSteps) {
+            this._imperialJogSteps = this.getJogSteps(true);
         }
-        return steps;
+        return this._imperialJogSteps;
+    }
+
+    _metricJogSteps = null;
+
+    get metricJogSteps() {
+        if (!this._metricJogSteps) {
+            this._metricJogSteps = this.getJogSteps(false);
+        }
+        return this._metricJogSteps;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // wpos / mpos
+    // Transformations to ensure that they are returned in mm
+    // ---------------------------------------------------------------------------------------------
+
+    get reportsImperial() {
+        if (this.controllerAttributes.type === GRBL || this.controllerAttributes.type === MASLOW) {
+            return (Number(_.get(this._controllerSettings, 'settings.$13', 0)) || 0) > 0;
+        }
+        return this.activeState.isImperialUnits;
+    }
+
+    _reportedValueToMM(val) {
+        return this.reportsImperial ? (val / 25.4) : val;
+    }
+
+    get wpos() {
+        return _.mapValues(this.activeState.wpos, this._reportedValueToMM.bind(this));
+    }
+
+    get mpos() {
+        // TinyG
+        if (this.controllerAttributes.type === TINYG) {
+            // https://github.com/synthetos/g2/wiki/Status-Reports
+            // Canonical machine position are always reported in millimeters with no offsets.
+            return this.activeState.mpos;
+        }
+        return _.mapValues(this.activeState.mpos, this._reportedValueToMM.bind(this));
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -243,8 +294,7 @@ class Workspaces extends events.EventEmitter {
     }
 
     get isReady() {
-        return _.get(this.controller.state, 'status.activeState') === GRBL_ACTIVE_STATE_IDLE &&
-            this.controller.workflow.state === WORKFLOW_STATE_IDLE;
+        return this.activeState.isIdle && this.controller.workflow.state === WORKFLOW_STATE_IDLE;
     }
 
     // Given a code: value map, write all the settings.
@@ -367,10 +417,12 @@ class Workspaces extends events.EventEmitter {
         },
         'controller:state': (type, state) => {
             // log.debug(type, 'state changed', state);
+            this.activeState.updateControllerState(state);
             this._controllerState = state;
         },
         'controller:settings': (type, settings) => {
             log.debug(type, 'settings changed', settings);
+            this.hardware.updateControllerSettings(settings);
             this._controllerSettings = settings;
         }
     };

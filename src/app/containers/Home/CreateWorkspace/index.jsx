@@ -211,27 +211,15 @@ class CreateWorkspace extends PureComponent {
         },
         'controller:settings': (type, controllerSettings) => {
             log.debug('Got', type, 'settings:', controllerSettings);
-            const firmware = this.getVersion(controllerSettings.firmware || {});
-            const protocol = this.getVersion(controllerSettings.protocol || {});
-            const isValid = `${firmware} ${protocol}`.toLowerCase().includes(type.toLowerCase());
+            this.workspace.hardware.updateControllerSettings(controllerSettings);
 
             this.setState({
                 version: {
-                    isValid: isValid,
-                    firmware: firmware,
-                    protocol: protocol,
+                    isValid: this.workspace.hardware.isValid,
+                    firmware: this.workspace.hardware.firmwareStr,
+                    protocol: this.workspace.hardware.protocolStr,
                 },
                 hasSettings: true
-            });
-            analytics.event({
-                category: 'controller',
-                action: 'firmware',
-                label: firmware,
-            });
-            analytics.event({
-                category: 'controller',
-                action: 'protocol',
-                label: protocol,
             });
         },
         'serialport:read': (data) => {
@@ -384,14 +372,16 @@ class CreateWorkspace extends PureComponent {
         return (
             <span>
                 {`The machine has not yet reported any firmware which is compatible with ${controllerType}. It may still be starting up.`}
-                {controllerType === MASLOW && (
-                    <span>
-                        <br />
-                        Download the <a href="https://github.com/WebControlCNC/Firmware/tree/release/holey" target="_blank" rel="noopener noreferrer">Arduino Mega (Holey) firmware</a>.
-                        <br />
-                        Download the <a href="https://github.com/makermadecnc/MaslowDue" target="_blank" rel="noopener noreferrer">Arduino Due (M2) firmware</a>.
-                    </span>
-                )}
+                <br />
+                {'You may also need to '}
+                <analytics.OutboundLink
+                    eventLabel="update"
+                    to={this.workspace.firmware.updateLink}
+                    target="_blank"
+                >
+                    {i18n._('Update Firmware')}
+                </analytics.OutboundLink>
+                {'.'}
             </span>
         );
     }

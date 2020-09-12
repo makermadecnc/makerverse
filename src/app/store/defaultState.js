@@ -1,6 +1,4 @@
 import {
-    IMPERIAL_STEPS,
-    METRIC_STEPS,
     GRBL
 } from '../constants';
 
@@ -16,11 +14,11 @@ const defaultState = {
             jog: {
                 keypad: false,
                 imperial: {
-                    step: IMPERIAL_STEPS.indexOf(1), // Defaults to 1 inch
+                    step: 0,
                     distances: []
                 },
                 metric: {
-                    step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
+                    step: 0,
                     distances: []
                 }
             },

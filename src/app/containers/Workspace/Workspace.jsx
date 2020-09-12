@@ -14,6 +14,7 @@ import {
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import store from 'app/store';
+import analytics from 'app/lib/analytics';
 import * as widgetManager from './WidgetManager';
 import CenterWidgets from './CenterWidgets';
 import PrimaryWidgets from './PrimaryWidgets';
@@ -71,6 +72,9 @@ class Workspace extends PureComponent {
 
     action = {
         openModal: (name = MODAL_NONE, params = {}) => {
+            if (name !== MODAL_NONE) {
+                analytics.modalview(`workspace/${name}`);
+            }
             this.setState(state => ({
                 modal: {
                     name: name,

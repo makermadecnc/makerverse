@@ -9,6 +9,8 @@ import Widget from 'app/components/Widget';
 import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
+import analytics from 'app/lib/analytics';
+import ActiveState from 'app/lib/active-state';
 import WidgetConfig from '../WidgetConfig';
 import Macro from './Macro';
 import AddMacro from './AddMacro';
@@ -17,8 +19,6 @@ import RunMacro from './RunMacro';
 import {
     // Grbl
     GRBL,
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_RUN,
     // Marlin
     MARLIN,
     // Workflow
@@ -71,6 +71,9 @@ class MacroWidget extends PureComponent {
             this.setState({ minimized: !minimized });
         },
         openModal: (name = MODAL_NONE, params = {}) => {
+            if (name && name.length > 0 && name !== MODAL_NONE) {
+                analytics.modalview(`macro/${name}`);
+            }
             this.setState({
                 modal: {
                     name: name,
@@ -257,32 +260,14 @@ class MacroWidget extends PureComponent {
 
     canClick() {
         const { port, workflow } = this.state;
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
-
         if (!port) {
             return false;
         }
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL, MARLIN], controllerType)) {
-            return false;
-        }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_IDLE,
-                GRBL_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
-        }
-        return true;
+        this.workspace.activeState.updateControllerState(this.state.controller.state);
+        return this.workspace.activeState.canRunMacro;
     }
 
     render() {

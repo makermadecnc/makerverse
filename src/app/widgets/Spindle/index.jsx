@@ -1,6 +1,4 @@
 import classNames from 'classnames';
-import includes from 'lodash/includes';
-import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
@@ -12,8 +10,6 @@ import Spindle from './Spindle';
 import {
     // Grbl
     GRBL,
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_HOLD,
     // Marlin
     MARLIN,
     // Workflow
@@ -158,8 +154,6 @@ class SpindleWidget extends PureComponent {
 
     canClick() {
         const { port, workflow } = this.state;
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
 
         if (!port) {
             return false;
@@ -167,23 +161,9 @@ class SpindleWidget extends PureComponent {
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL, MARLIN], controllerType)) {
-            return false;
-        }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_IDLE,
-                GRBL_ACTIVE_STATE_HOLD
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
-        }
-        return true;
+
+        this.workspace.activeState.updateControllerState(this.state.controller.state);
+        return this.workspace.activeState.canReceiveCommand;
     }
 
     render() {
