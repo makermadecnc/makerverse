@@ -1,6 +1,7 @@
 import cx from 'classnames';
 import ensureArray from 'ensure-array';
 import frac from 'frac';
+import _ from 'lodash';
 import _includes from 'lodash/includes';
 import _uniqueId from 'lodash/uniqueId';
 import PropTypes from 'prop-types';
@@ -12,12 +13,11 @@ import Dropdown, { MenuItem } from 'app/components/Dropdown';
 import Space from 'app/components/Space';
 import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
+import analytics from 'app/lib/analytics';
 import Fraction from './components/Fraction';
 import {
     IMPERIAL_UNITS,
-    IMPERIAL_STEPS,
     METRIC_UNITS,
-    METRIC_STEPS
 } from '../../constants';
 import styles from './index.styl';
 
@@ -39,6 +39,14 @@ class Keypad extends PureComponent {
 
     get workspace() {
         return Workspaces.all[this.props.workspaceId];
+    }
+
+    event(opts) {
+        analytics.event({
+            ...opts,
+            category: 'interaction',
+            action: 'keypad',
+        });
     }
 
     handleSelect = (eventKey) => {
@@ -72,11 +80,7 @@ class Keypad extends PureComponent {
 
     renderImperialMenuItems() {
         const { jog } = this.props;
-        const imperialJogDistances = ensureArray(jog.imperial.distances);
-        const imperialJogSteps = [
-            ...imperialJogDistances,
-            ...IMPERIAL_STEPS
-        ];
+        const imperialJogSteps = this.workspace.imperialJogSteps;
         const step = jog.imperial.step;
 
         return imperialJogSteps.map((value, key) => {
@@ -98,11 +102,7 @@ class Keypad extends PureComponent {
 
     renderMetricMenuItems() {
         const { jog } = this.props;
-        const metricJogDistances = ensureArray(jog.metric.distances);
-        const metricJogSteps = [
-            ...metricJogDistances,
-            ...METRIC_STEPS
-        ];
+        const metricJogSteps = this.workspace.metricJogSteps;
         const step = jog.metric.step;
 
         return metricJogSteps.map((value, key) => {
@@ -122,20 +122,51 @@ class Keypad extends PureComponent {
         });
     }
 
+    move(params) {
+        const s = _.map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
+        this.workspace.controller.command('gcode', 'G0 ' + s);
+        this.event({ label: 'move' });
+    }
+
+    jog(params) {
+        const s = _.map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
+        this.workspace.controller.command('gcode', 'G91'); // relative
+        this.workspace.controller.command('gcode', 'G0 ' + s);
+        this.workspace.controller.command('gcode', 'G90'); // absolute
+        this.event({ label: 'jog' });
+    }
+
+    getJogDistance() {
+        return this.props.actions.getJogDistance();
+    }
+
+    selectStep(step) {
+        if (this.props.actions.selectStep) {
+            this.props.actions.selectStep(step);
+            return;
+        }
+    }
+
+    stepForward() {
+        if (this.props.actions.stepForward) {
+            this.props.actions.stepForward();
+            return;
+        }
+    }
+
+    stepBackward() {
+        if (this.props.actions.stepBackward) {
+            this.props.actions.stepBackward();
+            return;
+        }
+    }
+
     render() {
-        const { canClick, units, axes, jog, actions } = this.props;
+        const { canClick, units, axes, jog } = this.props;
         const canChangeUnits = canClick;
         const canChangeStep = canClick;
-        const imperialJogDistances = ensureArray(jog.imperial.distances);
-        const metricJogDistances = ensureArray(jog.metric.distances);
-        const imperialJogSteps = [
-            ...imperialJogDistances,
-            ...IMPERIAL_STEPS
-        ];
-        const metricJogSteps = [
-            ...metricJogDistances,
-            ...METRIC_STEPS
-        ];
+        const imperialJogSteps = this.workspace.imperialJogSteps;
+        const metricJogSteps = this.workspace.metricJogSteps;
         const canStepForward = canChangeStep && (
             (units === IMPERIAL_UNITS && (jog.imperial.step < imperialJogSteps.length - 1)) ||
             (units === METRIC_UNITS && (jog.metric.step < metricJogSteps.length - 1))
@@ -168,8 +199,8 @@ class Keypad extends PureComponent {
                                                 { [styles.highlight]: highlightY }
                                             )}
                                             onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                actions.jog({ X: -distance, Y: distance });
+                                                const distance = this.getJogDistance();
+                                                this.jog({ X: -distance, Y: distance });
                                             }}
                                             disabled={!canClickXY}
                                             title={i18n._('Move machine left & up')}
@@ -188,8 +219,8 @@ class Keypad extends PureComponent {
                                                 { [styles.highlight]: highlightY }
                                             )}
                                             onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                actions.jog({ Y: distance });
+                                                const distance = this.getJogDistance();
+                                                this.jog({ Y: distance });
                                             }}
                                             disabled={!canClickY}
                                             title={i18n._('Move machine up')}
@@ -206,8 +237,8 @@ class Keypad extends PureComponent {
                                             compact
                                             className={cx(styles.btnKeypad, styles['btn-xy'])}
                                             onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                actions.jog({ X: distance, Y: distance });
+                                                const distance = this.getJogDistance();
+                                                this.jog({ X: distance, Y: distance });
                                             }}
                                             disabled={!canClickXY}
                                             title={i18n._('Move machine right & up')}
@@ -226,8 +257,8 @@ class Keypad extends PureComponent {
                                                 { [styles.highlight]: highlightZ }
                                             )}
                                             onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                actions.jog({ Z: distance });
+                                                const distance = this.getJogDistance();
+                                                this.jog({ Z: distance });
                                             }}
                                             disabled={!canClickZ}
                                             title={i18n._('Raise bit')}
@@ -251,8 +282,8 @@ class Keypad extends PureComponent {
                                                 { [styles.highlight]: highlightX }
                                             )}
                                             onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                actions.jog({ X: -distance });
+                                                const distance = this.getJogDistance();
+                                                this.jog({ X: -distance });
                                             }}
                                             disabled={!canClickX}
                                             title={i18n._('Move machine left')}
@@ -268,7 +299,7 @@ class Keypad extends PureComponent {
                                             btnStyle="flat"
                                             compact
                                             className={cx(styles.btnKeypad, styles['btn-xy'])}
-                                            onClick={() => actions.move({ X: 0, Y: 0 })}
+                                            onClick={() => this.move({ X: 0, Y: 0 })}
                                             disabled={!canClickXY}
                                             title={i18n._('Move machine to 0/0')}
                                         >
@@ -286,8 +317,8 @@ class Keypad extends PureComponent {
                                                 { [styles.highlight]: highlightX }
                                             )}
                                             onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                actions.jog({ X: distance });
+                                                const distance = this.getJogDistance();
+                                                this.jog({ X: distance });
                                             }}
                                             disabled={!canClickX}
                                             title={i18n._('Move machine right')}
@@ -303,7 +334,7 @@ class Keypad extends PureComponent {
                                             btnStyle="flat"
                                             compact
                                             className={cx(styles.btnKeypad, styles['btn-z'])}
-                                            onClick={() => actions.move({ Z: 0 })}
+                                            onClick={() => this.move({ Z: 0 })}
                                             disabled={!canClickZ}
                                             title={i18n._('Move bit to zero')}
                                         >
@@ -322,8 +353,8 @@ class Keypad extends PureComponent {
                                             compact
                                             className={cx(styles.btnKeypad, styles['btn-xy'])}
                                             onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                actions.jog({ X: -distance, Y: -distance });
+                                                const distance = this.getJogDistance();
+                                                this.jog({ X: -distance, Y: -distance });
                                             }}
                                             disabled={!canClickXY}
                                             title={i18n._('Move machine left & down')}
@@ -342,8 +373,8 @@ class Keypad extends PureComponent {
                                                 { [styles.highlight]: highlightY }
                                             )}
                                             onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                actions.jog({ Y: -distance });
+                                                const distance = this.getJogDistance();
+                                                this.jog({ Y: -distance });
                                             }}
                                             disabled={!canClickY}
                                             title={i18n._('Move machine down')}
@@ -360,8 +391,8 @@ class Keypad extends PureComponent {
                                             compact
                                             className={cx(styles.btnKeypad, styles['btn-xy'])}
                                             onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                actions.jog({ X: distance, Y: -distance });
+                                                const distance = this.getJogDistance();
+                                                this.jog({ X: distance, Y: -distance });
                                             }}
                                             disabled={!canClickXY}
                                             title={i18n._('Move machine right & down')}
@@ -377,8 +408,8 @@ class Keypad extends PureComponent {
                                             compact
                                             className={cx(styles.btnKeypad, styles['btn-z'])}
                                             onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                actions.jog({ Z: -distance });
+                                                const distance = this.getJogDistance();
+                                                this.jog({ Z: -distance });
                                             }}
                                             disabled={!canClickZ}
                                             title={i18n._('Lower bit')}
@@ -443,7 +474,7 @@ class Keypad extends PureComponent {
                                     disabled={!canChangeStep}
                                     onSelect={(eventKey) => {
                                         const step = eventKey;
-                                        actions.selectStep(step);
+                                        this.selectStep(step);
                                     }}
                                 >
                                     <Dropdown.Toggle
@@ -479,7 +510,7 @@ class Keypad extends PureComponent {
                                     disabled={!canChangeStep}
                                     onSelect={(eventKey) => {
                                         const step = eventKey;
-                                        actions.selectStep(step);
+                                        this.selectStep(step);
                                     }}
                                 >
                                     <Dropdown.Toggle
@@ -513,10 +544,10 @@ class Keypad extends PureComponent {
                                     <Repeatable
                                         disabled={!canStepBackward}
                                         style={{ marginRight: 2.5 }}
-                                        repeatDelay={1000}
+                                        repeatDelay={2000}
                                         repeatInterval={Math.floor(1000 / 15)}
-                                        onHold={actions.stepBackward}
-                                        onRelease={actions.stepBackward}
+                                        onHold={this.stepBackward.bind(this)}
+                                        onRelease={this.stepBackward.bind(this)}
                                     >
                                         <Button
                                             disabled={!canStepBackward}
@@ -533,10 +564,10 @@ class Keypad extends PureComponent {
                                     <Repeatable
                                         disabled={!canStepForward}
                                         style={{ marginLeft: 2.5 }}
-                                        repeatDelay={1000}
+                                        repeatDelay={2000}
                                         repeatInterval={Math.floor(1000 / 15)}
-                                        onHold={actions.stepForward}
-                                        onRelease={actions.stepForward}
+                                        onHold={this.stepForward.bind(this)}
+                                        onRelease={this.stepForward.bind(this)}
                                     >
                                         <Button
                                             disabled={!canStepForward}

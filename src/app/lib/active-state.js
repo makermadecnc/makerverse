@@ -62,6 +62,12 @@ const TINYG_STATES = [
     TINYG_MACHINE_STATE_PANIC,
 ];
 
+/**
+ * ActiveState normalizes the current status of a machine across protocols.
+ * - isImperialUnits for checking current units.
+ * - mpos & wpos (in reported units)
+ * - isIdle, isRunning, hasAlarm, etc.
+ */
 class ActiveState {
     constructor(controllerType, controllerState = {}) {
         this._controllerType = controllerType;

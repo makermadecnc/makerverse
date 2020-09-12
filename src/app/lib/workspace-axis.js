@@ -25,6 +25,10 @@ class WorkspaceAxis {
         return precision > 0 ? str : str.split('.')[0];
     }
 
+    round(val, isImperialUnits = null) {
+        return Number(this.getAxisValueString(val, isImperialUnits));
+    }
+
     // When used without an argument, uses the workspace setting.
     _checkImperialUnits(isImperial = null) {
         return isImperial === null ? this.workspace.isImperialUnits : !!isImperial;
@@ -110,6 +114,23 @@ class WorkspaceAxis {
         for (let i = -numNegativeSteps; i <= numPositiveSteps; i += 1) {
             callback(i * step, (Math.abs(i) % majorStep) === 0);
         }
+    }
+
+    // Returns an array of jog steps for this axis.
+    getJogSteps(opts) {
+        // const isImperialUnits = this._checkImperialUnits(imperialUnits);
+        const max = opts.max || (this.range / 2);
+        const min = opts.min || (this.accuracy);
+        const steps = [];
+        for (let v = min; v < max; v *= 10) {
+            steps.push(this.round(v, opts.imperialUnits));
+            const v2 = v * 10;
+            if (v2 < max) {
+                steps.push(this.round(v2 / 2, opts.imperialUnits));
+            }
+        }
+        steps.push(max);
+        return steps;
     }
 }
 

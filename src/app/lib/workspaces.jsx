@@ -16,6 +16,7 @@ import {
     MASLOW,
     GRBL,
     MARLIN,
+    TINYG,
     WORKFLOW_STATE_IDLE,
 } from '../constants';
 
@@ -172,7 +173,7 @@ class Workspaces extends events.EventEmitter {
     }
     // ---------------------------------------------------------------------------------------------
     // AXES
-    // Each machine may have its own precision, accurancy, etc. for each axis.
+    // Each machine may have its own precision, accuracy, etc. for each axis.
     // ---------------------------------------------------------------------------------------------
 
     _axes = {};
@@ -199,20 +200,65 @@ class Workspaces extends events.EventEmitter {
         return ret;
     }
 
-    getAxisSteps(axis) {
-        const settings = this.getAxisSettings(axis);
-        const min = settings.accuracy;
-        const minDigits = `${min}`.replace('.', '').length;
-        const max = settings.range || 500;
-        const maxDigits = `${max}`.replace('.', '').length;
-        const digitRange = maxDigits - minDigits;
-        const steps = [];
-        let v = min;
-        for (let i = 0; i < digitRange; i++) {
-            steps.push(v);
-            v *= 10;
+    // Find min & max units across all axes to create a single set of jog steps.
+    getJogSteps(imperialUnits = null) {
+        let axis = null;
+        const opts = { min: 9999, max: 0, imperialUnits: imperialUnits };
+        Object.keys(this.axes).forEach((ak) => {
+            const a = this._axes[ak];
+            axis = (!axis || a.precision > axis.precision) ? a : axis;
+            opts.max = Math.max(opts.max, a.range / 2);
+            opts.min = Math.min(opts.min, a.accuracy);
+        });
+        return axis ? axis.getJogSteps(opts) : null;
+    }
+
+    _imperialJogSteps = null;
+
+    get imperialJogSteps() {
+        if (!this._imperialJogSteps) {
+            this._imperialJogSteps = this.getJogSteps(true);
         }
-        return steps;
+        return this._imperialJogSteps;
+    }
+
+    _metricJogSteps = null;
+
+    get metricJogSteps() {
+        if (!this._metricJogSteps) {
+            this._metricJogSteps = this.getJogSteps(false);
+        }
+        return this._metricJogSteps;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // wpos / mpos
+    // Transformations to ensure that they are returned in mm
+    // ---------------------------------------------------------------------------------------------
+
+    get reportsImperial() {
+        if (this.controllerAttributes.type === GRBL || this.controllerAttributes.type === MASLOW) {
+            return (Number(_.get(this._controllerSettings, 'settings.$13', 0)) || 0) > 0;
+        }
+        return this.activeState.isImperialUnits;
+    }
+
+    _reportedValueToMM(val) {
+        return this.reportsImperial ? (val / 25.4) : val;
+    }
+
+    get wpos() {
+        return _.mapValues(this.activeState.wpos, this._reportedValueToMM.bind(this));
+    }
+
+    get mpos() {
+        // TinyG
+        if (this.controllerAttributes.type === TINYG) {
+            // https://github.com/synthetos/g2/wiki/Status-Reports
+            // Canonical machine position are always reported in millimeters with no offsets.
+            return this.activeState.mpos;
+        }
+        return _.mapValues(this.activeState.mpos, this._reportedValueToMM.bind(this));
     }
 
     // ---------------------------------------------------------------------------------------------

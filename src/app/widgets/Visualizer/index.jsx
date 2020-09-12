@@ -2,8 +2,6 @@ import chainedFunction from 'chained-function';
 import classNames from 'classnames';
 import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';
-import get from 'lodash/get';
-import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
@@ -17,7 +15,6 @@ import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
-import { in2mm } from 'app/lib/units';
 import analytics from 'app/lib/analytics';
 import WidgetConfig from '../WidgetConfig';
 import PrimaryToolbar from './PrimaryToolbar';
@@ -30,9 +27,6 @@ import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
 import {
-    GRBL,
-    MASLOW,
-    TINYG,
     // Units
     IMPERIAL_UNITS,
     METRIC_UNITS,
@@ -704,31 +698,6 @@ class VisualizerWidget extends PureComponent {
             activeState.updateControllerState(controllerState);
             const units = activeState.isImperialUnits ? IMPERIAL_UNITS : METRIC_UNITS;
 
-            let mposTransform = (val) => {
-                return activeState.isImperialUnits ? in2mm(val) : val;
-            };
-            let wposTransform = mposTransform;
-
-            // Grbl
-            if (type === GRBL || type === MASLOW) {
-                const $13 = Number(get(this.workspace.controller.settings, 'settings.$13', 0)) || 0;
-                const reportedInches = $13 > 0;
-
-                mposTransform = (val) => {
-                    return reportedInches ? in2mm(val) : val;
-                };
-                wposTransform = mposTransform;
-            }
-
-            // TinyG
-            if (type === TINYG) {
-                mposTransform = (val) => {
-                    // https://github.com/synthetos/g2/wiki/Status-Reports
-                    // Canonical machine position are always reported in millimeters with no offsets.
-                    return val;
-                };
-            }
-
             this.setState(state => ({
                 units: units,
                 controller: {
@@ -736,14 +705,8 @@ class VisualizerWidget extends PureComponent {
                     type: type,
                     state: controllerState
                 },
-                machinePosition: mapValues({
-                    ...state.machinePosition,
-                    ...activeState.mpos,
-                }, wposTransform),
-                workPosition: mapValues({
-                    ...state.workPosition,
-                    ...activeState.wpos,
-                }, wposTransform),
+                machinePosition: this.workspace.mpos,
+                workPosition: this.workspace.wpos,
             }));
         }
     };

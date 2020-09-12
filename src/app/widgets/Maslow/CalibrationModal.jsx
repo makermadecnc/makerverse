@@ -11,6 +11,7 @@ import Workspaces from 'app/lib/workspaces';
 import analytics from 'app/lib/analytics';
 import MaslowCalibration from 'app/lib/Maslow/MaslowCalibration';
 import styles from './index.styl';
+import MeasureChainsFlow from './MeasureChainsFlow';
 import {
     MODAL_CALIBRATION
 } from './constants';
@@ -77,11 +78,10 @@ class CalibrationModal extends PureComponent {
         ...this.internalState,
         measurements: defaultMeasurements,
         activeTab: this.props.activeTab || 'machine',
-        yHome: 0,
-        definedHome: false,
         setMachineSettings: false,
         setWorkspaceSettings: false,
         setFrameSettings: false,
+        setChains: false,
         calibrating: -1,
         calibrated: !!this.props.calibrated,
         result: false,
@@ -245,30 +245,38 @@ class CalibrationModal extends PureComponent {
             leftChainTolerance: 0,
             rightChainTolerance: 0,
         });
-        this.setState({ ...this.state, resetCalibration: true, definedHome: false, chainError: null });
+        this.setState({ ...this.state, resetCalibration: true, chainError: null });
+    }
+
+    setChains(yMeasure) {
+        this.event({ label: 'chains' });
+        this.workspace.hasOnboarded = true;
+
+        const yFromTop = this.toMM(yMeasure);
+        const yPos = this.calibration.kin.opts.machineHeight / 2 - yFromTop;
+        const chainLengths = this.calibration.kin.positionToChain(0, yPos);
+        console.log(chainLengths, yPos);
+        const chainDiff = Math.abs(chainLengths[0] - chainLengths[1]);
+        const { leftChainTolerance, rightChainTolerance } = this.calibration.kin.opts;
+        const previouslyCalibrated = leftChainTolerance !== 0 || rightChainTolerance !== 0;
+        if (previouslyCalibrated && chainDiff >= 1) {
+            this.setState({ ...this.state, chainError: chainLengths[1] - chainLengths[0] });
+            return;
+        }
+        const origChainLength = Math.round((chainLengths[0] + chainLengths[1]) / 2);
+        this.updateKinematics({ origChainLength: origChainLength });
+        this.writeSettings({
+            origChainLength: this.calibration.kin.opts.origChainLength,
+        }, () => {
+            this.workspace.controller.command('homing');
+        });
+        this.setState({ ...this.state, setChains: true }); //, chainError: null });
     }
 
     setFrameSettings() {
         this.event({ label: 'frame' });
         this.workspace.hasOnboarded = true;
 
-        // const chainLengths = this.calibration.kin.positionToChain(0, this.toMM(this.state.yHome));
-        // const chainDiff = Math.abs(chainLengths[0] - chainLengths[1]);
-        // const { leftChainTolerance, rightChainTolerance } = this.calibration.kin.opts;
-        // const previouslyCalibrated = leftChainTolerance !== 0 || rightChainTolerance !== 0;
-        // if (previouslyCalibrated && chainDiff >= 1) {
-        //     this.setState({ ...this.state, chainError: chainLengths[1] - chainLengths[0] });
-        //     return;
-        // }
-        // const origChainLength = Math.round((chainLengths[0] + chainLengths[1]) / 2);
-        // this.updateKinematics({ origChainLength: origChainLength });
-        // this.writeSettings({
-        //     origChainLength: this.calibration.kin.opts.origChainLength,
-        //     motorOffsetY: this.calibration.kin.opts.motorOffsetY,
-        //     distBetweenMotors: this.calibration.kin.opts.distBetweenMotors,
-        // }, () => {
-        //     this.workspace.controller.command('homing');
-        // });
         this.writeSettings({
             motorOffsetY: this.calibration.kin.opts.motorOffsetY,
             distBetweenMotors: this.calibration.kin.opts.distBetweenMotors,
@@ -376,9 +384,8 @@ class CalibrationModal extends PureComponent {
             setMachineSettings,
             setWorkspaceSettings,
             setFrameSettings,
-            definedHome,
+            setChains,
             result,
-            // yHome,
             wiping,
             wiped,
             rotationDiskRadius,
@@ -465,7 +472,6 @@ class CalibrationModal extends PureComponent {
                         <NavItem eventKey="stock">{i18n._('Stock')}</NavItem>
                         <NavItem eventKey="frame">{i18n._('Frame')}</NavItem>
                         <NavItem eventKey="chains">{i18n._('Chains')}</NavItem>
-                        <NavItem eventKey="sled">{i18n._('Sled')}</NavItem>
                         <NavItem eventKey="edge">{i18n._('Edge Calibration')}</NavItem>
                         <NavItem eventKey="precision">{i18n._('Precision Calibration')}</NavItem>
                     </Nav>
@@ -687,67 +693,29 @@ class CalibrationModal extends PureComponent {
                         )}
                         {activeTab === 'chains' && (
                             <div className={styles.tabFull}>
-                                <div className={styles.center} style={ this.getBkImageStyle('calibration_overview.png') } />
                                 <div className={styles.top}>
-                                    {chainError && (
-                                        <div>
-                                            {'Setting chains failed!'}
-                                            <br />
-                                            {'Your machine has already begun calibration, and the new chain position differs from the old.'}
-                                        </div>
-                                    )}
-                                    {!chainError && (
-                                        <div>
-                                            {'Your chains need to be marked at a well-known length.'}
-                                            <br />
-                                            {'This is the most important step for successful calibration.'}
-                                        </div>
-                                    )}
+                                    {'Now the Maslow will learn how long the chains are currently extended.'}
+                                    <br />
+                                    {'This will also create a "save point" to restore calibration (if chains ever come off sprockets).'}
                                 </div>
+                                {!alreadyStartedCalibration && !setChains && (
+                                    <div className={styles.center} >
+                                        <MeasureChainsFlow
+                                            calibration={this.calibration}
+                                            callback={this.setChains.bind(this)}
+                                            workspaceId={this.workspace.id}
+                                        />
+                                    </div>
+                                )}
+                                {!alreadyStartedCalibration && setChains && (
+                                    <div className={styles.center} >
+                                        Chains have been set.
+                                    </div>
+                                )}
                                 {alreadyStartedCalibration && this.renderAlreadyCalibrated()}
                                 {!alreadyStartedCalibration && (
-                                    <div className={styles.bottom}>
-                                        <div>
-                                            {''}
-                                        </div>
-                                        <strong>Chain</strong>:
-                                        <select
-                                            value={chainOffBottom}
-                                            className={styles.selectInput}
-                                            onChange={e => {
-                                                this.updateKinematics({ chainOverSprocket: e.target.value });
-                                                this.setState({ chainLength: e.target.value });
-                                            }}
-                                        >
-                                            <option value="1">Off Top</option>
-                                            <option value="2">Off Bottom</option>
-                                        </select>
-                                        Full Length:
-                                        <input
-                                            type="text"
-                                            name="chainLength"
-                                            className={styles.mmInput}
-                                            value={chainLength}
-                                            onChange={e => {
-                                                this.updateKinematics({ chainLength: this.toMM(e.target.value) || 0 });
-                                                this.setState({ chainLength: e.target.value });
-                                            }}
-                                        />
-                                        (mm)
-                                        <Button
-                                            btnSize="medium"
-                                            btnStyle="flat"
-                                            className={styles.nextStep}
-                                            onClick={event => this.defineHome()}
-                                        >
-                                            <i className="fa fa-check" />
-                                            {i18n._('Set Chains')}
-                                        </Button>
-                                        {definedHome && (
-                                            <span className={styles.nextStep}>
-                                                Homed!
-                                            </span>
-                                        )}
+                                    <div className={styles.bottom} >
+                                        {'Please read carefully; "Chains" are the most important step in all of calibration.'}
                                     </div>
                                 )}
                             </div>

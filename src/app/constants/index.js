@@ -9,54 +9,8 @@ export const AXIS_C = 'c';
 
 // Imperial System
 export const IMPERIAL_UNITS = 'in';
-export const IMPERIAL_STEPS = [
-    0.01,
-    0.02,
-    0.03,
-    0.05,
-    0.1,
-    0.2,
-    0.3,
-    0.5,
-    1, // Default
-    2,
-    3,
-    4,
-    6,
-    8,
-    10,
-    15,
-    20,
-    30,
-    40
-];
-
 // Metric System
 export const METRIC_UNITS = 'mm';
-export const METRIC_STEPS = [
-    0.05,
-    0.1,
-    0.2,
-    0.3,
-    0.5,
-    1, // Default
-    2,
-    3,
-    5,
-    7,
-    10,
-    15,
-    20,
-    30,
-    40,
-    50,
-    75,
-    100,
-    150,
-    200,
-    300,
-    500
-];
 
 // Controller
 export const GRBL = 'Grbl';
