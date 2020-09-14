@@ -244,14 +244,17 @@ class Workspaces extends events.EventEmitter {
         if (this.controllerAttributes.type === MASLOW) {
             // Since there are two kinds of Maslow, and one is "true Gbrl"...
             const settings = new MaslowSettings(this._controllerSettings);
-            const reportInInches = settings.getValue('reportInInches', 0);
+            // The Maslow Mega reports in inches when in G20 mode.
+            const defReportInches = this.activeState.isImperialUnits ? 1 : 0;
+            // Since the Due always has the setting present, the default will not apply to it.
+            const reportInInches = settings.getValue('reportInInches', defReportInches);
             return reportInInches > 0;
         }
         return this.activeState.isImperialUnits;
     }
 
     _reportedValueToMM(val) {
-        return this.reportsImperial ? (val / 25.4) : val;
+        return this.reportsImperial ? (val * 25.4) : val;
     }
 
     get wpos() {
@@ -423,7 +426,7 @@ class Workspaces extends events.EventEmitter {
             });
         },
         'controller:state': (type, state) => {
-            // log.debug(type, 'state changed', state);
+            log.debug(type, 'state changed', state);
             this.activeState.updateControllerState(state);
             this._controllerState = state;
         },
