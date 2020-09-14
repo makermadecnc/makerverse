@@ -447,7 +447,7 @@ class Settings extends PureComponent {
                     });
             },
             openModal: (name = '', params = {}) => {
-                analytics.modalview(`settings/${name}`);
+                analytics.modalview(name);
                 this.setState({
                     workspaces: {
                         ...this.state.workspaces,
@@ -607,7 +607,7 @@ class Settings extends PureComponent {
                     });
             },
             openModal: (name = '', params = {}) => {
-                analytics.modalview(`settings/${name}`);
+                analytics.modalview(name);
                 this.setState({
                     userAccounts: {
                         ...this.state.userAccounts,
@@ -766,7 +766,7 @@ class Settings extends PureComponent {
                     });
             },
             openModal: (name = '', params = {}) => {
-                analytics.modalview(`settings/${name}`);
+                analytics.modalview(name);
                 this.setState({
                     commands: {
                         ...this.state.commands,
@@ -925,7 +925,7 @@ class Settings extends PureComponent {
                     });
             },
             openModal: (name = '', params = {}) => {
-                analytics.modalview(`settings/${name}`);
+                analytics.modalview(name);
                 this.setState({
                     events: {
                         ...this.state.events,

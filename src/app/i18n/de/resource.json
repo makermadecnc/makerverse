@@ -436,8 +436,6 @@
     "Last {{n}} days": "Letzte {{n}} Tage",
     "Apply": "Übernehmen",
     "Add": "Hinzufügen",
-    "Custom Jog Distance (mm)": "",
-    "Custom Jog Distance (inches)": "",
     "New Account": "Neues Konto",
     "Hide Limits": "",
     "Show Limits": "",
@@ -530,12 +528,10 @@
     "Machine": "",
     "Frame": "",
     "Move machine to 0/0": "",
-    "Set Chains": "",
     "Update Firmware": "",
     "Chains": "",
     "Set Frame": "",
     "Stock": "",
-    "Sled": "",
     "Uplload Program": "",
     "Upload Program": ""
 }

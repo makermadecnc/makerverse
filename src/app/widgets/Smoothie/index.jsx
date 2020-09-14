@@ -58,7 +58,7 @@ class SmoothieWidget extends PureComponent {
         },
         openModal: (name = MODAL_NONE, params = {}) => {
             if (name && name.length > 0 && name !== MODAL_NONE) {
-                analytics.modalview(`axes/${name}`);
+                analytics.modalview(name);
             }
             this.setState({
                 modal: {

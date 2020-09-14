@@ -202,9 +202,9 @@ class MeasureChainsFlow extends PureComponent {
                 </div>
                 <br /><br />
                 <h3>Measuring Chains</h3>
-                Otherwise, remove the sled from the chain by detaching the collet pins from the ends of the chains.
+                Otherwise, remove the sled from the chain by detaching the Cotter pins from the ends of the chains.
                 <br />
-                Take one of the collet pins and insert it through the hole at the tip of both chains, so they are attached together.
+                Take one of the Cotter pins and insert it through the hole at the tip of both chains, so they are attached together.
                 <br />
                 <br />
                 <div >
@@ -226,13 +226,13 @@ class MeasureChainsFlow extends PureComponent {
     renderAlignment() {
         return (
             <div>
-                <h3>Align the Collet Pin</h3>
+                <h3>Align the Cotter Pin</h3>
                 The goal of this step is for the two chains to be <strong>exactly</strong> the same length.
                 <br /><br />
                 The simplest way to do this is:
                 <br />
                 - Use the Y axis controls to pull the chain taut.<br />
-                - Use the X axis controls to ensure the collet pin is exactly at the middle of the top beam.<br />
+                - Use the X axis controls to ensure the Cotter pin is exactly at the middle of the top beam.<br />
                 <br /><br />
                 {this.renderShuttleControls()}
                 <hr />
@@ -245,11 +245,11 @@ class MeasureChainsFlow extends PureComponent {
         return (
             <div>
                 <h3>Let Slack the Chains</h3>
-                Use the Y axis controls to move the collet pin downward.
+                Use the Y axis controls to move the Cotter pin downward.
                 <br />
                 Keep doing so until you have enough slack to attach the sled (but do NOT attach it yet!)
                 <br />
-                As you do so, notice that the collet pin should remain in the <strong>exact center</strong> of the workspace.
+                As you do so, notice that the Cotter pin should remain in the <strong>exact center</strong> of the workspace.
                 <br />
                 If it fails to do so: either your chains were not an identical length, or your frame is not sufficiently level.
                 <br /><br />
@@ -270,10 +270,12 @@ class MeasureChainsFlow extends PureComponent {
                 <h3>Attach the Sled</h3>
                 - Make sure that both sprockets have a gear tooth pointing <strong>exactly</strong> upwards (12 o{'\''}clock).<br />
                 - Use paint, a sharpie, nail polish, or similar to place a mark on the link of each chain which is overtop this top-tooth.<br />
-                <br /><br />
+                <br />
+                <img alt="sprocket at noon" src="images/calibration_chain_noon.png" />
+                <br />
                 {'Once this chain calibration tab is complete, you can use this as your "Reset Chains" location.'}<br />
-                {'Simply return the sprockets & chains to this location, and then press "Reset Chains."'}<br />
-                This will tell the Maslow that the chains are back at the well-known length.<br />
+                {'Simply return the sprockets & chains to this location, which should cause the chains to be precisely the same length as they are now.'}<br />
+                {'Then, pressing "Reset Chains" will tell the Maslow they are back at this well-known length.'}<br />
                 But first, we need to finish this chain calibration tab so that we can calculate the length.<br />
                 {this.renderToolbar(this.renderPrevPage(), this.renderNextPage())}
             </div>

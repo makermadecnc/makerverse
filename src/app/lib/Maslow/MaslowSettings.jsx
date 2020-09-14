@@ -7,14 +7,11 @@ class MaslowSettings {
 
     _maslowSettings = {};
 
-    _keyMap = {
+    _requiredSettings = {
         machineHeight: ['machine height'],
         machineWidth: ['machine width'],
         motorOffsetY: ['motor height'],
         distBetweenMotors: ['motor distance'],
-        // sledWidth: ['sled width'],
-        // sledHeight: ['sled height'],
-        // kinematicsType: ['kinematics type'],
         rotationDiskRadius: ['rotation radius'],
         origChainLength: ['calibration chain length'],
         chainLength: ['full length of chain'],
@@ -25,6 +22,13 @@ class MaslowSettings {
         sledWeight: ['sled weight', 'weight of sled'],
     };
 
+    _optionalSettings = {
+        sledWidth: ['sled width'],
+        sledHeight: ['sled height'],
+        kinematicsType: ['kinematics type'],
+        reportInInches: ['report in inches'],
+    };
+
     _errors = [];
 
     constructor(controllerSettings) {
@@ -33,12 +37,13 @@ class MaslowSettings {
 
     update(controllerSettings) {
         this._controllerSettings = { ...this._controllerSettings, controllerSettings };
+        const allSettings = { ...this._requiredSettings, ...this._optionalSettings };
 
         Object.keys(controllerSettings.grbl || {}).forEach((code) => {
             const g = controllerSettings.grbl[code];
             const msg = `${g.message}, ${g.units}`.toLowerCase();
-            Object.keys(this._keyMap).forEach((key) => {
-                this._keyMap[key].forEach((prefix) => {
+            Object.keys(allSettings).forEach((key) => {
+                allSettings[key].forEach((prefix) => {
                     if (msg.startsWith(prefix)) {
                         this._maslowSettings[key] = g;
                     }
@@ -47,11 +52,18 @@ class MaslowSettings {
         });
 
         this._errors = [];
-        Object.keys(this._keyMap).forEach((key) => {
+        Object.keys(this._requiredSettings).forEach((key) => {
             if (!_.has(this._maslowSettings, key)) {
                 this._errors.push(`Missing setting: ${key}`);
             }
         });
+    }
+
+    getValue(key, defValue) {
+        if (!_.has(this._maslowSettings, key)) {
+            return defValue;
+        }
+        return _.get(this._maslowSettings, key).value;
     }
 
     get map() {

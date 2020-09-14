@@ -181,7 +181,7 @@ class VisualizerWidget extends PureComponent {
         },
         openModal: (name = '', params = {}) => {
             if (name && name.length > 0) {
-                analytics.modalview(`axes/${name}`);
+                analytics.modalview(name);
             }
             this.setState((state) => ({
                 modal: {
