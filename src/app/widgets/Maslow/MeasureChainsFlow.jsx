@@ -11,14 +11,16 @@ class MeasureChainsFlow extends PureComponent {
     static propTypes = {
         workspaceId: PropTypes.string.isRequired,
         calibration: PropTypes.object.isRequired,
-        callback: PropTypes.func.isRequired,
+        setChains: PropTypes.func.isRequired,
+        measureCenterOffset: PropTypes.func.isRequired,
+        moveToCenter: PropTypes.func.isRequired,
     };
 
     get workspace() {
         return Workspaces.all[this.props.workspaceId];
     }
 
-    pages = ['Preparation', 'Alignment', 'Slack', 'Attachment', 'Measurement'];
+    pages = ['Preparation', 'Alignment', 'Slack', 'Attachment', 'Measurement', 'Axes'];
 
     state = {
         page: this.pages[0],
@@ -32,6 +34,8 @@ class MeasureChainsFlow extends PureComponent {
         },
         hasHomed: false,
         yPos: 0,
+        xOff: 0,
+        yOff: 0,
     };
 
     runHoming() {
@@ -90,7 +94,7 @@ class MeasureChainsFlow extends PureComponent {
             this.updateJogStep((v) => v + 1);
         },
         selectStep: (step) => {
-            this.updateJogStep((v) => Number(v));
+            this.updateJogStep((v) => Number(step));
         },
     };
 
@@ -111,12 +115,13 @@ class MeasureChainsFlow extends PureComponent {
         );
     }
 
-    renderNextPage() {
+    renderNextPage(action) {
+        action = action || this.nextPage.bind(this);
         return (
             <button
                 type="button"
                 className="btn btn-medium btn-primary"
-                onClick={() => this.nextPage()}
+                onClick={() => action()}
             >
                 Next
             </button>
@@ -149,8 +154,9 @@ class MeasureChainsFlow extends PureComponent {
         );
     }
 
-    applyResults() {
-        this.props.callback(this.state.yPos);
+    setChains() {
+        this.props.setChains(Number(this.state.yPos));
+        this.nextPage();
     }
 
     renderFinish() {
@@ -159,7 +165,7 @@ class MeasureChainsFlow extends PureComponent {
                 type="button"
                 className="btn btn-medium btn-warning"
                 onClick={() => {
-                    this.applyResults();
+                    this.props.measureCenterOffset(Number(this.state.xOff), Number(this.state.yOff));
                 }}
             >
                 Finish & Apply Results
@@ -258,7 +264,7 @@ class MeasureChainsFlow extends PureComponent {
                 This way, it is easy to ensure stock is centered when it is loaded.
                 <br /><br />
                 {this.renderShuttleControls(['y'])}
-                <hr style={{ marginTop: '10px', marginBottom: '10px', maxWidth: '400px' }} />
+                <hr />
                 {this.renderToolbar(this.renderPrevPage(), this.renderNextPage())}
             </div>
         );
@@ -286,10 +292,11 @@ class MeasureChainsFlow extends PureComponent {
         return (
             <div>
                 <h3>Measure Actual Location</h3>
-                Make a mark where the bit (end-mill) touches the stock.
+                Measure the distance from the <strong>top of the stock to the top edge of the sled</strong>.
                 <br />
-                Measure the distance from the top of the stock to this location.
+                Press the tape measure firmly against the sled.
                 <br /><br />
+                {'Distance from top: '}
                 <input
                     type="text"
                     name="yPos"
@@ -298,8 +305,55 @@ class MeasureChainsFlow extends PureComponent {
                         this.setState({ yPos: e.target.value });
                     }}
                 />
+                <hr />
+                {this.renderToolbar(this.renderPrevPage(), this.renderNextPage(this.setChains.bind(this)))}
+            </div>
+        );
+    }
+
+    renderAxes() {
+        return (
+            <div>
+                <h3>Axes Checks</h3>
+                Ensure that the stock is loaded. Make a mark at the exact middle (0, 0).
                 <br />
-                {this.renderToolbar(this.renderRestart(), this.renderFinish())}
+                {'When you press the "Move to Center" button below, the Maslow will try to move to this center location.'}
+                <br />
+                Once it is there, measure the distance from the <strong>tip of the end-mill</strong> to the center mark you made.
+                <br />
+                Use the Z-axis controls to help touch the tip to the stock.
+                <br />
+                <br />
+                <button
+                    type="button"
+                    className="btn btn-medium btn-primary"
+                    onClick={() => this.props.moveToCenter()}
+                >
+                    Move to Center
+                </button>
+                <br /><br /><br />
+                {this.renderShuttleControls(['z'])}
+                <br />
+                {'X Offset: '}
+                <input
+                    type="text"
+                    name="xOff"
+                    value={this.state.xOff}
+                    onChange={e => {
+                        this.setState({ xOff: e.target.value });
+                    }}
+                />
+                {' Y Offset: '}
+                <input
+                    type="text"
+                    name="yOff"
+                    value={this.state.yOff}
+                    onChange={e => {
+                        this.setState({ yOff: e.target.value });
+                    }}
+                />
+                <hr />
+                {this.renderToolbar(this.renderPrevPage(), this.renderFinish())}
             </div>
         );
     }

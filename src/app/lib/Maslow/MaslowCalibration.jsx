@@ -5,13 +5,26 @@ const calibrationDefaults = {
     safeTravel: 3,
     motorXAccuracy: 5,
     motorYAccuracy: 5,
+    chainBounds: 5,
     edgeDistance: 0,
     cutEdgeDistance: 25.4,
     origChainLength: 1790,
     measuredInches: false,
     cutDepth: 3,
     cutHoles: false,
-    sledType: 'Standard Circle',
+};
+
+const sled = { type: 'Standard Circle' };
+
+const sleds = {
+    'Standard Circle': { top: 9 * 25.4, left: 9 * 25.4, right: 9 * 25.4, bottom: 9 * 25.4, desc: '18 inch diameter circle' },
+    'MetalMaslow': { top: 6.325 * 25.4, left: 7.325 * 25.4, right: 7.325 * 25.4, bottom: 8.325 * 25.4, desc: '14.64 inch square, off-center' },
+    'Custom': { top: 9 * 25.4, left: 9 * 25.4, right: 9 * 25.4, bottom: 9 * 25.4, desc: 'Enter your own measurements' },
+};
+
+export {
+    sled,
+    sleds
 };
 
 /**
@@ -20,10 +33,9 @@ const calibrationDefaults = {
 class MaslowCalibration {
     opts = {};
 
-    static sleds = {
-        'Standard Circle': { top: 9 * 25.4, left: 9 * 25.4, right: 9 * 25.4, bottom: 9 * 25.4, desc: '18 inch diameter circle' },
-        'MetalMaslow': { top: 6.325 * 25.4, left: 7.325 * 25.4, right: 7.325 * 25.4, bottom: 8.325 * 25.4, desc: '14.64 inch square, off-center' },
-    };
+    static setSledType(st) {
+        sled.type = st;
+    }
 
     constructor(controller, opts) {
         this.controller = controller;
@@ -46,17 +58,18 @@ class MaslowCalibration {
     }
 
     calibrate(measurements, callback) {
-        if (measurements.length !== 10) {
-            log.error('Calibration requires exactly 10 measurements');
-            return false;
-        }
         log.debug('calibrating...');
         const xError = this.calculateXError(measurements);
         const measured = this.calculateMeasurementCoordinates(measurements, xError);
+        const ret = this._calibrate(measured, callback);
+        ret.xError = xError;
+        return ret;
+    }
 
+    _calibrate(measured, callback) {
         const origSettings = {
-            leftChainTolerance: this.kin.opts.leftChainTolerance,
-            rightChainTolerance: this.kin.opts.rightChainTolerance,
+            leftChainTolerance: this.kin.opts.leftChainTolerance || 0,
+            rightChainTolerance: this.kin.opts.rightChainTolerance || 0,
             distBetweenMotors: this.kin.opts.distBetweenMotors,
             motorOffsetY: this.kin.opts.motorOffsetY,
         };
@@ -80,11 +93,27 @@ class MaslowCalibration {
                 maxErrDist: this.round(-change.maxErrDist / orig.maxErrDist * 100, 2),
             },
             optimized: op,
-            xError: xError
         };
     }
 
+    // First pass calibration. After setting chains, user is told to move the sled to origin.
+    // X/Y offset point is passed in.
+    calibrateOrigin(homePoint, offsetFromOrigin) {
+        const chainBounds = this.opts.chainBounds;
+        const measured = [homePoint, offsetFromOrigin];
+        this.idealCoordinates = [homePoint, { x: 0, y: 0 }];
+        this.idealChainLengths = this.calculateChainLengths(this.idealCoordinates);
+        this.opts.chainBounds = 0;
+        const ret = this._calibrate(measured);
+        this.opts.chainBounds = chainBounds;
+        this.recomputeIdeals();
+        return ret;
+    }
+
     calculateXError(measurements) {
+        if (measurements.length < 10) {
+            return 0;
+        }
         const tr = measurements[2];
         const br = measurements[3];
         const bl = measurements[7];
@@ -105,14 +134,14 @@ class MaslowCalibration {
         const precision = 1.0 / Math.pow(10, i);
         const percentMult = (i + 1) / decimals;
         const percentAdd = percentMult * i;
-        const chainBounds = 5; // Math.pow(steps, 1/2) / 2;
+        const chainBounds = this.opts.chainBounds;
         let mxBounds = Math.min(this.opts.motorXAccuracy, 1), myBounds = Math.min(this.opts.motorYAccuracy, 1);
         if (precision > 0.01) {
             mxBounds = this.opts.motorXAccuracy;
             myBounds = this.opts.motorYAccuracy;
         }
         const iters = (mxBounds * 2) * (myBounds * 2) * (chainBounds * 2) * (chainBounds * 2);
-        const step = precision / chainBounds;
+        const step = chainBounds > 0 ? (precision / chainBounds) : 0;
         let idx = 0;
         let best = { ...start };
 
@@ -127,6 +156,9 @@ class MaslowCalibration {
                             start.motorOffsetY + mh,
                             start.distBetweenMotors + mw
                         );
+                        if (!opt) {
+                            log.warn('Failed to compute location', left, right, mh, mw);
+                        }
                         if (opt.maxErrDist < best.maxErrDist && opt.totalErrDist <= best.totalErrDist) {
                             log.debug('new best', opt, 'change=', this.calculateChange(best, opt));
                             best = opt;
@@ -202,7 +234,7 @@ class MaslowCalibration {
         if (this.opts.cutHoles) {
             return { top: 0, left: 0, bottom: 0, right: 0 };
         }
-        return MaslowCalibration.sleds[this.opts.sledType] || MaslowCalibration.sleds['Standard Circle'];
+        return sleds[sled.type];
     }
 
     calculateMeasurementCoordinates(ms, xError) {
@@ -264,6 +296,10 @@ class MaslowCalibration {
             gcode.push('G20');
         }
         return gcode;
+    }
+
+    generateBottomMiddlePoint() {
+        return this.generateGcodePoint(3);
     }
 
     generateGcode() {

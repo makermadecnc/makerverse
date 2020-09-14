@@ -10,6 +10,9 @@ import {
     METRIC_UNITS,
     IMPERIAL_UNITS,
 } from './constants';
+import {
+    WORKFLOW_STATE_RUNNING
+} from '../../lib/Workflow';
 
 // GCode which is actually supported by the Maslow Classic
 const MaslowClassicGCode = [
@@ -242,11 +245,12 @@ class MaslowMemory {
         const params = cmd.split(' ');
         const c = params[0];
         const cmds = [cmd];
-        if (c === 'G20' || c === 'G21') {
+        const gNum = c[0] === 'G' ? Number(c.substr(1)) : 0;
+        if (gNum === 20 || gNum === 21) {
             this.updateModal('units', c);
-        } else if (c === 'G90' || c === 'G91') {
+        } else if (gNum === 90 || gNum === 91) {
             this.updateModal('distance', c);
-        } else if (c === 'G10') {
+        } else if (gNum === 10) {
             // Implement "Work Position" for the classic.
             const mpos = this.storage.config.status.mpos;
             const dest = this.extractCoords(params);
@@ -262,9 +266,11 @@ class MaslowMemory {
         } else if (c === 'G28.3') {
             params[0] = 'G10'; // Maslow Classic uses WPos to set MPos
             cmds[0] = params.join(' ');
-        } else if (c === 'G0' || c === 'G1') {
-            // Adjust absolute movement for the work position
-            if (_.get(this.storage.config, 'parserstate.modal.distance') === 'G90') {
+        } else if (gNum === 0 || gNum === 1 || gNum === 2 || gNum === 3) {
+            // Adjust absolute movement for the work position when running gcode...
+            const absoluteMovement = _.get(this.storage.config, 'parserstate.modal.distance') === 'G90';
+            const runningWorkflow = this.controller.workflow.state === WORKFLOW_STATE_RUNNING;
+            if (absoluteMovement && runningWorkflow) {
                 const dest = this.extractCoords(params);
                 const coords = [];
                 Object.keys(dest).forEach((coord) => {
@@ -281,17 +287,6 @@ class MaslowMemory {
         } else if (cmd === '$X') {
             // When unlocking, just print a welcome message. State was changed above.
             cmds[0] = '$';
-        } else if (c === 'G28.3') {
-            // Machine homing commands, per-axis.
-            const dest = this.extractCoords(params);
-            if (_.has(dest, 'x') || _.has(dest, 'y')) {
-                this.log.error('X and Y must be homed via the homing button.');
-            }
-            if (_.has(dest, 'z')) {
-                // Maslow classic uses G10 to set machine home Z
-                this.log.debug(`Setting machine home Z: ${dest.z}`);
-                cmds[0] = `G10 Z${dest.z}`;
-            }
         } else if (!MaslowClassicGCode.includes(c) && c[0] !== 'T') {
             this.log.error(`MaslowClassic does not support: ${cmd}`);
         }

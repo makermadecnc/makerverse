@@ -9,7 +9,7 @@ import Space from 'app/components/Space';
 import i18n from 'app/lib/i18n';
 import Workspaces from 'app/lib/workspaces';
 import analytics from 'app/lib/analytics';
-import MaslowCalibration from 'app/lib/Maslow/MaslowCalibration';
+import MaslowCalibration, { sleds, sled } from 'app/lib/Maslow/MaslowCalibration';
 import styles from './index.styl';
 import MeasureChainsFlow from './MeasureChainsFlow';
 import {
@@ -55,10 +55,12 @@ class CalibrationModal extends PureComponent {
 
     get internalState() {
         const inches = this.calibration.opts.measuredInches;
+        const sledDimensions = this.calibration.sledDimensions;
+
         return {
             cutDepth: this.fromMM(this.calibration.opts.cutDepth, inches), // mm to cut in the calibration pattern (zero = no cutting)
             cutHoles: this.calibration.opts.cutHoles,
-            sledType: this.calibration.opts.sledType,
+            sledType: sled.type,
             measuredInches: inches,
             edgeDistance: this.fromMM(this.calibration.opts.edgeDistance, inches),
             cutEdgeDistance: this.fromMM(this.calibration.opts.cutEdgeDistance, inches),
@@ -71,6 +73,12 @@ class CalibrationModal extends PureComponent {
             chainLength: this.fromMM(this.calibration.kin.opts.chainLength, inches),
             rotationDiskRadius: this.fromMM(this.calibration.kin.opts.rotationDiskRadius, inches),
             chainOverSprocket: this.calibration.kin.opts.chainOverSprocket,
+            sledDimensions: {
+                top: this.fromMM(sledDimensions.top, inches),
+                right: this.fromMM(sledDimensions.right, inches),
+                bottom: this.fromMM(sledDimensions.bottom, inches),
+                left: this.fromMM(sledDimensions.left, inches),
+            },
         };
     }
 
@@ -82,6 +90,7 @@ class CalibrationModal extends PureComponent {
         setWorkspaceSettings: false,
         setFrameSettings: false,
         setChains: false,
+        measuredChains: null,
         calibrating: -1,
         calibrated: !!this.props.calibrated,
         result: false,
@@ -159,11 +168,9 @@ class CalibrationModal extends PureComponent {
         });
     }
 
-    applyCalibrationResults() {
-        this.event({ label: 'apply' });
+    writeCalibrationResult(result, callback) {
         const settings = this.calibration.kin.settings.map;
         const sks = Object.keys(settings);
-        const result = this.state.result;
         const grblSettings = {};
         Object.keys(result.optimized).forEach((k) => {
             if (!sks.includes(k)) {
@@ -171,7 +178,16 @@ class CalibrationModal extends PureComponent {
             }
             grblSettings[settings[k].name] = result.optimized[k];
         });
-        this.workspace.writeSettings(grblSettings, () => this.nextCalibration());
+        this.workspace.writeSettings(grblSettings, () => {
+            if (callback) {
+                callback();
+            }
+        });
+    }
+
+    applyCalibrationResults() {
+        this.event({ label: 'apply' });
+        this.writeCalibrationResult(this.state.result, () => this.nextCalibration());
         this.setState({ ...this.state, result: null });
     }
 
@@ -193,10 +209,26 @@ class CalibrationModal extends PureComponent {
         this.workspace.controller.command('reset');
     }
 
+    setWPosToOrigin() {
+        const mpos = this.workspace.mpos;
+        this.workspace.controller.writeln(`G10 L20 P1 X${mpos.x} Y${mpos.y}`);
+    }
+
     moveToCenter() {
         this.unlock();
         this.workspace.controller.writeln('G90');
+        // this.setWPosToOrigin();
         this.workspace.controller.writeln('G0 X0 Y0');
+    }
+
+    measureCenterOffset(xOff, yOff) {
+        this.event({ label: 'center' });
+        const pt = { x: this.toMM(xOff), y: this.toMM(yOff) };
+        const hp = { x: 0, y: this.state.yHome };
+        const res = this.calibration.calibrateOrigin(hp, pt);
+        log.debug('Center offset calibration', res);
+        this.writeCalibrationResult(res);
+        this.setState({ ...this.state, measuredChains: res });
     }
 
     moveToPosition(index) {
@@ -252,10 +284,9 @@ class CalibrationModal extends PureComponent {
         this.event({ label: 'chains' });
         this.workspace.hasOnboarded = true;
 
-        const yFromTop = this.toMM(yMeasure);
+        const yFromTop = this.toMM(yMeasure) + this.calibration.sledDimensions.top;
         const yPos = this.calibration.kin.opts.machineHeight / 2 - yFromTop;
         const chainLengths = this.calibration.kin.positionToChain(0, yPos);
-        console.log(chainLengths, yPos);
         const chainDiff = Math.abs(chainLengths[0] - chainLengths[1]);
         const { leftChainTolerance, rightChainTolerance } = this.calibration.kin.opts;
         const previouslyCalibrated = leftChainTolerance !== 0 || rightChainTolerance !== 0;
@@ -270,7 +301,12 @@ class CalibrationModal extends PureComponent {
         }, () => {
             this.workspace.controller.command('homing');
         });
-        this.setState({ ...this.state, setChains: true }); //, chainError: null });
+        this.setState({ ...this.state, setChains: true, yHome: yPos }); //, chainError: null });
+    }
+
+    setCustomSledDimension(edge, value) {
+        sleds.Custom[edge] = this.toMM(Number(value));
+        this.setState({ sledDimensions: { ...this.state.sledDimensions, [edge]: value } });
     }
 
     setFrameSettings() {
@@ -384,7 +420,8 @@ class CalibrationModal extends PureComponent {
             setMachineSettings,
             setWorkspaceSettings,
             setFrameSettings,
-            setChains,
+            // setChains,
+            measuredChains,
             result,
             wiping,
             wiped,
@@ -393,6 +430,7 @@ class CalibrationModal extends PureComponent {
             sledType,
             calibrated,
             chainError,
+            sledDimensions,
         } = this.state;
         const isCalibrating = calibrating >= 0;
         const hasCalibrationResult = !!result;
@@ -418,6 +456,7 @@ class CalibrationModal extends PureComponent {
         const offCenter = Math.abs(leftChainTolerance - rightChainTolerance) >= 0.001;
         const alreadyStartedCalibration = offCenter;
         const canApplyCalibration = this.workspace.isReady;
+        const edges = ['top', 'right', 'bottom', 'left'];
 
         return (
             <Modal
@@ -471,6 +510,7 @@ class CalibrationModal extends PureComponent {
                         <NavItem eventKey="machine">{i18n._('Machine')}</NavItem>
                         <NavItem eventKey="stock">{i18n._('Stock')}</NavItem>
                         <NavItem eventKey="frame">{i18n._('Frame')}</NavItem>
+                        <NavItem eventKey="sled">{i18n._('Sled')}</NavItem>
                         <NavItem eventKey="chains">{i18n._('Chains')}</NavItem>
                         <NavItem eventKey="edge">{i18n._('Edge Calibration')}</NavItem>
                         <NavItem eventKey="precision">{i18n._('Precision Calibration')}</NavItem>
@@ -541,7 +581,6 @@ class CalibrationModal extends PureComponent {
                                                 this.setState({ chainLength: e.target.value });
                                             }}
                                         />
-                                        (mm)
                                     </div>
                                     {!setMachineSettings && (
                                         <div className={styles.nextStep}>
@@ -691,33 +730,96 @@ class CalibrationModal extends PureComponent {
                                 )}
                             </div>
                         )}
+                        {activeTab === 'sled' && (
+                            <div>
+                                <div className={styles.top}>
+                                    {'Occasionally during calibration, you will be asked to measure from the edge of your sled.'}
+                                    <br />
+                                    {'But first, please enter your sled dimensions (or select from a preset).'}
+                                    <br />
+                                    {'This allows calibration to determine the end-mill location based upon the edge of the sled.'}
+                                </div>
+                                <div className={styles.center}>
+                                    <div style={{ paddingTop: '20px' }} >
+                                        <span>
+                                            Sled Type:
+                                            <select
+                                                value={sledType}
+                                                className={styles.selectInput}
+                                                onChange={e => {
+                                                    MaslowCalibration.setSledType(e.target.value);
+                                                    this.updateCalibrationOpts({ sledType: e.target.value });
+                                                    // Reload state from calibration/kinematics to account many new values.
+                                                    this.setState({
+                                                        ...this.internalState,
+                                                        sledType: e.target.value,
+                                                    });
+                                                }}
+                                            >
+                                                {Object.keys(sleds).map((k) => {
+                                                    return (
+                                                        <option
+                                                            value={k}
+                                                            key={k}
+                                                        >
+                                                            {k}
+                                                        </option>
+                                                    );
+                                                })}
+                                            </select>
+                                        </span>
+                                        {edges.map((edge) => {
+                                            return (
+                                                <div key={edge}>
+                                                    {`Distance to ${edge} edge: `}
+                                                    <input
+                                                        type="text"
+                                                        name={edge}
+                                                        value={sledDimensions[edge]}
+                                                        onChange={e => {
+                                                            this.setCustomSledDimension(edge, e.target.value);
+                                                        }}
+                                                        disabled={sledType !== 'Custom'}
+                                                    />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         {activeTab === 'chains' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.top}>
                                     {'Now the Maslow will learn how long the chains are currently extended.'}
                                     <br />
                                     {'This will also create a "save point" to restore calibration (if chains ever come off sprockets).'}
+                                    <br />
+                                    {'Please read carefully; "Chains" are the most important step in all of calibration.'}
                                 </div>
-                                {!alreadyStartedCalibration && !setChains && (
+                                {!alreadyStartedCalibration && !measuredChains && (
                                     <div className={styles.center} >
                                         <MeasureChainsFlow
                                             calibration={this.calibration}
-                                            callback={this.setChains.bind(this)}
+                                            setChains={this.setChains.bind(this)}
+                                            moveToCenter={this.moveToCenter.bind(this)}
+                                            measureCenterOffset={this.measureCenterOffset.bind(this)}
                                             workspaceId={this.workspace.id}
                                         />
                                     </div>
                                 )}
-                                {!alreadyStartedCalibration && setChains && (
+                                {!alreadyStartedCalibration && measuredChains && (
                                     <div className={styles.center} >
-                                        Chains have been set.
+                                        <h4>Chains Set</h4>
+                                        <span>
+                                            Accuracy is currently at {Math.max(1, Math.round(measuredChains.optimized.maxErrDist * 10) / 10)}mm
+                                            <br />
+                                            <br />
+                                            Use Edge Calibration (and then precision calibration) to finish calibration.
+                                        </span>
                                     </div>
                                 )}
                                 {alreadyStartedCalibration && this.renderAlreadyCalibrated()}
-                                {!alreadyStartedCalibration && (
-                                    <div className={styles.bottom} >
-                                        {'Please read carefully; "Chains" are the most important step in all of calibration.'}
-                                    </div>
-                                )}
                             </div>
                         )}
                         {isCalibrationTab && (
@@ -857,30 +959,6 @@ class CalibrationModal extends PureComponent {
                                     </div>
                                 )}
                                 <div className={styles.bottom}>
-                                    {isEdgeTab && (
-                                        <span>
-                                            Sled Type:
-                                            <select
-                                                value={sledType}
-                                                className={styles.selectInput}
-                                                onChange={e => {
-                                                    this.updateCalibrationOpts({ sledType: e.target.value });
-                                                    this.setState({ sledType: e.target.value });
-                                                }}
-                                            >
-                                                {Object.keys(MaslowCalibration.sleds).map((k) => {
-                                                    return (
-                                                        <option
-                                                            value={k}
-                                                            key={k}
-                                                        >
-                                                            {k}
-                                                        </option>
-                                                    );
-                                                })}
-                                            </select>
-                                        </span>
-                                    )}
                                     <span>
                                         {'Target distance from edge: '}
                                         <input
