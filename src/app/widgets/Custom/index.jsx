@@ -59,7 +59,7 @@ class CustomWidget extends PureComponent {
         },
         openModal: (name = MODAL_NONE, params = {}) => {
             if (name && name.length > 0 && name !== MODAL_NONE) {
-                analytics.modalview(`custom/${name}`);
+                analytics.modalview(name);
             }
             this.setState({
                 modal: {

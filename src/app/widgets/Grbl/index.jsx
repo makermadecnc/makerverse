@@ -58,7 +58,7 @@ class GrblWidget extends PureComponent {
         },
         openModal: (name = MODAL_NONE, params = {}) => {
             if (name && name.length > 0 && name !== MODAL_NONE) {
-                analytics.modalview(`grbl/${name}`);
+                analytics.modalview(name);
             }
             this.setState({
                 modal: {

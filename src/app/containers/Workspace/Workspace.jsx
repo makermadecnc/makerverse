@@ -73,7 +73,7 @@ class Workspace extends PureComponent {
     action = {
         openModal: (name = MODAL_NONE, params = {}) => {
             if (name !== MODAL_NONE) {
-                analytics.modalview(`workspace/${name}`);
+                analytics.modalview(name);
             }
             this.setState(state => ({
                 modal: {

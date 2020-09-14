@@ -23,6 +23,7 @@ const defaultFeatures = {
             description: 'Inform the Maslow that the chains (not the sled) are in the exact same position as they were when you used "Set Chains".',
             icon: 'fa-link',
         },
+        sleep: false,
         mpos_set_home_x: false,
         mpos_set_home_y: false,
         mpos_go_home_x: false,

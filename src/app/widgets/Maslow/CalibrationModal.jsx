@@ -524,7 +524,7 @@ class CalibrationModal extends PureComponent {
                                             className={styles.selectInput}
                                             onChange={e => {
                                                 this.updateKinematics({ chainOverSprocket: e.target.value });
-                                                this.setState({ chainLength: e.target.value });
+                                                this.setState({ chainOverSprocket: e.target.value });
                                             }}
                                         >
                                             <option value="1">Off Top</option>

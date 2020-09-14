@@ -109,7 +109,7 @@ class MDI extends PureComponent {
 
         openModal: (name = '', params = {}) => {
             if (name && name.length > 0) {
-                analytics.modalview(`mdi/${name}`);
+                analytics.modalview(name);
             }
             this.setState(state => ({
                 modal: {

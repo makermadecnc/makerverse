@@ -5,6 +5,7 @@ import WorkspaceAxis from 'app/lib/workspace-axis';
 import series from 'app/lib/promise-series';
 import auth from 'app/lib/auth';
 import promisify from 'app/lib/promisify';
+import MaslowSettings from 'app/lib/Maslow/MaslowSettings';
 import api from 'app/api';
 import io from 'socket.io-client';
 import Controller from 'cncjs-controller';
@@ -237,8 +238,14 @@ class Workspaces extends events.EventEmitter {
     // ---------------------------------------------------------------------------------------------
 
     get reportsImperial() {
-        if (this.controllerAttributes.type === GRBL || this.controllerAttributes.type === MASLOW) {
+        if (this.controllerAttributes.type === GRBL) {
             return (Number(_.get(this._controllerSettings, 'settings.$13', 0)) || 0) > 0;
+        }
+        if (this.controllerAttributes.type === MASLOW) {
+            // Since there are two kinds of Maslow, and one is "true Gbrl"...
+            const settings = new MaslowSettings(this._controllerSettings);
+            const reportInInches = settings.getValue('reportInInches', 0);
+            return reportInInches > 0;
         }
         return this.activeState.isImperialUnits;
     }
