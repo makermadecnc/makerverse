@@ -24,7 +24,7 @@ const TrackballControls = function ( object, domElement ) {
 
     this.rotateSpeed = 1.0;
     this.zoomSpeed = 1.2;
-    this.panSpeed = 0.8;
+    this.panSpeed = 3.0;
 
     this.noRotate = false;
     this.noZoom = false;
@@ -96,7 +96,7 @@ const TrackballControls = function ( object, domElement ) {
 
 
     // methods
-    
+
     this.setMouseButtonState = function(button, state) {
         if (this.mouseButtonState[button] === undefined) {
             return;
@@ -236,7 +236,7 @@ const TrackballControls = function ( object, domElement ) {
         }
 
         if (_this.object.inOrthographicMode) {
-            const factor = 1.0 + (delta * _this.zoomSpeed);
+            const factor = 1.0 + (delta * _this.getZoomSpeed());
             const zoom = _this.object.zoom * factor;
             if (zoom > 0.1) {
                 _this.object.setZoom(zoom);
@@ -244,7 +244,7 @@ const TrackballControls = function ( object, domElement ) {
                 _this.object.setZoom(0.1);
             }
         } else {
-            const factor = 1.0 - (delta * _this.zoomSpeed);
+            const factor = 1.0 - (delta * _this.getZoomSpeed());
             _eye.subVectors(_this.object.position, _this.target);
             _eye.multiplyScalar(factor);
             _this.object.position.addVectors(_this.target, _eye);
@@ -263,7 +263,7 @@ const TrackballControls = function ( object, domElement ) {
         }
 
         if (_this.object.inOrthographicMode) {
-            const factor = 1.0 - (delta * _this.zoomSpeed);
+            const factor = 1.0 - (delta * _this.getZoomSpeed());
             const zoom = _this.object.zoom * factor;
             if (zoom > 0.1) {
                 _this.object.setZoom(zoom);
@@ -271,7 +271,7 @@ const TrackballControls = function ( object, domElement ) {
                 _this.object.setZoom(0.1);
             }
         } else {
-            const factor = 1.0 + (delta * _this.zoomSpeed);
+            const factor = 1.0 + (delta * _this.getZoomSpeed());
             _eye.subVectors(_this.object.position, _this.target);
             _eye.multiplyScalar(factor);
             _this.object.position.addVectors(_this.target, _eye);
@@ -282,6 +282,10 @@ const TrackballControls = function ( object, domElement ) {
                 lastPosition.copy( _this.object.position );
             }
         }
+    };
+
+    this.getZoomSpeed = function () {
+        return _this.zoomSpeed;
     };
 
     this.zoomCamera = function () {
@@ -296,7 +300,7 @@ const TrackballControls = function ( object, domElement ) {
 
         } else {
 
-            factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
+            factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.getZoomSpeed();
 
             if ( factor !== 1.0 && factor > 0.0 ) {
 
@@ -323,6 +327,10 @@ const TrackballControls = function ( object, domElement ) {
 
     };
 
+    this.getPanSpeed = function () {
+        return _this.panSpeed / this.object.zoom;
+    };
+
     this.panCamera = ( function() {
 
         var mouseChange = new THREE.Vector2(),
@@ -334,8 +342,8 @@ const TrackballControls = function ( object, domElement ) {
             mouseChange.copy( _panEnd ).sub( _panStart );
 
             if ( mouseChange.lengthSq() ) {
-
-                mouseChange.multiplyScalar( _eye.length() * _this.panSpeed );
+                const panSpeed = _this.getPanSpeed();
+                mouseChange.multiplyScalar( _eye.length() * panSpeed );
 
                 pan.copy( _eye ).cross( _this.object.up ).setLength( mouseChange.x );
                 pan.add( objectUp.copy( _this.object.up ).setLength( mouseChange.y ) );

@@ -22,7 +22,6 @@ import CoordinateAxes from './CoordinateAxes';
 import Cuboid from './Cuboid';
 import CuttingPointer from './CuttingPointer';
 import GridLine from './GridLine';
-import PivotPoint3 from './PivotPoint3';
 import TextSprite from './TextSprite';
 import GCodeVisualizer from './GCodeVisualizer';
 import {
@@ -69,14 +68,6 @@ class Visualizer extends Component {
     };
 
     group = new THREE.Group();
-
-    pivotPoint = new PivotPoint3({ x: 0, y: 0, z: 0 }, (x, y, z) => { // relative position
-        _each(this.group.children, (o) => {
-            o.translateX(x);
-            o.translateY(y);
-            o.translateZ(z);
-        });
-    });
 
     node = null;
 
@@ -442,6 +433,8 @@ class Visualizer extends Component {
         return new Cuboid(cb);
     }
 
+    _axisLabels = [];
+
     axisLabel(axis, positive = true) {
         const pos = positive ? (axis.max + axis.pad) : (axis.min - axis.pad);
         return new TextSprite({
@@ -477,19 +470,23 @@ class Visualizer extends Component {
         }
 
         { // Axis Labels
-            group.add(this.axisLabel(axes.x));
-            group.add(this.axisLabel(axes.y));
-            group.add(this.axisLabel(axes.z));
+            this._axisLabels = this.workspace.mapAxes((axis) => {
+                const label = this.axisLabel(axis);
+                group.add(label);
+                return label;
+            });
         }
 
         return group;
     }
 
+    _gridTextLabels = [];
+
     createGridLineNumbers(group, axisKey, units) {
         const isImperial = units === IMPERIAL_UNITS;
         const axis = this.workspace.axes[axisKey];
 
-        const textSize = isImperial ? (25.4 / 3) : (10 / 3);
+        const textSize = 10;
         const textOffset = isImperial ? (25.4 / 5) : (10 / 5);
 
         axis.eachGridLine((i, majorStep) => {
@@ -511,13 +508,14 @@ class Visualizer extends Component {
             const textLabel = new TextSprite({
                 ...coords,
                 size: textSize,
-                text: axis.getAxisValueString(v, isImperial),
+                text: axis.getAxisValueString(v, isImperial) + units,
                 textAlign: 'center',
                 textBaseline: 'bottom',
                 color: axis.color,
                 opacity: 0.5
             });
             group.add(textLabel);
+            this._gridTextLabels.push(textLabel);
         }, isImperial);
 
         return group;
@@ -606,6 +604,7 @@ class Visualizer extends Component {
             this.group.add(metricCoordinateSystem);
         }
 
+        this._gridTextLabels = [];
         { // Imperial Grid Line Numbers
             const visible = objects.gridLineNumbers.visible;
             const imperialGridLineNumbers = new THREE.Group();
@@ -637,7 +636,7 @@ class Visualizer extends Component {
                 geometry.rotateX(-Math.PI / 2);
 
                 // Scale the geometry data.
-                geometry.scale(5, 5, 5);
+                geometry.scale(1, 1, 1);
 
                 // Compute the bounding box.
                 geometry.computeBoundingBox();
@@ -689,6 +688,8 @@ class Visualizer extends Component {
         }
 
         this.scene.add(this.group);
+
+        this.updateUIScale();
     }
 
     // @param [options] The options object.
@@ -696,6 +697,12 @@ class Visualizer extends Component {
     updateScene(options) {
         const { forceUpdate = false } = { ...options };
         const needUpdateScene = this.props.show || forceUpdate;
+
+        const zoom = this.camera.zoom;
+        if (zoom !== this._lastZoom) {
+            this.updateUIScale(1 / zoom);
+            this._lastZoom = zoom;
+        }
 
         if (this.renderer && needUpdateScene) {
             this.renderer.render(this.scene, this.camera);
@@ -772,12 +779,6 @@ class Visualizer extends Component {
     createTrackballControls(object, domElement) {
         const controls = new TrackballControls(object, domElement);
 
-        controls.rotateSpeed = 1.0;
-        controls.zoomSpeed = 1.2;
-        controls.panSpeed = 0.8;
-        controls.noZoom = false;
-        controls.noPan = false;
-
         controls.staticMoving = true;
         controls.dynamicDampingFactor = 0.3;
 
@@ -827,19 +828,12 @@ class Visualizer extends Component {
         this.cuttingTool.rotateZ(-(rpm / 60 * degrees)); // rotate in clockwise direction
     }
 
-    mposToLocalPoint(mpos) {
-        const pivotPoint = this.pivotPoint.get();
-        return this.workspace.mapAxes((axis) => {
-            return mpos[axis.key] - pivotPoint[axis.key];
-        });
-    }
-
     // Update cutting tool position
     updateCuttingToolPosition() {
         if (!this.cuttingTool) {
             return;
         }
-        const mpos = this.mposToLocalPoint(this.machinePosition);
+        const mpos = this.machinePosition; // this.mposToLocalPoint(this.machinePosition);
         this.cuttingTool.position.set(mpos.x, mpos.y, mpos.z);
     }
 
@@ -848,8 +842,18 @@ class Visualizer extends Component {
         if (!this.cuttingPointer) {
             return;
         }
-        const mpos = this.mposToLocalPoint(this.machinePosition);
+        const mpos = this.machinePosition; // this.mposToLocalPoint(this.machinePosition);
         this.cuttingPointer.position.set(mpos.x, mpos.y, mpos.z);
+    }
+
+    get wco() {
+        const mpos = this.machinePosition;
+        const wpos = this.workPosition;
+        return {
+            x: mpos.x - wpos.x,
+            y: mpos.y - wpos.y,
+            z: mpos.z - wpos.z,
+        };
     }
 
     // Move the visualizer to the work position
@@ -857,10 +861,28 @@ class Visualizer extends Component {
         if (!this.rendered) {
             return;
         }
-        const mpos = this.machinePosition;
-        const wpos = this.workPosition;
-        const pivotPoint = this.pivotPoint.get();
-        this.rendered.position.set(mpos.x - wpos.x - pivotPoint.x, mpos.y - wpos.y - pivotPoint.y, mpos.z - wpos.z - pivotPoint.z);
+        const wco = this.wco;
+        this.rendered.position.set(wco.x, wco.y, wco.z);
+    }
+
+    updateObjectScale(obj, scale) {
+        if (!obj) {
+            return;
+        }
+        obj.scale.x = scale;
+        obj.scale.y = scale;
+        obj.scale.z = scale;
+    }
+
+    updateUIScale(scale) {
+        this.updateObjectScale(this.cuttingTool, scale);
+        this.updateObjectScale(this.cuttingPointer, scale);
+        Object.keys(this._axisLabels).forEach((axisKey) => {
+            this.updateObjectScale(this._axisLabels[axisKey], scale);
+        });
+        this._gridTextLabels.forEach((label) => {
+            this.updateObjectScale(label, scale);
+        });
     }
 
     // Make the controls look at the specified position
@@ -882,6 +904,10 @@ class Visualizer extends Component {
         this.updateScene();
     }
 
+    updateLookAt() {
+
+    }
+
     load(name, gcode, callback) {
         // Remove previous G-code object
         this.unload();
@@ -892,18 +918,18 @@ class Visualizer extends Component {
         this.group.add(this.rendered);
 
         const bbox = getBoundingBox(this.rendered);
-        // const axes = this.workspace.axes;
-        const dX = bbox.max.x - bbox.min.x;
-        const dY = bbox.max.y - bbox.min.y;
-        const dZ = bbox.max.z - bbox.min.z;
-        const center = new THREE.Vector3(
-            bbox.min.x + (dX / 2),
-            bbox.min.y + (dY / 2),
-            bbox.min.z + (dZ / 2)
-        );
+        // // const axes = this.workspace.axes;
+        // const dX = bbox.max.x - bbox.min.x;
+        // const dY = bbox.max.y - bbox.min.y;
+        // const dZ = bbox.max.z - bbox.min.z;
+        // const center = new THREE.Vector3(
+        //     bbox.min.x + (dX / 2),
+        //     bbox.min.y + (dY / 2),
+        //     bbox.min.z + (dZ / 2)
+        // );
 
         // Set the pivot point to the center of the loaded object
-        this.pivotPoint.set(center.x, center.y, center.z);
+        // this.pivotPoint.set(center.x, center.y, center.z);
 
         // Update position
         this.updateCuttingToolPosition();
@@ -932,11 +958,6 @@ class Visualizer extends Component {
 
         if (this.visualizer) {
             this.visualizer = null;
-        }
-
-        if (this.pivotPoint) {
-            // Set the pivot point to the origin point (0, 0, 0)
-            this.pivotPoint.set(0, 0, 0);
         }
 
         if (this.controls) {

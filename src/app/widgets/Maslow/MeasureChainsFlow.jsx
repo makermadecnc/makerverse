@@ -271,7 +271,7 @@ class MeasureChainsFlow extends PureComponent {
                 - Make sure that both sprockets have a gear tooth pointing <strong>exactly</strong> upwards (12 o{'\''}clock).<br />
                 - Use paint, a sharpie, nail polish, or similar to place a mark on the link of each chain which is overtop this top-tooth.<br />
                 <br />
-                <img alt="sprocket at noon" src="images/calibration_chain_noon.png" />
+                <img style={{ maxHeight: '180px' }} alt="sprocket at noon" src="images/calibration_chain_noon.png" />
                 <br />
                 {'Once this chain calibration tab is complete, you can use this as your "Reset Chains" location.'}<br />
                 {'Simply return the sprockets & chains to this location, which should cause the chains to be precisely the same length as they are now.'}<br />

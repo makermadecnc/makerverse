@@ -111,9 +111,11 @@ class WorkspaceAxis {
         const majorStep = isImperialUnits ? (12) : 10;
         const numNegativeSteps = Math.ceil(-this.min / step);
         const numPositiveSteps = Math.ceil(this.max / step);
+        const ret = [];
         for (let i = -numNegativeSteps; i <= numPositiveSteps; i += 1) {
-            callback(i * step, (Math.abs(i) % majorStep) === 0);
+            ret.push(callback(i * step, (Math.abs(i) % majorStep) === 0));
         }
+        return ret;
     }
 
     // Returns an array of jog steps for this axis.
