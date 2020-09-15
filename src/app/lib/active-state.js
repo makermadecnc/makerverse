@@ -182,7 +182,7 @@ class ActiveState {
     }
 
     get isValidState() {
-        return this.validStates.includes(this.stateValue);
+        return this._controllerType === MARLIN || this.validStates.includes(this.stateValue);
     }
 
     get validStates() {

@@ -513,8 +513,9 @@ class CalibrationModal extends PureComponent {
                         <NavItem eventKey="frame">{i18n._('Frame')}</NavItem>
                         <NavItem eventKey="sled">{i18n._('Sled')}</NavItem>
                         <NavItem eventKey="chains">{i18n._('Chains')}</NavItem>
-                        <NavItem eventKey="edge">{i18n._('Edge Calibration')}</NavItem>
-                        <NavItem eventKey="precision">{i18n._('Precision Calibration')}</NavItem>
+                        <NavItem eventKey="z">{i18n._('Z-Axis')}</NavItem>
+                        <NavItem eventKey="edge">{i18n._('Edge')}</NavItem>
+                        <NavItem eventKey="precision">{i18n._('Precision')}</NavItem>
                     </Nav>
                     <div className={styles.navContent} style={{ height: height }}>
                         {activeTab === 'machine' && (
@@ -821,6 +822,10 @@ class CalibrationModal extends PureComponent {
                                     </div>
                                 )}
                                 {alreadyStartedCalibration && this.renderAlreadyCalibrated()}
+                            </div>
+                        )}
+                        {activeTab === 'z' && (
+                            <div className={styles.tabFull}>
                             </div>
                         )}
                         {isCalibrationTab && (
