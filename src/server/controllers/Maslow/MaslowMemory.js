@@ -10,9 +10,6 @@ import {
     METRIC_UNITS,
     IMPERIAL_UNITS,
 } from './constants';
-import {
-    WORKFLOW_STATE_RUNNING
-} from '../../lib/Workflow';
 
 // GCode which is actually supported by the Maslow Classic
 const MaslowClassicGCode = [
@@ -245,7 +242,7 @@ class MaslowMemory {
         const params = cmd.split(' ');
         const c = params[0];
         const cmds = [cmd];
-        const gNum = c[0] === 'G' ? Number(c.substr(1)) : 0;
+        const gNum = c[0] === 'G' ? Number(c.substr(1)) : -1;
         if (gNum === 20 || gNum === 21) {
             this.updateModal('units', c);
         } else if (gNum === 90 || gNum === 91) {
@@ -269,8 +266,7 @@ class MaslowMemory {
         } else if (gNum === 0 || gNum === 1 || gNum === 2 || gNum === 3) {
             // Adjust absolute movement for the work position when running gcode...
             const absoluteMovement = _.get(this.storage.config, 'parserstate.modal.distance') === 'G90';
-            const runningWorkflow = this.controller.workflow.state === WORKFLOW_STATE_RUNNING;
-            if (absoluteMovement && runningWorkflow) {
+            if (absoluteMovement) {
                 const dest = this.extractCoords(params);
                 const coords = [];
                 Object.keys(dest).forEach((coord) => {

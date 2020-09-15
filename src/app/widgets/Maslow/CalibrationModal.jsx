@@ -209,16 +209,12 @@ class CalibrationModal extends PureComponent {
         this.workspace.controller.command('reset');
     }
 
-    setWPosToOrigin() {
-        const mpos = this.workspace.mpos;
-        this.workspace.controller.writeln(`G10 L20 P1 X${mpos.x} Y${mpos.y}`);
-    }
-
     moveToCenter() {
+        const gcode = this.calibration.generateGoToCenterGcode();
         this.unlock();
-        this.workspace.controller.writeln('G90');
-        // this.setWPosToOrigin();
-        this.workspace.controller.writeln('G0 X0 Y0');
+        gcode.forEach((cmd) => {
+            this.workspace.controller.command('gcode', cmd);
+        });
     }
 
     measureCenterOffset(xOff, yOff) {
@@ -232,11 +228,11 @@ class CalibrationModal extends PureComponent {
     }
 
     moveToPosition(index) {
-        const gcode = this.calibration.generateGcodePoint(index);
+        const gcode = this.calibration.generateCalibrationGcode(index);
         log.debug(`Moving to position ${index}`);
         this.unlock();
         gcode.forEach((cmd) => {
-            this.workspace.controller.writeln(cmd);
+            this.workspace.controller.command('gcode', cmd);
         });
     }
 

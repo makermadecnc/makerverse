@@ -16,9 +16,11 @@ The Maslow requires calibration to correct "chain sag" (catenary effects).
 
 ![Calibration Overview](/assets/machines/maslow/calibration_overview.png)
 
-### Pre-Flight Check
+### Before you Start
 
-Test your frame! **This is extremely important**.
+Do a **pre-flight check**.
+
+Maslow frames are generally built from hand-cut, imprecise materials. Catching errors early will greatly improve the chances of an easy, successful calibration.
 
 Use the Shuttle controls to move your sled to all 4 corners of the stock. Check that it can reach each corner easily and without obstruction. If you have any of these problems, do **not** attempt to calibrate:
 
@@ -30,7 +32,7 @@ Use the Shuttle controls to move your sled to all 4 corners of the stock. Check 
 
 _Note: rather than fixing a frame problem, you can use the Frame Settings (below) to make your machine size smaller than the standard 8 ft. x 4 ft. This will prevent the machine from attempting to access the inaccessible corners. However, after later making changes to the frame to clear the obstruction, the calibration process should be repeated._
 
-### Machine Settings
+### Machine
 
 These options may not need to be changed, as they default to match standard Maslow kits. However, you should take a moment to review them, just in case:
 
@@ -39,7 +41,7 @@ These options may not need to be changed, as they default to match standard Masl
 - **Chain Direction**: The image above depicts `Off Bottom`. Only choose `Off Top` if the chains come off the sprockets in the opposite direction.
 - **Chain Full Length**: The total length of each chain (usually 12 feet, or 3360mm).
 
-### Frame Settings
+### Frame
 
 During calibration, you should make sure that these values match the stock you have loaded. **Measure your stock!** Most plywood is exactly 8x4 feet, but it is important to be certain about these values before calibrating.
 
@@ -48,7 +50,7 @@ During calibration, you should make sure that these values match the stock you h
 
 After calibration, you may change the frame settings (machine size) for different sizes of stock, as needed. The machine's origin (at the center of the calibration stock) will remain in exactly the same place. You can therefore load a different size stock on this same origin point without re-calibrating.
 
-### Set Chains
+### Chains
 
 This step will tell the machine where the end-mill is currently located.
 
@@ -100,3 +102,9 @@ You should not need to change anything with the Mega, but there are some extra s
 
 - **MakerMade M2** (V2 shield): Make sure **Step pulse invert** (`$3`) is set to `4` (inverts the Z-axis). Also make sure **Z-axis travel resolution** (`$102`) is set to `472.5` (scales the Z-axis).
 - **V1 Shield**: You may need to change **Z-axis travel resolution** (`$102`) based upon your gear tooth ratio.
+
+## Further Reading
+
+- [Getting Starting with the Maslow CNC Router](https://www.technicallywizardry.com/maslow-cnc-router-simplified-guide/)
+- [Upgrading the Frame for Better Accuracy](https://www.technicallywizardry.com/upgrade-maslow-cnc-frame-plans/)
+
