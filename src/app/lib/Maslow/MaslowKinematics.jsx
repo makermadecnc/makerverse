@@ -22,7 +22,7 @@ class MaslowKinematics {
 
     maxGuess = 200;
 
-    maxErr = 0.1;
+    maxErr = 0.01;
 
     lastPosition = { x: 0, y: 0 };
 

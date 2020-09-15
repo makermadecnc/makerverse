@@ -3,7 +3,7 @@ import MaslowKinematics from './MaslowKinematics';
 
 const calibrationDefaults = {
     safeTravel: 3,
-    motorXAccuracy: 5,
+    motorXAccuracy: 10,
     motorYAccuracy: 5,
     chainBounds: 5,
     edgeDistance: 0,
@@ -61,12 +61,14 @@ class MaslowCalibration {
         log.debug('calibrating...');
         const xError = this.calculateXError(measurements);
         const measured = this.calculateMeasurementCoordinates(measurements);
-        const ret = this._calibrate(measured, callback);
+        const yError = this.calculateYError(measured[0], this.idealCoordinates[0]);
+        console.log('yError', yError);
+        const ret = this._calibrate(measured, yError, callback);
         ret.xError = xError;
         return ret;
     }
 
-    _calibrate(measured, callback) {
+    _calibrate(measured, yError, callback) {
         const origSettings = {
             leftChainTolerance: this.kin.opts.leftChainTolerance || 0,
             rightChainTolerance: this.kin.opts.rightChainTolerance || 0,
@@ -76,7 +78,8 @@ class MaslowCalibration {
         const origErr = this.calculateError(measured, this.idealCoordinates);
         const orig = { ...origSettings, ...origErr };
 
-        let op = orig;
+        let op = { ...orig };
+        op.motorOffsetY -= yError;
         const decimals = 4;
         for (let i = 0; i < decimals; i++) {
             log.debug('calibration #', i);
@@ -110,6 +113,10 @@ class MaslowCalibration {
         return ret;
     }
 
+    calculateYError(measured, ideal) {
+        return ideal.y - measured.y;
+    }
+
     calculateXError(measurements) {
         if (measurements.length < 10) {
             return 0;
@@ -135,41 +142,38 @@ class MaslowCalibration {
         const percentMult = (i + 1) / decimals;
         const percentAdd = percentMult * i;
         const chainBounds = this.opts.chainBounds;
-        let mxBounds = Math.min(this.opts.motorXAccuracy, 1), myBounds = Math.min(this.opts.motorYAccuracy, 1);
+        let mxBounds = Math.min(this.opts.motorXAccuracy, 1);
         if (precision > 0.01) {
             mxBounds = this.opts.motorXAccuracy;
-            myBounds = this.opts.motorYAccuracy;
         }
-        const iters = (mxBounds * 2) * (myBounds * 2) * (chainBounds * 2) * (chainBounds * 2);
+        const iters = (mxBounds * 2) * (chainBounds * 2) * (chainBounds * 2);
         const step = chainBounds > 0 ? (precision / chainBounds) : 0;
         let idx = 0;
         let best = { ...start };
 
         for (let mw = -mxBounds; mw <= mxBounds; mw++) {
-            for (let mh = -myBounds; mh <= myBounds; mh++) {
-                for (let left = -chainBounds; left <= chainBounds; left++) {
-                    for (let right = -chainBounds; right <= chainBounds; right++) {
-                        const opt = this.calculateOptimization(
-                            measured,
-                            start.leftChainTolerance + left * step,
-                            start.rightChainTolerance + right * step,
-                            start.motorOffsetY + mh,
-                            start.distBetweenMotors + mw
-                        );
-                        if (!opt) {
-                            log.warn('Failed to compute location', left, right, mh, mw);
-                        }
-                        if (opt.maxErrDist < best.maxErrDist && opt.totalErrDist <= best.totalErrDist) {
-                            log.debug('new best', opt, 'change=', this.calculateChange(best, opt));
-                            best = opt;
-                        }
-                        idx++;
+            for (let left = -chainBounds; left <= chainBounds; left++) {
+                for (let right = -chainBounds; right <= chainBounds; right++) {
+                    const opt = this.calculateOptimization(
+                        measured,
+                        start.leftChainTolerance + left * step,
+                        start.rightChainTolerance + right * step,
+                        start.motorOffsetY,
+                        start.distBetweenMotors + mw
+                    );
+                    if (!opt) {
+                        log.warn('Failed to compute location', left, right, mw);
                     }
+                    if (opt.maxErrDist < best.maxErrDist && opt.totalErrDist <= best.totalErrDist) {
+                        log.debug('new best', opt, 'change=', this.calculateChange(best, opt));
+                        best = opt;
+                    }
+                    idx++;
                 }
-                const percent = Math.round(((idx / iters) * percentMult + percentAdd) * 100);
-                if (callback) {
-                    callback(percent);
-                }
+            }
+            const percent = Math.round(((idx / iters) * percentMult + percentAdd) * 100);
+            if (callback) {
+                callback(percent);
             }
         }
         return best;
