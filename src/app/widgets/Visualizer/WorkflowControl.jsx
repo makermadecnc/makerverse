@@ -155,7 +155,7 @@ class WorkflowControl extends PureComponent {
         return !!(this.props.state.port && this.props.state.gcode.ready);
     }
 
-    get canRun() {
+    get canRunWorkflow() {
         if (!this.hasGcode) {
             return false;
         }
@@ -197,7 +197,7 @@ class WorkflowControl extends PureComponent {
         const hasError = !!activeState.error;
         const isPaused = hasPausedWorkflow || activeState.isPaused;
         const canPause = isRunningWorkflow || activeState.isRunning;
-        const canPlay = this.canRun || activeState.isPaused;
+        const canPlay = this.canRunWorkflow || activeState.isPaused;
         const playPauseText = isPaused ? 'Resume (Cycle Start)' : 'Run Program';
 
         return (

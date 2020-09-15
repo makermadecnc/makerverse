@@ -25,6 +25,7 @@ const analytics = {
     modalview: wrapDev(ReactGA.modalview),
     pageview: wrapDev(ReactGA.pageview),
     event: wrapDev(ReactGA.event),
+    exception: wrapDev(ReactGA.event),
     set: wrapDev(ReactGA.set),
     OutboundLink: ReactGA.OutboundLink,
 };

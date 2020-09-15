@@ -322,27 +322,28 @@ class CalibrationModal extends PureComponent {
         }
     }
 
-    getCalibrationRecommendation(result) {
+    getCalibrationRecommendation(result, accuracy) {
         const isPrecisionTab = this.state.activeTab === 'precision';
         let pre = '';
         if (result.xError > 0) {
-            pre += `When you Defined Home, it appears your X coordinate was off by about ${result.xError}mm from the center of the stock.`;
-            pre += 'Consider closing this modal, ensuring the sled is centered, and starting from Set Chains again. Otherwise... ';
+            pre += `When you Defined Home, it appears your X coordinate was off by about ${result.xError}mm from the center of the stock. `;
         }
         if (result.change.avgErrDist > 0 || result.change.maxErrDist > 0) {
             return pre + 'The error margin went up. This should not happen. Please start over from the beginning.';
-        } else if (result.optimized.maxErrDist <= 3 && result.optimized.avgErrDist <= 2) {
+        } else if (accuracy <= 3) {
             return pre + 'Your machine is extremely well calibrated.';
-        } else if (result.optimized.maxErrDist <= 8 && result.optimized.avgErrDist <= 4) {
+        } else if (accuracy <= 6.25) {
             if (isPrecisionTab) {
                 return pre + 'Results are generally good, but might improve using a tiny endmill to calibrate again.';
             } else {
-                return pre + 'Results are good; precision calibration may improve them further';
+                return pre + 'Results are quite good for edge calibration; precision calibration may improve them further.';
             }
-        } else if (result.optimized.totalErrDist <= 30 && result.optimized.avgErrDist <= 10) {
-            return pre + 'Your machine could be calibrated further. Try starting the entire calibration process again. If it does not improve, review the help.';
+        } else if (accuracy <= 12.5 && !isPrecisionTab) {
+            return pre + 'Results are pretty good for edge calibration; precision calibration may improve them further.';
+        } else if (accuracy <= 25) {
+            return pre + 'Your machine could be calibrated further. If this is your first or second calibration run, this message is normal. If it does not improve, review the help.';
         } else {
-            return pre + 'Your machine is still pretty un-calibrated. Try starting the calibration process again. If it does not improve, review the help.';
+            return pre + 'Your machine is quite un-calibrated. Please review the help, and check that your frame build is not compromising accuracy.';
         }
     }
 
@@ -453,6 +454,7 @@ class CalibrationModal extends PureComponent {
         const alreadyStartedCalibration = offCenter;
         const canApplyCalibration = this.workspace.isReady;
         const edges = ['top', 'right', 'bottom', 'left'];
+        const accuracy = result ? Math.max(1, Math.round(result.optimized.maxErrDist * 10) / 10) : 0;
 
         return (
             <Modal
@@ -916,10 +918,10 @@ class CalibrationModal extends PureComponent {
                                         <div
                                             style={{ position: 'absolute', right: '0px', bottom: '0px', width: '40%' }}
                                         >
-                                            <h4>New Accuracy: {Math.max(1, Math.round(result.optimized.maxErrDist * 10) / 10)}mm</h4>
+                                            <h4>New Accuracy: {accuracy}mm</h4>
                                             These results must be applied to take effect!
                                             <hr style={{ marginTop: '10px', marginBottom: '10px' }} />
-                                            {this.getCalibrationRecommendation(result)}
+                                            {this.getCalibrationRecommendation(result, accuracy)}
                                             <br />
                                             <br />
                                             {canApplyCalibration && (

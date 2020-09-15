@@ -91,8 +91,8 @@ const defaultAxes = {
         z: {
             accuracy: 0.001,
             precision: 3,
-            min: -30,
-            max: 30,
+            min: -300,
+            max: 300,
         },
     },
 };

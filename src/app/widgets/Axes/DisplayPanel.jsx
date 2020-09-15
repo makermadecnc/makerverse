@@ -1019,8 +1019,9 @@ class DisplayPanel extends PureComponent {
         const lengthUnits = (units === METRIC_UNITS) ? i18n._('mm') : i18n._('in');
         const degreeUnits = i18n._('deg');
         const axisSettings = this.workspace.axes[axis];
-        const mpos = axisSettings.getAxisValueString(machinePosition[axis]);
-        const wpos = axisSettings.getAxisValueString(workPosition[axis]);
+        const unknown = '?';
+        const mpos = !axisSettings ? unknown : axisSettings.getAxisValueString(machinePosition[axis]);
+        const wpos = !axisSettings ? unknown : axisSettings.getAxisValueString(workPosition[axis]);
         const axisLabel = axis.toUpperCase();
         const axisKey = axis.toLowerCase();
         const displayUnits = {

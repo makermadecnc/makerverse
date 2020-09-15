@@ -1,5 +1,6 @@
 #!/bin/bash
 un="$2"
+port="$3"
 echo "Makerverse Server will be controlled by $un"
 
 sv="makerverse.service"
@@ -39,6 +40,9 @@ if [ "$1" = "install" ]; then
   echo "" >> $sf
 
   echo "[Service]" >> $sf
+  if [[ ! -z "$port" ]]; then
+    echo "Environment=MAKERVERSE_PORT=${port}"
+  fi
   echo "ExecStart=runuser -l ${un} -c \"${lf}\"" >> $sf
   echo "Restart=always" >> $sf
   echo "StandardOutput=syslog" >> $sf
