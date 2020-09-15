@@ -278,11 +278,13 @@ class MeasureChainsFlow extends PureComponent {
                 - Use paint, a sharpie, nail polish, or similar to place a mark on the link of each chain which is overtop this top-tooth.<br />
                 <br />
                 <img style={{ maxHeight: '180px' }} alt="sprocket at noon" src="images/calibration_chain_noon.png" />
+                {this.renderShuttleControls(['y'])}
                 <br />
                 {'Once this chain calibration tab is complete, you can use this as your "Reset Chains" location.'}<br />
                 {'Simply return the sprockets & chains to this location, which should cause the chains to be precisely the same length as they are now.'}<br />
                 {'Then, pressing "Reset Chains" will tell the Maslow they are back at this well-known length.'}<br />
                 But first, we need to finish this chain calibration tab so that we can calculate the length.<br />
+                <hr />
                 {this.renderToolbar(this.renderPrevPage(), this.renderNextPage())}
             </div>
         );

@@ -213,7 +213,7 @@ class CalibrationModal extends PureComponent {
         const gcode = this.calibration.generateGoToCenterGcode();
         this.unlock();
         gcode.forEach((cmd) => {
-            this.workspace.controller.command('gcode', cmd);
+            this.workspace.controller.writeln(cmd);
         });
     }
 
@@ -232,7 +232,7 @@ class CalibrationModal extends PureComponent {
         log.debug(`Moving to position ${index}`);
         this.unlock();
         gcode.forEach((cmd) => {
-            this.workspace.controller.command('gcode', cmd);
+            this.workspace.controller.writeln(cmd);
         });
     }
 
@@ -327,6 +327,9 @@ class CalibrationModal extends PureComponent {
         let pre = '';
         if (result.xError > 0) {
             pre += `When you Defined Home, it appears your X coordinate was off by about ${result.xError}mm from the center of the stock. `;
+        }
+        if (result.skew > 0) {
+            pre += 'Measurements indicate some skew. Be extra-certain the stock is not rotated. Otherwise, this should disappear with repeated calibration.';
         }
         if (result.change.avgErrDist > 0 || result.change.maxErrDist > 0) {
             return pre + 'The error margin went up. This should not happen. Please start over from the beginning.';

@@ -64,6 +64,7 @@ class MaslowCalibration {
         const yError = this.calculateYError(measured[0], this.idealCoordinates[0]);
         const ret = this._calibrate(measured, yError, callback);
         ret.xError = xError;
+        ret.skew = this.calculateSkew(measurements);
         return ret;
     }
 
@@ -111,6 +112,28 @@ class MaslowCalibration {
         this.opts.chainBounds = chainBounds;
         this.recomputeIdeals();
         return ret;
+    }
+
+    calculateSkew(measurements) {
+        if (measurements.length < 10) {
+            return 0;
+        }
+        const tr = measurements[2];
+        const br = measurements[3];
+        const bl = measurements[7];
+        const tl = measurements[8];
+        const skewRight = tr - br;
+        const skewLeft = tl - bl;
+        const lneg = skewLeft < 0;
+        const rneg = skewRight < 0;
+        if (lneg !== rneg) {
+            // Both must be skewed in the same direction.
+            return 0;
+        }
+        if (Math.abs(skewRight) < 1 || Math.abs(skewLeft) < 1) {
+            return 0;
+        }
+        return Math.min(Math.abs(skewRight), Math.abs(skewLeft));
     }
 
     calculateYError(measured, ideal) {

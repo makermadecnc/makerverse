@@ -61,7 +61,7 @@ class WorkflowControl extends PureComponent {
             this.event({ label: 'unlock' });
         },
         'cyclestart': () => {
-            if (this.canRun) {
+            if (this.canRunWorkflow) {
                 this.props.actions.handleRun();
                 return;
             }
