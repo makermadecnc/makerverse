@@ -61,7 +61,7 @@ class MaslowCalibration {
         log.debug('calibrating...');
         const measured = this.calculateMeasurementCoordinates(measurements);
         const xError = this.calculateXError(measured, this.idealCoordinates);
-        const yError = this.calculateYError(measured[0], this.idealCoordinates[0]);
+        const yError = this.calculateYError(measured, this.idealCoordinates);
         const ret = this._calibrate(measured, yError, callback);
         ret.xError = xError;
         ret.skew = this.calculateSkew(measured);
@@ -137,8 +137,14 @@ class MaslowCalibration {
         }
     }
 
+    // Y error is the average of all Y errors, thus shifting the entire cutting plane up/down
+    // to match the appropriate center-point.
     calculateYError(measured, ideal) {
-        return ideal.y - measured.y;
+        let total = 0;
+        for (let i = 0; i < measured.length; i++) {
+            total += ideal[i].y - measured[i].y;
+        }
+        return total / measured.length;
     }
 
     calculateXError(measured, ideals) {
