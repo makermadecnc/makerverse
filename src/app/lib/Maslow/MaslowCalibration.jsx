@@ -59,12 +59,12 @@ class MaslowCalibration {
 
     calibrate(measurements, callback) {
         log.debug('calibrating...');
-        const xError = this.calculateXError(measurements);
         const measured = this.calculateMeasurementCoordinates(measurements);
+        const xError = this.calculateXError(measured, this.idealCoordinates);
         const yError = this.calculateYError(measured[0], this.idealCoordinates[0]);
         const ret = this._calibrate(measured, yError, callback);
         ret.xError = xError;
-        ret.skew = this.calculateSkew(measurements);
+        ret.skew = this.calculateSkew(measured);
         return ret;
     }
 
@@ -114,50 +114,57 @@ class MaslowCalibration {
         return ret;
     }
 
-    calculateSkew(measurements) {
-        if (measurements.length < 10) {
+    calculateSkew(measured) {
+        const tr = measured[1];
+        const br = measured[2];
+        const bl = measured[4];
+        const tl = measured[5];
+        const skewRight = tr.x - br.x;
+        const skewLeft = tl.x - bl.x;
+        if (Math.abs(skewRight) < 1 || Math.abs(skewLeft) < 1) {
             return 0;
         }
-        const tr = measurements[2];
-        const br = measurements[3];
-        const bl = measurements[7];
-        const tl = measurements[8];
-        const skewRight = tr - br;
-        const skewLeft = tl - bl;
         const lneg = skewLeft < 0;
         const rneg = skewRight < 0;
         if (lneg !== rneg) {
             // Both must be skewed in the same direction.
             return 0;
         }
-        if (Math.abs(skewRight) < 1 || Math.abs(skewLeft) < 1) {
-            return 0;
+        if (Math.abs(skewRight) > Math.abs(skewLeft)) {
+            return skewRight;
+        } else {
+            return skewLeft;
         }
-        return Math.min(Math.abs(skewRight), Math.abs(skewLeft));
     }
 
     calculateYError(measured, ideal) {
         return ideal.y - measured.y;
     }
 
-    calculateXError(measurements) {
-        if (measurements.length < 10) {
-            return 0;
+    calculateXError(measured, ideals) {
+        let posCount = 0;
+        let negCount = 0;
+        let posMin = 9999;
+        let negMin = 9999;
+        const pts = [1, 2, 4, 5];
+        pts.forEach((i) => {
+            const xOff = ideals[i].x - measured[i].x;
+            if (xOff < 0) {
+                negCount++;
+                negMin = Math.min(negMin, Math.abs(xOff));
+            }
+            if (xOff > 0) {
+                posCount++;
+                posMin = Math.min(posMin, Math.abs(xOff));
+            }
+        });
+        if (posCount === pts.length) {
+            return posMin;
         }
-        const tr = measurements[2];
-        const br = measurements[3];
-        const bl = measurements[7];
-        const tl = measurements[8];
-        const left = Math.round((bl + tl) / 2);
-        const right = Math.round((tr + br) / 2);
-        const lneg = left < 0;
-        const rneg = right < 0;
-        if (lneg === rneg) {
-            // If both have the same sign, there cannot be an error
-            return 0;
+        if (negCount === pts.length) {
+            return -negMin;
         }
-        // Return the mm adjustment needed to center the stock.
-        return Math.min(Math.abs(left), Math.abs(right)) * (lneg ? 1 : -1);
+        return 0;
     }
 
     optimize(measured, start, i, decimals, callback) {

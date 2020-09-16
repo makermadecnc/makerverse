@@ -336,11 +336,16 @@ class CalibrationModal extends PureComponent {
     getCalibrationRecommendation(result, accuracy) {
         const isPrecisionTab = this.state.activeTab === 'precision';
         let pre = '';
-        if (result.xError > 0) {
-            pre += `When you Defined Home, it appears your X coordinate was off by about ${result.xError}mm from the center of the stock. `;
+        const xErrAmt = Math.abs(result.xError);
+        if (xErrAmt > 0) {
+            const dir = result.xError > 0 ? 'left' : 'right';
+            pre += `It appears your stock was loaded about ${xErrAmt}mm to the ${dir} from the center of workspace. `;
         }
-        if (result.skew > 0) {
-            pre += 'Measurements indicate some skew. Be extra-certain the stock is not rotated. Otherwise, this should disappear with repeated calibration.';
+        const skewAmt = Math.abs(result.skew);
+        if (skewAmt > 0) {
+            const dir = result.skew > 0 ? 'clockwise' : 'counter-clockwise';
+            pre += `Measurements indicate about ${skewAmt}mm ${dir} skew. `;
+            pre += 'Be extra-certain the stock is not rotated. Otherwise, this should disappear with repeated calibration.';
         }
         if (result.change.avgErrDist > 0 || result.change.maxErrDist > 0) {
             return pre + 'The error margin went up. This should not happen. Please start over from the beginning.';
