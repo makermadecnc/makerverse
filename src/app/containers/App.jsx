@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Redirect, withRouter } from 'react-router-dom';
-import { trackPage } from '../lib/analytics';
+import analytics from '../lib/analytics';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Workspace from './Workspace';
@@ -38,7 +38,7 @@ class App extends PureComponent {
             document.title = settings.productName;
         }
 
-        trackPage(location);
+        analytics.trackPage(location, workspace);
 
         return (
             <div>

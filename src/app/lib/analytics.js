@@ -21,23 +21,27 @@ const wrapDev = (func) => {
     return func;
 };
 
-const analytics = {
-    modalview: wrapDev(ReactGA.modalview),
-    pageview: wrapDev(ReactGA.pageview),
-    event: wrapDev(ReactGA.event),
-    exception: wrapDev(ReactGA.event),
-    set: wrapDev(ReactGA.set),
-    OutboundLink: ReactGA.OutboundLink,
-};
+const pageview = wrapDev(ReactGA.pageview);
 
-export const trackPage = (location) => {
+const trackPage = (location, workspace) => {
     analytics.set({
         version: settings.version.public,
         build: settings.version.build,
         hostname: location.hostname,
         protocol: location.protocol,
     });
-    analytics.pageview(location.pathname);
+    const path = workspace ? workspace.hardware.path : location.pathname;
+    pageview(path);
+};
+
+const analytics = {
+    modalview: wrapDev(ReactGA.modalview),
+    // pageview: wrapDev(ReactGA.pageview),
+    trackPage: trackPage,
+    event: wrapDev(ReactGA.event),
+    exception: wrapDev(ReactGA.event),
+    set: wrapDev(ReactGA.set),
+    OutboundLink: ReactGA.OutboundLink,
 };
 
 export default analytics;

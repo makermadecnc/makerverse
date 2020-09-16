@@ -89,10 +89,10 @@ jobs:
 - name: "MacOS"
   os: osx
   osx_image: xcode8.3
-  before_install:
-  - brew update
-  before_deploy:
-  - scripts/add-osx-cert.sh
+  # before_install:
+  # - brew update
+  # before_deploy:
+  # - scripts/add-osx-cert.sh
   script:
   - npm run build-latest
   - npm run build:mac-x64

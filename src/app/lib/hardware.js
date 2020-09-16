@@ -53,6 +53,18 @@ class Hardware {
         return `${name} v${vers}`;
     }
 
+    // A path (unique ID) for this hardware / firmware / protocol
+    get path() {
+        const parts = [this.controllerType.toLowerCase()];
+        if (this.hasFirmware) {
+            parts.push(`${this.firmware.name}-${this.firmware.version}`);
+        }
+        if (this.hasProtocol) {
+            parts.push(`${this.protocol.name}-${this.protocol.version}`);
+        }
+        return '/' + parts.join('/') + '/';
+    }
+
     get hasFirmware() {
         return this.firmware && this.firmware.name && this.firmware.version;
     }
