@@ -63,9 +63,13 @@ class MaslowWidget extends PureComponent {
             }
             this.setState({
                 modal: {
+                    ...this.state.modal,
                     ...opts,
                     name: name,
-                    params: params
+                    params: {
+                        ...this.state.modal.params,
+                        ...(params || {}),
+                    }
                 }
             });
         },
@@ -84,7 +88,7 @@ class MaslowWidget extends PureComponent {
                     ...this.state.modal,
                     params: {
                         ...this.state.modal.params,
-                        ...params
+                        ...(params || {})
                     }
                 }
             });
