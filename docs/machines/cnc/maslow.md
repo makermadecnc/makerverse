@@ -10,6 +10,10 @@ nav_order: 1
 
 The Maslow is a unique CNC machine due to its hanging "pendant" design.
 
+## Firmware
+
+Coming from GroundControl/WebControl? Read [this forum post](https://forums.maslowcnc.com/t/how-to-upgrade-to-holey-51-28-firmware-using-webcontrol-in-preparation-for-running-makerverse/14549) for help upgrading firmware.
+
 ## Calibration
 
 The Maslow requires calibration to correct "chain sag" (catenary effects).

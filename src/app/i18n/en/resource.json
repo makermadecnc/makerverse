@@ -504,8 +504,6 @@
     "Webcam Widget": "Webcam Widget",
     "View a webcam from within the app to monitor progress.": "View a webcam from within the app to monitor progress.",
     "Baud Rate": "Baud Rate",
-    "Edge Calibration": "Edge Calibration",
-    "Precision Calibration": "Precision Calibration",
     "Next Step": "Next Step",
     "Apply Calibration Results": "Apply Calibration Results",
     "Calibrating": "Calibrating",
@@ -534,5 +532,8 @@
     "Stock": "Stock",
     "Uplload Program": "Uplload Program",
     "Upload Program": "Upload Program",
-    "Sled": "Sled"
+    "Sled": "Sled",
+    "Z-Axis": "Z-Axis",
+    "Edge": "Edge",
+    "Precision": "Precision"
 }

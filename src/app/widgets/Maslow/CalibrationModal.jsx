@@ -79,6 +79,10 @@ class CalibrationModal extends PureComponent {
                 bottom: this.fromMM(sledDimensions.bottom, inches),
                 left: this.fromMM(sledDimensions.left, inches),
             },
+            zAxisRes: this.workspace.machineSettings.getValue('zAxisRes'),
+            zInvert: this.workspace.machineSettings.isAxisInverted('z') ? '1' : '0',
+            zMove: inches ? 0.25 : 10,
+            exported: JSON.stringify(this.calibration.kin.export(), null, 4),
         };
     }
 
@@ -97,6 +101,7 @@ class CalibrationModal extends PureComponent {
         wiping: false,
         wiped: false,
         chainError: null,
+        zMoved: 0,
     };
 
     controllerEvents = {
@@ -178,7 +183,7 @@ class CalibrationModal extends PureComponent {
             }
             grblSettings[settings[k].name] = result.optimized[k];
         });
-        this.workspace.writeSettings(grblSettings, () => {
+        this.workspace.machineSettings.write(grblSettings, () => {
             if (callback) {
                 callback();
             }
@@ -236,19 +241,25 @@ class CalibrationModal extends PureComponent {
         });
     }
 
-    writeSettings(map, callback = null) {
-        const grblMap = {};
-        Object.keys(map).forEach((key) => {
-            const setting = this.calibration.kin.settings.map[key];
-            grblMap[setting.name] = map[key];
-        });
-        this.workspace.writeSettings(grblMap, callback);
+    zApplyScaling() {
+        const scale = Math.abs(Number(this.state.zMove)) / Math.abs(Number(this.state.zMoved));
+        const zAxisRes = Number(this.state.zAxisRes) * scale;
+        this.workspace.machineSettings.write({ zAxisRes: zAxisRes });
+        this.setState({ zAxisRes: zAxisRes });
+    }
+
+    zMove(val) {
+        this.unlock();
+        this.workspace.controller.writeln('G91');
+        this.workspace.controller.writeln('G21');
+        this.workspace.controller.writeln(`G0 Z${this.toMM(val)}`);
+        this.workspace.controller.writeln('G90');
     }
 
     setMachineSettings() {
         this.event({ label: 'resize' });
         this.workspace.hasOnboarded = true;
-        this.writeSettings({
+        this.workspace.machineSettings.write({
             chainOverSprocket: this.calibration.kin.opts.chainOverSprocket,
             chainLength: this.calibration.kin.opts.chainLength,
             sledWeight: this.calibration.kin.opts.sledWeight,
@@ -259,7 +270,7 @@ class CalibrationModal extends PureComponent {
     setWorkspaceSettings() {
         this.event({ label: 'resize' });
         this.workspace.hasOnboarded = true;
-        this.writeSettings({
+        this.workspace.machineSettings.write({
             machineWidth: this.calibration.kin.opts.machineWidth,
             machineHeight: this.calibration.kin.opts.machineHeight,
         });
@@ -269,7 +280,7 @@ class CalibrationModal extends PureComponent {
     resetCalibration() {
         this.event({ label: 'reset' });
         this.workspace.hasOnboarded = true;
-        this.writeSettings({
+        this.workspace.machineSettings.write({
             leftChainTolerance: 0,
             rightChainTolerance: 0,
         });
@@ -292,7 +303,7 @@ class CalibrationModal extends PureComponent {
         }
         const origChainLength = Math.round((chainLengths[0] + chainLengths[1]) / 2);
         this.updateKinematics({ origChainLength: origChainLength });
-        this.writeSettings({
+        this.workspace.machineSettings.write({
             origChainLength: this.calibration.kin.opts.origChainLength,
         }, () => {
             this.workspace.controller.command('homing');
@@ -309,7 +320,7 @@ class CalibrationModal extends PureComponent {
         this.event({ label: 'frame' });
         this.workspace.hasOnboarded = true;
 
-        this.writeSettings({
+        this.workspace.machineSettings.write({
             motorOffsetY: this.calibration.kin.opts.motorOffsetY,
             distBetweenMotors: this.calibration.kin.opts.distBetweenMotors,
         });
@@ -379,6 +390,12 @@ class CalibrationModal extends PureComponent {
         );
     }
 
+    setInvertZ(optionValue) {
+        const invertZ = optionValue === '1';
+        this.workspace.machineSettings.setAxisInverted('z', invertZ);
+        this.setState({ zInvert: optionValue });
+    }
+
     render() {
         const { actions } = this.props;
         const edge = '0%';
@@ -431,6 +448,11 @@ class CalibrationModal extends PureComponent {
             calibrated,
             chainError,
             sledDimensions,
+            zInvert,
+            zMove,
+            zMoved,
+            zAxisRes,
+            exported,
         } = this.state;
         const isCalibrating = calibrating >= 0;
         const hasCalibrationResult = !!result;
@@ -459,6 +481,9 @@ class CalibrationModal extends PureComponent {
         const edges = ['top', 'right', 'bottom', 'left'];
         const accuracy = result ? Math.max(1, Math.round(result.optimized.maxErrDist * 10) / 10) : 0;
 
+        const stepDirectionInvert = this.workspace.machineSettings.map.stepDirectionInvert;
+        const zAxisResSetting = this.workspace.machineSettings.map.zAxisRes;
+
         return (
             <Modal
                 disableOverlay
@@ -470,7 +495,17 @@ class CalibrationModal extends PureComponent {
             >
                 <Modal.Header>
                     <Modal.Title>
-                        Maslow Calibration
+                        {'Maslow Calibration   '}
+                        <button
+                            type="button"
+                            className="btn btn-small"
+                            onClick={() => {
+                                this.setState({ activeTab: 'export' });
+                            }}
+                            title="Export and import calibration settings"
+                        >
+                            {i18n._('Export Calibration')}
+                        </button>
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -518,6 +553,38 @@ class CalibrationModal extends PureComponent {
                         <NavItem eventKey="precision">{i18n._('Precision')}</NavItem>
                     </Nav>
                     <div className={styles.navContent} style={{ height: height }}>
+                        {activeTab === 'export' && (
+                            <div className={styles.tabFull}>
+                                <div className={styles.center}>
+                                    <textarea
+                                        name="export"
+                                        cols="30"
+                                        rows="10"
+                                        style={{ width: '100%', height: '100%' }}
+                                        onChange={(e) => {
+                                            this.setState({ exported: e.target.value });
+                                        }}
+                                    >
+                                        {exported}
+                                    </textarea>
+                                </div>
+                                <div className={styles.top}>
+                                    {'Save the following text into a file.'}
+                                    <br />
+                                    {'To import, replace these contents and press the "Import" button in the bottom-right.'}
+                                </div>
+                                <div className={styles.nextStep}>
+                                    <Button
+                                        btnSize="medium"
+                                        btnStyle="flat"
+                                        onClick={event => this.workspace.machineSettings.write(JSON.parse(exported))}
+                                    >
+                                        <i className="fa fa-check" />
+                                        {i18n._('Import')}
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                         {activeTab === 'machine' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.center} style={ this.getBkImageStyle('calibration_overview.png') }>
@@ -826,6 +893,114 @@ class CalibrationModal extends PureComponent {
                         )}
                         {activeTab === 'z' && (
                             <div className={styles.tabFull}>
+                                <div className={styles.top}>
+                                    {'This step checks that your Z-axis is moving up and down correctly.'}
+                                    <br />
+                                    {'It may be skipped if you have already tested the Z-axis, or your machine came preconfigured for Z-movement.'}
+                                </div>
+                                <div className={styles.center} >
+                                    {zAxisResSetting && (
+                                        <div>
+                                            <h3>Movement</h3>
+                                            Move the Z-axis up and down:
+                                            <br />
+
+                                            <input
+                                                type="text"
+                                                className={styles.mmInput}
+                                                name="zMove"
+                                                value={zMove}
+                                                onChange={e => {
+                                                    this.setState({ zMove: e.target.value });
+                                                }}
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn btn-medium"
+                                                onClick={() => this.zMove(Number(zMove))}
+                                            >
+                                                Move Up
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="btn btn-medium"
+                                                onClick={() => this.zMove(-Number(zMove))}
+                                            >
+                                                Move Down
+                                            </button>
+                                            <br /><br /><br />
+                                            Use calipers or a mm tape measure to enter the actual movement:
+                                            <br />
+                                            Z-Distance Moved:
+                                            <input
+                                                type="text"
+                                                className={styles.mmInput}
+                                                name="zDist"
+                                                value={zMoved}
+                                                onChange={e => {
+                                                    this.setState({ zMoved: e.target.value });
+                                                }}
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn btn-medium btn-primary"
+                                                onClick={() => this.zApplyScaling()}
+                                            >
+                                                Apply Scaling
+                                            </button>
+                                            <br /><br /><br />
+                                            Or, edit the raw value:
+                                            <br />
+                                            Z-Axis Resolution:
+                                            <input
+                                                type="text"
+                                                name="zRes"
+                                                value={zAxisRes}
+                                                onChange={e => {
+                                                    this.setState({ zAxisRes: e.target.value });
+                                                }}
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn btn-medium"
+                                                onClick={() => {
+                                                    this.workspace.machineSettings.write({
+                                                        zAxisRes: Number(zAxisRes),
+                                                    });
+                                                }}
+                                            >
+                                                Save
+                                            </button>
+                                        </div>
+                                    )}
+                                    {!zAxisResSetting && (
+                                        <div>
+                                            Your machine cannot change the Z-axis speed.
+                                        </div>
+                                    )}
+                                    {stepDirectionInvert && (
+                                        <div>
+                                            {'Invert Z-axis motion? '}
+                                            <select
+                                                className={styles.mmInput}
+                                                style={{ marginRight: '10px' }}
+                                                name="zInvert"
+                                                value={zInvert}
+                                                onChange={(event) => {
+                                                    this.setInvertZ(event.target.value);
+                                                }}
+                                            >
+                                                <option value="1">{i18n._('yes')}</option>
+                                                <option default value="0">{i18n._('no')}</option>
+                                            </select>
+                                        </div>
+                                    )}
+                                    {!stepDirectionInvert && (
+                                        <div>
+                                            Your machine does not support Z-axis inversion.
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         )}
                         {isCalibrationTab && (

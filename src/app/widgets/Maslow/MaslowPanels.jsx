@@ -4,7 +4,6 @@ import React, { PureComponent } from 'react';
 import { ProgressBar } from 'react-bootstrap';
 import mapGCodeToText from 'app/lib/gcode-text';
 import i18n from 'app/lib/i18n';
-import MaslowSettings from 'app/lib/Maslow/MaslowSettings';
 import Panel from 'app/components/Panel';
 import Toggler from 'app/components/Toggler';
 import Space from 'app/components/Space';
@@ -47,8 +46,6 @@ class MaslowPanels extends PureComponent {
 
     receiveBufferMin = 0;
 
-    settings = new MaslowSettings();
-
     renderError(top, classicLink, dueLink) {
         const firmwareLink = classicLink || dueLink;
         return (
@@ -72,7 +69,7 @@ class MaslowPanels extends PureComponent {
     saveSetting(key) {
         const { settingsEdits } = this.state;
         const controllerSettings = this.props.state.controller.settings || {};
-        this.workspace.writeSettings({
+        this.workspace.machineSettings.write({
             [key]: _.has(settingsEdits, key) ? settingsEdits[key] : controllerSettings.grbl[key].value,
         });
     }
@@ -106,7 +103,7 @@ class MaslowPanels extends PureComponent {
             return 'danger';
         })(buf.rx);
 
-        this.settings.update(controllerSettings);
+        this.workspace.machineSettings.update(controllerSettings);
 
         this.plannerBufferMax = Math.max(this.plannerBufferMax, buf.planner) || this.plannerBufferMax;
         this.receiveBufferMax = Math.max(this.receiveBufferMax, buf.rx) || this.receiveBufferMax;
@@ -251,11 +248,11 @@ class MaslowPanels extends PureComponent {
                         )}
                     </Panel>
                 )}
-                {!this.settings.isValid && (
+                {!this.workspace.machineSettings.isValid && (
                     <span style={{ fontStyle: 'italic' }}>
                         {'Problems detected with Maslow settings:'}
                         <ul>
-                            {this.settings.errors.map((err) => {
+                            {this.workspace.machineSettings.errors.map((err) => {
                                 return (
                                     <li key={err}>{err}</li>
                                 );

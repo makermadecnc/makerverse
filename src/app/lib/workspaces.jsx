@@ -5,7 +5,7 @@ import WorkspaceAxis from 'app/lib/workspace-axis';
 import series from 'app/lib/promise-series';
 import auth from 'app/lib/auth';
 import promisify from 'app/lib/promisify';
-import MaslowSettings from 'app/lib/Maslow/MaslowSettings';
+import MachineSettings from 'app/lib/MachineSettings';
 import api from 'app/api';
 import io from 'socket.io-client';
 import Controller from 'cncjs-controller';
@@ -17,7 +17,6 @@ import {
     MASLOW,
     GRBL,
     MARLIN,
-    TINYG,
     WORKFLOW_STATE_IDLE,
 } from '../constants';
 
@@ -84,6 +83,7 @@ class Workspaces extends events.EventEmitter {
 
         const controllerType = this.controllerAttributes.type;
         this.hardware = new Hardware(controllerType);
+        this.machineSettings = new MachineSettings(this, controllerType);
         this.activeState = new ActiveState(controllerType);
     }
 
@@ -237,38 +237,21 @@ class Workspaces extends events.EventEmitter {
     // Transformations to ensure that they are returned in mm
     // ---------------------------------------------------------------------------------------------
 
-    get reportsImperial() {
-        if (this.controllerAttributes.type === GRBL) {
-            return (Number(_.get(this._controllerSettings, 'settings.$13', 0)) || 0) > 0;
-        }
-        if (this.controllerAttributes.type === MASLOW) {
-            // Since there are two kinds of Maslow, and one is "true Gbrl"...
-            const settings = new MaslowSettings(this._controllerSettings);
-            // The Maslow Mega reports in inches when in G20 mode.
-            const defReportInches = this.activeState.isImperialUnits ? 1 : 0;
-            // Since the Due always has the setting present, the default will not apply to it.
-            const reportInInches = settings.getValue('reportInInches', defReportInches);
-            return reportInInches > 0;
-        }
-        return this.activeState.isImperialUnits;
-    }
-
-    _reportedValueToMM(val) {
-        return this.reportsImperial ? (val * 25.4) : val;
+    _reportedValueToMM(val, reportType = 'mpos') {
+        const ri = this.machineSettings.reportsImperial(this.activeState.isImperialUnits, reportType);
+        return ri ? (val * 25.4) : val;
     }
 
     get wpos() {
-        return _.mapValues(this.activeState.wpos, this._reportedValueToMM.bind(this));
+        return _.mapValues(this.activeState.wpos, (val) => {
+            return this._reportedValueToMM(val, 'wpos');
+        });
     }
 
     get mpos() {
-        // TinyG
-        if (this.controllerAttributes.type === TINYG) {
-            // https://github.com/synthetos/g2/wiki/Status-Reports
-            // Canonical machine position are always reported in millimeters with no offsets.
-            return this.activeState.mpos;
-        }
-        return _.mapValues(this.activeState.mpos, this._reportedValueToMM.bind(this));
+        return _.mapValues(this.activeState.mpos, (val) => {
+            return this._reportedValueToMM(val, 'mpos');
+        });
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -304,35 +287,7 @@ class Workspaces extends events.EventEmitter {
     }
 
     get isReady() {
-        return this.activeState.isIdle && this.controller.workflow.state === WORKFLOW_STATE_IDLE;
-    }
-
-    // Given a code: value map, write all the settings.
-    writeSettings(map, callback = null, delay = 2000) {
-        const cmds = [];
-        if (!this.isReady) {
-            cmds.push('reset');
-            cmds.push('unlock');
-        }
-        const lines = [];
-        Object.keys(map).forEach((code) => {
-            lines.push(`${code}=${map[code]}`);
-        });
-
-        this.blockingText = 'Preparing Machine...';
-        this.writeCommands(cmds, () => {
-            this.blockingText = 'Applying Settings...';
-            this.writeLines(lines, () => {
-                this.blockingText = 'Refreshing Settings...';
-                this.controller.writeln('$$');
-                setTimeout(() => {
-                    this.blockingText = null;
-                    if (callback) {
-                        callback();
-                    }
-                }, delay);
-            }, delay);
-        }, delay);
+        return this.activeState.isReady && this.controller.workflow.state === WORKFLOW_STATE_IDLE;
     }
 
     writeCommands(lines, callback = null, delay = 2000) {
@@ -433,6 +388,7 @@ class Workspaces extends events.EventEmitter {
         'controller:settings': (type, settings) => {
             log.debug(type, 'settings changed', settings);
             this.hardware.updateControllerSettings(settings);
+            this.machineSettings.update(settings);
             this._controllerSettings = settings;
         }
     };

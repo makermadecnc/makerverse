@@ -1,4 +1,5 @@
-import MaslowSettings from './MaslowSettings';
+import { MASLOW } from 'app/constants';
+import MachineSettings from '../MachineSettings';
 
 const maslowDefaultOpts = {
     chainLength: 3360,
@@ -30,7 +31,7 @@ class MaslowKinematics {
 
     opts = maslowDefaultOpts;
 
-    settings = new MaslowSettings();
+    settings = new MachineSettings(null, MASLOW);
 
     constructor(controller) {
         this.controller = controller;
@@ -44,6 +45,10 @@ class MaslowKinematics {
         });
         this.recomputeGeometry(opts);
         this.positionToChain(this.lastPosition.x, this.lastPosition.y); // save chain lengths
+    }
+
+    export() {
+        return this.settings.export(Object.keys(maslowDefaultOpts));
     }
 
     loadControllerSettings(controllerSettings) {
