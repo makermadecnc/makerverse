@@ -10,6 +10,7 @@ import api from 'app/api';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import auth from 'app/lib/auth';
+import Hardware from 'app/lib/hardware';
 import Workspaces from 'app/lib/workspaces';
 import analytics from 'app/lib/analytics';
 import {
@@ -31,6 +32,8 @@ class CreateWorkspace extends PureComponent {
     controller = new Controller(io);
 
     state = this.getInitialState();
+
+    hardware = null;
 
     actions = {
         toggleFullscreen: () => {
@@ -211,13 +214,13 @@ class CreateWorkspace extends PureComponent {
         },
         'controller:settings': (type, controllerSettings) => {
             log.debug('Got', type, 'settings:', controllerSettings);
-            this.workspace.hardware.updateControllerSettings(controllerSettings);
+            this.hardware.updateControllerSettings(controllerSettings);
 
             this.setState({
                 version: {
-                    isValid: this.workspace.hardware.isValid,
-                    firmware: this.workspace.hardware.firmwareStr,
-                    protocol: this.workspace.hardware.protocolStr,
+                    isValid: this.hardware.isValid,
+                    firmware: this.hardware.firmwareStr,
+                    protocol: this.hardware.protocolStr,
                 },
                 hasSettings: true
             });
@@ -334,6 +337,8 @@ class CreateWorkspace extends PureComponent {
             hasSettings: false,
         }));
 
+        this.hardware = new Hardware(this.state.controllerType);
+
         this.controller.openPort(port, {
             controllerType: this.state.controllerType,
             baudrate: baudrate,
@@ -376,7 +381,7 @@ class CreateWorkspace extends PureComponent {
                 {'You may also need to '}
                 <analytics.OutboundLink
                     eventLabel="update"
-                    to={this.workspace.firmware.updateLink}
+                    to={this.hardware.updateLink}
                     target="_blank"
                 >
                     {i18n._('Update Firmware')}
