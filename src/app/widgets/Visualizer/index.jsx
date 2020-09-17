@@ -165,9 +165,8 @@ class VisualizerWidget extends PureComponent {
     actions = {
         event: (opts) => {
             analytics.event({
+                ...{ category: 'interaction', action: 'press', label: 'visualizer' },
                 ...opts,
-                category: 'interaction',
-                action: 'visualizer',
             });
         },
         dismissNotification: () => {
@@ -219,7 +218,7 @@ class VisualizerWidget extends PureComponent {
                     ready: false
                 }
             }));
-            this.actions.event({ label: 'loadFile' });
+            this.actions.event({ action: 'load', label: 'workflow' });
 
             this.workspace.controller.command('watchdir:load', file, (err, data) => {
                 if (err) {
@@ -251,7 +250,7 @@ class VisualizerWidget extends PureComponent {
                     ready: false
                 }
             }));
-            this.actions.event({ label: 'uploadFile' });
+            this.actions.event({ action: 'upload', label: 'workflow' });
 
             this.workspace.controller.command('gcode:load', name, gcode, context, (err, data) => {
                 if (err) {
@@ -359,7 +358,7 @@ class VisualizerWidget extends PureComponent {
                 zmin: 0,
                 zmax: 0
             };
-            this.actions.event({ label: 'unloadGcode' });
+            this.actions.event({ action: 'unload', label: 'workflow' });
 
             this.setState((state) => ({
                 gcode: {
@@ -389,13 +388,13 @@ class VisualizerWidget extends PureComponent {
 
             if (workflow.state === WORKFLOW_STATE_IDLE) {
                 this.workspace.controller.command('gcode:start');
-                this.actions.event({ label: 'start' });
+                this.actions.event({ action: 'start', label: 'workflow' });
                 return;
             }
 
             if (workflow.state === WORKFLOW_STATE_PAUSED) {
                 const { notification } = this.state;
-                this.actions.event({ label: 'resume' });
+                this.actions.event({ action: 'resume', label: 'workflow' });
 
                 // M6 Tool Change
                 if (notification.type === NOTIFICATION_M6_TOOL_CHANGE) {
@@ -437,21 +436,21 @@ class VisualizerWidget extends PureComponent {
         handlePause: () => {
             const { workflow } = this.state;
             console.assert(includes([WORKFLOW_STATE_RUNNING], workflow.state));
-            this.actions.event({ label: 'pause' });
+            this.actions.event({ action: 'pause', label: 'workflow' });
 
             this.workspace.controller.command('gcode:pause');
         },
         handleStop: () => {
             const { workflow } = this.state;
             console.assert(includes([WORKFLOW_STATE_PAUSED], workflow.state));
-            this.actions.event({ label: 'stop' });
+            this.actions.event({ action: 'stop', label: 'workflow' });
 
             this.workspace.controller.command('gcode:stop', { force: true });
         },
         handleClose: () => {
             const { workflow } = this.state;
             console.assert(includes([WORKFLOW_STATE_IDLE], workflow.state));
-            this.actions.event({ label: 'unload' });
+            this.actions.event({ action: 'close', label: 'workflow' });
 
             this.workspace.controller.command('gcode:unload');
 
@@ -476,11 +475,13 @@ class VisualizerWidget extends PureComponent {
             }));
         },
         toPerspectiveProjection: (projection) => {
+            this.actions.event({ action: 'perspective' });
             this.setState((state) => ({
                 projection: 'perspective'
             }));
         },
         toOrthographicProjection: (projection) => {
+            this.actions.event({ action: 'orthographic' });
             this.setState((state) => ({
                 projection: 'orthographic'
             }));
@@ -494,6 +495,7 @@ class VisualizerWidget extends PureComponent {
             }));
         },
         toggleLimitsVisibility: () => {
+            this.actions.event({ action: 'toggle', label: 'limits' });
             this.setState((state) => ({
                 objects: {
                     ...state.objects,
@@ -505,6 +507,7 @@ class VisualizerWidget extends PureComponent {
             }));
         },
         toggleCoordinateSystemVisibility: () => {
+            this.actions.event({ action: 'toggle', label: 'coordinates' });
             this.setState((state) => ({
                 objects: {
                     ...state.objects,
@@ -516,6 +519,7 @@ class VisualizerWidget extends PureComponent {
             }));
         },
         toggleGridLineNumbersVisibility: () => {
+            this.actions.event({ action: 'toggle', label: 'gridLineNumbers' });
             this.setState((state) => ({
                 objects: {
                     ...state.objects,
@@ -527,6 +531,7 @@ class VisualizerWidget extends PureComponent {
             }));
         },
         toggleCuttingToolVisibility: () => {
+            this.actions.event({ action: 'toggle', label: 'tool' });
             this.setState((state) => ({
                 objects: {
                     ...state.objects,
@@ -539,68 +544,83 @@ class VisualizerWidget extends PureComponent {
         },
         camera: {
             toRotateMode: () => {
+                this.actions.event({ action: 'camera', label: 'rotateMode' });
                 this.setState((state) => ({
                     cameraMode: CAMERA_MODE_ROTATE
                 }));
             },
             toPanMode: () => {
+                this.actions.event({ action: 'camera', label: 'panMode' });
                 this.setState((state) => ({
                     cameraMode: CAMERA_MODE_PAN
                 }));
             },
             zoomFit: () => {
+                this.actions.event({ action: 'camera', label: 'zoomFit' });
                 if (this.visualizer) {
                     this.visualizer.zoomFit();
                 }
             },
             zoomIn: () => {
+                this.actions.event({ action: 'camera', label: 'zoomIn' });
                 if (this.visualizer) {
                     this.visualizer.zoomIn();
                 }
             },
             zoomOut: () => {
+                this.actions.event({ action: 'camera', label: 'zoomOut' });
                 if (this.visualizer) {
                     this.visualizer.zoomOut();
                 }
             },
             panUp: () => {
+                this.actions.event({ action: 'camera', label: 'panUp' });
                 if (this.visualizer) {
                     this.visualizer.panUp();
                 }
             },
             panDown: () => {
+                this.actions.event({ action: 'camera', label: 'panDown' });
                 if (this.visualizer) {
                     this.visualizer.panDown();
                 }
             },
             panLeft: () => {
+                this.actions.event({ action: 'camera', label: 'panLeft' });
                 if (this.visualizer) {
                     this.visualizer.panLeft();
                 }
             },
             panRight: () => {
+                this.actions.event({ action: 'camera', label: 'panRight' });
                 if (this.visualizer) {
                     this.visualizer.panRight();
                 }
             },
             lookAtCenter: () => {
+                this.actions.event({ action: 'camera', label: 'lookAtCenter' });
                 if (this.visualizer) {
                     this.visualizer.lookAtCenter();
                 }
             },
             toTopView: () => {
+                this.actions.event({ action: 'camera', label: 'top' });
                 this.setState({ cameraPosition: 'top' });
             },
             to3DView: () => {
+                this.actions.event({ action: 'camera', label: '3d' });
                 this.setState({ cameraPosition: '3d' });
             },
             toFrontView: () => {
+                this.actions.event({ action: 'camera', label: 'front' });
                 this.setState({ cameraPosition: 'front' });
             },
             toLeftSideView: () => {
+                this.actions.event({ action: 'camera', label: 'left' });
                 this.setState({ cameraPosition: 'left' });
             },
             toRightSideView: () => {
+                this.actions.event({ action: 'camera', label: 'right' });
                 this.setState({ cameraPosition: 'right' });
             }
         }

@@ -59,6 +59,7 @@ class MaslowCalibration {
 
     calibrate(measurements, callback) {
         log.debug('calibrating...');
+        this.recomputeIdeals();
         const measured = this.calculateMeasurementCoordinates(measurements);
         const xError = this.calculateXError(measured, this.idealCoordinates);
         const yError = this.calculateYError(measured, this.idealCoordinates);
@@ -80,7 +81,7 @@ class MaslowCalibration {
 
         let op = { ...orig };
         // Start by offsetting the motor offset by the y error, so it's a reasonable guess.
-        op.motorOffsetY -= yError;
+        op.motorOffsetY -= Math.round(yError);
         const decimals = 4;
         for (let i = 0; i < decimals; i++) {
             log.debug('calibration #', i);

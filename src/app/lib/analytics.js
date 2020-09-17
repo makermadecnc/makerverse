@@ -10,6 +10,20 @@ ReactGA.initialize(settings.analytics.trackingId, {
     }
 });
 
+// Common names for dimensions
+const DIMENSION_MAP = {
+    // page: 1,
+    version: 2,
+    build: 3,
+    // hostname: 4,
+    // protocol: 5,
+    firmwareName: 6,
+    firmwareVersion: 7,
+    protocolName: 8,
+    protocolVersion: 9,
+    controllerType: 10,
+};
+
 // When in development mode, analytics go into the console and not to the server.
 const wrapDev = (func) => {
     const branch = _.get(settings, 'version.branch');
@@ -22,13 +36,23 @@ const wrapDev = (func) => {
 };
 
 const pageview = wrapDev(ReactGA.pageview);
+const set = wrapDev(ReactGA.set);
+
+const setDimensions = (opts) => {
+    Object.keys(DIMENSION_MAP).forEach((d) => {
+        if (_.has(opts, d)) {
+            const dNum = DIMENSION_MAP[d];
+            opts[`dimension${dNum}`] = opts[d];
+            delete opts[d];
+        }
+    });
+    set(opts);
+};
 
 const trackPage = (location, workspace) => {
-    analytics.set({
+    setDimensions({
         version: settings.version.public,
         build: settings.version.build,
-        hostname: location.hostname,
-        protocol: location.protocol,
     });
     const path = workspace ? workspace.hardware.path : location.pathname;
     pageview(path);
@@ -40,7 +64,7 @@ const analytics = {
     trackPage: trackPage,
     event: wrapDev(ReactGA.event),
     exception: wrapDev(ReactGA.event),
-    set: wrapDev(ReactGA.set),
+    set: setDimensions,
     OutboundLink: ReactGA.OutboundLink,
 };
 

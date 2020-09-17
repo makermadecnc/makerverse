@@ -337,7 +337,7 @@ class CreateWorkspace extends PureComponent {
             hasSettings: false,
         }));
 
-        this.hardware = new Hardware(this.state.controllerType);
+        this.hardware = new Hardware(null, this.state.controllerType);
 
         this.controller.openPort(port, {
             controllerType: this.state.controllerType,

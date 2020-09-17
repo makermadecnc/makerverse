@@ -35,9 +35,8 @@ class CalibrationModal extends PureComponent {
 
     event(opts) {
         analytics.event({
+            ...{ category: 'interaction', action: 'press', label: 'quickaccess' },
             ...opts,
-            category: 'interaction',
-            action: 'calibration',
         });
     }
 

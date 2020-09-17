@@ -41,9 +41,8 @@ class WorkflowControl extends PureComponent {
 
     event(opts) {
         analytics.event({
+            ...{ category: 'interaction', action: 'press', label: 'workflow' },
             ...opts,
-            category: 'interaction',
-            action: 'workflow',
         });
     }
 

@@ -52,9 +52,8 @@ class PrimaryToolbar extends PureComponent {
 
     event(opts) {
         analytics.event({
+            ...{ category: 'interaction', action: 'press', label: 'toolbar' },
             ...opts,
-            category: 'interaction',
-            action: 'visualizer',
         });
     }
 

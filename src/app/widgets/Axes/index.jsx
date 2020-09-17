@@ -61,9 +61,8 @@ class AxesWidget extends PureComponent {
 
     event(opts) {
         analytics.event({
+            ...{ category: 'interaction', action: 'press', label: 'axes' },
             ...opts,
-            category: 'interaction',
-            action: 'axes',
         });
     }
 
@@ -191,12 +190,12 @@ class AxesWidget extends PureComponent {
             this.workspace.controller.command('gcode', 'G91'); // relative
             this.workspace.controller.command('gcode', 'G0 ' + s);
             this.workspace.controller.command('gcode', 'G90'); // absolute
-            this.event({ label: 'jog' });
+            this.event({ action: 'jog' });
         },
         move: (params = {}) => {
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             this.workspace.controller.command('gcode', 'G0 ' + s);
-            this.event({ label: 'move' });
+            this.event({ action: 'move' });
         },
         selectStep: (value = '') => {
             const step = Number(value);

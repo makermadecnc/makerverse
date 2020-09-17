@@ -43,9 +43,8 @@ class Keypad extends PureComponent {
 
     event(opts) {
         analytics.event({
+            ...{ category: 'interaction', action: 'press', label: 'keypad' },
             ...opts,
-            category: 'interaction',
-            action: 'keypad',
         });
     }
 
@@ -122,18 +121,24 @@ class Keypad extends PureComponent {
         });
     }
 
+    getMoveString(params, label) {
+        return _.map(params, (value, letter) => {
+            const l = letter.toUpperCase();
+            this.event({ action: `move${l}`, label: label, value: Number(value) });
+            return `${l}${value}`;
+        }).join(' ');
+    }
+
     move(params) {
-        const s = _.map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
+        const s = this.getMoveString(params, 'absolute');
         this.workspace.controller.command('gcode', 'G0 ' + s);
-        this.event({ label: 'move' });
     }
 
     jog(params) {
-        const s = _.map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
+        const s = this.getMoveString(params, 'relative');
         this.workspace.controller.command('gcode', 'G91'); // relative
         this.workspace.controller.command('gcode', 'G0 ' + s);
         this.workspace.controller.command('gcode', 'G90'); // absolute
-        this.event({ label: 'jog' });
     }
 
     getJogDistance() {

@@ -5,7 +5,8 @@ import {
 } from 'app/constants';
 
 class Hardware {
-    constructor(controllerType, controllerSettings = {}) {
+    constructor(workspace, controllerType, controllerSettings = {}) {
+        this._workspace = workspace;
         this._controllerType = controllerType;
         this.updateControllerSettings(controllerSettings);
     }
@@ -18,7 +19,8 @@ class Hardware {
         const hadFirmware = this.hasFirmware;
         this.firmware = controllerSettings.firmware || {};
         this.firmwareStr = this._getVersionStr('firmware', this.firmware);
-        if (this.hasFirmware && !hadFirmware) {
+        const updatedFirmware = this.hasFirmware && !hadFirmware;
+        if (updatedFirmware) {
             analytics.event({
                 category: 'controller',
                 action: 'firmware',
@@ -29,12 +31,17 @@ class Hardware {
         const hadProtocol = this.hasProtocol;
         this.protocol = controllerSettings.protocol || {};
         this.protocolStr = this._getVersionStr('protocol', this.protocol);
-        if (this.hasProtocol && !hadProtocol) {
+        const updatedProtocol = this.hasProtocol && !hadProtocol;
+        if (updatedProtocol) {
             analytics.event({
                 category: 'controller',
                 action: 'protocol',
                 label: this.protocolStr,
             });
+        }
+
+        if ((!this._workspace || this._workspace.isActive) && (updatedFirmware || updatedProtocol)) {
+            this._updateAnalytics();
         }
     }
 
@@ -42,14 +49,25 @@ class Hardware {
         return this._controllerType;
     }
 
+    // When this hardware is activated in the current workspace
+    onActivated() {
+        this._updateAnalytics();
+    }
+
+    _updateAnalytics() {
+        analytics.set({
+            controllerType: this.controllerType,
+            firmwareName: this.firmware.name,
+            firmwareVersion: this.firmware.version,
+            protocolName: this.protocol.name,
+            protocolVersion: this.protocol.version,
+        });
+    }
+
     // For a firmware or protocol object, combine name & version into a string & set dimensions.
     _getVersionStr(key, values) {
         const name = values.name && values.name.length > 0 ? values.name : '?';
         const vers = values.version && values.version.length > 0 ? values.version : '?';
-        analytics.set({
-            [`${key}Name`]: name,
-            [`${key}Version`]: vers,
-        });
         return `${name} v${vers}`;
     }
 

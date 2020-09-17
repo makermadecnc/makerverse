@@ -82,7 +82,7 @@ class Workspaces extends events.EventEmitter {
         this.addControllerEvents(this._controllerEvents);
 
         const controllerType = this.controllerAttributes.type;
-        this.hardware = new Hardware(controllerType);
+        this.hardware = new Hardware(this, controllerType);
         this.machineSettings = new MachineSettings(this, controllerType);
         this.activeState = new ActiveState(controllerType);
     }
@@ -148,6 +148,7 @@ class Workspaces extends events.EventEmitter {
         if (this.controllerAttributes.reconnect) {
             this.openPort();
         }
+        this.hardware.onActivated();
     }
 
     onDeactivated() { }
