@@ -12,11 +12,7 @@ With this approach, you can connect to the Makerverse app from any web browser o
 
 _**Tip**: the easiest setup is the [Raspberry Pi Image](/installation/web-server/raspberry-pi/), which configures the web server for you._
 
-## Launch Script
-
-Start by downloading the **Source Code** from the [latest release](https://github.com/makermadecnc/makerverse/releases) (or clone the git repository).
-
-There is a launch script located at `bin/launch`. Run it from a command prompt on almost any machine. It will try to run Makerverse via Docker (by default). See the [Docker](/installation/web-server/docker/) section for help.
+If you don't wish to use the pre-built image, you can achieve the same thing on a Raspberry Pi (or any Debian computer) using the [Linux Service](/installation/web-server/linux-service/) installation. For all other cases, refer directly to the [Docker](/installation/web-server/docker/) instructions.
 
 ## Configuration
 

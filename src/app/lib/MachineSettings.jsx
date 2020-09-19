@@ -21,6 +21,50 @@ const GRBL_SETTINGS = {
     zAxisMax: ['z-axis maximum travel'],
 };
 
+// How many digits to round?
+const NUMBER_PRECISION = {
+    machineHeight: 1,
+    machineWidth: 1,
+    motorOffsetY: 1,
+    distBetweenMotors: 1,
+    rotationDiskRadius: 1,
+    origChainLength: 1,
+    chainLength: 1,
+    chainOverSprocket: 0,
+    leftChainTolerance: 5,
+    rightChainTolerance: 5,
+    sledWeight: 1,
+    sledWidth: 1,
+    sledHeight: 1,
+    sledCg: 1,
+    mainStepsPerRev: 1,
+    distancePerRotation: 1,
+    zAxisRpm: 1,
+    zAxisDistancePerRotation: 2,
+    zAxisRes: 2,
+    kpPos: 2,
+    kiPos: 2,
+    kdPos: 2,
+    posPro: 2,
+    kpVel: 2,
+    kiVel: 2,
+    kdVel: 2,
+    velPro: 2,
+    zAxisKpPos: 2,
+    zAxisKiPos: 2,
+    zAxisKdPos: 2,
+    zAxisPosPro: 2,
+    zAxisKpVel: 2,
+    zAxisKiVel: 2,
+    zAxisKdVel: 2,
+    zAxisVelPro: 2,
+    chainElongationFactor: 8,
+    positionErrorAlarmLimit: 1,
+    reserved1: 2,
+    reserved2: 2,
+    chainSagCorrection: 5,
+};
+
 const REQUIRED_SETTINGS = {
     [MASLOW]: {
         machineHeight: ['machine height'],
@@ -44,16 +88,39 @@ const OPTIONAL_SETTINGS = {
         ...GRBL_SETTINGS,
         sledWidth: ['sled width'],
         sledHeight: ['sled height'],
+        sledCg: ['sled cg'],
+        mainStepsPerRev: ['main steps per revolution'],
+        distancePerRotation: ['distance / rotation'],
         kinematicsType: ['kinematics type'],
+        zAxisRpm: ['max z axis rpm'],
+        zAxisDistancePerRotation: ['z axis distance / rotation'],
         zAxisRes: ['z-axis travel resolution', 'z axis steps per revolution'],
+        kpPos: ['main kp pos'],
+        kiPos: ['main ki pos'],
+        kdPos: ['main kd pos'],
+        posPro: ['main pos pro'],
+        kpVel: ['main kp vel'],
+        kiVel: ['main ki vel'],
+        kdVel: ['main kd vel'],
+        velPro: ['main velocity pro'],
+        zAxisKpPos: ['z axis kp pos'],
+        zAxisKiPos: ['z axis ki pos'],
+        zAxisKdPos: ['z axis kd pos'],
+        zAxisPosPro: ['z axis pos pro'],
+        zAxisKpVel: ['z axis kp vel'],
+        zAxisKiVel: ['z axis ki vel'],
+        zAxisKdVel: ['z axis kd vel'],
+        zAxisVelPro: ['z axis velocity pro'],
+        positionErrorAlarmLimit: ['position error alarm limit'],
+        reserved1: ['reserved1'],
+        reserved2: ['reserved2'],
+        chainSagCorrection: ['chain sag correction'],
     },
 };
 
 // Acts as an intermediary between controller's settings ($13, etc.)
 // And human-readable settings (reportsImperial, etc.)
 class MachineSettings {
-    _controllerSettings = {};
-
     _mappedSettings = {};
 
     _unmappedSettings = {};
@@ -79,44 +146,66 @@ class MachineSettings {
     }
 
     update(controllerSettings) {
-        this._controllerSettings = { ...this._controllerSettings, controllerSettings };
-        const requiredSettings = this.requiredSettings;
-        const allSettings = this.allSettings;
+        this._grbl = controllerSettings.grbl || {};
 
-        Object.keys(controllerSettings.grbl || {}).forEach((code) => {
-            const g = controllerSettings.grbl[code];
-            const msg = `${g.message}, ${g.units}`.toLowerCase();
-            let mapped = false;
-            Object.keys(allSettings).forEach((key) => {
-                allSettings[key].forEach((prefix) => {
-                    if (msg.startsWith(prefix)) {
-                        this._mappedSettings[key] = g;
-                        mapped = true;
-                    }
-                });
-            });
+        this._unmappedSettings = {};
+        this._mappedSettings = {};
+        Object.keys(this._grbl).forEach((code) => {
+            const mapped = this.mapSetting(code);
             if (!mapped) {
-                this._unmappedSettings[code] = g;
+                this._unmappedSettings[code] = this._grbl[code];
+            } else {
+                this._unmappedSettings[code] = mapped;
+                this._mappedSettings[mapped.key] = mapped;
             }
         });
 
         this._errors = [];
-        Object.keys(requiredSettings).forEach((key) => {
+        Object.keys(this.requiredSettings).forEach((key) => {
             if (!_.has(this._mappedSettings, key)) {
                 this._errors.push(`Missing setting: ${key}`);
             }
         });
     }
 
+    mapSetting(code) {
+        if (_.has(this._unmappedSettings, code)) {
+            return this._unmappedSettings[code];
+        }
+        const allSettings = this.allSettings;
+        const g = this._grbl[code];
+        const msg = `${g.message}, ${g.units}`.toLowerCase();
+        let mapped = null;
+        Object.keys(allSettings).forEach((key) => {
+            allSettings[key].forEach((prefix) => {
+                if (msg.startsWith(prefix)) {
+                    mapped = { ...g, code: code, key: key };
+                }
+            });
+        });
+        return mapped;
+    }
+
     has(key) {
         return _.has(this._mappedSettings, key);
     }
 
-    getValue(key, defValue) {
-        if (!this.has(key)) {
+    getSetting(keyOrCode) {
+        if (_.has(this._mappedSettings, keyOrCode)) {
+            return this._mappedSettings[keyOrCode];
+        }
+        if (_.has(this._unmappedSettings, keyOrCode)) {
+            return this._unmappedSettings[keyOrCode];
+        }
+        return null;
+    }
+
+    getValue(keyOrCode, defValue) {
+        const setting = this.getSetting(keyOrCode);
+        if (!setting) {
             return defValue;
         }
-        return _.get(this._mappedSettings, key).value;
+        return this._sanitizeSettingValue(setting, setting.value);
     }
 
     reportsImperial(isInImperialUnitsMode, reportType) {
@@ -166,6 +255,10 @@ class MachineSettings {
         this.write({ [setting.name]: val });
     }
 
+    get all() {
+        return this._unmappedSettings;
+    }
+
     get map() {
         return this._mappedSettings;
     }
@@ -195,14 +288,16 @@ class MachineSettings {
     }
 
     // Before writing a setting value, do some checks.
-    _sanitizeSettingValue(val) {
+    _sanitizeSettingValue(setting, val) {
+        if (!_.has(NUMBER_PRECISION, setting.key)) {
+            return val;
+        }
         const number = Number(val);
-        console.log('setting', typeof val, val, number);
         if (typeof number === 'number') {
             val = number;
         }
         if (typeof val === 'number') {
-            return Math.round(val * 1000000) / 1000000;
+            return val.toFixed(NUMBER_PRECISION[setting.key]);
         }
         return val;
     }
@@ -216,7 +311,8 @@ class MachineSettings {
         }
         const lines = [];
         Object.keys(map).forEach((code) => {
-            const val = this._sanitizeSettingValue(map[code]);
+            const setting = this.mapSetting(code);
+            const val = this._sanitizeSettingValue(setting, map[code]);
             if (code.startsWith('$')) {
                 lines.push(`${code}=${val}`);
             } else if (_.has(this._mappedSettings, code)) {

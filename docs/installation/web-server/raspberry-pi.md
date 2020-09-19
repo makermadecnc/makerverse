@@ -10,7 +10,7 @@ nav_order: 1
 
 This is the easiest approach.
 
-It does all the work of setting up the Linux Service and Docker Image (below) for you.
+It does all the work of setting up the Docker environment (and Linux service) for you. If you prefer to set up your Raspberry Pi manually (instead of using a pre-built SD card), see the [Linux Service](/installation/web-server/linux-service/) instructions.
 
 ## Choose Release
 

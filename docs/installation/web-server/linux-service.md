@@ -12,8 +12,7 @@ On a Raspberry Pi, Ubuntu, and other Linux machines you can use systemd to run M
 
 _Note: these steps are already performed on the Raspberry Pi image._
 
-- First ensure that you are able to start the application correctly via `bin/launch`.
-- See the [Docker](/installation/web-server/docker/) section if you have trouble.
+- Read the [Docker launch instructions](/installation/web-server/docker/) and make sure `bin/launch` works.
 - Once you're sure the server is running the way you want it, terminate the server.
 - Now run `bin/server install` to create the service.
 
@@ -41,4 +40,4 @@ The following commands are helpful if something is not working:
 
 ## Updating
 
-Use `sudo systemctl restart makerverse`. The Makerverse web server will keep running the old version while it downloads the updates and restarts the server. You can check on the update progress with `journalctl -xe`. After a few minutes, refreshing the "About" screen should show the new version.
+Just run the launch script, i.e., `makerverse/bin/launch`. Details about the updating progress (if any) will be displayed on the screen before the server is restarted. Note that any clients will be disconnected, and any cuts/prints halted.

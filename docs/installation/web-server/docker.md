@@ -43,11 +43,18 @@ Unplug any USB ports connected to a machine, and then re-connect them. The rule 
 
 ## Launching Makerverse
 
-The `bin/launch` script is the easiest way to run Makerverse. For most users, you should simply type `bin/launch` in the terminal to start the application.
+Start by downloading the **Source Code** from the [latest release](https://github.com/makermadecnc/makerverse/releases) (or clone the git repository). There is a launch script located at `bin/launch`. For most users, you should simply type `bin/launch` in the terminal to start the application.
+
+If you have `git` installed, you can just copy-and-paste:
+
+```
+git clone https://github.com/makermadecnc/makerverse.git
+makerverse/bin/launch
+```
 
 After a few minutes, you should be able to connect to Makerverse via port `8000` on the IP address of the computer. For example, `http://localhost:8000` (when on the same computer), or `http://192.168.0.100:8000` (if connecting to a computer with the IP address `192.168.0.100`). Once this works, Linux users may optionally move on to the [Linux Service](/installation/web-server/linux-service/) section to run the application automatically.
 
-## Run Manually
+### Run Manually (Optional)
 
 If you prefer to run the Docker image directly instead of using `bin/launch`, you should do the following:
 

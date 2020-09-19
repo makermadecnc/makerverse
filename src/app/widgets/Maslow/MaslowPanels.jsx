@@ -31,18 +31,17 @@ class MaslowPanels extends PureComponent {
         return Workspaces.all[this.props.workspaceId];
     }
 
-    state = {
-        'settingsEdits': this.emptySettings,
-    };
-
-    get emptySettings() {
+    getEmptySettings() {
         const ret = {};
-        Object.keys(this.workspace.machineSettings.map).forEach((code) => {
-            const setting = this.workspace.machineSettings.map[code];
-            ret[code] = setting.value;
+        Object.keys(this.workspace.machineSettings.all).forEach((code) => {
+            ret[code] = this.workspace.machineSettings.getValue(code);
         });
         return ret;
     }
+
+    state = {
+        'settingsEdits': this.getEmptySettings(),
+    };
 
     // https://github.com/grbl/grbl/wiki/Interfacing-with-Grbl
     // Grbl v0.9: BLOCK_BUFFER_SIZE (18), RX_BUFFER_SIZE (128)
@@ -55,33 +54,40 @@ class MaslowPanels extends PureComponent {
 
     receiveBufferMin = 0;
 
-    renderError(top, classicLink, dueLink) {
-        const firmwareLink = classicLink || dueLink;
+    renderError(top) {
         return (
             <div className={styles.noConnection}>
                 {top}
-                {firmwareLink && <hr style={{ marginTop: '10px', marginBottom: '10px' }} />}
-                {classicLink && (
-                    <div>
-                        Download the <a href="https://github.com/WebControlCNC/Firmware/tree/release/holey" target="_blank" rel="noopener noreferrer">Arduino Mega (Holey) firmware</a>.
-                    </div>
-                )}
-                {dueLink && (
-                    <div>
-                        Download the <a href="https://github.com/makermadecnc/MaslowDue" target="_blank" rel="noopener noreferrer">Arduino Due (M2) firmware</a>.
-                    </div>
-                )}
+                <hr style={{ marginTop: '10px', marginBottom: '10px' }} />
+                <div>
+                    Download the <a href="http://www.makerverse.com/machines/cnc/#maslow" target="_blank" rel="noopener noreferrer">Arduino Firmware</a>.
+                </div>
             </div>
         );
     }
 
-    saveSetting(key) {
+    saveSetting(code) {
         const { settingsEdits } = this.state;
-        const controllerSettings = this.props.state.controller.settings || {};
         this.workspace.machineSettings.write({
-            [key]: _.has(settingsEdits, key) ? settingsEdits[key] : controllerSettings.grbl[key].value,
+            [code]: settingsEdits[code],
         });
     }
+
+    controllerEvents = {
+        'controller:settings': (type, data) => {
+            this.workspace.machineSettings.update(data);
+            this.setState({ settingsEdits: this.getEmptySettings() });
+        }
+    };
+
+    componentDidMount() {
+        this.workspace.addControllerEvents(this.controllerEvents);
+    }
+
+    componentWillUnmount() {
+        this.workspace.removeControllerEvents(this.controllerEvents);
+    }
+
 
     render() {
         const { state, actions } = this.props;
@@ -89,7 +95,6 @@ class MaslowPanels extends PureComponent {
         const none = '–';
         const panel = state.panel;
         const controllerState = state.controller.state || {};
-        const controllerSettings = state.controller.settings || {};
         const parserState = _.get(controllerState, 'parserstate', {});
         const activeState = _.get(controllerState, 'status.activeState') || none;
         const feedrate = _.get(controllerState, 'status.feedrate', _.get(parserState, 'feedrate', none));
@@ -112,13 +117,14 @@ class MaslowPanels extends PureComponent {
             return 'danger';
         })(buf.rx);
 
-        this.workspace.machineSettings.update(controllerSettings);
-
         this.plannerBufferMax = Math.max(this.plannerBufferMax, buf.planner) || this.plannerBufferMax;
         this.receiveBufferMax = Math.max(this.receiveBufferMax, buf.rx) || this.receiveBufferMax;
 
-        const fv = controllerSettings.firmware ? (Number(controllerSettings.firmware.version) || 0) : 0;
-        const fn = controllerSettings.firmware ? controllerSettings.firmware.name : null;
+        const allSettings = this.workspace.machineSettings.all;
+        const hasFirmware = this.workspace.hardware.hasFirmware;
+        const firmware = this.workspace.hardware.firmware;
+        const fv = hasFirmware ? (Number(firmware.version) || 0) : 0;
+        const fn = hasFirmware ? firmware.name : null;
 
         let banner = null;
 
@@ -130,17 +136,17 @@ class MaslowPanels extends PureComponent {
                     The firmware is not reporting any known Maslow versions.
                     This is common if you plugged in a regular Grbl device, like the M2 with factory firmware.
                 </span>),
-            true, true);
+            );
         } else if (fn === 'MaslowClassic') {
             if (fv < MASLOW_MIN_FIRMWARE_CLASSIC) {
-                return this.renderError(`Please upgrade your Maslow Holey firmware (${MASLOW_MIN_FIRMWARE_CLASSIC} or later).`, true, false);
+                return this.renderError(`Please upgrade your Maslow Holey firmware (${MASLOW_MIN_FIRMWARE_CLASSIC} or later).`);
             }
         } else if (fn === 'MaslowDue') {
             if (fv < MASLOW_MIN_FIRMWARE_DUE) {
-                return this.renderError(`Please upgrade your Maslow Due firmware (${MASLOW_MIN_FIRMWARE_DUE} or later).`, false, true);
+                return this.renderError(`Please upgrade your Maslow Due firmware (${MASLOW_MIN_FIRMWARE_DUE} or later).`);
             }
             if (fv < MASLOW_CUR_FIRMWARE_DUE) {
-                banner = this.renderError('There is an update available for your Maslow Due firmware.', false, true);
+                banner = this.renderError('There is an update available for your Maslow Due firmware.');
             }
         } else {
             return this.renderError(
@@ -149,7 +155,7 @@ class MaslowPanels extends PureComponent {
                     <br /><br />
                     {`The firmware reported it was of type ${fn}, but 'Maslow' was expected.`}
                     Please use an Arduino Due or Mega with the appropriate firmware.
-                </span>, true, true
+                </span>
             );
         }
 
@@ -291,12 +297,12 @@ class MaslowPanels extends PureComponent {
                                 Hover over setting names for information.
                             </span>
                             <hr style={{ marginTop: '10px', marginBottom: '10px' }} />
-                            {Object.keys(controllerSettings.grbl).map((key) => {
-                                const grbl = controllerSettings.grbl[key];
-                                const name = (grbl.message && grbl.message.length > 0) ? grbl.message : grbl.name;
-                                const title = `${grbl.name}: ${grbl.message}`;
+                            {Object.keys(allSettings).map((code) => {
+                                const setting = allSettings[code];
+                                const name = (setting.message && setting.message.length > 0) ? setting.message : setting.name;
+                                const title = `${setting.name}: ${setting.message}`;
                                 return (
-                                    <div key={key} className="row no-gutters">
+                                    <div key={code} className="row no-gutters">
                                         <div className="col col-xs-5">
                                             <div className={styles.textEllipsis} title={title}>
                                                 {name}
@@ -306,26 +312,26 @@ class MaslowPanels extends PureComponent {
                                             <input
                                                 type="text"
                                                 className={styles.setting}
-                                                value={ _.has(settingsEdits, key) ? settingsEdits[key] : grbl.value}
+                                                value={settingsEdits[code]}
                                                 onChange={(e) => {
                                                     this.setState({
                                                         settingsEdits: {
                                                             ...settingsEdits,
-                                                            [key]: e.target.value
+                                                            [code]: e.target.value
                                                         }
                                                     });
                                                 }}
                                             />
                                         </div>
                                         <div className="col col-xs-1" style={{ textAlign: 'right', fontStyle: 'italic', fontSize: '-2em' }}>
-                                            {grbl.units}
+                                            {setting.units}
                                         </div>
                                         <div className="col col-xs-2" style={{ textAlign: 'right' }}>
                                             <button
                                                 type="button"
                                                 className="btn btn-sm btn-default"
                                                 onClick={() => {
-                                                    this.saveSetting(key);
+                                                    this.saveSetting(code);
                                                 }}
                                                 title={i18n._('Save')}
                                             >
@@ -550,8 +556,7 @@ class MaslowPanels extends PureComponent {
                                 </div>
                                 <div className="col col-xs-8">
                                     <div className={styles.well}>
-                                        {controllerSettings.protocol && controllerSettings.protocol.name}
-                                        ({controllerSettings.protocol && controllerSettings.protocol.version})
+                                        {this.workspace.hardware.protocolStr}
                                     </div>
                                 </div>
                             </div>
