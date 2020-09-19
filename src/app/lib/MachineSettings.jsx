@@ -311,16 +311,13 @@ class MachineSettings {
         }
         const lines = [];
         Object.keys(map).forEach((code) => {
-            const setting = this.mapSetting(code);
-            const val = this._sanitizeSettingValue(setting, map[code]);
-            if (code.startsWith('$')) {
-                lines.push(`${code}=${val}`);
-            } else if (_.has(this._mappedSettings, code)) {
-                const setting = _.get(this._mappedSettings, code);
-                lines.push(`${setting.name}=${val}`);
-            } else {
+            const setting = this.getSetting(code);
+            if (!setting) {
                 log.error(`Invalid setting cannot be written: ${code}`);
+                return;
             }
+            const val = this._sanitizeSettingValue(setting, map[code]);
+            lines.push(`${setting.name}=${val}`);
         });
 
         this._workspace.blockingText = 'Preparing Machine...';
