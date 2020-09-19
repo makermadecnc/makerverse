@@ -124,7 +124,7 @@ class Keypad extends PureComponent {
     getMoveString(params, label) {
         return _.map(params, (value, letter) => {
             const l = letter.toUpperCase();
-            this.event({ action: `move${l}`, label: label, value: Number(value) });
+            this.event({ action: `move${l}`, label: label, value: Math.abs(Number(value)) });
             return `${l}${value}`;
         }).join(' ');
     }

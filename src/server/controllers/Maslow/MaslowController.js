@@ -523,7 +523,7 @@ class MaslowController {
         this.runner.on('settings', (res) => {
             const { name, value, message } = res;
             const setting = this.hardware.setGrbl(name, value, message);
-            this.log.debug(`setting ${setting.name}=${setting.value}`);
+            this.log.debug(`setting ${name}=${value} (${setting.message})`);
 
             // Don't echo the settings back to the client. The UI should now handle it, and
             // it's confusing when they only show up on first connection.

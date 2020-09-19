@@ -194,6 +194,19 @@ class MachineSettings {
         this.write(map, callback, delay);
     }
 
+    // Before writing a setting value, do some checks.
+    _sanitizeSettingValue(val) {
+        const number = Number(val);
+        console.log('setting', typeof val, val, number);
+        if (typeof number === 'number') {
+            val = number;
+        }
+        if (typeof val === 'number') {
+            return Math.round(val * 1000000) / 1000000;
+        }
+        return val;
+    }
+
     // Given a code: value map, write all the settings.
     write(map, callback = null, delay = 2000) {
         const cmds = [];
@@ -203,11 +216,12 @@ class MachineSettings {
         }
         const lines = [];
         Object.keys(map).forEach((code) => {
+            const val = this._sanitizeSettingValue(map[code]);
             if (code.startsWith('$')) {
-                lines.push(`${code}=${map[code]}`);
+                lines.push(`${code}=${val}`);
             } else if (_.has(this._mappedSettings, code)) {
                 const setting = _.get(this._mappedSettings, code);
-                lines.push(`${setting.name}=${map[code]}`);
+                lines.push(`${setting.name}=${val}`);
             } else {
                 log.error(`Invalid setting cannot be written: ${code}`);
             }

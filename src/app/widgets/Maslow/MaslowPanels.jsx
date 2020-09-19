@@ -17,7 +17,7 @@ import {
 
 const MASLOW_MIN_FIRMWARE_CLASSIC = 51.28;
 const MASLOW_MIN_FIRMWARE_DUE = 20200905;
-const MASLOW_CUR_FIRMWARE_DUE = 20200909;
+const MASLOW_CUR_FIRMWARE_DUE = 20200915;
 
 class MaslowPanels extends PureComponent {
     static propTypes = {
@@ -32,8 +32,17 @@ class MaslowPanels extends PureComponent {
     }
 
     state = {
-        'settingsEdits': {}
+        'settingsEdits': this.emptySettings,
     };
+
+    get emptySettings() {
+        const ret = {};
+        Object.keys(this.workspace.machineSettings.map).forEach((code) => {
+            const setting = this.workspace.machineSettings.map[code];
+            ret[code] = setting.value;
+        });
+        return ret;
+    }
 
     // https://github.com/grbl/grbl/wiki/Interfacing-with-Grbl
     // Grbl v0.9: BLOCK_BUFFER_SIZE (18), RX_BUFFER_SIZE (128)
@@ -297,10 +306,11 @@ class MaslowPanels extends PureComponent {
                                             <input
                                                 type="text"
                                                 className={styles.setting}
-                                                value={settingsEdits[key] || grbl.value}
+                                                value={ _.has(settingsEdits, key) ? settingsEdits[key] : grbl.value}
                                                 onChange={(e) => {
                                                     this.setState({
                                                         settingsEdits: {
+                                                            ...settingsEdits,
                                                             [key]: e.target.value
                                                         }
                                                     });

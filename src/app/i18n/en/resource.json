@@ -535,5 +535,9 @@
     "Sled": "Sled",
     "Z-Axis": "Z-Axis",
     "Edge": "Edge",
-    "Precision": "Precision"
+    "Precision": "Precision",
+    "Export Calibration": "Export Calibration",
+    "Import": "Import",
+    "yes": "yes",
+    "no": "no"
 }
