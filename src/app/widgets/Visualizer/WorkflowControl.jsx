@@ -254,9 +254,9 @@ class WorkflowControl extends PureComponent {
                         {canClose && this.renderButtonFeature('unload', null, 'Unload the current program', 'fa-trash', 'danger')}
                     </div>
                     <div className="btn-group btn-group-sm">
-                        {this.renderButtonFeature('reset', 'Reset', 'Reset board connection', 'fa-plug', 'danger')}
                         {activeState.isIdle && this.renderButtonFeature('sleep', 'Sleep', 'Put machine to sleep', 'fa-bed', 'success')}
                         {(activeState.hasAlarm || hasError) && this.renderButtonFeature('unlock', 'Unlock', 'Clear system alarms and errors', 'fa-unlock-alt', 'warning')}
+                        {this.renderButtonFeature('reset', 'Reset', 'Reset board connection', 'fa-plug', 'danger')}
                     </div>
                     <div className="pull-right btn-group btn-group-sm">
                         {this.renderButtonFeature('homing', 'Set Home', 'Set current position as machine home', 'fa-home', 'primary')}

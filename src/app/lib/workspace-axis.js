@@ -120,17 +120,23 @@ class WorkspaceAxis {
 
     // Returns an array of jog steps for this axis.
     getJogSteps(opts) {
-        // const isImperialUnits = this._checkImperialUnits(imperialUnits);
-        const max = opts.max || (this.range / 2);
-        const min = opts.min || (this.accuracy);
+        const isImperialUnits = this._checkImperialUnits(opts.imperialUnits);
+        const max = (opts.max || (this.range / 2));
+        const min = (opts.min || (this.accuracy));
         const steps = [];
         for (let v = min; v < max; v *= 10) {
-            steps.push(this.round(v, opts.imperialUnits));
+            steps.push(this.round(v, isImperialUnits));
             const v2 = v * 10;
             if (v2 < max) {
-                steps.push(this.round(v2 / 2, opts.imperialUnits));
+                steps.push(this.round(v2 / 2, isImperialUnits));
             }
         }
+        // Remove the last element and add it in-order with the second-biggest element.
+        const last = steps.pop();
+        const next = this.round(max / 2, isImperialUnits);
+        steps.push(Math.min(last, next));
+        steps.push(Math.max(last, next));
+
         steps.push(max);
         return steps;
     }

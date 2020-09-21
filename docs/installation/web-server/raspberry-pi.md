@@ -36,6 +36,12 @@ When running the Desktop version, you will still need to follow on-screen instru
 
 The Desktop edition is meant to be used as a shopfloor tablet. Once configured, it will automatically launch Chromium in "Kiosk" mode, loading the Makerverse application in a full-screen web browser. Makerverse is still running as a Web Server in the background, so other clients can also simultaneously connect.
 
+## Scripts & Widgets
+
+Files you need to access from Makerverse should be placed in the `/home/pi/makerverse` directory (or a new subdirectory thereof). Then, from Makerverse, you can access the files from `/home/node/makerverse` (notice the `pi` vs. `node`).
+
+A more complete explanation of this topic may be found in the [Docker section](/installation/web-server/docker/).
+
 ## Updating
 
 See: how to [update the linux service installation](/installation/web-server/linux-service/#updating).

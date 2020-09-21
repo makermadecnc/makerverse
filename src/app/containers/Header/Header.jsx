@@ -54,7 +54,7 @@ class Header extends PureComponent {
                     this._isMounted && this.setState(versionInfo);
                 }
             } catch (res) {
-                // Ignore error
+                log.error('api:updates', res);
             }
         },
         fetchCommands: async () => {
@@ -66,7 +66,7 @@ class Header extends PureComponent {
                     commands: commands.filter(command => command.enabled)
                 });
             } catch (res) {
-                // Ignore error
+                log.error('api:fetchCommands', res);
             }
         },
         runCommand: async (cmd) => {
@@ -80,7 +80,7 @@ class Header extends PureComponent {
                     })
                 });
             } catch (res) {
-                // Ignore error
+                log.error('api:runCommand', res);
             }
         }
     };
@@ -250,10 +250,11 @@ class Header extends PureComponent {
         const signedInName = store.get('session.name');
         const hideUserDropdown = !sessionEnabled;
         const showCommands = commands.length > 0;
-        // const workspace = Workspaces.findByPath(location.pathname);
+        const workspace = Workspaces.findByPath(location.pathname);
         const updateMsg = i18n._('A new version of {{name}} is available', { name: settings.productName }) + '. ' +
             i18n._('Version {{version}}', { version: latestVersion.readable }) +
             ` (${moment(lastUpdate).format('LLL')})`;
+        const title = workspace ? workspace.name : 'Makerverse';
 
         return (
             <Navbar
@@ -272,7 +273,9 @@ class Header extends PureComponent {
                         src="images/logo-badge-32x32.png"
                         alt=""
                     />
-                    <h1 style={{ color: '#222', marginLeft: '15px', marginTop: 0, marginBottom: 0, fontSize: '30px', fontWeight: '600' }}>Makerverse</h1>
+                    <h1 style={{ color: '#222', marginLeft: '15px', marginTop: 0, marginBottom: 0, fontSize: '30px', fontWeight: '600' }}>
+                        {title}
+                    </h1>
                     {updateAvailable && (
                         <Tooltip
                             placement="bottom"

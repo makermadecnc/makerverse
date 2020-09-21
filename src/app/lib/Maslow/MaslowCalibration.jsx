@@ -326,7 +326,7 @@ class MaslowCalibration {
         const wpos = this.controller.state.status.wpos;
         if (this.dist(mpos, wpos) >= 0.1) {
             // Set WPos = MPos when they differ.
-            gcode.push(`G10 L20 P1 X${mpos.x} Y${mpos.y}`);
+            gcode.push(`G10 L20 P1 X${mpos.x} Y${mpos.y} Z${mpos.z}`);
         }
         if (this.opts.cutHoles) {
             gcode.push(`G0 Z${this.opts.safeTravel}`);

@@ -80,8 +80,10 @@ class CalibrationModal extends PureComponent {
             },
             zAxisRes: this.workspace.machineSettings.getValue('zAxisRes'),
             zInvert: this.workspace.machineSettings.isAxisInverted('z') ? '1' : '0',
+            zDistPerRot: this.workspace.machineSettings.getValue('zAxisDistancePerRotation'),
             zMove: inches ? 0.25 : 10,
             exported: JSON.stringify(this.calibration.kin.export(), null, 4),
+            kinematicsType: this.workspace.machineSettings.getValue('kinematicsType'),
         };
     }
 
@@ -394,6 +396,16 @@ class CalibrationModal extends PureComponent {
         );
     }
 
+    import(exportStr) {
+        exportStr = exportStr.replaceAll('“', '"').replaceAll('”', '"');
+        try {
+            this.workspace.machineSettings.write(JSON.parse(exportStr));
+            this.setState({ imported: true, importFailure: null });
+        } catch (e) {
+            this.setState({ imported: false, importFailure: e.message });
+        }
+    }
+
     setInvertZ(optionValue) {
         const invertZ = optionValue === '1';
         this.workspace.machineSettings.setAxisInverted('z', invertZ);
@@ -457,7 +469,12 @@ class CalibrationModal extends PureComponent {
             zMoved,
             zAxisRes,
             exported,
+            kinematicsType,
+            imported,
+            importFailure,
+            zDistPerRot,
         } = this.state;
+        const kt = Number(kinematicsType);
         const isCalibrating = calibrating >= 0;
         const hasCalibrationResult = !!result;
         const height = Math.max(window.innerHeight / 2, 200);
@@ -469,8 +486,9 @@ class CalibrationModal extends PureComponent {
         });
         const measurementsValid = emptyInputIdx < 0 && nanIdx < 0;
         const canCalibrate = measurementsValid && !isCalibrating && !hasCalibrationResult;
-        const isPrecisionTab = activeTab === 'precision';
-        const isEdgeTab = activeTab === 'edge';
+        const curTab = kt === 2 ? activeTab : 'triangular';
+        const isPrecisionTab = curTab === 'precision';
+        const isEdgeTab = curTab === 'edge';
         const isCalibrationTab = isPrecisionTab || isEdgeTab;
         const isImperial = !!measuredInches;
         const units = isImperial ? 'in' : 'mm';
@@ -486,7 +504,10 @@ class CalibrationModal extends PureComponent {
         const accuracy = result ? Math.max(1, Math.round(result.optimized.maxErrDist * 10) / 10) : 0;
 
         const stepDirectionInvert = this.workspace.machineSettings.map.stepDirectionInvert;
+        const zAxisDistancePerRotation = this.workspace.machineSettings.map.zAxisDistancePerRotation;
+
         const zAxisResSetting = this.workspace.machineSettings.map.zAxisRes;
+        const canShowTabs = curTab !== 'triangular';
 
         return (
             <Modal
@@ -500,64 +521,97 @@ class CalibrationModal extends PureComponent {
                 <Modal.Header>
                     <Modal.Title>
                         {'Maslow Calibration   '}
-                        <button
-                            type="button"
-                            className="btn btn-small"
-                            onClick={() => {
-                                this.setState({ activeTab: 'export' });
-                            }}
-                            title="Export and import calibration settings"
-                        >
-                            {i18n._('Export Calibration')}
-                        </button>
+                        {canShowTabs && (
+                            <button
+                                type="button"
+                                className="btn btn-small"
+                                onClick={() => {
+                                    this.setState({ activeTab: 'export' });
+                                }}
+                                title="Export and import calibration settings"
+                            >
+                                {i18n._('Export Calibration')}
+                            </button>
+                        )}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div style={{ float: 'right' }}>
-                        <button
-                            type="button"
-                            className="btn btn-warning"
-                            onClick={() => {
-                                this.unlock();
+                    {canShowTabs && (
+                        <div style={{ float: 'right' }}>
+                            <button
+                                type="button"
+                                className="btn btn-warning"
+                                onClick={() => {
+                                    this.unlock();
+                                }}
+                                title={i18n._('Clear system alarm')}
+                            >
+                                <i className="fa fa-unlock-alt" />
+                                <Space width="8" />
+                                {i18n._('Unlock')}
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-danger"
+                                onClick={() => {
+                                    this.reset();
+                                }}
+                                title={i18n._('Reset board connection')}
+                            >
+                                <i className="fa fa-undo" />
+                                <Space width="8" />
+                                {i18n._('Reset')}
+                            </button>
+                        </div>
+                    )}
+                    {canShowTabs && (
+                        <Nav
+                            navStyle="tabs"
+                            activeKey={curTab}
+                            onSelect={(eventKey, event) => {
+                                this.setState({ activeTab: eventKey });
                             }}
-                            title={i18n._('Clear system alarm')}
+                            style={{ marginBottom: 10 }}
                         >
-                            <i className="fa fa-unlock-alt" />
-                            <Space width="8" />
-                            {i18n._('Unlock')}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-danger"
-                            onClick={() => {
-                                this.reset();
-                            }}
-                            title={i18n._('Reset board connection')}
-                        >
-                            <i className="fa fa-undo" />
-                            <Space width="8" />
-                            {i18n._('Reset')}
-                        </button>
-                    </div>
-                    <Nav
-                        navStyle="tabs"
-                        activeKey={activeTab}
-                        onSelect={(eventKey, event) => {
-                            this.setState({ activeTab: eventKey });
-                        }}
-                        style={{ marginBottom: 10 }}
-                    >
-                        <NavItem eventKey="machine">{i18n._('Machine')}</NavItem>
-                        <NavItem eventKey="stock">{i18n._('Stock')}</NavItem>
-                        <NavItem eventKey="frame">{i18n._('Frame')}</NavItem>
-                        <NavItem eventKey="sled">{i18n._('Sled')}</NavItem>
-                        <NavItem eventKey="chains">{i18n._('Chains')}</NavItem>
-                        <NavItem eventKey="z">{i18n._('Z-Axis')}</NavItem>
-                        <NavItem eventKey="edge">{i18n._('Edge')}</NavItem>
-                        <NavItem eventKey="precision">{i18n._('Precision')}</NavItem>
-                    </Nav>
+                            <NavItem eventKey="machine">{i18n._('Machine')}</NavItem>
+                            <NavItem eventKey="stock">{i18n._('Stock')}</NavItem>
+                            <NavItem eventKey="frame">{i18n._('Frame')}</NavItem>
+                            <NavItem eventKey="sled">{i18n._('Sled')}</NavItem>
+                            <NavItem eventKey="chains">{i18n._('Chains')}</NavItem>
+                            <NavItem eventKey="z">{i18n._('Z-Axis')}</NavItem>
+                            <NavItem eventKey="edge">{i18n._('Edge')}</NavItem>
+                            <NavItem eventKey="precision">{i18n._('Precision')}</NavItem>
+                        </Nav>
+                    )}
                     <div className={styles.navContent} style={{ height: height }}>
-                        {activeTab === 'export' && (
+                        {curTab === 'triangular' && (
+                            <div className={styles.tabFull}>
+                                <div className={styles.center} style={ this.getBkImageStyle('calibration_overview.png') } />
+                                <div className={styles.top}>
+                                    {'Your Maslow is not using "triangular" kinematics.'}
+                                    <br />
+                                    {'Make sure your Maslow chains look like the picture (creating a triangle).'}
+                                </div>
+                                <div className={styles.bottom}>
+                                    {'This message may be normal after wiping your settings.'}
+                                    <br />
+                                    {'If you are certain your machine matches, press the button to the right.'}
+                                </div>
+                                <div className={styles.nextStep}>
+                                    <Button
+                                        btnSize="medium"
+                                        btnStyle="flat"
+                                        onClick={event => this.workspace.machineSettings.write({
+                                            kinematicsType: 2,
+                                        })}
+                                    >
+                                        <i className="fa fa-check" />
+                                        Use Triangular Kinematics
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                        {curTab === 'export' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.center}>
                                     <textarea
@@ -565,23 +619,34 @@ class CalibrationModal extends PureComponent {
                                         cols="30"
                                         rows="10"
                                         style={{ width: '100%', height: '100%' }}
+                                        value={exported}
                                         onChange={(e) => {
                                             this.setState({ exported: e.target.value });
                                         }}
-                                    >
-                                        {exported}
-                                    </textarea>
+                                    />
                                 </div>
                                 <div className={styles.top}>
                                     {'Save the following text into a file.'}
                                     <br />
                                     {'To import, replace these contents and press the "Import" button in the bottom-right.'}
                                 </div>
+                                {importFailure && (
+                                    <div className={styles.bottom}>
+                                        {'There was an error during the import process:'}
+                                        <br />
+                                        {importFailure}
+                                    </div>
+                                )}
+                                {imported && (
+                                    <div className={styles.bottom}>
+                                        Settings imported!
+                                    </div>
+                                )}
                                 <div className={styles.nextStep}>
                                     <Button
                                         btnSize="medium"
                                         btnStyle="flat"
-                                        onClick={event => this.workspace.machineSettings.write(JSON.parse(exported))}
+                                        onClick={event => this.import(exported)}
                                     >
                                         <i className="fa fa-check" />
                                         {i18n._('Import')}
@@ -589,7 +654,7 @@ class CalibrationModal extends PureComponent {
                                 </div>
                             </div>
                         )}
-                        {activeTab === 'machine' && (
+                        {curTab === 'machine' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.center} style={ this.getBkImageStyle('calibration_overview.png') }>
                                     <div style={{ position: 'absolute', bottom: '0px', right: '30%' }}>
@@ -675,7 +740,7 @@ class CalibrationModal extends PureComponent {
                                 </div>
                             </div>
                         )}
-                        {activeTab === 'stock' && (
+                        {curTab === 'stock' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.center} style={ this.getBkImageStyle('calibration_dimensions.png') } />
                                 <div className={styles.top}>
@@ -736,7 +801,7 @@ class CalibrationModal extends PureComponent {
                                 </div>
                             </div>
                         )}
-                        {activeTab === 'frame' && (
+                        {curTab === 'frame' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.center} style={ this.getBkImageStyle('calibration_motor.png') } />
                                 <div className={styles.top}>
@@ -803,7 +868,7 @@ class CalibrationModal extends PureComponent {
                                 )}
                             </div>
                         )}
-                        {activeTab === 'sled' && (
+                        {curTab === 'sled' && (
                             <div>
                                 <div className={styles.top}>
                                     {'Occasionally during calibration, you will be asked to measure from the edge of your sled.'}
@@ -861,7 +926,7 @@ class CalibrationModal extends PureComponent {
                                 </div>
                             </div>
                         )}
-                        {activeTab === 'chains' && (
+                        {curTab === 'chains' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.top}>
                                     {'Now the Maslow will learn how long the chains are currently extended.'}
@@ -895,7 +960,7 @@ class CalibrationModal extends PureComponent {
                                 {alreadyStartedCalibration && this.renderAlreadyCalibrated()}
                             </div>
                         )}
-                        {activeTab === 'z' && (
+                        {curTab === 'z' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.top}>
                                     {'This step checks that your Z-axis is moving up and down correctly.'}
@@ -905,7 +970,7 @@ class CalibrationModal extends PureComponent {
                                 <div className={styles.center} >
                                     {zAxisResSetting && (
                                         <div>
-                                            <h3>Movement</h3>
+                                            <h3>Test Z-Axis</h3>
                                             Move the Z-axis up and down:
                                             <br />
 
@@ -952,9 +1017,19 @@ class CalibrationModal extends PureComponent {
                                             >
                                                 Apply Scaling
                                             </button>
-                                            <br /><br /><br />
-                                            Or, edit the raw value:
-                                            <br />
+                                            <br /><br />
+                                            If simple scaling does not work, you may need to adjust the following:
+                                        </div>
+                                    )}
+                                    {!zAxisResSetting && (
+                                        <div>
+                                            Your machine cannot change the Z-axis speed.
+                                        </div>
+                                    )}
+                                    <h3>Raw Settings</h3>
+                                    <br />
+                                    {zAxisResSetting && (
+                                        <div>
                                             Z-Axis Resolution:
                                             <input
                                                 type="text"
@@ -977,11 +1052,6 @@ class CalibrationModal extends PureComponent {
                                             </button>
                                         </div>
                                     )}
-                                    {!zAxisResSetting && (
-                                        <div>
-                                            Your machine cannot change the Z-axis speed.
-                                        </div>
-                                    )}
                                     {stepDirectionInvert && (
                                         <div>
                                             {'Invert Z-axis motion? '}
@@ -999,7 +1069,36 @@ class CalibrationModal extends PureComponent {
                                             </select>
                                         </div>
                                     )}
-                                    {!stepDirectionInvert && (
+                                    {zAxisDistancePerRotation && (
+                                        <div>
+                                            <br />
+                                            <div>
+                                                Your Maslow uses this additional value.<br />
+                                                It may be negative in order to invert the Z-axis.
+                                            </div>
+                                            {'Z Distance per Rotation: '}
+                                            <input
+                                                type="text"
+                                                name="zRes"
+                                                value={zDistPerRot}
+                                                onChange={e => {
+                                                    this.setState({ zDistPerRot: e.target.value });
+                                                }}
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn btn-medium"
+                                                onClick={() => {
+                                                    this.workspace.machineSettings.write({
+                                                        zAxisDistancePerRotation: Number(zDistPerRot),
+                                                    });
+                                                }}
+                                            >
+                                                Save
+                                            </button>
+                                        </div>
+                                    )}
+                                    {!stepDirectionInvert && !zAxisDistancePerRotation && (
                                         <div>
                                             Your machine does not support Z-axis inversion.
                                         </div>

@@ -57,13 +57,14 @@ class PrimaryToolbar extends PureComponent {
         });
     }
 
-    renderControllerType() {
+    renderHeaderTitle() {
         const { state } = this.props;
-        const controllerType = state.controller.type;
+        // const controllerType = state.controller.type;
+        const name = state.gcode.name; // this.workspace.name;
 
         return (
-            <div className={styles.controllerType}>
-                {controllerType}
+            <div className={styles.controllerType} style={{ paddingLeft: '10px' }}>
+                {name}
             </div>
         );
     }
@@ -96,12 +97,12 @@ class PrimaryToolbar extends PureComponent {
 
         return (
             <div className={styles.primaryToolbar}>
-                {this.renderControllerType()}
                 <ControllerStatusBadge
                     workspaceId={this.workspace.id}
                     controller={state.controller}
                 />
-                <div className="pull-right">
+                {this.renderHeaderTitle()}
+                <div style={{ position: 'absolute', top: '5px', right: '5px' }}>
                     <Dropdown
                         style={{ marginRight: 5 }}
                         disabled={!canSendCommand}

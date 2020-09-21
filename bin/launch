@@ -1,6 +1,6 @@
 #!/bin/bash
 set -eo pipefail
-version="0.2"
+version="0.3"
 
 MAKERVERSE_HOME=${MAKERVERSE_HOME:-${HOME}}
 # Figure out where the git checkout directory lives, if any:
@@ -151,6 +151,10 @@ launch() {
       installPrompt "curl -sSL https://get.docker.com | sh" "https://www.docker.com/products/docker-desktop"
       exit 1
     fi
+
+    echo "Cleaning up old docker images..."
+    docker system prune --force
+
     docker_tagged="${docker_img}:${channel}"
     if [[ "$_arg_update" = "on" ]]; then
       echo "Updating $docker_tagged..."

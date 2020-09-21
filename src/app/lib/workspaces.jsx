@@ -206,11 +206,14 @@ class Workspaces extends events.EventEmitter {
     getJogSteps(imperialUnits = null) {
         let axis = null;
         const opts = { min: 9999, max: 0, imperialUnits: imperialUnits };
+        const div = imperialUnits ? 25.4 : 1;
+        const precision = imperialUnits ? 1 : 2;
+        const pow = Math.pow(10, precision);
         Object.keys(this.axes).forEach((ak) => {
             const a = this._axes[ak];
             axis = (!axis || a.precision > axis.precision) ? a : axis;
-            opts.max = Math.max(opts.max, a.range / 2);
-            opts.min = Math.min(opts.min, a.accuracy);
+            opts.max = Math.max(opts.max, Math.round(a.range / 2 / div * pow) / pow);
+            opts.min = Math.min(opts.min, Math.round(a.accuracy / div * pow) / pow);
         });
         return axis ? axis.getJogSteps(opts) : null;
     }

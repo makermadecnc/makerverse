@@ -78,3 +78,48 @@ docker run --rm --privileged --name makerverse \
 ## Updating
 
 Each time the `bin/launch` script is run, it will automatically update the application by pulling the latest docker image. If you use the [linux service](/installation/web-server/linux-service/#updating), this happens each time you restart the service.
+
+## Scripts & Widgets
+
+Sometimes, you need to create a file or folder which Makerverse can access.
+
+This is slightly complicated when using Docker:
+
+- The folder where Makerverse is located is called the "project path."
+- Anything in this folder is "shared" with the Makerverse application.
+- However, while inside the Makerverse application, the path to the shared folder is `/home/node/makerverse`.
+
+### Shared Path
+
+When you run the `bin/launch` script, you should see something like this (example taken from a Raspberry Pi):
+
+```
+Makerverse:latest settings: /home/pi/.makerverse (project at: /home/pi/makerverse)
+```
+
+On a Mac, the project might be at something like `/Users/zaneclaes/makerverse`.
+
+Inside Makerverse, you always use `/home/node/makerverse` to refer to the project path.
+
+### Example
+
+For example, on your Raspberry Pi or Linux computer running Makerverse, you could run:
+
+```
+cd makerverse
+mkdir -p commands
+```
+
+And then perhaps create a script to turn on your CNC machine (e.g., `nano commands/cnc-power.sh`). You do **not** need to restart Makerverse. You should immediately be able to refer to the files in this "commands" folder (e.g., `/home/node/makerverse/commands/cnc-power.sh`).
+
+For example, you might use the Makerverse settings to create a command which passes the argument "on":
+
+```
+bash /home/node/makerverse/actions/cnc-power.sh on
+```
+
+And another the argument "off":
+
+```
+bash /home/node/makerverse/events/cnc-power.sh off
+```
