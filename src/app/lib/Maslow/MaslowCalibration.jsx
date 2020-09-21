@@ -132,9 +132,9 @@ class MaslowCalibration {
             return 0;
         }
         if (Math.abs(skewRight) > Math.abs(skewLeft)) {
-            return skewRight;
+            return Math.round(skewRight);
         } else {
-            return skewLeft;
+            return Math.round(skewLeft);
         }
     }
 

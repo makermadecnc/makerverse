@@ -8,6 +8,8 @@ has_children: true
 
 # CNC
 
+Find your machine, below, and click on the appropriate link for the latest firmware.
+
 ## Maslow
 
 _Please read the [Maslow-specific instructions](/machines/cnc/maslow)._
@@ -27,6 +29,6 @@ _Please read the [Maslow-specific instructions](/machines/cnc/maslow)._
 - [Grbl](https://github.com/gnea/grbl) ([Download](https://github.com/gnea/grbl/releases))
 - [Grbl-Mega](https://github.com/gnea/grbl-Mega) ([Download](https://github.com/gnea/grbl-Mega/releases))
 
-### Tested On
+#### Tested On
 
 - SainSmart Genmitsu 3180 Pro (Baud Rate: 115200)

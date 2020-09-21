@@ -22,6 +22,7 @@ const Axes = (props) => {
             <Keypad
                 workspaceId={props.workspaceId}
                 canClick={state.canClick}
+                canChangeUnits={true}
                 units={state.units}
                 axes={state.axes}
                 jog={state.jog}

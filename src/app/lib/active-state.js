@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import {
+    IMPERIAL_UNITS,
+    METRIC_UNITS,
     GRBL,
     MASLOW,
     MARLIN,
@@ -133,6 +135,10 @@ class ActiveState {
 
     get stateValue() {
         return this._state;
+    }
+
+    get units() {
+        return this.isImperialUnits ? IMPERIAL_UNITS : METRIC_UNITS;
     }
 
     get isImperialUnits() {

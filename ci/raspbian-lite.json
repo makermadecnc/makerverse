@@ -61,7 +61,7 @@
       "type": "shell",
       "inline": [
         "sudo apt-get update -y",
-        "sudo apt-get install -y pigpiod",
+        "sudo apt-get install -y pigpiod git",
         "sudo systemctl enable pigpiod",
         "sudo systemctl start pigpiod"
       ]
