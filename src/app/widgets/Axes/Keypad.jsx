@@ -31,6 +31,7 @@ class Keypad extends PureComponent {
     static propTypes = {
         workspaceId: PropTypes.string.isRequired,
         canClick: PropTypes.bool,
+        canChangeUnits: PropTypes.bool,
         units: PropTypes.oneOf([IMPERIAL_UNITS, METRIC_UNITS]),
         axes: PropTypes.array,
         jog: PropTypes.object,
@@ -167,8 +168,7 @@ class Keypad extends PureComponent {
     }
 
     render() {
-        const { canClick, units, axes, jog } = this.props;
-        const canChangeUnits = canClick;
+        const { canClick, units, axes, jog, canChangeUnits } = this.props;
         const canChangeStep = canClick;
         const imperialJogSteps = this.workspace.imperialJogSteps;
         const metricJogSteps = this.workspace.metricJogSteps;
@@ -434,7 +434,7 @@ class Keypad extends PureComponent {
                                 style={{
                                     width: '100%'
                                 }}
-                                disabled={!canChangeUnits}
+                                disabled={!canChangeUnits || !canClick}
                             >
                                 <Dropdown.Toggle
                                     btnStyle="flat"

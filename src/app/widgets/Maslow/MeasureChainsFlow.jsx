@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import Workspaces from 'app/lib/workspaces';
 import Keypad from 'app/widgets/Axes/Keypad';
 import {
-    METRIC_UNITS,
-} from '../../constants';
+    IMPERIAL_UNITS,
+} from 'app/constants';
 // import i18n from 'app/lib/i18n';
 
 class MeasureChainsFlow extends PureComponent {
@@ -12,6 +12,8 @@ class MeasureChainsFlow extends PureComponent {
         workspaceId: PropTypes.string.isRequired,
         calibration: PropTypes.object.isRequired,
         setChains: PropTypes.func.isRequired,
+        setStep: PropTypes.func.isRequired,
+        step: PropTypes.string,
         measureCenterOffset: PropTypes.func.isRequired,
         moveToCenter: PropTypes.func.isRequired,
     };
@@ -23,7 +25,6 @@ class MeasureChainsFlow extends PureComponent {
     pages = ['Preparation', 'Alignment', 'Slack', 'Attachment', 'Measurement', 'Axes'];
 
     state = {
-        page: this.pages[0],
         jog: {
             metric: {
                 step: 0,
@@ -47,12 +48,12 @@ class MeasureChainsFlow extends PureComponent {
     }
 
     get pageNum() {
-        return this.pages.indexOf(this.state.page);
+        return this.pages.indexOf(this.props.step) || 0;
     }
 
     set pageNum(pn) {
         pn = Math.max(0, Math.min(pn, this.pages.length - 1));
-        this.setState({ page: this.pages[pn] });
+        this.props.setStep(this.pages[pn]);
     }
 
     setPage(name) {
@@ -67,13 +68,18 @@ class MeasureChainsFlow extends PureComponent {
         this.pageNum -= 1;
     }
 
+    get isImperialUnits() {
+        return this.props.units === IMPERIAL_UNITS;
+    }
+
     updateJogStep(callback) {
-        const v = callback(this.state.jog.metric.step);
-        const metricJogSteps = this.workspace.metricJogSteps;
-        const step = Math.max(0, Math.min(v, metricJogSteps.length - 1));
+        const key = this.isImperialUnits ? 'imperial' : 'metric';
+        const v = callback(this.state.jog[key].step);
+        const jogSteps = this.isImperialUnits ? this.workspace.imperialJogSteps : this.workspace.metricJogSteps;
+        const step = Math.max(0, Math.min(v, jogSteps.length - 1));
         this.setState({
             jog: {
-                metric: {
+                [key]: {
                     step: step,
                 }
             }
@@ -82,9 +88,10 @@ class MeasureChainsFlow extends PureComponent {
 
     keypadActions = {
         getJogDistance: () => {
-            const step = this.state.jog.metric.step;
-            const metricJogSteps = this.workspace.metricJogSteps;
-            const distance = Number(metricJogSteps[step]) || 0;
+            const key = this.isImperialUnits ? 'imperial' : 'metric';
+            const step = this.state.jog[key].step;
+            const jogSteps = this.isImperialUnits ? this.workspace.imperialJogSteps : this.workspace.metricJogSteps;
+            const distance = Number(jogSteps[step]) || 0;
             return distance;
         },
         stepBackward: () => {
@@ -105,7 +112,8 @@ class MeasureChainsFlow extends PureComponent {
                     <Keypad
                         workspaceId={this.workspace.id}
                         canClick={true}
-                        units={METRIC_UNITS}
+                        canChangeUnits={false}
+                        units={this.workspace.activeState.units}
                         axes={axes}
                         jog={this.state.jog}
                         actions={this.keypadActions}
@@ -361,8 +369,8 @@ class MeasureChainsFlow extends PureComponent {
     }
 
     render() {
-        // TODO: before shutting, run Home. We know there's no chain sag already.
-        return this[`render${this.state.page}`]();
+        const step = this.props.step || this.pages[0];
+        return this[`render${step}`]();
     }
 }
 
