@@ -858,10 +858,10 @@ class Visualizer extends Component {
 
     // Move the visualizer to the work position
     updateVisualizerPosition() {
-        if (!this.rendered) {
+        const wco = this.wco;
+        if (!this.rendered || !wco) {
             return;
         }
-        const wco = this.wco;
         this.rendered.position.set(wco.x, wco.y, wco.z);
     }
 

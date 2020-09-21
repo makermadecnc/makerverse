@@ -84,8 +84,14 @@ class ActiveState {
         this._modal = _.get(controllerState, this.modalStateKey) || {};
         this._mpos = _.get(controllerState, this.mposKey);
         this._wpos = _.get(controllerState, this.wposKey);
-        this.error = _.get(controllerState, 'status.error');
-        this.alarm = _.get(controllerState, 'status.alarm');
+        if (_.has(controllerState, 'status')) {
+            const status = controllerState.status;
+            this.error = status.error;
+            this.alarm = status.alarm;
+        } else {
+            this.error = null;
+            this.alarm = null;
+        }
     }
 
     get modalStateKey() {
