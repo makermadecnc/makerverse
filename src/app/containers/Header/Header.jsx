@@ -10,7 +10,6 @@ import { Tooltip } from 'app/components/Tooltip';
 import Anchor from 'app/components/Anchor';
 import Space from 'app/components/Space';
 import combokeys from 'app/lib/combokeys';
-import analytics from 'app/lib/analytics';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import * as user from 'app/lib/user';
@@ -187,7 +186,6 @@ class Header extends PureComponent {
             latestVersion: { readable: '' },
             lastUpdate: '',
             updateAvailable: false,
-            updateUrl: null,
             controllerState: this.workspace ? this.workspace.controller.state : {},
         };
     }
@@ -245,7 +243,7 @@ class Header extends PureComponent {
 
     render() {
         const { history, location } = this.props;
-        const { pushPermission, commands, runningTasks, updateAvailable, updateUrl, latestVersion, lastUpdate } = this.state;
+        const { pushPermission, commands, runningTasks, updateAvailable, latestVersion, lastUpdate } = this.state;
         const sessionEnabled = store.get('session.enabled');
         const signedInName = store.get('session.name');
         const hideUserDropdown = !sessionEnabled;
@@ -283,15 +281,19 @@ class Header extends PureComponent {
                             style={{ color: '#fff' }}
                             content={updateMsg}
                         >
-                            <div style={{ marginTop: '-15px', paddingLeft: '10px' }}>
-                                <analytics.OutboundLink
-                                    eventLabel="update"
-                                    to={updateUrl}
-                                    target="_blank"
-                                >
-                                    {i18n._('New update available')}
-                                </analytics.OutboundLink>
-                            </div>
+                            <button
+                                type="button"
+                                className="btn btn-warning"
+                                style={{ marginLeft: '10px' }}
+                                onClick={() => {
+                                    window.location = '/#/settings/about';
+                                }}
+                                title={i18n._('New update available')}
+                            >
+                                <i className="fa fa-warning" />
+                                <Space width="8" />
+                                {i18n._('New update available')}
+                            </button>
                         </Tooltip>
                     )}
                     <Navbar.Toggle />

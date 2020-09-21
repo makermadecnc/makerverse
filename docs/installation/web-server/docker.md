@@ -112,6 +112,8 @@ mkdir -p commands
 
 And then perhaps [create a command script to turn on/off your shopvac](/features/commands/#raspberry-pi-gpio).
 
+If this script file were named `shopvac.sh`, you would reference it as `/home/node/makerverse/commands/shopvac.sh`.
+
 ### Gcode Folder
 
 In addition to the project path, Makerverse will look for a folder at `$HOME/gcode` which contains `.nc` (gcode) files.

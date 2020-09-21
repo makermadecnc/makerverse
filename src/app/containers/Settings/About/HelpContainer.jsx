@@ -19,7 +19,7 @@ const HelpContainer = () => {
                 type="button"
                 className="btn btn-default"
                 onClick={() => {
-                    const url = 'http://www.makerverse.com/';
+                    const url = 'http://www.makerverse.com/about/#issues';
                     window.open(url, '_blank');
                 }}
             >

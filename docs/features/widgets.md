@@ -5,6 +5,16 @@ parent: Features
 nav_order: 2
 ---
 
+# Widgets
+
+Widgets are additional, optional UI you can add.
+
+## Installing Widgets
+
+Place any widget code in the project path, such as `$HOME/makerverse/widgets`. The [web-server project path](/installation/web-server/docker/#project-path) can then be used within Makerverse as `/home/pi/makerverse/widgets`.
+
+Further installation instructions may be found in the widget-specific README (below).
+
 ## Custom Widgets
 
 * [cncjs-widget-boilerplate](https://github.com/cncjs/cncjs-widget-boilerplate) - Boilerplate for custom widgets in Makerverse.

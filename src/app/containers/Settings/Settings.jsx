@@ -98,6 +98,8 @@ class Settings extends PureComponent {
         // General
         general: {
             load: (options) => {
+                options = options || {};
+                const callback = options.callback;
                 this.setState({
                     general: {
                         ...this.state.general,
@@ -130,6 +132,9 @@ class Settings extends PureComponent {
                         this.initialState.general = nextState;
 
                         this.setState({ general: nextState });
+                        if (callback) {
+                            callback();
+                        }
                     })
                     .catch((res) => {
                         this.setState({
@@ -142,6 +147,9 @@ class Settings extends PureComponent {
                                 }
                             }
                         });
+                        if (callback) {
+                            callback();
+                        }
                     });
             },
             save: () => {
@@ -965,6 +973,10 @@ class Settings extends PureComponent {
         // About
         about: {
             checkLatestVersion: () => {
+                // Ensure that the general settings are loaded, which contain prerelease info.
+                this.actions.general.load({ callback: this.actions.about.getLatestVersion.bind(this) });
+            },
+            getLatestVersion: () => {
                 this.setState({
                     about: {
                         ...this.state.about,

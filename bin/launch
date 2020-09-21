@@ -152,11 +152,11 @@ launch() {
       exit 1
     fi
 
-    echo "Cleaning up old docker images..."
-    docker system prune --force
-
     docker_tagged="${docker_img}:${channel}"
     if [[ "$_arg_update" = "on" ]]; then
+      echo "Removing old versions (pruning docker)..."
+      docker system prune --force
+
       echo "Updating $docker_tagged..."
       docker pull "$docker_tagged"
     fi

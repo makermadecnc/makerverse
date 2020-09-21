@@ -6,6 +6,7 @@ import Anchor from 'app/components/Anchor';
 import Space from 'app/components/Space';
 import settings from 'app/config/settings';
 import i18n from 'app/lib/i18n';
+import analytics from 'app/lib/analytics';
 import styles from './index.styl';
 
 const UpdateStatusContainer = (props) => {
@@ -36,6 +37,14 @@ const UpdateStatusContainer = (props) => {
                 <div className={styles.updateStatusMessageContainer}>
                     <div className={styles.updateStatusMessage}>
                         {i18n._('A new version of {{name}} is available', { name: settings.productName })}
+                        <br />
+                        <analytics.OutboundLink
+                            eventLabel="update"
+                            to="http://www.makerverse.com/installation/updating/"
+                            target="_blank"
+                        >
+                            {i18n._('Need help updating?')}
+                        </analytics.OutboundLink>
                     </div>
                     <div className={styles.releaseLatest}>
                         {i18n._('Version {{version}}', { version: latestVersion.readable })}
