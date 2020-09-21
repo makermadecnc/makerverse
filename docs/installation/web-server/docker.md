@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Docker Quickstart
+title: Docker
 grand_parent: Installation
 parent: Web Server
 nav_order: 2
@@ -79,7 +79,7 @@ docker run --rm --privileged --name makerverse \
 
 Each time the `bin/launch` script is run, it will automatically update the application by pulling the latest docker image. If you use the [linux service](/installation/web-server/linux-service/#updating), this happens each time you restart the service.
 
-## Scripts & Widgets
+## Shared Directories
 
 Sometimes, you need to create a file or folder which Makerverse can access.
 
@@ -89,7 +89,7 @@ This is slightly complicated when using Docker:
 - Anything in this folder is "shared" with the Makerverse application.
 - However, while inside the Makerverse application, the path to the shared folder is `/home/node/makerverse`.
 
-### Shared Path
+### Project Path
 
 When you run the `bin/launch` script, you should see something like this (example taken from a Raspberry Pi):
 
@@ -110,16 +110,11 @@ cd makerverse
 mkdir -p commands
 ```
 
-And then perhaps create a script to turn on your CNC machine (e.g., `nano commands/cnc-power.sh`). You do **not** need to restart Makerverse. You should immediately be able to refer to the files in this "commands" folder (e.g., `/home/node/makerverse/commands/cnc-power.sh`).
+And then perhaps [create a command script to turn on/off your shopvac](/features/commands/#raspberry-pi-gpio).
 
-For example, you might use the Makerverse settings to create a command which passes the argument "on":
+### Gcode Folder
 
-```
-bash /home/node/makerverse/actions/cnc-power.sh on
-```
+In addition to the project path, Makerverse will look for a folder at `$HOME/gcode` which contains `.nc` (gcode) files.
 
-And another the argument "off":
+Any files located in this directory will be available in the "watch directory" from Makerverse. Instead of uploading a new program, you can just use the drop-down to "Browse" for the existing programs in the folder.
 
-```
-bash /home/node/makerverse/events/cnc-power.sh off
-```

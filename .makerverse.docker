@@ -2,5 +2,20 @@
   "watchDirectory": "/home/node/gcode",
   "accessTokenLifetime": "30d",
   "allowRemoteAccess": true,
-  "workspaces": []
+  "workspaces": [],
+  "mountPoints": [
+    {
+      "route": "/tablet",
+      "target": "/home/node/makerverse/widgets/cncjs-shopfloor-tablet/src/"
+    }
+  ],
+  "commands": [
+    {
+      "id": "5b98d27e-79e7-4fcd-afbe-8de87b558df3",
+      "mtime": 1600691535812,
+      "enabled": true,
+      "title": "Restart Makerverse",
+      "commands": "pkill node"
+    }
+  ]
 }

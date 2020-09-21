@@ -131,6 +131,10 @@ class CreateRecord extends PureComponent {
                                     <option value="port:open">{i18n._('Open a serial port (System only)')}</option>
                                     <option value="port:close">{i18n._('Close a serial port (System only)')}</option>
                                     <option value="controller:ready">{i18n._('Ready to start')}</option>
+                                    <option value="workflow:start">{i18n._('Program: Start')}</option>
+                                    <option value="workflow:pause">{i18n._('Program: Pause')}</option>
+                                    <option value="workflow:stop">{i18n._('Program: Stop')}</option>
+                                    <option value="workflow:resume">{i18n._('Program: Resume')}</option>
                                     <option value="gcode:load">{i18n._('G-code: Load')}</option>
                                     <option value="gcode:unload">{i18n._('G-code: Unload')}</option>
                                     <option value="gcode:start">{i18n._('G-code: Start')}</option>

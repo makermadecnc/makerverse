@@ -345,15 +345,17 @@ class MaslowController {
         this.workflow = new Workflow();
         this.workflow.on('start', (...args) => {
             this.emit('workflow:state', this.workflow.state);
+            this.emit('workflow:start');
             this.sender.rewind();
         });
         this.workflow.on('stop', (...args) => {
             this.emit('workflow:state', this.workflow.state);
+            this.emit('workflow:stop');
             this.sender.rewind();
         });
         this.workflow.on('pause', (...args) => {
             this.emit('workflow:state', this.workflow.state);
-
+            this.emit('workflow:pause');
             if (args.length > 0) {
                 const reason = { ...args[0] };
                 this.sender.hold(reason); // Hold reason
@@ -363,6 +365,7 @@ class MaslowController {
         });
         this.workflow.on('resume', (...args) => {
             this.emit('workflow:state', this.workflow.state);
+            this.emit('workflow:resume');
 
             // Reset feeder prior to resume program execution
             this.feeder.reset();

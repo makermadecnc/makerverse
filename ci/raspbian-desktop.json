@@ -30,7 +30,11 @@
     ],
     "image_setup_extra": [
       ["mkdir", "$MOUNTPOINT/home/pi/makerverse"],
+      ["mkdir", "$MOUNTPOINT/home/pi/makerverse/commands"],
+      ["mkdir", "$MOUNTPOINT/home/pi/makerverse/events"],
+      ["mkdir", "$MOUNTPOINT/home/pi/makerverse/widgets"],
       ["cp", "/build/.makerverse.docker", "$MOUNTPOINT/home/pi/.makerverse"],
+      ["cp", "/build/scripts/gpio.sh", "$MOUNTPOINT/home/pi/makerverse/commands/gpio.sh"],
       ["cp", "-r", "/build/bin", "$MOUNTPOINT/home/pi/makerverse/"],
       ["cp", "-r", "/build/scripts", "$MOUNTPOINT/home/pi/makerverse/"]
     ],
@@ -57,14 +61,23 @@
       "type": "shell",
       "inline": [
         "mkdir -p /home/pi/.config/lxsession/LXDE-pi/",
-        "echo \"@bash /home/pi/makerverse/bin/tablet\" > /home/pi/.config/lxsession/LXDE-pi/autostart",
+        "echo \"@bash /home/pi/makerverse/bin/kiosk /\" > /home/pi/.config/lxsession/LXDE-pi/autostart",
         "sudo chown -R pi:pi /home/pi/.config"
       ]
     },
     {
       "type": "shell",
       "inline": [
-        "sudo apt-get update -y"
+        "git clone https://github.com/cncjs/cncjs-shopfloor-tablet.git /home/pi/makerverse/widgets/cncjs-shopfloor-tablet"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo apt-get update -y",
+        "sudo apt-get install -y pigpiod",
+        "sudo systemctl enable pigpiod",
+        "sudo systemctl start pigpiod"
       ]
     },
     {

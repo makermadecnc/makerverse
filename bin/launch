@@ -1,6 +1,6 @@
 #!/bin/bash
 set -eo pipefail
-version="0.3"
+version="0.4"
 
 MAKERVERSE_HOME=${MAKERVERSE_HOME:-${HOME}}
 # Figure out where the git checkout directory lives, if any:
@@ -166,6 +166,7 @@ launch() {
     docker run --rm --privileged --name makerverse \
       -p "${MAKERVERSE_PORT}:8000" \
       -v /dev:/dev \
+      -v /var/run/docker.sock:/var/run/docker.sock \
       -v "$MAKERVERSE_HOME/gcode:/home/node/gcode" \
       -v "$MAKERVERSE_SETTINGS_FILE:/home/node/.makerverse" \
       -v "$MAKERVERSE_SRC_DIR:/home/node/makerverse" \

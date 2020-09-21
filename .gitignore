@@ -15,3 +15,5 @@ filesystem.img
 bootstrap.log
 raspberry-pi.img
 .makerverse
+/commands
+/events

@@ -27,7 +27,8 @@ You can set the following environment variables to configure Makerverse on any W
 
 The web server installation automatically updates when it restarts.
 
-To update a web-server install:
+To update a web-server install, just run the `bin/launch` script:
 
-- On a [Raspberry Pi or Linux service installation](/installation/web-server/linux-service/#updating).
-- When [using Docker (`bin/launch`) directly](/installation/web-server/docker/#updating).
+```
+$HOME/makerverse/bin/launch
+```

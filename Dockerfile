@@ -7,6 +7,10 @@ RUN apt-get update -y && \
     python-pip git curl make g++ udev && \
   apt-get -y autoclean
 
+# Install Docker, for access within the container.
+RUN curl -sSL https://get.docker.com | sh
+RUN usermod -aG docker node
+
 # Create user to run the application
 USER node
 WORKDIR /home/node

@@ -30,8 +30,12 @@
     ],
     "image_setup_extra": [
       ["mkdir", "$MOUNTPOINT/home/pi/makerverse"],
+      ["mkdir", "$MOUNTPOINT/home/pi/makerverse/commands"],
+      ["mkdir", "$MOUNTPOINT/home/pi/makerverse/events"],
+      ["mkdir", "$MOUNTPOINT/home/pi/makerverse/widgets"],
       ["cp", "/build/.makerverse.docker", "$MOUNTPOINT/home/pi/.makerverse"],
-      ["cp", "-r", "/build/bin", "$MOUNTPOINT/home/pi/makerverse/"]
+      ["cp", "/build/scripts/gpio.sh", "$MOUNTPOINT/home/pi/makerverse/commands/gpio.sh"],
+      ["cp", "-r", "/build/bin", "$MOUNTPOINT/home/pi/makerverse/"],
     ],
     "image_chroot_env": ["PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"],
     "qemu_binary_source_path": "/usr/bin/qemu-arm-static",
@@ -55,7 +59,16 @@
     {
       "type": "shell",
       "inline": [
-        "sudo apt-get update -y"
+        "sudo apt-get update -y",
+        "sudo apt-get install -y pigpiod",
+        "sudo systemctl enable pigpiod",
+        "sudo systemctl start pigpiod"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "git clone https://github.com/cncjs/cncjs-shopfloor-tablet.git /home/pi/makerverse/widgets/cncjs-shopfloor-tablet"
       ]
     },
     {

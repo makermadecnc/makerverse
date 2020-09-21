@@ -1,4 +1,6 @@
 #!/bin/bash
+path=${1:-/}
+
 # Figure out where the git checkout directory lives, if any:
 if [[ -z "$MAKERVERSE_SRC_DIR" ]]; then
   # Otherwise, the parent directory of this script should (hopefully) work.
@@ -8,7 +10,7 @@ MAKERVERSE_PROTOCOL="${MAKERVERSE_PROTOCOL:-http}"
 MAKERVERSE_HOST="${MAKERVERSE_HOST:-localhost}"
 MAKERVERSE_PORT="${MAKERVERSE_PORT:-8000}"
 MAKERVERSE_KIOSK_SCALE="${MAKERVERSE_KIOSK_SCALE:-1.0}"
-url="${MAKERVERSE_PROTOCOL}://${MAKERVERSE_HOST}:${MAKERVERSE_PORT}/"
+url="${MAKERVERSE_PROTOCOL}://${MAKERVERSE_HOST}:${MAKERVERSE_PORT}${path}"
 
 while [[ ! $(curl -s $url) ]]; do
   echo "Waiting for $url"

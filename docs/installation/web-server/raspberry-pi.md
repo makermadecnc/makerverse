@@ -30,17 +30,32 @@ As soon as you are ablem to, SSH in to the Raspberry Pi and run `sudo raspi-conf
 
 _**Tip**: read the [useful commands in the Linux Service section](/installation/web-server/linux-service/#useful-commands)!_
 
+## Tablet UI
+
+The Raspberry Pi image comes pre-installed with a mobile/tablet UI. It can be accessed by adding `/tablet` to the URL, such as `http://makerverse.local:8000/tablet`.
+
+However, this UI is not the default UI because it is much less full-featured (it is intended for simple controls, like jogging or pausing program execution, from the shopfloor). You will still need to perform setup and calibration using the normal, desktop UI.
+
 ## Desktop (Kiosk Mode)
 
-When running the Desktop version, you will still need to follow on-screen instructions after the first boot to configure your Raspberry Pi. If you don't have an extra keyboard/mouse, just SSH and use `sudo raspi-config` to turn on the VNC in `Interfacing Options`. Then use an app like VNC Viewer to connect from your computer.
+When running the `makerverse-raspberrypi-os-dekstop.**` (desktop version), you will need to follow on-screen instructions after the first boot to configure your Raspberry Pi. If you don't have an extra keyboard/mouse, just SSH and use `sudo raspi-config` to turn on the VNC in `Interfacing Options`. Then use an app like VNC Viewer to connect from your computer.
 
-The Desktop edition is meant to be used as a shopfloor tablet. Once configured, it will automatically launch Chromium in "Kiosk" mode, loading the Makerverse application in a full-screen web browser. Makerverse is still running as a Web Server in the background, so other clients can also simultaneously connect.
+The Desktop edition is meant to be used as a kiosk. Once configured, it will automatically launch Chromium in "Kiosk" mode, loading the Makerverse application in a full-screen web browser. Makerverse is still running as a Web Server in the background, so other clients can also simultaneously connect.
 
-## Scripts & Widgets
+_**Note**: if your screen is smaller than 7" or so, you will likely want your Kiosk to use the Tablet UI specified above. To do so, edit the `/home/pi/.config/lxsession/LXDE-pi/autostart` file to become: `@bash /home/pi/makerverse/bin/kiosk /tablet`._
 
-Files you need to access from Makerverse should be placed in the `/home/pi/makerverse` directory (or a new subdirectory thereof). Then, from Makerverse, you can access the files from `/home/node/makerverse` (notice the `pi` vs. `node`).
+## Shared Directories
 
-A more complete explanation of this topic may be found in the [Docker section](/installation/web-server/docker/).
+- `/home/pi/gcode` should be used for `.nc` (gcode) files.
+- `/home/pi/makerverse` contains three subfolders (`commands`, `events`, and `widgets`).
+
+A more complete explanation of this topic may be found in the [Docker section](/installation/web-server/docker/#shared-directories).
+
+## GPIO Pins
+
+The Raspberry Pi image comes with `pigpiod` enabled, which allows you to control the GPIO pins from within Makerverse.
+
+See the [example of creating a command to turn on/off a shopvac](/features/commands/#create-the-command).
 
 ## Updating
 
