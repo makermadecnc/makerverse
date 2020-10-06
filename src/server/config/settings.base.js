@@ -26,12 +26,6 @@ export default {
     // @see "src/app/index.js"
     secret: secret,
 
-    // Access Token Lifetime
-    accessTokenLifetime: '30d', // https://github.com/zeit/ms
-
-    // Allow Remote Access
-    allowRemoteAccess: false,
-
     // Express view engine
     view: {
         // Set html (w/o dot) as the default extension

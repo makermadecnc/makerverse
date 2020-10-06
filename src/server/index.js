@@ -12,7 +12,6 @@ import httpProxy from 'http-proxy';
 import escapeRegExp from 'lodash/escapeRegExp';
 import isEqual from 'lodash/isEqual';
 import set from 'lodash/set';
-import size from 'lodash/size';
 import trimEnd from 'lodash/trimEnd';
 import uniqWith from 'lodash/uniqWith';
 import webappengine from 'webappengine';
@@ -100,26 +99,6 @@ const createServer = (options, callback) => {
             } else {
                 log.error(`The directory ${chalk.yellow(JSON.stringify(watchDirectory))} does not exist.`);
             }
-        }
-    }
-
-    { // accessTokenLifetime
-        const accessTokenLifetime = options.accessTokenLifetime || config.get('accessTokenLifetime');
-
-        if (accessTokenLifetime) {
-            set(settings, 'accessTokenLifetime', accessTokenLifetime);
-        }
-    }
-
-    { // allowRemoteAccess
-        const allowRemoteAccess = options.allowRemoteAccess || config.get('allowRemoteAccess', false);
-
-        if (allowRemoteAccess) {
-            if (size(config.get('users')) === 0) {
-                log.warn('You\'ve enabled remote access to the server. It\'s recommended to create an user account to protect against malicious attacks.');
-            }
-
-            set(settings, 'allowRemoteAccess', allowRemoteAccess);
         }
     }
 

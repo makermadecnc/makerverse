@@ -19,13 +19,9 @@
     "Sleep": "Uyku",
     "Unlock": "Kilidi Aç",
     "Reset": "Sıfırla",
-    "Authentication failed.": "Kimlik Doğrulama Başarısız",
     "Error": "Hata",
-    "Sign in to {{name}}": "Giriş yap {{name}}",
     "Username": "Kullanıcı adı",
     "Password": "şifre",
-    "Sign In": "Giriş",
-    "Forgot your password?": "Parolanızı mı unuttunuz?",
     "Learn more": "Daha fazla",
     "Downloads": "İndir",
     "Checking for updates...": "Güncellemeler Kontrol Ediliyor...",
@@ -517,10 +513,7 @@
     "Accept": "",
     "Move to Center": "",
     "Firmware": "",
-    "enabled": "",
-    "disabled": "",
     "Software Updates": "",
-    "Web Server": "",
     "Save": "",
     "Machine": "",
     "Frame": "",
@@ -542,5 +535,7 @@
     "Program: Start": "",
     "Program: Pause": "",
     "Program: Stop": "",
-    "Program: Resume": ""
+    "Program: Resume": "",
+    "Login": "",
+    "Why is it necessary to log in?": ""
 }

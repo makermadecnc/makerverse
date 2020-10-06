@@ -19,13 +19,9 @@
     "Sleep": "スリープ",
     "Unlock": "アンロック",
     "Reset": "リセット",
-    "Authentication failed.": "認証失敗.",
     "Error": "エラー",
-    "Sign in to {{name}}": "{{name}}にサインイン",
     "Username": "ユーザ名",
     "Password": "パスワード",
-    "Sign In": "サインイン",
-    "Forgot your password?": "パスワードを忘れましたか？",
     "Learn more": "詳細情報",
     "Downloads": "ダウンロード",
     "Checking for updates...": "更新プログラムを確認しています...",
@@ -517,10 +513,7 @@
     "Accept": "",
     "Move to Center": "",
     "Firmware": "",
-    "enabled": "",
-    "disabled": "",
     "Software Updates": "",
-    "Web Server": "",
     "Save": "",
     "Machine": "",
     "Frame": "",
@@ -542,5 +535,7 @@
     "Program: Start": "",
     "Program: Pause": "",
     "Program: Stop": "",
-    "Program: Resume": ""
+    "Program: Resume": "",
+    "Login": "",
+    "Why is it necessary to log in?": ""
 }

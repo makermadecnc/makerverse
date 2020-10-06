@@ -19,13 +19,9 @@
     "Sleep": "Slapen",
     "Unlock": "Ontsluiten",
     "Reset": "Reset",
-    "Authentication failed.": "Authenticatie mislukt",
     "Error": "Fout",
-    "Sign in to {{name}}": "Log in naar {{name}}",
     "Username": "Gebruikersnaam",
     "Password": "Paswoord",
-    "Sign In": "Log in",
-    "Forgot your password?": "Uw wachtwoord vergeten?",
     "Learn more": "Meer weten?",
     "Downloads": "Downloads",
     "Checking for updates...": "Zoeken of er nieuwe updates zijn...",
@@ -517,10 +513,7 @@
     "Accept": "",
     "Move to Center": "",
     "Firmware": "",
-    "enabled": "",
-    "disabled": "",
     "Software Updates": "",
-    "Web Server": "",
     "Save": "",
     "Machine": "",
     "Frame": "",
@@ -542,5 +535,7 @@
     "Program: Start": "",
     "Program: Pause": "",
     "Program: Stop": "",
-    "Program: Resume": ""
+    "Program: Resume": "",
+    "Login": "",
+    "Why is it necessary to log in?": ""
 }

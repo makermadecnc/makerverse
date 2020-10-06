@@ -434,7 +434,8 @@ class Visualizer extends Component {
         cuboid.position.set(
             this.workspace.axes.x.middle,
             this.workspace.axes.y.middle,
-            this.workspace.axes.z.middle);
+            this.workspace.axes.z.middle
+        );
         return cuboid;
     }
 

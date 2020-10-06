@@ -1,6 +1,5 @@
 import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import * as Oidc from 'redux-oidc';
-import { authManager } from '../lib/user';
 
 const reducers = {
 };
@@ -25,8 +24,6 @@ export default function configureStore(history, initialState) {
         initialState,
         compose(applyMiddleware(...middleware), ...enhancers)
     );
-
-    Oidc.loadUser(store, authManager);
 
     return store;
 }

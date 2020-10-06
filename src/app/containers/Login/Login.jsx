@@ -5,13 +5,13 @@ import { withRouter, Redirect } from 'react-router-dom';
 import Anchor from 'app/components/Anchor';
 import Space from 'app/components/Space';
 // import settings from 'app/config/settings';
-import Workspaces from 'app/lib/workspaces';
+// import Workspaces from 'app/lib/workspaces';
 // import promisify from 'app/lib/promisify';
-import auth from 'app/lib/auth';
+// import auth from 'app/lib/auth';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
-import { signup, signin, resend } from 'app/lib/user';
-import store from 'app/store';
+import auth from 'app/lib/auth';
+// import store from 'app/store';
 import styles from './index.styl';
 
 class Login extends PureComponent {
@@ -51,24 +51,6 @@ class Login extends PureComponent {
     }
 
     actions = {
-        handleResendVerification: (event) => {
-            event.preventDefault();
-            this.setState({ resending: true });
-            resend({ username: this.state.username })
-                .then(({ success, errors }) => {
-                    if (!success) {
-                        this.processErrors(errors);
-                        return;
-                    }
-                    this.setState({
-                        resent: true,
-                        resending: false,
-                    });
-                });
-        },
-        handleForgotPassword: (event) => {
-            event.preventDefault();
-        },
         handleSignIn: (event) => {
             event.preventDefault();
 
@@ -79,48 +61,50 @@ class Login extends PureComponent {
                 errors: { ...this.state.errors },
             });
 
-            const args = {
-                username: this.fields.username.value,
-                password: this.fields.password.value,
-            };
+            auth.manager.signinRedirect();
 
-            const registering = this.state.registering;
-            if (registering) {
-                args.email = this.fields.email.value;
-            }
+            // const args = {
+            //     username: this.fields.username.value,
+            //     password: this.fields.password.value,
+            // };
 
-            const func = registering ? signup : signin;
-            func(args)
-                .then(({ success, errors }) => {
-                    if (!success) {
-                        this.processErrors(errors);
-                        return;
-                    }
-                    if (registering) {
-                        this.setState({ registered: true });
-                        return;
-                    }
+            // const registering = this.state.registering;
+            // if (registering) {
+            //     args.email = this.fields.email.value;
+            // }
 
-                    log.debug('Create and establish a WebSocket connection');
+            // const func = registering ? signup : signin;
+            // func(args)
+            //     .then(({ success, errors }) => {
+            //         if (!success) {
+            //             this.processErrors(errors);
+            //             return;
+            //         }
+            //         if (registering) {
+            //             this.setState({ registered: true });
+            //             return;
+            //         }
 
-                    const token = store.get('session.token');
-                    auth.host = '';
-                    auth.options = {
-                        query: 'token=' + token
-                    };
-                })
-                .then(Workspaces.connect)
-                .then(() => {
-                    this.setState({
-                        alertMessage: '',
-                        authenticating: false,
-                        redirectToReferrer: true,
-                        errors: this.emptyErrors,
-                    });
-                })
-                .catch((e) => {
-                    console.log('signup/signin error', e);
-                });
+            //         log.debug('Create and establish a WebSocket connection');
+
+            //         const token = store.get('session.token');
+            //         auth.host = '';
+            //         auth.options = {
+            //             query: 'token=' + token
+            //         };
+            //     })
+            //     .then(Workspaces.connect)
+            //     .then(() => {
+            //         this.setState({
+            //             alertMessage: '',
+            //             authenticating: false,
+            //             redirectToReferrer: true,
+            //             errors: this.emptyErrors,
+            //         });
+            //     })
+            //     .catch((e) => {
+            //         console.log('signup/signin error', e);
+            //     });
         }
     };
 
@@ -190,38 +174,49 @@ class Login extends PureComponent {
         );
     }
 
-    renderResend() {
-        if (this.state.resent) {
-            return <i>The email has been re-sent.</i>;
-        }
-        const enabled = !this.state.resending;
+    renderSocialLogin(name) {
+        const authenticating = this.state.authenticating;
+        const icon = 'fa-' + name.toLowerCase();
         return (
             <button
-                type="submit"
-                className="btn btn-block btn-primary"
+                type="button"
+                className="btn btn-block btn-secondary"
+                style={{ marginLeft: '0' }}
                 onClick={this.actions.handleResendVerification}
-                disabled={!enabled}
+                disabled={authenticating}
             >
                 <i
                     className={cx(
                         'fa',
                         'fa-fw',
-                        { 'fa-envelope-o': enabled },
-                        { 'fa-spin': !enabled },
+                        icon
                     )}
                 />
                 <Space width="8" />
-                {i18n._('Resend Verification Email')}
+                {name}
             </button>
         );
     }
 
+    renderSocialLogins() {
+        return (
+            <div>
+                <i>Or, use one of the following...</i>
+                <br />
+                {this.renderSocialLogin('GitHub')}
+                {this.renderSocialLogin('Google')}
+            </div>
+        );
+    }
+
     render() {
+        const error = decodeURIComponent(window.location.hash.split('error=')[1] || '');
+
         const { from } = this.props.location.state || { from: { pathname: '/' } };
         const state = { ...this.state };
         // const actions = { ...this.actions };
-        const { alertMessage, authenticating, registering, registered } = state;
-        const act = registering ? i18n._('Create Account') : i18n._('Sign in');
+        const { alertMessage, authenticating, registering } = state;
+        const act = i18n._('Login');
         const docLink = 'http://www.makerverse.com/features/security/';
         let enabled = !authenticating && this.fields.username && this.fields.username.value.length > 0 &&
             this.fields.password && this.fields.password.value.length > 0;
@@ -245,38 +240,6 @@ class Login extends PureComponent {
             );
         }
 
-        if (registered) {
-            return (
-                <div className={styles.container}>
-                    <div className={styles.login}>
-                        <div className={styles.title}>
-                            Confirm your Email Address
-                        </div>
-                        <div className={styles.content}>
-                            {'Please check your inbox for an email from:'}
-                            <br />
-                            <b>hello@openwork.shop</b>
-                            <br />
-                            <div style={{ paddingTop: '10px', paddingBottom: '10px' }}>
-                                {this.renderResend()}
-                            </div>
-                        </div>
-                        <div className={styles.footer}>
-                            <a
-                                href={docLink}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    this.setState({ registered: false });
-                                }}
-                            >
-                                {i18n._('Return to Login')}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
         return (
             <div className={styles.container}>
                 <div className={styles.login}>
@@ -285,104 +248,19 @@ class Login extends PureComponent {
                         {act}
                     </div>
                     <div className={styles.content}>
-                        <div style={{ textAlign: 'center', textDecoration: 'italic', marginBottom: '10px' }}>
-                            {registering && (
-                                <a
-                                    href="#sign-in"
-                                    onClick={(e) => {
-                                        this.setState({ registering: false });
-                                        e.preventDefault();
-                                    }}
-                                >
-                                    {i18n._('Already have an account?')}
-                                </a>
-                            )}
-                            {!registering && (
-                                <a
-                                    href="#sign-up"
-                                    onClick={(e) => {
-                                        this.setState({ registering: true });
-                                        e.preventDefault();
-                                    }}
-                                >
-                                    {i18n._('Don\'t have an account?')}
-                                </a>
-                            )}
-                        </div>
+                        {error.length > 0 && (
+                            <div className={styles.error}>
+                                {error}
+                            </div>
+                        )}
                         <form className={styles.form}>
-                            {registering && (
-                                <div className="form-group">
-                                    <input
-                                        ref={node => {
-                                            this.fields.email = node;
-                                        }}
-                                        type="email"
-                                        onChange={() => this.onChangeEmail()}
-                                        className="form-control"
-                                        placeholder={i18n._('Email')}
-                                        autoComplete="email"
-                                    />
-                                    {this.renderError('email')}
-                                </div>
-                            )}
-                            <div className="form-group">
-                                <input
-                                    ref={node => {
-                                        this.fields.username = node;
-                                    }}
-                                    type="text"
-                                    onChange={(e) => this.setState({
-                                        hasChangedUsername: true,
-                                        username: e.target.value,
-                                    })}
-                                    className="form-control"
-                                    placeholder={i18n._('Username')}
-                                    autoComplete="username"
-                                />
-                                {this.renderError('username')}
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    ref={node => {
-                                        this.fields.password = node;
-                                    }}
-                                    type="password"
-                                    onChange={(e) => this.onChangePasswords(e.target.value)}
-                                    className="form-control"
-                                    placeholder={i18n._('Password')}
-                                    autoComplete="password"
-                                />
-                                {this.renderError('password')}
-                            </div>
-                            {registering && (
-                                <div className="form-group">
-                                    <input
-                                        ref={node => {
-                                            this.fields.passwordMatch = node;
-                                        }}
-                                        type="password"
-                                        className="form-control"
-                                        onChange={() => this.onChangePasswords()}
-                                        placeholder={i18n._('Password (again)')}
-                                        autoComplete="password"
-                                    />
-                                    {this.renderError('passwordMatch')}
-                                </div>
-                            )}
-                            {!registering && (
-                                <div style={{ textAlign: 'right', width: '100%' }}>
-                                    <a href="#forgot-password" onClick={this.actions.handleForgotPassword}>
-                                        {i18n._('Forgot your password?')}
-                                    </a>
-                                </div>
-                            )}
                             <div className="form-group">
                                 {this.renderError('unknown')}
                                 <button
                                     type="submit"
                                     className="btn btn-block btn-primary"
                                     onClick={this.actions.handleSignIn}
-                                    disabled={!enabled}
+                                    disabled={authenticating}
                                 >
                                     <i
                                         className={cx(
@@ -390,12 +268,11 @@ class Login extends PureComponent {
                                             'fa-fw',
                                             { 'fa-spin': authenticating },
                                             { 'fa-circle-o-notch': authenticating },
-                                            { 'fa-sign-in': !authenticating && !registering },
-                                            { 'fa-user-plus': !authenticating && registering },
+                                            { 'fa-envelope-o': !authenticating },
                                         )}
                                     />
                                     <Space width="8" />
-                                    {act}
+                                    {act} with Email
                                 </button>
                                 {alertMessage && (
                                     <div className={styles.error}>
@@ -407,7 +284,7 @@ class Login extends PureComponent {
                     </div>
                     <div className={styles.footer}>
                         <Anchor href={docLink}>
-                            {i18n._('Why is it necessary to create an account?')}
+                            {i18n._('Why is it necessary to log in?')}
                         </Anchor>
                     </div>
                 </div>

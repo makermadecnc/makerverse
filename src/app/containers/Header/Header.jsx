@@ -12,8 +12,7 @@ import Space from 'app/components/Space';
 import combokeys from 'app/lib/combokeys';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
-import * as user from 'app/lib/user';
-import store from 'app/store';
+import auth from 'app/lib/auth';
 import Workspaces from 'app/lib/workspaces';
 import settings from 'app/config/settings';
 import styles from './index.styl';
@@ -244,9 +243,7 @@ class Header extends PureComponent {
     render() {
         const { history, location } = this.props;
         const { pushPermission, commands, runningTasks, updateAvailable, latestVersion, lastUpdate } = this.state;
-        const sessionEnabled = store.get('session.enabled');
-        const signedInName = store.get('session.name');
-        const hideUserDropdown = !sessionEnabled;
+        const signedInName = auth.user ? auth.user.username : '?';
         const showCommands = commands.length > 0;
         const workspace = Workspaces.findByPath(location.pathname);
         const updateMsg = i18n._('A new version of {{name}} is available', { name: settings.productName }) + '. ' +
@@ -301,9 +298,6 @@ class Header extends PureComponent {
                 <Navbar.Collapse>
                     <Nav pullRight>
                         <NavDropdown
-                            className={classNames(
-                                { 'hidden': hideUserDropdown }
-                            )}
                             id="nav-dropdown-user"
                             title={(
                                 <div title={i18n._('My Account')}>
@@ -317,7 +311,7 @@ class Header extends PureComponent {
                             </MenuItem>
                             <MenuItem divider />
                             <MenuItem
-                                href="#/settings/user-accounts"
+                                href="https://openwork.shop/account/manage"
                             >
                                 <i className="fa fa-fw fa-user" />
                                 <Space width="8" />
@@ -325,11 +319,11 @@ class Header extends PureComponent {
                             </MenuItem>
                             <MenuItem
                                 onClick={() => {
-                                    if (user.isAuthenticated()) {
+                                    if (auth.isAuthenticated()) {
                                         log.debug('Destroy and cleanup the WebSocket connection');
                                         Workspaces.disconnect();
 
-                                        user.signout();
+                                        auth.signout();
 
                                         // Remember current location
                                         history.replace(location.pathname);

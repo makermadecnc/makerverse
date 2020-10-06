@@ -19,13 +19,9 @@
     "Sleep": "Сон",
     "Unlock": "Разблокировать",
     "Reset": "Сброс",
-    "Authentication failed.": "",
     "Error": "",
-    "Sign in to {{name}}": "",
     "Username": "Имя пользователя",
     "Password": "Пароль",
-    "Sign In": "Вход",
-    "Forgot your password?": "",
     "Learn more": "Подробнее",
     "Downloads": "Загрузки",
     "Checking for updates...": "Проверка наличия обновлений...",
@@ -517,10 +513,7 @@
     "Accept": "",
     "Move to Center": "",
     "Firmware": "",
-    "enabled": "",
-    "disabled": "",
     "Software Updates": "",
-    "Web Server": "",
     "Save": "",
     "Machine": "",
     "Frame": "",
@@ -542,5 +535,7 @@
     "Program: Start": "",
     "Program: Pause": "",
     "Program: Stop": "",
-    "Program: Resume": ""
+    "Program: Resume": "",
+    "Login": "",
+    "Why is it necessary to log in?": ""
 }

@@ -9,12 +9,10 @@ import connectRestreamer from 'connect-restreamer';
 import engines from 'consolidate';
 import errorhandler from 'errorhandler';
 import express from 'express';
-import expressJwt from 'express-jwt';
 import session from 'express-session';
 import 'hogan.js'; // required by consolidate
 import i18next from 'i18next';
 import i18nextBackend from 'i18next-node-fs-backend';
-import jwt from 'jsonwebtoken';
 import methodOverride from 'method-override';
 import morgan from 'morgan';
 import favicon from 'serve-favicon';
@@ -35,14 +33,7 @@ import errclient from './lib/middleware/errclient';
 import errlog from './lib/middleware/errlog';
 import errnotfound from './lib/middleware/errnotfound';
 import errserver from './lib/middleware/errserver';
-import config from './services/configstore';
-import {
-    authorizeIPAddress,
-    validateUser
-} from './access-control';
-import {
-    ERR_FORBIDDEN
-} from './constants';
+import { authExpressMiddleware } from './access-control';
 
 const log = logger('app');
 
@@ -101,20 +92,6 @@ const appMain = () => {
         .use(i18nextBackend)
         .use(i18nextLanguageDetector)
         .init(settings.i18next);
-
-    app.use(async (req, res, next) => {
-        try {
-            // IP Address Access Control
-            const ipaddr = req.ip || req.connection.remoteAddress;
-            await authorizeIPAddress(ipaddr);
-        } catch (err) {
-            log.warn(err);
-            res.status(ERR_FORBIDDEN).end('Forbidden Access');
-            return;
-        }
-
-        next();
-    });
 
     // Removes the 'X-Powered-By' header in earlier versions of Express
     app.use((req, res, next) => {
@@ -204,50 +181,7 @@ const appMain = () => {
 
     app.use(i18nextHandle(i18next, {}));
 
-    { // Secure API Access
-        app.use(urljoin(settings.route, 'api'), expressJwt({
-            secret: config.get('secret'),
-            credentialsRequired: true
-        }));
-
-        app.use(async (err, req, res, next) => {
-            let bypass = !(err && (err.name === 'UnauthorizedError'));
-
-            // Check whether the app is running in development mode
-            bypass = bypass || (process.env.NODE_ENV === 'development');
-
-            // Check whether the request path is not restricted
-            const whitelist = [
-                // Also see "src/app/api/index.js"
-                urljoin(settings.route, 'api/signin')
-            ];
-            bypass = bypass || whitelist.some(path => {
-                return req.path.indexOf(path) === 0;
-            });
-
-            if (!bypass) {
-                // Check whether the provided credential is correct
-                const token = _get(req, 'query.token') || _get(req, 'body.token');
-                try {
-                    // User Validation
-                    const user = jwt.verify(token, settings.secret) || {};
-                    await validateUser(user);
-                    bypass = true;
-                } catch (err) {
-                    log.warn(err);
-                }
-            }
-
-            if (!bypass) {
-                const ipaddr = req.ip || req.connection.remoteAddress;
-                log.warn(`Forbidden: ipaddr=${ipaddr}, code="${err.code}", message="${err.message}"`);
-                res.status(ERR_FORBIDDEN).end('Forbidden Access');
-                return;
-            }
-
-            next();
-        });
-    }
+    app.use(authExpressMiddleware);
 
     { // Register API routes with public access
         // Also see "src/app/app.js"
@@ -311,9 +245,9 @@ const appMain = () => {
 
         // Users
         app.get(urljoin(settings.route, 'api/users'), api.users.fetch);
-        app.post(urljoin(settings.route, 'api/users/'), api.users.create);
+        // app.post(urljoin(settings.route, 'api/users/'), api.users.create);
         app.get(urljoin(settings.route, 'api/users/:id'), api.users.read);
-        app.put(urljoin(settings.route, 'api/users/:id'), api.users.update);
+        // app.put(urljoin(settings.route, 'api/users/:id'), api.users.update);
         app.delete(urljoin(settings.route, 'api/users/:id'), api.users.__delete);
 
         // Watch

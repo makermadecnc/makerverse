@@ -19,13 +19,9 @@
     "Sleep": "Alvás",
     "Unlock": "Feloldás",
     "Reset": "Reset",
-    "Authentication failed.": "A hitelesítés sikertelen.",
     "Error": "",
-    "Sign in to {{name}}": "Bejelentkezés a {{name}}-be",
     "Username": "Felhasználó",
     "Password": "Jelszó",
-    "Sign In": "Bejelentkezés",
-    "Forgot your password?": "Elfelejtetted a jelszavad?",
     "Learn more": "További információ",
     "Downloads": "Letöltés",
     "Checking for updates...": "Frissítések keresése ...",
@@ -517,10 +513,7 @@
     "Accept": "",
     "Move to Center": "",
     "Firmware": "",
-    "enabled": "",
-    "disabled": "",
     "Software Updates": "",
-    "Web Server": "",
     "Save": "",
     "Machine": "",
     "Frame": "",
@@ -542,5 +535,7 @@
     "Program: Start": "",
     "Program: Pause": "",
     "Program: Stop": "",
-    "Program: Resume": ""
+    "Program: Resume": "",
+    "Login": "",
+    "Why is it necessary to log in?": ""
 }

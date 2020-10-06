@@ -52,7 +52,6 @@ class General extends PureComponent {
     render() {
         const { state, stateChanged } = this.props;
         const lang = get(state, 'lang', 'en');
-        const raEnabled = state.allowRemoteAccess ? i18n._('enabled') : i18n._('disabled');
 
         if (state.api.loading) {
             return (
@@ -96,12 +95,6 @@ class General extends PureComponent {
                             </label>
                         </div>
                     </div>
-                </div>
-                <div className={styles.formFields}>
-                    <h4>{i18n._('Web Server')}</h4>
-                    <span style={{ fontStyle: 'italic' }} >
-                        Remote access is <strong>{raEnabled}</strong> in your .makerverse config file.
-                    </span>
                 </div>
                 <div className={styles.formFields}>
                     <h4>{i18n._('Language')}</h4>

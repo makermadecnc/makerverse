@@ -2,10 +2,8 @@ import ensureArray from 'ensure-array';
 import noop from 'lodash/noop';
 import SerialPort from 'serialport';
 import socketIO from 'socket.io';
-import socketioJwt from 'socketio-jwt';
 import EventTrigger from '../../lib/EventTrigger';
 import logger from '../../lib/logger';
-import settings from '../../config/settings';
 import store from '../../store';
 import config from '../configstore';
 import taskRunner from '../taskrunner';
@@ -21,10 +19,7 @@ import { MARLIN } from '../../controllers/Marlin/constants';
 import { SMOOTHIE } from '../../controllers/Smoothie/constants';
 import { TINYG } from '../../controllers/TinyG/constants';
 import { MASLOW } from '../../controllers/Maslow/constants';
-import {
-    authorizeIPAddress,
-    validateUser
-} from '../../access-control';
+import { authSocketIoMiddleware } from '../../access-control';
 
 const log = logger('service:cncengine');
 
@@ -95,33 +90,12 @@ class CNCEngine {
             path: '/socket.io'
         });
 
-        this.io.use(socketioJwt.authorize({
-            secret: settings.secret,
-            handshake: true
-        }));
-
-        this.io.use(async (socket, next) => {
-            try {
-                // IP Address Access Control
-                const ipaddr = socket.handshake.address;
-                await authorizeIPAddress(ipaddr);
-
-                // User Validation
-                const user = socket.decoded_token || {};
-                await validateUser(user);
-            } catch (err) {
-                log.warn(err);
-                next(err);
-                return;
-            }
-
-            next();
-        });
+        this.io.use(authSocketIoMiddleware);
 
         this.io.on('connection', (socket) => {
             const address = socket.handshake.address;
-            const user = socket.decoded_token || {};
-            log.debug(`New connection from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`);
+            const user = socket.user || {};
+            log.debug(`New connection from ${address}: id=${socket.id}, user.username=${user.username}`);
 
             // Add to the socket pool
             this.sockets.push(socket);
@@ -135,7 +109,7 @@ class CNCEngine {
             });
 
             socket.on('disconnect', () => {
-                log.debug(`Disconnected from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`);
+                log.debug(`Disconnected from ${address}: id=${socket.id}, user.username=${user.username}`);
 
                 const controllers = store.get('controllers', {});
                 Object.keys(controllers).forEach(port => {

@@ -19,13 +19,9 @@
     "Sleep": "Režim spánku",
     "Unlock": "Odemknout",
     "Reset": "Resetovat",
-    "Authentication failed.": "",
     "Error": "",
-    "Sign in to {{name}}": "",
     "Username": "Uživatelské jméno",
     "Password": "Heslo",
-    "Sign In": "Přihlásit se",
-    "Forgot your password?": "",
     "Learn more": "Další informace",
     "Downloads": "Stažené soubory",
     "Checking for updates...": "Vyhledávají se aktualizace...",
@@ -517,10 +513,7 @@
     "Accept": "",
     "Move to Center": "",
     "Firmware": "",
-    "enabled": "",
-    "disabled": "",
     "Software Updates": "",
-    "Web Server": "",
     "Save": "",
     "Machine": "",
     "Frame": "",
@@ -542,5 +535,7 @@
     "Program: Start": "",
     "Program: Pause": "",
     "Program: Stop": "",
-    "Program: Resume": ""
+    "Program: Resume": "",
+    "Login": "",
+    "Why is it necessary to log in?": ""
 }

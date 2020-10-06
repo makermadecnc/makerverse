@@ -19,13 +19,9 @@
     "Sleep": "Sleep",
     "Unlock": "Unlock",
     "Reset": "Reset",
-    "Authentication failed.": "Authentication failed.",
     "Error": "Error",
-    "Sign in to {{name}}": "Sign in to {{name}}",
     "Username": "Username",
     "Password": "Password",
-    "Sign In": "Sign In",
-    "Forgot your password?": "Forgot your password?",
     "Learn more": "Learn more",
     "Downloads": "Downloads",
     "Checking for updates...": "Checking for updates...",
@@ -517,10 +513,7 @@
     "Accept": "Accept",
     "Move to Center": "Move to Center",
     "Firmware": "Firmware",
-    "enabled": "enabled",
-    "disabled": "disabled",
     "Software Updates": "Software Updates",
-    "Web Server": "Web Server",
     "Save": "Save",
     "Machine": "Machine",
     "Frame": "Frame",
@@ -542,5 +535,7 @@
     "Program: Start": "Program: Start",
     "Program: Pause": "Program: Pause",
     "Program: Stop": "Program: Stop",
-    "Program: Resume": "Program: Resume"
+    "Program: Resume": "Program: Resume",
+    "Login": "Login",
+    "Why is it necessary to log in?": "Why is it necessary to log in?"
 }

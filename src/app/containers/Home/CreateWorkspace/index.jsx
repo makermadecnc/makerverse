@@ -238,7 +238,7 @@ class CreateWorkspace extends PureComponent {
 
     componentDidMount() {
         this._mounting = true;
-        this.controller.connect(auth.host, auth.options, () => {
+        this.controller.connect(auth.host, auth.socket, () => {
             this.addControllerEvents();
             this.refreshPorts();
             this._mounting = false;

@@ -19,13 +19,9 @@
     "Sleep": "Suspensión",
     "Unlock": "Desbloquear",
     "Reset": "Resetear",
-    "Authentication failed.": "Fallo de autenticación",
     "Error": "Error",
-    "Sign in to {{name}}": "Conectarse a {{name}}",
     "Username": "Nombre de usuario",
     "Password": "Contraseña",
-    "Sign In": "Iniciar sesión",
-    "Forgot your password?": "Olvido contraseña?",
     "Learn more": "Más información",
     "Downloads": "Descargas",
     "Checking for updates...": "Buscando actualizaciones...",
@@ -517,10 +513,7 @@
     "Accept": "",
     "Move to Center": "",
     "Firmware": "",
-    "enabled": "",
-    "disabled": "",
     "Software Updates": "",
-    "Web Server": "",
     "Save": "",
     "Machine": "",
     "Frame": "",
@@ -542,5 +535,7 @@
     "Program: Start": "",
     "Program: Pause": "",
     "Program: Stop": "",
-    "Program: Resume": ""
+    "Program: Resume": "",
+    "Login": "",
+    "Why is it necessary to log in?": ""
 }
