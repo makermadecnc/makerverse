@@ -504,7 +504,6 @@
     "Webcam Widget": "",
     "View a webcam from within the app to monitor progress.": "",
     "Baud Rate": "",
-    "Next Step": "",
     "Apply Calibration Results": "",
     "Calibrating": "",
     "Kinematics": "",
@@ -528,7 +527,6 @@
     "Move machine to 0/0": "",
     "Update Firmware": "",
     "Chains": "",
-    "Set Frame": "",
     "Stock": "",
     "Uplload Program": "",
     "Upload Program": "",
@@ -539,5 +537,10 @@
     "Export Calibration": "",
     "Import": "",
     "yes": "",
-    "no": ""
+    "no": "",
+    "Need help updating?": "",
+    "Program: Start": "",
+    "Program: Pause": "",
+    "Program: Stop": "",
+    "Program: Resume": ""
 }

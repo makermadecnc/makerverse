@@ -5,11 +5,14 @@ import pubsub from 'pubsub-js';
 import qs from 'qs';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { createBrowserHistory } from 'history';
 import {
     HashRouter as Router,
     Route
 } from 'react-router-dom';
 import i18next from 'i18next';
+import { OidcProvider } from 'redux-oidc';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import XHR from 'i18next-xhr-backend';
 import { TRACE, DEBUG, INFO, WARN, ERROR } from 'universal-logger';
@@ -22,8 +25,9 @@ import auth from './lib/auth';
 import api from './api';
 import series from './lib/promise-series';
 import promisify from './lib/promisify';
-import * as user from './lib/user';
+import { authManager, signin, isAuthenticated } from './lib/user';
 import store from './store';
+import configureReduxStore from './store/redux';
 import App from './containers/App';
 import Login from './containers/Login';
 import Anchor from './components/Anchor';
@@ -37,24 +41,32 @@ import './styles/vendor.styl';
 import './styles/app.styl';
 
 const renderPage = () => {
+    const baseUrl = window.location.host;
+    const history = createBrowserHistory({ basename: baseUrl });
+    const reduxStore = configureReduxStore(history);
+
     const container = document.createElement('div');
     document.body.appendChild(container);
 
     ReactDOM.render(
-        <GridSystemProvider
-            breakpoints={[576, 768, 992, 1200]}
-            containerWidths={[540, 720, 960, 1140]}
-            columns={12}
-            gutterWidth={0}
-            layout="floats"
-        >
-            <Router>
-                <div>
-                    <Route path="/login" component={Login} />
-                    <ProtectedRoute path="/" component={App} />
-                </div>
-            </Router>
-        </GridSystemProvider>,
+        <Provider store={reduxStore}>
+            <OidcProvider store={store} userManager={authManager}>
+                <GridSystemProvider
+                    breakpoints={[576, 768, 992, 1200]}
+                    containerWidths={[540, 720, 960, 1140]}
+                    columns={12}
+                    gutterWidth={0}
+                    layout="floats"
+                >
+                    <Router>
+                        <div>
+                            <Route path="/login" component={Login} />
+                            <ProtectedRoute path="/" component={App} />
+                        </div>
+                    </Router>
+                </GridSystemProvider>
+            </OidcProvider>
+        </Provider>,
         container
     );
 };
@@ -94,7 +106,7 @@ series([
     })(),
     () => promisify(next => {
         const token = store.get('session.token');
-        user.signin({ token: token })
+        signin({ token: token })
             .then(({ authenticated, token }) => {
                 if (authenticated) {
                     log.debug('Authenticated');
@@ -108,6 +120,10 @@ series([
             });
     })(),
     () => promisify(next => {
+        if (!isAuthenticated()) {
+            next();
+            return;
+        }
         api.workspaces
             .fetch()
             .then(({ body }) => {
@@ -120,11 +136,10 @@ series([
                     log.error('workspaces load error');
                 }
                 next();
-            });
+            })
+            .then(Workspaces.connect);
     })()
-]).then(
-    Workspaces.connect
-).then(async () => {
+]).then(async () => {
     log.info(`${settings.productName}`);
 
     // Cross-origin communication

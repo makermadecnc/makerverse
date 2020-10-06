@@ -504,7 +504,6 @@
     "Webcam Widget": "Webcam Widget",
     "View a webcam from within the app to monitor progress.": "View a webcam from within the app to monitor progress.",
     "Baud Rate": "Baud Rate",
-    "Next Step": "Next Step",
     "Apply Calibration Results": "Apply Calibration Results",
     "Calibrating": "Calibrating",
     "Kinematics": "Kinematics",
@@ -528,7 +527,6 @@
     "Move machine to 0/0": "Move machine to 0/0",
     "Update Firmware": "Update Firmware",
     "Chains": "Chains",
-    "Set Frame": "Set Frame",
     "Stock": "Stock",
     "Uplload Program": "Uplload Program",
     "Upload Program": "Upload Program",
@@ -539,5 +537,10 @@
     "Export Calibration": "Export Calibration",
     "Import": "Import",
     "yes": "yes",
-    "no": "no"
+    "no": "no",
+    "Need help updating?": "Need help updating?",
+    "Program: Start": "Program: Start",
+    "Program: Pause": "Program: Pause",
+    "Program: Stop": "Program: Stop",
+    "Program: Resume": "Program: Resume"
 }

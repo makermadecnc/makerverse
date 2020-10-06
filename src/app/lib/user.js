@@ -1,29 +1,73 @@
-import api from 'app/api';
+import { apirequest } from 'app/api';
 import config from 'app/store';
+import { createUserManager } from 'redux-oidc';
+import log from 'app/lib/log';
+
+// Makerverse OAuth login mechanism.
+// The oidc-client handles token hand-off and validation.
+
+const devServer = true;
+const authority = devServer ? 'http://localhost:5000' : 'https://openwork.shop';
+const self = 'http://localhost:8000';
+const oauthConfig = {
+    client_id: 'Makerverse',
+    redirect_uri: `${self}/#/account/logged-in`,
+    post_logout_redirect_uri: `${self}/#/account/logged-out`,
+    response_type: 'code',
+    scope: 'OpenWorkShopAPI openid profile',
+    authority: `${authority}/`,
+    silent_redirect_uri: `${self}/silent_renew.html`,
+    automaticSilentRenew: true,
+    filterProtocolClaims: true,
+    loadUserInfo: true,
+    monitorSession: false,
+};
+export const authManager = createUserManager(oauthConfig);
+
+export const userProfile = {
+    user: null,
+};
 
 let _authenticated = false;
 
-export const signin = ({ token, name, password }) => new Promise((resolve, reject) => {
-    api.signin({ token, name, password })
-        .then((res) => {
-            const { enabled = false, token = '', name = '' } = { ...res.body };
+export const getReturnUrl = () => new Promise((resolve, reject) => {
+    authManager
+        .createSigninRequest()
+        .then((p) => {
+            resolve(p.url);
+        });
+    // resolve(`${self}/logged-in`);
+});
 
-            config.set('session.enabled', enabled);
-            config.set('session.token', token);
-            config.set('session.name', name);
-
-            // Persist data after successful login to prevent debounced update
-            config.persist();
-
-            _authenticated = true;
-            resolve({ authenticated: true, token: token });
+export const call = (path, args) => new Promise((resolve, reject) => {
+    getReturnUrl()
+        .then((url) => {
+            args.returnUrl = url;
+            log.debug(path, 'request', url);
+            return apirequest.post(`${authority}/api/auth/${path}`).send(args); // withCredentials().
         })
-        .catch((res) => {
-            // Do not unset session token so it won't trigger an update to the store
-            _authenticated = false;
-            resolve({ authenticated: false, token: null });
+        .then((res) => {
+            log.debug(path, 'response: ', res.body);
+            if (!res.body.record) {
+                throw new Error('Response was missing data');
+            } else if (res.body.meta && res.body.meta.redirectUrl) {
+                window.location.replace(res.body.meta.redirectUrl);
+            } else {
+                resolve({ success: true });
+            }
+        })
+        .catch((err) => {
+            let body = err.response ? err.response.body : {};
+            log.error(path, 'error:', err.message, body);
+            resolve({ success: false, errors: body.errors || [err.message] });
         });
 });
+
+export const signin = (args) => call('login', args);
+
+export const signup = (args) => call('register', args);
+
+export const resend = (args) => call('send/email', args);
 
 export const signout = () => new Promise((resolve, reject) => {
     config.unset('session.token');

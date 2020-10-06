@@ -27,7 +27,10 @@ const noCache = (request) => {
     }
 };
 
-const authrequest = superagentUse(superagent);
+export const apirequest = superagentUse(superagent);
+apirequest.use(noCache);
+
+export const authrequest = superagentUse(superagent);
 authrequest.use(bearer);
 authrequest.use(noCache);
 
@@ -35,18 +38,31 @@ authrequest.use(noCache);
 // Authentication
 //
 const signin = (options) => new Promise((resolve, reject) => {
-    const { token, name, password } = { ...options };
+    // const { token, username, password } = { ...options };
 
-    authrequest
-        .post('/api/signin')
-        .send({ token, name, password })
-        .end((err, res) => {
-            if (err) {
-                reject(res);
-            } else {
-                resolve(res);
-            }
-        });
+    // const requestedUrl = new URLSearchParams(window.location.search).get('ReturnUrl');
+    // args.returnUrl = requestedUrl || (await ).url;
+    // const args = { username, password };
+
+    // fetch(`${owsApi}/auth/login`, {
+    //     method: 'POST',
+    //     credentials: 'include',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(args),
+    // });
+
+    // authrequest
+    //     .post('/api/signin')
+    //     .send({ token, name, password })
+    //     .end((err, res) => {
+    //         if (err) {
+    //             reject(res);
+    //         } else {
+    //             resolve(res);
+    //         }
+    //     });
 });
 
 //

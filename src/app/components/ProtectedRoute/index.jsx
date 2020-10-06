@@ -1,13 +1,15 @@
 import React from 'react';
+// import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { Route, Redirect, withRouter } from 'react-router-dom';
-import * as user from 'app/lib/user';
 import log from 'app/lib/log';
 
 const ProtectedRoute = ({ component: Component, ...rest }) => (
     <Route
         {...rest}
         render={props => {
-            if (user.isAuthenticated()) {
+            if (props.user) {
+                log.debug('User is authenticated.', props.user);
                 return Component ? <Component {...rest} /> : null;
             }
 
@@ -34,7 +36,19 @@ const ProtectedRoute = ({ component: Component, ...rest }) => (
 );
 
 ProtectedRoute.propTypes = {
-    ...withRouter.propTypes
+    ...withRouter.propTypes,
 };
 
-export default ProtectedRoute;
+function mapStateToProps(state) {
+    return {
+        user: state.oidc.user
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProtectedRoute);

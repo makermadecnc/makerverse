@@ -13,6 +13,7 @@ import store from '../store';
 import analytics from './analytics';
 import Hardware from './hardware';
 import ActiveState from './active-state';
+import isAuthenticated from './user';
 import {
     MASLOW,
     GRBL,
@@ -56,7 +57,7 @@ class Workspaces extends events.EventEmitter {
     }
 
     static connect() {
-        const funcs = Object.keys(Workspaces.all).map((id) => {
+        const funcs = isAuthenticated() ? Object.keys(Workspaces.all).map((id) => {
             return () => promisify(next => {
                 const workspace = Workspaces.all[id];
                 workspace.controller.connect(auth.host, auth.options, () => {
@@ -64,7 +65,7 @@ class Workspaces extends events.EventEmitter {
                     next();
                 });
             })();
-        });
+        }) : [];
         return series(funcs);
     }
 
