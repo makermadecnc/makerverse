@@ -23,7 +23,7 @@ import log from 'app/lib/log';
 import Workspaces from 'app/lib/workspaces';
 import General from './General';
 import WorkspaceSettings from './WorkspaceSettings';
-import UserAccounts from './UserAccounts';
+// import UserAccounts from './UserAccounts';
 import Controller from './Controller';
 import Commands from './Commands';
 import Events from './Events';
@@ -58,12 +58,12 @@ class Settings extends PureComponent {
             title: 'Controller',
             component: (props) => <Controller {...props} />
         },
-        {
-            id: 'userAccounts',
-            path: 'user-accounts',
-            title: 'User Accounts',
-            component: (props) => <UserAccounts {...props} />
-        },
+        // {
+        //     id: 'userAccounts',
+        //     path: 'user-accounts',
+        //     title: 'User Accounts',
+        //     component: (props) => <UserAccounts {...props} />
+        // },
         {
             id: 'commands',
             path: 'commands',
@@ -113,7 +113,7 @@ class Settings extends PureComponent {
 
                 api.getState()
                     .then((res) => {
-                        const { checkForUpdates, prereleases, allowRemoteAccess } = { ...res.body };
+                        const { checkForUpdates, prereleases } = { ...res.body };
 
                         const nextState = {
                             ...this.state.general,
@@ -124,7 +124,6 @@ class Settings extends PureComponent {
                             },
                             // followed by data
                             checkForUpdates: !!checkForUpdates,
-                            allowRemoteAccess: !!allowRemoteAccess,
                             prereleases: !!prereleases,
                             lang: i18next.language
                         };
@@ -1029,7 +1028,6 @@ class Settings extends PureComponent {
                 },
                 checkForUpdates: true,
                 prereleases: false,
-                allowRemoteAccess: !!(settings.allowRemoteAccess),
                 lang: i18next.language
             },
             // Workspaces

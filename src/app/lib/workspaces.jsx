@@ -2,9 +2,6 @@ import _ from 'lodash';
 import log from 'app/lib/log';
 import events from 'events';
 import WorkspaceAxis from 'app/lib/workspace-axis';
-import series from 'app/lib/promise-series';
-import auth from 'app/lib/auth';
-import promisify from 'app/lib/promisify';
 import MachineSettings from 'app/lib/MachineSettings';
 import api from 'app/api';
 import io from 'socket.io-client';
@@ -53,19 +50,6 @@ class Workspaces extends events.EventEmitter {
         workspace.removeControllerEvents(workspace._controllerEvents);
         workspace.closePort();
         delete Workspaces.all[id];
-    }
-
-    static connect() {
-        const funcs = Object.keys(Workspaces.all).map((id) => {
-            return () => promisify(next => {
-                const workspace = Workspaces.all[id];
-                workspace.controller.connect(auth.host, auth.options, () => {
-                    // @see "src/web/containers/Login/Login.jsx"
-                    next();
-                });
-            })();
-        });
-        return series(funcs);
     }
 
     static disconnect() {
@@ -331,6 +315,14 @@ class Workspaces extends events.EventEmitter {
     _controllerState = null;
 
     _controllerSettings = null;
+
+    get commands() {
+        return this._record.commands;
+    }
+
+    getCommand(name, def = []) {
+        return [].concat(this.commands[name] || def);
+    }
 
     _controllerEvents = {
         'serialport:change': (options) => {

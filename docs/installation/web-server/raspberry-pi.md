@@ -12,6 +12,13 @@ This is the easiest approach.
 
 It does all the work of setting up the Docker environment (and Linux service) for you. If you prefer to set up your Raspberry Pi manually (instead of using a pre-built SD card), see the [Linux Service](/installation/web-server/linux-service/) instructions.
 
+## Requirements
+
+- Raspberry Pi 3B+ (or better)
+- 16 GB micro SD card (or bigger)
+- Power supply for the RPi
+- _Optional: keyboard, mouse, and monitor_
+
 ## Choose Release
 
 There are two download options in the [Latest Release](https://github.com/makermadecnc/makerverse/releases/latest/):

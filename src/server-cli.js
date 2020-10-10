@@ -89,8 +89,6 @@ export default () => new Promise((resolve, reject) => {
         verbosity: program.verbose,
         mountPoints: program.mount,
         watchDirectory: program.watchDirectory,
-        accessTokenLifetime: program.accessTokenLifetime,
-        allowRemoteAccess: !!program.allowRemoteAccess,
         controller: program.controller
     }, (err, data) => {
         if (err) {

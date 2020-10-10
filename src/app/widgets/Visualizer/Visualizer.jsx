@@ -430,7 +430,13 @@ class Visualizer extends Component {
             gapSize,
             scale,
         };
-        return new Cuboid(cb);
+        const cuboid = new Cuboid(cb);
+        cuboid.position.set(
+            this.workspace.axes.x.middle,
+            this.workspace.axes.y.middle,
+            this.workspace.axes.z.middle
+        );
+        return cuboid;
     }
 
     _axisLabels = [];
@@ -684,7 +690,6 @@ class Visualizer extends Component {
             this.limits.name = 'Limits';
             this.limits.visible = objects.limits.visible;
             this.group.add(this.limits);
-            this.limits.position.set(0, 0, 0); // always extend from machine origin.
         }
 
         this.scene.add(this.group);

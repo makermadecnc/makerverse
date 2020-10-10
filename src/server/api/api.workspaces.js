@@ -10,8 +10,7 @@ import {
     ERR_NOT_FOUND,
     ERR_INTERNAL_SERVER_ERROR
 } from '../constants';
-import { MASLOW } from '../controllers/Maslow/constants';
-import { GRBL } from '../controllers/Grbl/constants';
+import { MASLOW, GRBL, MARLIN, TINYG } from '../controllers/Maslow/constants';
 
 const log = logger('api:workspaces');
 const CONFIG_KEY = 'workspaces';
@@ -28,6 +27,26 @@ const defaultFeatures = {
         mpos_go_home_x: false,
         mpos_go_home_y: false,
         mpos_go_home_z: false,
+    }
+};
+
+const defaultCommands = {
+    [MASLOW]: {
+        homing: [
+            'G21',
+            'G90',
+            'G0 Z5',
+            'G0 X0 Y0',
+        ],
+    },
+    [MARLIN]: {
+        homing: ['G28.2 X Y Z'],
+    },
+    [TINYG]: {
+        homing: ['G28.2 X0 Y0 Z0'],
+    },
+    '': {
+        homing: ['$H'],
     }
 };
 
@@ -151,6 +170,7 @@ const ensureWorkspace = (payload) => {
     const path = payload.path || `/${id}`;
     const ax = { ...(defaultAxes[controllerType] || defaultAxes['']), ...ensureObject(axes) };
     const ft = { ...(defaultFeatures[controllerType] || {}), ...ensureObject(features) };
+    const cmds = { ...defaultCommands[''], ...defaultCommands[controllerType], ...ensureObject(cmds) };
     Object.keys(ax).forEach((axis) => {
         ax[axis] = ensureAxis(ax[axis]);
     });
@@ -169,6 +189,7 @@ const ensureWorkspace = (payload) => {
         },
         axes: ax,
         features: ft,
+        commands: cmds,
     };
 };
 

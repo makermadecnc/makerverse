@@ -5,11 +5,15 @@ import pubsub from 'pubsub-js';
 import qs from 'qs';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { createBrowserHistory } from 'history';
 import {
     HashRouter as Router,
+    Switch,
     Route
 } from 'react-router-dom';
 import i18next from 'i18next';
+import { OidcProvider } from 'redux-oidc';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import XHR from 'i18next-xhr-backend';
 import { TRACE, DEBUG, INFO, WARN, ERROR } from 'universal-logger';
@@ -18,43 +22,51 @@ import settings from './config/settings';
 import portal from './lib/portal';
 import i18n from './lib/i18n';
 import log from './lib/log';
-import auth from './lib/auth';
-import api from './api';
 import series from './lib/promise-series';
 import promisify from './lib/promisify';
-import * as user from './lib/user';
+import auth from './lib/auth';
 import store from './store';
+import configureReduxStore from './store/redux';
 import App from './containers/App';
 import Login from './containers/Login';
+import Callback from './containers/Login/Callback';
 import Anchor from './components/Anchor';
 import { Button } from './components/Buttons';
 import ModalTemplate from './components/ModalTemplate';
 import Modal from './components/Modal';
 import ProtectedRoute from './components/ProtectedRoute';
 import Space from './components/Space';
-import Workspaces from './lib/workspaces';
 import './styles/vendor.styl';
 import './styles/app.styl';
+
+const baseUrl = window.location.host;
+const history = createBrowserHistory({ basename: baseUrl });
+const reduxStore = configureReduxStore(history);
 
 const renderPage = () => {
     const container = document.createElement('div');
     document.body.appendChild(container);
 
     ReactDOM.render(
-        <GridSystemProvider
-            breakpoints={[576, 768, 992, 1200]}
-            containerWidths={[540, 720, 960, 1140]}
-            columns={12}
-            gutterWidth={0}
-            layout="floats"
-        >
-            <Router>
-                <div>
-                    <Route path="/login" component={Login} />
-                    <ProtectedRoute path="/" component={App} />
-                </div>
-            </Router>
-        </GridSystemProvider>,
+        <Provider store={reduxStore}>
+            <OidcProvider store={reduxStore} userManager={auth.manager}>
+                <GridSystemProvider
+                    breakpoints={[576, 768, 992, 1200]}
+                    containerWidths={[540, 720, 960, 1140]}
+                    columns={12}
+                    gutterWidth={0}
+                    layout="floats"
+                >
+                    <Router>
+                        <Switch>
+                            <Route path="/login" component={Login} />
+                            <Route path="/callback" component={Callback} />
+                            <ProtectedRoute path="/" component={App} />
+                        </Switch>
+                    </Router>
+                </GridSystemProvider>
+            </OidcProvider>
+        </Provider>,
         container
     );
 };
@@ -92,39 +104,8 @@ series([
             next();
         });
     })(),
-    () => promisify(next => {
-        const token = store.get('session.token');
-        user.signin({ token: token })
-            .then(({ authenticated, token }) => {
-                if (authenticated) {
-                    log.debug('Authenticated');
-
-                    auth.host = '';
-                    auth.options = {
-                        query: 'token=' + token
-                    };
-                }
-                next();
-            });
-    })(),
-    () => promisify(next => {
-        api.workspaces
-            .fetch()
-            .then(({ body }) => {
-                if (body && body.records) {
-                    body.records.forEach((record) => {
-                        log.debug(`loading workspace: ${record.name}`);
-                        Workspaces.load(record);
-                    });
-                } else {
-                    log.error('workspaces load error');
-                }
-                next();
-            });
-    })()
-]).then(
-    Workspaces.connect
-).then(async () => {
+    () => auth.resume(reduxStore),
+]).then(async () => {
     log.info(`${settings.productName}`);
 
     // Cross-origin communication

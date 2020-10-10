@@ -1,7 +1,5 @@
 {
   "watchDirectory": "/home/node/gcode",
-  "accessTokenLifetime": "30d",
-  "allowRemoteAccess": true,
   "workspaces": [],
   "mountPoints": [
     {

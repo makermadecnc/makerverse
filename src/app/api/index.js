@@ -27,27 +27,9 @@ const noCache = (request) => {
     }
 };
 
-const authrequest = superagentUse(superagent);
+export const authrequest = superagentUse(superagent);
 authrequest.use(bearer);
 authrequest.use(noCache);
-
-//
-// Authentication
-//
-const signin = (options) => new Promise((resolve, reject) => {
-    const { token, name, password } = { ...options };
-
-    authrequest
-        .post('/api/signin')
-        .send({ token, name, password })
-        .end((err, res) => {
-            if (err) {
-                reject(res);
-            } else {
-                resolve(res);
-            }
-        });
-});
 
 //
 // Latest Version
@@ -693,9 +675,6 @@ export default {
     loadGCode,
     fetchGCode,
     downloadGCode,
-
-    // Authentication
-    signin,
 
     // Controllers
     controllers,

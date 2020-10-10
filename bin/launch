@@ -1,6 +1,6 @@
 #!/bin/bash
 set -eo pipefail
-version="0.4"
+version="0.5"
 
 MAKERVERSE_HOME=${MAKERVERSE_HOME:-${HOME}}
 # Figure out where the git checkout directory lives, if any:
@@ -16,6 +16,7 @@ fi
 MAKERVERSE_GIT_DIR="${MAKERVERSE_SRC_DIR}"
 MAKERVERSE_LAUNCH_METHOD=${MAKERVERSE_LAUNCH_METHOD:-docker}
 MAKERVERSE_SETTINGS_FILE="${MAKERVERSE_HOME}/.makerverse"
+MAKERVERSE_WATCH_DIR="${MAKERVERSE_WATCH_DIR:-${MAKERVERSE_HOME}/gcode}"
 MAKERVERSE_PORT="${MAKERVERSE_PORT:-8000}"
 
 # Scan dependency versions
@@ -167,7 +168,7 @@ launch() {
       -p "${MAKERVERSE_PORT}:8000" \
       -v /dev:/dev \
       -v /var/run/docker.sock:/var/run/docker.sock \
-      -v "$MAKERVERSE_HOME/gcode:/home/node/gcode" \
+      -v "$MAKERVERSE_WATCH_DIR:/home/node/gcode" \
       -v "$MAKERVERSE_SETTINGS_FILE:/home/node/.makerverse" \
       -v "$MAKERVERSE_SRC_DIR:/home/node/makerverse" \
       "$docker_tagged"
