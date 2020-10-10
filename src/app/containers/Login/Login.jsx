@@ -182,7 +182,9 @@ class Login extends PureComponent {
                 type="button"
                 className="btn btn-block btn-secondary"
                 style={{ marginLeft: '0' }}
-                onClick={this.actions.handleResendVerification}
+                onClick={(e) => {
+                    window.location.replace(`https://openwork.shop/api/auth/${name}`);
+                }}
                 disabled={authenticating}
             >
                 <i
@@ -216,7 +218,6 @@ class Login extends PureComponent {
         const state = { ...this.state };
         // const actions = { ...this.actions };
         const { alertMessage, authenticating, registering } = state;
-        const act = i18n._('Login');
         const docLink = 'http://www.makerverse.com/features/security/';
         let enabled = !authenticating && this.fields.username && this.fields.username.value.length > 0 &&
             this.fields.password && this.fields.password.value.length > 0;
@@ -245,7 +246,7 @@ class Login extends PureComponent {
                 <div className={styles.login}>
                     <div className={styles.title}>
                         <img src="images/logo-badge-32x32.png" alt="" style={{ maxWidth: '32px', marginRight: '10px' }} />
-                        {act}
+                        {i18n._('Login')}
                     </div>
                     <div className={styles.content}>
                         {error.length > 0 && (
@@ -268,11 +269,34 @@ class Login extends PureComponent {
                                             'fa-fw',
                                             { 'fa-spin': authenticating },
                                             { 'fa-circle-o-notch': authenticating },
-                                            { 'fa-envelope-o': !authenticating },
+                                            { 'fa-user': !authenticating },
                                         )}
                                     />
                                     <Space width="8" />
-                                    {act} with Email
+                                    {i18n._('Login')}
+                                </button>
+                                <center>
+                                    <i>
+                                        - or -
+                                    </i>
+                                </center>
+                                <button
+                                    type="submit"
+                                    className="btn btn-block btn-primary"
+                                    onClick={this.actions.handleSignIn}
+                                    disabled={authenticating}
+                                >
+                                    <i
+                                        className={cx(
+                                            'fa',
+                                            'fa-fw',
+                                            { 'fa-spin': authenticating },
+                                            { 'fa-circle-o-notch': authenticating },
+                                            { 'fa-user-plus': !authenticating },
+                                        )}
+                                    />
+                                    <Space width="8" />
+                                    {i18n._('Create an Account')}
                                 </button>
                                 {alertMessage && (
                                     <div className={styles.error}>

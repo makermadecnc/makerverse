@@ -517,7 +517,6 @@
     "Save": "",
     "Machine": "",
     "Frame": "",
-    "Move machine to 0/0": "",
     "Update Firmware": "",
     "Chains": "",
     "Stock": "",
@@ -537,5 +536,7 @@
     "Program: Stop": "",
     "Program: Resume": "",
     "Login": "",
-    "Why is it necessary to log in?": ""
+    "Why is it necessary to log in?": "",
+    "Create an Account": "",
+    "Run homing sequence": ""
 }

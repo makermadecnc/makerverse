@@ -6,7 +6,6 @@ import _includes from 'lodash/includes';
 import _uniqueId from 'lodash/uniqueId';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import Repeatable from 'react-repeatable';
 import styled from 'styled-components';
 import { Button } from 'app/components/Buttons';
 import Dropdown, { MenuItem } from 'app/components/Dropdown';
@@ -167,6 +166,11 @@ class Keypad extends PureComponent {
         }
     }
 
+    runHoming() {
+        const commands = [].concat(this.workspace.getCommand('homing', ['$H']));
+        this.workspace.writeLines(commands, null, 200);
+    }
+
     render() {
         const { canClick, units, axes, jog, canChangeUnits } = this.props;
         const canChangeStep = canClick;
@@ -304,11 +308,11 @@ class Keypad extends PureComponent {
                                             btnStyle="flat"
                                             compact
                                             className={cx(styles.btnKeypad, styles['btn-xy'])}
-                                            onClick={() => this.move({ X: 0, Y: 0 })}
+                                            onClick={() => this.runHoming()}
                                             disabled={!canClickXY}
-                                            title={i18n._('Move machine to 0/0')}
+                                            title={i18n._('Run homing sequence')}
                                         >
-                                            <i className="fa fa-crosshairs" />
+                                            <i className="fa fa-home" />
                                         </Button>
                                     </div>
                                 </div>
@@ -546,44 +550,28 @@ class Keypad extends PureComponent {
                         <div className={styles.rowSpace}>
                             <div className="row no-gutters">
                                 <div className="col-xs-6">
-                                    <Repeatable
+                                    <Button
                                         disabled={!canStepBackward}
-                                        style={{ marginRight: 2.5 }}
-                                        repeatDelay={2000}
-                                        repeatInterval={Math.floor(1000 / 15)}
-                                        onHold={this.stepBackward.bind(this)}
-                                        onRelease={this.stepBackward.bind(this)}
+                                        style={{ width: '100%' }}
+                                        compact
+                                        btnStyle="flat"
+                                        onClick={() => this.stepBackward()}
+                                        className="pull-left"
                                     >
-                                        <Button
-                                            disabled={!canStepBackward}
-                                            style={{ width: '100%' }}
-                                            compact
-                                            btnStyle="flat"
-                                            className="pull-left"
-                                        >
-                                            <i className="fa fa-minus" />
-                                        </Button>
-                                    </Repeatable>
+                                        <i className="fa fa-minus" />
+                                    </Button>
                                 </div>
                                 <div className="col-xs-6">
-                                    <Repeatable
+                                    <Button
                                         disabled={!canStepForward}
-                                        style={{ marginLeft: 2.5 }}
-                                        repeatDelay={2000}
-                                        repeatInterval={Math.floor(1000 / 15)}
-                                        onHold={this.stepForward.bind(this)}
-                                        onRelease={this.stepForward.bind(this)}
+                                        style={{ width: '100%' }}
+                                        compact
+                                        btnStyle="flat"
+                                        onClick={() => this.stepForward()}
+                                        className="pull-right"
                                     >
-                                        <Button
-                                            disabled={!canStepForward}
-                                            style={{ width: '100%' }}
-                                            compact
-                                            btnStyle="flat"
-                                            className="pull-right"
-                                        >
-                                            <i className="fa fa-plus" />
-                                        </Button>
-                                    </Repeatable>
+                                        <i className="fa fa-plus" />
+                                    </Button>
                                 </div>
                             </div>
                         </div>

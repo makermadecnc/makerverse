@@ -316,6 +316,14 @@ class Workspaces extends events.EventEmitter {
 
     _controllerSettings = null;
 
+    get commands() {
+        return this._record.commands;
+    }
+
+    getCommand(name, def = []) {
+        return [].concat(this.commands[name] || def);
+    }
+
     _controllerEvents = {
         'serialport:change': (options) => {
             const { port } = options;

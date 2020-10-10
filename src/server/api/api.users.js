@@ -114,7 +114,7 @@ export const signin = (req, res) => {
         .send()
         .end((err, result) => {
             const body = result ? result.body : {};
-            const record = body && body.record ? body.record : {};
+            const record = body && body.data ? body.data : {};
 
             if (err || !record.username) {
                 res.send({ enabled: false, error: err ?? 'User not found' });
