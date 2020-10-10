@@ -31,15 +31,19 @@ const authManager = createUserManager(oauthConfig);
 let _authenticated = false;
 
 const resume = (reduxStore) => new Promise((resolve, reject) => {
-    loadUser(reduxStore, auth.manager).then(signin).then(resolve);
+    loadUser(reduxStore, auth.manager).then(signin).then(({ success }) => {
+        resolve(success);
+    });
 });
 
 const signin = (oidc) => new Promise((resolve, reject) => {
-    const token = oidc ? oidc.access_token : null;
+    const token = oidc ? oidc.access_token : config.get('session.token');
     if (!token) {
-        resolve(false);
+        log.debug('no token in storage');
+        resolve({ success: false });
         return;
     }
+    log.debug('resuming login...');
     authrequest
         .post('/api/signin')
         .send({ token })
@@ -47,8 +51,7 @@ const signin = (oidc) => new Promise((resolve, reject) => {
             const body = res ? res.body : {};
 
             if (!body.enabled || !body.user) {
-                log.warn('login failed', body.enabled, body.user);
-                resolve(false);
+                throw new Error(body.error ?? 'Login failed');
             } else {
                 config.set('session.token', token);
                 auth.user = body.user;
@@ -96,11 +99,11 @@ const signin = (oidc) => new Promise((resolve, reject) => {
         })
         .then(() => {
             log.debug('login complete');
-            resolve(true);
+            resolve({ success: true });
         })
         .catch((e) => {
             log.error('login error', e);
-            resolve(false);
+            resolve({ success: false, error: e });
         });
 });
 

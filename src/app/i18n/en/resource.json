@@ -535,8 +535,8 @@
     "Program: Pause": "Program: Pause",
     "Program: Stop": "Program: Stop",
     "Program: Resume": "Program: Resume",
-    "Login": "Login",
     "Why is it necessary to log in?": "Why is it necessary to log in?",
     "Create an Account": "Create an Account",
-    "Run homing sequence": "Run homing sequence"
+    "Run homing sequence": "Run homing sequence",
+    "Login (or Register)": "Login (or Register)"
 }

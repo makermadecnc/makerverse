@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { CallbackComponent } from 'redux-oidc';
 import { Redirect } from 'react-router-dom';
 import auth from 'app/lib/auth';
+import analytics from 'app/lib/analytics';
 import { connect } from 'react-redux';
 import styles from './index.styl';
 
@@ -10,18 +11,28 @@ class Callback extends PureComponent {
 
     handleSuccess(oidc) {
         this.setState({ success: true });
+        analytics.event({
+            category: 'interaction',
+            action: 'logged-in',
+        });
 
-        auth.signin(oidc).then((authorized) => {
-            if (authorized) {
+        auth.signin(oidc).then(({ success, error }) => {
+            if (success) {
                 this.setState({ ready: true });
             } else {
-                this.setState({ error: { message: 'Failed to authenticate.' } });
+                const err = error ?? { message: 'Failed to authenticate.' };
+                this.setState({ error: err });
             }
         });
     }
 
     handleError(err) {
         this.setState({ error: err });
+        analytics.event({
+            category: 'interaction',
+            action: 'login-error',
+            label: err.message ?? `${err}`,
+        });
     }
 
     renderInner() {

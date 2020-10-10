@@ -41,17 +41,6 @@ const noCache = (request) => {
 export const owsreq = superagentUse(superagent);
 owsreq.use(noCache);
 
-// Generate access token
-// https://github.com/auth0/node-jsonwebtoken#jwtsignpayload-secretorprivatekey-options-callback
-// Note. Do not use password and other sensitive fields in the payload
-// const generateAccessToken = (payload, secret = settings.secret) => {
-//     const token = jwt.sign(payload, secret, {
-//         expiresIn: settings.accessTokenLifetime
-//     });
-
-//     return token;
-// };
-
 const sanitizeRecord = (record) => {
     let shouldUpdate = false;
 
@@ -107,6 +96,12 @@ export const signin = (req, res) => {
     // const enabledUsers = users.filter(user => {
     //     return user.enabled;
     // });
+    const existingUser = getUserByToken(token);
+    if (existingUser) {
+        res.send({ enabled: true, user: existingUser });
+        return;
+    }
+
     owsreq.use((request) => {
         request.set('Authorization', 'Bearer ' + token);
     });
@@ -125,7 +120,8 @@ export const signin = (req, res) => {
             let userIdx = _.findIndex(users, { username: record.username });
 
             if (userIdx < 0) {
-                if (users.length > 1) {
+                log.debug(`User: '${record.username}' not found among ${users.length} users.`);
+                if (users.length >= 1) {
                     // Cannot sign in with a new user when there are already users.
                     res.send({ enabled: false, error: 'Wrong user (cannot access this installation)' });
                     return;
@@ -135,6 +131,7 @@ export const signin = (req, res) => {
                 sanitizeRecord(newUser);
                 userIdx = users.length;
                 users.push(newUser);
+                log.debug('User: created', record.username);
             }
 
             // Make sure the user has the given token
@@ -143,78 +140,12 @@ export const signin = (req, res) => {
                 while (users[userIdx].tokens.length > 100) {
                     users[userIdx].tokens.shift();
                 }
-                log.debug('Added new token for user', record.username);
+                log.debug('User: added token for', record.username);
                 config.set(CONFIG_KEY, users);
             }
 
-            res.send({
-                enabled: true,
-                user: record,
-            });
+            res.send({ enabled: true, user: record });
         });
-
-    // if (enabledUsers.length === 0) {
-    //     const user = { id: '', name: '' };
-    //     const payload = { ...user };
-    //     const token = generateAccessToken(payload, settings.secret); // generate access token
-    //     res.send({
-    //         enabled: false, // session is disabled
-    //         token: token,
-    //         name: user.name // empty name
-    //     });
-    //     return;
-    // }
-
-    // if (!token) {
-    //     const user = find(enabledUsers, { name: name });
-    //     const valid = user && bcrypt.compareSync(password, user.password);
-
-    //     if (!valid) {
-    //         res.status(ERR_UNAUTHORIZED).send({
-    //             msg: 'Authentication failed'
-    //         });
-    //         return;
-    //     }
-
-    //     const payload = {
-    //         id: user.id,
-    //         name: user.name
-    //     };
-    //     const token = generateAccessToken(payload, settings.secret); // generate access token
-    //     res.send({
-    //         enabled: true, // session is enabled
-    //         token: token, // new token
-    //         name: user.name
-    //     });
-    //     return;
-    // }
-
-    // jwt.verify(token, settings.secret, (err, user) => {
-    //     if (err) {
-    //         res.status(ERR_INTERNAL_SERVER_ERROR).send({
-    //             msg: 'Internal server error'
-    //         });
-    //         return;
-    //     }
-
-    //     const iat = new Date(user.iat * 1000).toISOString();
-    //     const exp = new Date(user.exp * 1000).toISOString();
-    //     log.debug(`jwt.verify: user.id=${user.id}, user.name=${user.name}, user.iat=${iat}, user.exp=${exp}`);
-
-    //     user = find(enabledUsers, { id: user.id, name: user.name });
-    //     if (!user) {
-    //         res.status(ERR_UNAUTHORIZED).send({
-    //             msg: 'Authentication failed'
-    //         });
-    //         return;
-    //     }
-
-    //     res.send({
-    //         enabled: true, // session is enabled
-    //         token: token, // old token
-    //         name: user.name
-    //     });
-    // });
 };
 
 export const fetch = (req, res) => {

@@ -4,14 +4,11 @@ import React, { PureComponent } from 'react';
 import { withRouter, Redirect } from 'react-router-dom';
 import Anchor from 'app/components/Anchor';
 import Space from 'app/components/Space';
-// import settings from 'app/config/settings';
-// import Workspaces from 'app/lib/workspaces';
-// import promisify from 'app/lib/promisify';
-// import auth from 'app/lib/auth';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import auth from 'app/lib/auth';
-// import store from 'app/store';
+import settings from 'app/config/settings';
+import analytics from 'app/lib/analytics';
 import styles from './index.styl';
 
 class Login extends PureComponent {
@@ -21,37 +18,8 @@ class Login extends PureComponent {
 
     state = this.getDefaultState();
 
-    processErrors = (errors) => {
-        const errs = this.emptyErrors;
-        const registering = this.state.registering;
-        let verificationRequired = false;
-        errors.forEach((err) => {
-            const str = err.code ? err.code.toLowerCase() : '';
-            let key = 'unknown';
-            if (str === 'notallowed') {
-                verificationRequired = true;
-                return;
-            } else if (str.includes('email')) {
-                key = 'email';
-            } else if (str.includes('password')) {
-                key = 'password';
-            } else if (str.includes('username')) {
-                key = 'username';
-            }
-            errs[key].push(err.message ?? err);
-        });
-        const msg = i18n._(registering ? 'Registration failed.' : 'Authentication failed.');
-        this.setState({
-            registered: verificationRequired,
-            alertMessage: verificationRequired ? null : msg,
-            authenticating: false,
-            redirectToReferrer: false,
-            errors: verificationRequired ? this.emptyErrors : errs,
-        });
-    }
-
     actions = {
-        handleSignIn: (event) => {
+        handleSignIn: (event, register) => {
             event.preventDefault();
 
             this.setState({
@@ -60,51 +28,20 @@ class Login extends PureComponent {
                 redirectToReferrer: false,
                 errors: { ...this.state.errors },
             });
+            analytics.event({
+                category: 'interaction',
+                action: register ? 'register' : 'login',
+            });
 
-            auth.manager.signinRedirect();
-
-            // const args = {
-            //     username: this.fields.username.value,
-            //     password: this.fields.password.value,
-            // };
-
-            // const registering = this.state.registering;
-            // if (registering) {
-            //     args.email = this.fields.email.value;
-            // }
-
-            // const func = registering ? signup : signin;
-            // func(args)
-            //     .then(({ success, errors }) => {
-            //         if (!success) {
-            //             this.processErrors(errors);
-            //             return;
-            //         }
-            //         if (registering) {
-            //             this.setState({ registered: true });
-            //             return;
-            //         }
-
-            //         log.debug('Create and establish a WebSocket connection');
-
-            //         const token = store.get('session.token');
-            //         auth.host = '';
-            //         auth.options = {
-            //             query: 'token=' + token
-            //         };
-            //     })
-            //     .then(Workspaces.connect)
-            //     .then(() => {
-            //         this.setState({
-            //             alertMessage: '',
-            //             authenticating: false,
-            //             redirectToReferrer: true,
-            //             errors: this.emptyErrors,
-            //         });
-            //     })
-            //     .catch((e) => {
-            //         console.log('signup/signin error', e);
-            //     });
+            auth.manager.createSigninRequest().then(r => {
+                const url = register ? r.url.replace('/login?', '/register?') : r.url;
+                window.location.replace(url);
+            }).catch((e) => {
+                this.setState({
+                    alertMessage: `${e.message}`,
+                    authenticating: false,
+                });
+            });
         }
     };
 
@@ -239,6 +176,29 @@ class Login extends PureComponent {
             return (
                 <Redirect to={from} />
             );
+            // <center>
+            //     <i>
+            //         - or -
+            //     </i>
+            // </center>
+            // <button
+            //     type="submit"
+            //     className="btn btn-block btn-primary"
+            //     onClick={(e) => this.actions.handleSignIn(e, true)}
+            //     disabled={authenticating}
+            // >
+            //     <i
+            //         className={cx(
+            //             'fa',
+            //             'fa-fw',
+            //             { 'fa-spin': authenticating },
+            //             { 'fa-circle-o-notch': authenticating },
+            //             { 'fa-user-plus': !authenticating },
+            //         )}
+            //     />
+            //     <Space width="8" />
+            //     {i18n._('Create an Account')}
+            // </button>
         }
 
         return (
@@ -246,7 +206,7 @@ class Login extends PureComponent {
                 <div className={styles.login}>
                     <div className={styles.title}>
                         <img src="images/logo-badge-32x32.png" alt="" style={{ maxWidth: '32px', marginRight: '10px' }} />
-                        {i18n._('Login')}
+                        {settings.productName}
                     </div>
                     <div className={styles.content}>
                         {error.length > 0 && (
@@ -257,10 +217,11 @@ class Login extends PureComponent {
                         <form className={styles.form}>
                             <div className="form-group">
                                 {this.renderError('unknown')}
+
                                 <button
                                     type="submit"
                                     className="btn btn-block btn-primary"
-                                    onClick={this.actions.handleSignIn}
+                                    onClick={(e) => this.actions.handleSignIn(e, false)}
                                     disabled={authenticating}
                                 >
                                     <i
@@ -273,34 +234,13 @@ class Login extends PureComponent {
                                         )}
                                     />
                                     <Space width="8" />
-                                    {i18n._('Login')}
-                                </button>
-                                <center>
-                                    <i>
-                                        - or -
-                                    </i>
-                                </center>
-                                <button
-                                    type="submit"
-                                    className="btn btn-block btn-primary"
-                                    onClick={this.actions.handleSignIn}
-                                    disabled={authenticating}
-                                >
-                                    <i
-                                        className={cx(
-                                            'fa',
-                                            'fa-fw',
-                                            { 'fa-spin': authenticating },
-                                            { 'fa-circle-o-notch': authenticating },
-                                            { 'fa-user-plus': !authenticating },
-                                        )}
-                                    />
-                                    <Space width="8" />
-                                    {i18n._('Create an Account')}
+                                    {i18n._('Login (or Register)')}
                                 </button>
                                 {alertMessage && (
                                     <div className={styles.error}>
-                                        {alertMessage}
+                                        <center>
+                                            {alertMessage}
+                                        </center>
                                     </div>
                                 )}
                             </div>
