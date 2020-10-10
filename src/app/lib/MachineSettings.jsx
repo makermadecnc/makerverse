@@ -1,4 +1,4 @@
-/*eslint no-bitwise: ["error", { "allow": ["<<", "&", "&=", "|="] }] */
+/*eslint no-bitwise: ["error", { "allow": ["<<", "&", "&=", "|=", "~"] }] */
 import _ from 'lodash';
 import log from 'app/lib/log';
 import {
@@ -250,7 +250,7 @@ class MachineSettings {
         if (inverted) {
             val |= bit;
         } else {
-            val &= bit;
+            val &= ~(bit);
         }
         this.write({ [setting.name]: val });
     }

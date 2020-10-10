@@ -101,6 +101,7 @@ class CalibrationModal extends PureComponent {
         result: false,
         wiping: false,
         wiped: false,
+        zEditRaw: false,
         chainError: null,
         zMoved: 0,
         chainsStep: null,
@@ -260,6 +261,13 @@ class CalibrationModal extends PureComponent {
         this.workspace.controller.writeln('G21');
         this.workspace.controller.writeln(`G0 Z${this.toMM(val)}`);
         this.workspace.controller.writeln('G90');
+    }
+
+    zMoveTo(val) {
+        this.unlock();
+        this.workspace.controller.writeln('G90');
+        this.workspace.controller.writeln('G21');
+        this.workspace.controller.writeln(`G0 Z${this.toMM(val)}`);
     }
 
     setMachineSettings() {
@@ -478,6 +486,7 @@ class CalibrationModal extends PureComponent {
             imported,
             importFailure,
             zDistPerRot,
+            zEditRaw,
         } = this.state;
         const kt = Number(kinematicsType);
         const isCalibrating = calibrating >= 0;
@@ -946,12 +955,42 @@ class CalibrationModal extends PureComponent {
                                     {'It may be skipped if you have already tested the Z-axis, or your machine came preconfigured for Z-movement.'}
                                 </div>
                                 <div className={styles.center} >
-                                    {zAxisResSetting && (
+                                    {stepDirectionInvert && (
+                                        <div>
+                                            {'Invert Z-axis motion? '}
+                                            <select
+                                                className={styles.mmInput}
+                                                style={{ marginRight: '10px' }}
+                                                name="zInvert"
+                                                value={zInvert}
+                                                onChange={(event) => {
+                                                    this.setInvertZ(event.target.value);
+                                                }}
+                                            >
+                                                <option value="1">{i18n._('yes')}</option>
+                                                <option default value="0">{i18n._('no')}</option>
+                                            </select>
+                                        </div>
+                                    )}
+                                    {!stepDirectionInvert && !zAxisDistancePerRotation && (
+                                        <div>
+                                            Your machine does not support Z-axis inversion.
+                                        </div>
+                                    )}
+                                    {!stepDirectionInvert && zAxisDistancePerRotation && (
+                                        <div>
+                                            If your Z-axis is inverted, press the Edit Raw Values button and use a negative number.
+                                        </div>
+                                    )}
+                                    {zAxisResSetting && !zEditRaw && (
                                         <div>
                                             <h3>Test Z-Axis</h3>
-                                            Move the Z-axis up and down:
+                                            You will move the Z axis up or down, and then measure the actual distance moved.
+                                            <br />
+                                            This allows Calibration to scale the Z axis correctly.
                                             <br />
 
+                                            Distance:
                                             <input
                                                 type="text"
                                                 className={styles.mmInput}
@@ -967,6 +1006,13 @@ class CalibrationModal extends PureComponent {
                                                 onClick={() => this.zMove(Number(zMove))}
                                             >
                                                 Move Up
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="btn btn-medium"
+                                                onClick={() => this.zMoveTo(0)}
+                                            >
+                                                Go To Zero
                                             </button>
                                             <button
                                                 type="button"
@@ -995,8 +1041,6 @@ class CalibrationModal extends PureComponent {
                                             >
                                                 Apply Scaling
                                             </button>
-                                            <br /><br />
-                                            If simple scaling does not work, you may need to adjust the following:
                                         </div>
                                     )}
                                     {!zAxisResSetting && (
@@ -1004,47 +1048,34 @@ class CalibrationModal extends PureComponent {
                                             Your machine cannot change the Z-axis speed.
                                         </div>
                                     )}
-                                    <h3>Raw Settings</h3>
-                                    <br />
-                                    {zAxisResSetting && (
+                                    {zEditRaw && (
                                         <div>
-                                            Z-Axis Resolution:
-                                            <input
-                                                type="text"
-                                                name="zRes"
-                                                value={zAxisRes}
-                                                onChange={e => {
-                                                    this.setState({ zAxisRes: e.target.value });
-                                                }}
-                                            />
-                                            <button
-                                                type="button"
-                                                className="btn btn-medium"
-                                                onClick={() => {
-                                                    this.workspace.machineSettings.write({
-                                                        zAxisRes: Number(zAxisRes),
-                                                    });
-                                                }}
-                                            >
-                                                Save
-                                            </button>
-                                        </div>
-                                    )}
-                                    {stepDirectionInvert && (
-                                        <div>
-                                            {'Invert Z-axis motion? '}
-                                            <select
-                                                className={styles.mmInput}
-                                                style={{ marginRight: '10px' }}
-                                                name="zInvert"
-                                                value={zInvert}
-                                                onChange={(event) => {
-                                                    this.setInvertZ(event.target.value);
-                                                }}
-                                            >
-                                                <option value="1">{i18n._('yes')}</option>
-                                                <option default value="0">{i18n._('no')}</option>
-                                            </select>
+                                            <h3>Raw Settings</h3>
+                                            <br />
+                                            {zAxisResSetting && (
+                                                <div>
+                                                    Z-Axis Resolution:
+                                                    <input
+                                                        type="text"
+                                                        name="zRes"
+                                                        value={zAxisRes}
+                                                        onChange={e => {
+                                                            this.setState({ zAxisRes: e.target.value });
+                                                        }}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-medium"
+                                                        onClick={() => {
+                                                            this.workspace.machineSettings.write({
+                                                                zAxisRes: Number(zAxisRes),
+                                                            });
+                                                        }}
+                                                    >
+                                                        Save
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                     {zAxisDistancePerRotation && (
@@ -1076,11 +1107,30 @@ class CalibrationModal extends PureComponent {
                                             </button>
                                         </div>
                                     )}
-                                    {!stepDirectionInvert && !zAxisDistancePerRotation && (
-                                        <div>
-                                            Your machine does not support Z-axis inversion.
-                                        </div>
-                                    )}
+                                </div>
+                                <div className={styles.bottom}>
+                                    <span>
+                                        {!zEditRaw && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    this.setState({ zEditRaw: true });
+                                                }}
+                                            >
+                                                Edit Raw Z-Axis Values
+                                            </button>
+                                        )}
+                                        {zEditRaw && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    this.setState({ zEditRaw: false });
+                                                }}
+                                            >
+                                                Test Z-Axis Values
+                                            </button>
+                                        )}
+                                    </span>
                                 </div>
                             </div>
                         )}

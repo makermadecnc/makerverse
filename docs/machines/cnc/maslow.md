@@ -45,7 +45,7 @@ These options may not need to be changed, as they default to match standard Masl
 - **Chain Direction**: The image above depicts `Off Bottom`. Only choose `Off Top` if the chains come off the sprockets in the opposite direction.
 - **Chain Full Length**: The total length of each chain (usually 12 feet, or 3360mm).
 
-### Frame
+### Stock
 
 During calibration, you should make sure that these values match the stock you have loaded. **Measure your stock!** Most plywood is exactly 8x4 feet, but it is important to be certain about these values before calibrating.
 
@@ -54,26 +54,40 @@ During calibration, you should make sure that these values match the stock you h
 
 After calibration, you may change the frame settings (machine size) for different sizes of stock, as needed. The machine's origin (at the center of the calibration stock) will remain in exactly the same place. You can therefore load a different size stock on this same origin point without re-calibrating.
 
+### Frame
+
+Frames can vary a lot, as they are usually hand-made.
+
+It's important to get a roughly accurate measurement (+/- 5mm) of these two values:
+
+- **Motor Height**: The distance from the top of the stock to the middle of the motor's sprockets (coplanar with the stock).
+- **Motor Width**: The distance between the two motors (measured from the center of each sprocket).
+
+If these two values are not accurate within +/- 5mm, it is likely that the subsequent calibration steps will _fail to ever achieve high precision_.
+
+### Sled
+
+This step measures the distance from the end-mill (tip of the router) to the four edges of the sled.
+
+If you have "standard" Maslow kit (with a circular sled 18" in diameter), it is likely that you do not need to change anything.
+
+The purpose of this step is to allow calibration to infer where the end-mill is located based upon a measurement from an edge of the sled to the edge of the stock. In other words, later in calibration, you will measure from "the top of the sled to the top of the stock." The Calibration process will use the sled values to infer where the center of the sled (and thus the cutter) is located.
+
+### Z-Axis
+
+This step will ensure that the Z-axis travels the correct distance, and invert the Z-axis (if needed).
+
+You will move the Z-axis by some amount (up or down), and then enter the actual distance moved. Calibration will simply scale the Z-axis based upon the actual distance moved.
+
+Alterantively, you can use the "Edit Raw Z-Axis Values" at the bottom of the screen to enter well-known settings values.
+
 ### Chains
 
 This step will tell the machine where the end-mill is currently located.
 
 It will also produce a "save point" to return to (_home_) in case the machine ever becomes un-calibrated (such as chains slipping or being removed from the sprockets).
 
-Before proceeding, ensure that:
-
-- The stock is centered between the motors.
-- The tip of the router bit is centered on the stock (this will be X=0, Y=0).
-- The tip of the router bit is barely touching the stock (Z=0).
-
-You may need to close the calibration dialog and move the sled to the appropriate location. Then, back in Calibration, enter the following measurements unique to your build:
-
-- **Motor Height**: The distance from the top of the stock to the middle of the motor's sprockets (coplanar with the stock).
-- **Motor Width**: The distance between the two motors (measured from the center of each sprocket).
-
-Finally, press the **Set Chains** button to apply the settings.
-
-_**Tip**: Once you press "Set Chains", use a sharpie or paint to mark exactly which link of the chain is at the top of each sprocket. If your machine ever comes out of alignment, such as if chains slip or are removed from the sprockets, you will need to return it to this position. It is important that the chains are exactly in the same position (within 1mm). **Do not try to visually move the sled back to the same position**. Most users simply mark the chain link which is at the 12 o'clock (noon) position on the sprocket. Once you are certain the chain is in the exact same position, press the "Reset Chains" button on the main screen and Makerverse will tell the Maslow it is back at this saved location._
+_**Tip**: As you complete the "Set Chains", use a sharpie or paint to mark exactly which link of the chain is at the top of each sprocket. If your machine ever comes out of alignment, such as if chains slip or are removed from the sprockets, you will need to return it to this position. It is important that the chains are exactly in the same position (within 1mm). **Do not try to visually move the sled back to the same position**. Most users simply mark the chain link which is at the 12 o'clock (noon) position on the sprocket. Once you are certain the chain is in the exact same position, press the "Reset Chains" button on the main screen and Makerverse will tell the Maslow it is back at this saved location._
 
 ### Edge Calibration
 
