@@ -14,11 +14,11 @@ const calibrationDefaults = {
     cutHoles: false,
 };
 
-const sled = { type: 'Standard Circle' };
+const sled = { type: 'Standard 18in Circle' };
 
 const sleds = {
-    'Standard Circle': { top: 9 * 25.4, left: 9 * 25.4, right: 9 * 25.4, bottom: 9 * 25.4, desc: '18 inch diameter circle' },
-    'MetalMaslow': { top: 6.325 * 25.4, left: 7.325 * 25.4, right: 7.325 * 25.4, bottom: 8.325 * 25.4, desc: '14.64 inch square, off-center' },
+    'Standard 18in Circle': { top: 9 * 25.4, left: 9 * 25.4, right: 9 * 25.4, bottom: 9 * 25.4, desc: '18 inch diameter circle' },
+    'MetalMaslow Square': { top: 6.325 * 25.4, left: 7.325 * 25.4, right: 7.325 * 25.4, bottom: 8.325 * 25.4, desc: '14.64 inch square, off-center' },
     'Custom': { top: 9 * 25.4, left: 9 * 25.4, right: 9 * 25.4, bottom: 9 * 25.4, desc: 'Enter your own measurements' },
 };
 

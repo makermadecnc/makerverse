@@ -270,6 +270,11 @@ class CalibrationModal extends PureComponent {
         this.workspace.controller.writeln(`G0 Z${this.toMM(val)}`);
     }
 
+    zDefineZero() {
+        this.unlock();
+        this.workspace.controller.writeln('G28.3 Z0');
+    }
+
     setMachineSettings() {
         this.event({ label: 'resize' });
         this.workspace.hasOnboarded = true;
@@ -1021,7 +1026,7 @@ class CalibrationModal extends PureComponent {
                                             >
                                                 Move Down
                                             </button>
-                                            <br /><br /><br />
+                                            <br /><br />
                                             Use calipers or a mm tape measure to enter the actual movement:
                                             <br />
                                             Z-Distance Moved:
@@ -1040,6 +1045,16 @@ class CalibrationModal extends PureComponent {
                                                 onClick={() => this.zApplyScaling()}
                                             >
                                                 Apply Scaling
+                                            </button>
+                                            <br /><br />
+                                            Once the Z-axis movement is correct, touch the bit to the stock and press Define Zero:
+                                            <br />
+                                            <button
+                                                type="button"
+                                                className="btn btn-medium"
+                                                onClick={() => this.zDefineZero()}
+                                            >
+                                                Define Zero
                                             </button>
                                         </div>
                                     )}

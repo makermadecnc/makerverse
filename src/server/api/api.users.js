@@ -9,6 +9,7 @@ import _ from 'lodash';
 import settings from '../config/settings';
 import logger from '../lib/logger';
 import config from '../services/configstore';
+import pkg from '../../package.json';
 import { getPagingRange } from './paging';
 import {
     // ERR_BAD_REQUEST,
@@ -92,28 +93,20 @@ export const getUserByToken = (token) => {
 
 export const signin = (req, res) => {
     const { token = '' } = { ...req.body };
-    // const users = getSanitizedRecords();
-    // const enabledUsers = users.filter(user => {
-    //     return user.enabled;
-    // });
-    const existingUser = getUserByToken(token);
-    if (existingUser) {
-        res.send({ enabled: true, user: existingUser });
-        return;
-    }
 
     owsreq.use((request) => {
         request.set('Authorization', 'Bearer ' + token);
+        request.set('ClientVersion', pkg.version);
     });
     owsreq.get(`${owsUrl}/api/users/me`)
         .send()
-        .end((err, result) => {
+        .then((result) => {
             const body = result ? result.body : {};
             const record = body && body.data ? body.data : {};
 
-            if (err || !record.username) {
-                res.send({ enabled: false, error: err ?? 'User not found' });
-                return;
+            if (!record || !record.username) {
+                log.warn('Login Failure Result', body);
+                throw new Error('User not found');
             }
 
             const users = getSanitizedRecords();
@@ -122,9 +115,7 @@ export const signin = (req, res) => {
             if (userIdx < 0) {
                 log.debug(`User: '${record.username}' not found among ${users.length} users.`);
                 if (users.length >= 1) {
-                    // Cannot sign in with a new user when there are already users.
-                    res.send({ enabled: false, error: 'Wrong user (cannot access this installation)' });
-                    return;
+                    throw new Error('Wrong user (cannot access this installation)');
                 }
                 // Implicitly create the user
                 const newUser = { ...record };
@@ -145,6 +136,20 @@ export const signin = (req, res) => {
             }
 
             res.send({ enabled: true, user: record });
+        })
+        .catch((e) => {
+            if (e.code === 'ENOTFOUND') {
+                // Internet is offline; attempt to use a previous token.
+                const existingUser = getUserByToken(token);
+                if (existingUser) {
+                    log.debug('Login offline; token previously authenticated.');
+                    res.send({ enabled: true, user: existingUser });
+                    return;
+                }
+            }
+            const message = e.message ?? `${e}`;
+            log.warn('Login Error', message);
+            res.send({ enabled: false, error: message });
         });
 };
 

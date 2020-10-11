@@ -241,7 +241,9 @@ class MeasureChainsFlow extends PureComponent {
         return (
             <div>
                 <h3>Align the Cotter Pin</h3>
-                The goal of this step is for the two chains to be <strong>exactly</strong> the same length.
+                The goal of this step is for the two chains to be <strong>exactly</strong> the same length
+                <strong>and</strong> for one gear on each sprocket to be oriented at 12 {'o\'clock'} (straight up).
+                If the gears are not both in the same orientation, then the chains are not equal length!
                 <br /><br />
                 The simplest way to do this is:
                 <br />
