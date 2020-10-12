@@ -156,6 +156,7 @@ class Login extends PureComponent {
         // const actions = { ...this.actions };
         const { alertMessage, authenticating, registering } = state;
         const docLink = 'http://www.makerverse.com/features/security/';
+        const showLogout = error && error.includes('Wrong user');
         let enabled = !authenticating && this.fields.username && this.fields.username.value.length > 0 &&
             this.fields.password && this.fields.password.value.length > 0;
         if (enabled && registering) {
@@ -214,6 +215,26 @@ class Login extends PureComponent {
                                 {error}
                             </div>
                         )}
+                        {showLogout && (
+                            <button
+                                type="submit"
+                                className="btn btn-block btn-primary"
+                                onClick={(e) => auth.signout()}
+                                disabled={authenticating}
+                            >
+                                <i
+                                    className={cx(
+                                        'fa',
+                                        'fa-fw',
+                                        { 'fa-spin': authenticating },
+                                        { 'fa-circle-o-notch': authenticating },
+                                        { 'fa-user': !authenticating },
+                                    )}
+                                />
+                                <Space width="8" />
+                                {i18n._('Logout')}
+                            </button>
+                        )}
                         <form className={styles.form}>
                             <div className="form-group">
                                 {this.renderError('unknown')}
@@ -252,6 +273,10 @@ class Login extends PureComponent {
                         </Anchor>
                     </div>
                 </div>
+                <br />
+                <center>
+                    <i>v. {settings.version.full}</i>
+                </center>
             </div>
         );
     }

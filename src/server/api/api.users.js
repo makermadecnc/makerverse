@@ -85,9 +85,15 @@ const getSanitizedRecords = () => {
     return records;
 };
 
+// Get all users which may be used for login purposes.
+export const getValidUsers = () => {
+    const users = getSanitizedRecords();
+    return _.filter(users, (u) => u.authenticationType === 'OWS');
+};
+
 // Helper function for auth to get a user given its token.
 export const getUserByToken = (token) => {
-    const users = getSanitizedRecords();
+    const users = getValidUsers();
     return _.find(users, (u) => u.tokens.includes(token));
 };
 
@@ -109,7 +115,7 @@ export const signin = (req, res) => {
                 throw new Error('User not found');
             }
 
-            const users = getSanitizedRecords();
+            const users = getValidUsers();
             let userIdx = _.findIndex(users, { username: record.username });
 
             if (userIdx < 0) {
