@@ -21,6 +21,16 @@ if [[ ! -z "$CI_SEMVER" ]]; then
 fi
 cf="raspbian-${edition}.json"
 
+# Enable or disable prereleases by editing the config file directly
+prereleases="false"
+if [[ $(echo $CI_VERSION | grep '-') ]]; then
+  prereleases="true"
+fi
+mvfn="./.makerverse.docker"
+echo "Setting prereleases = ${prereleases} in ${mvfn}"
+sed -i "s/\"prereleases\": true/\"prereleases\": ${prereleases}/g" $mvfn
+sed -i "s/\"prereleases\": false/\"prereleases\": ${prereleases}/g" $mvfn
+
 mkdir -p "output"
 docker run --rm --privileged -v /dev:/dev -v ${PWD}:/build \
   mkaczanowski/packer-builder-arm build "ci/$cf"

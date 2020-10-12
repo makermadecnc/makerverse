@@ -61,7 +61,6 @@
       "type": "shell",
       "inline": [
         "mkdir -p /home/pi/.config/lxsession/LXDE-pi/",
-        "echo \"@bash /home/pi/makerverse/bin/kiosk /\" > /home/pi/.config/lxsession/LXDE-pi/autostart",
         "sudo chown -R pi:pi /home/pi/.config"
       ]
     },

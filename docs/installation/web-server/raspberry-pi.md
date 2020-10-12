@@ -43,11 +43,24 @@ The Raspberry Pi image comes pre-installed with a mobile/tablet UI. It can be ac
 
 However, this UI is not the default UI because it is much less full-featured (it is intended for simple controls, like jogging or pausing program execution, from the shopfloor). You will still need to perform setup and calibration using the normal, desktop UI.
 
-## Desktop (Kiosk Mode)
+## Desktop
 
-When running the `makerverse-raspberrypi-os-dekstop.**` (desktop version), you will need to follow on-screen instructions after the first boot to configure your Raspberry Pi. If you don't have an extra keyboard/mouse, just SSH and use `sudo raspi-config` to turn on the VNC in `Interfacing Options`. Then use an app like VNC Viewer to connect from your computer.
+When running the `makerverse-raspberrypi-os-dekstop.**` (desktop version), you will need to follow on-screen instructions after the first boot to configure your Raspberry Pi. This image is based upon a standard Raspberry Pi OS Desktop installation, so please refer to the official documentation for any help.
 
-The Desktop edition is meant to be used as a kiosk. Once configured, it will automatically launch Chromium in "Kiosk" mode, loading the Makerverse application in a full-screen web browser. Makerverse is still running as a Web Server in the background, so other clients can also simultaneously connect.
+You can open a web browser and navigate to Makerverse at `http://localhost:8000`. Or, you can enable Kiosk mode...
+
+### Kiosk Mode
+
+When running the "Desktop" variation, you can enable Kiosk mode:
+
+```
+echo "@bash /home/pi/makerverse/bin/kiosk /" > /home/pi/.config/lxsession/LXDE-pi/autostart
+```
+
+Once configured, it will automatically launch Chromium in "Kiosk" mode during boot. This will load the Makerverse application in a full-screen web browser. Makerverse is still running as a Web Server in the background, so other clients can also simultaneously connect. In this mode, Chromium takes over the desktop, hiding all menus in order to maximize screen-space.
+
+- If your keyboard/mouse are attached directly to the Pi, use the `Alt + F4` hotkey to close the full-screen web browser, and/or `Ctrl + Alt + T` to open a terminal.
+- If you don't have an extra keyboard/mouse, just SSH and use `sudo raspi-config` to turn on the VNC in `Interfacing Options`. Then use an app like VNC Viewer to connect from your computer.
 
 _**Note**: if your screen is smaller than 7" or so, you will likely want your Kiosk to use the Tablet UI specified above. To do so, edit the `/home/pi/.config/lxsession/LXDE-pi/autostart` file to become: `@bash /home/pi/makerverse/bin/kiosk /tablet`._
 

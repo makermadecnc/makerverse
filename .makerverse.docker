@@ -7,6 +7,16 @@
       "target": "/home/node/makerverse/widgets/cncjs-shopfloor-tablet/src/"
     }
   ],
+  "state": {
+      "checkForUpdates": true,
+      "prereleases": false,
+      "controller": {
+          "exception": {
+              "ignoreErrors": false
+          }
+      },
+      "allowRemoteAccess": true
+  },
   "commands": [
     {
       "id": "5b98d27e-79e7-4fcd-afbe-8de87b558df3",
