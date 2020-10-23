@@ -6,12 +6,11 @@ import log from 'app/lib/log';
 import analytics from 'app/lib/analytics';
 import series from 'app/lib/promise-series';
 import promisify from 'app/lib/promisify';
+import { prodHost } from 'app/lib/ows/api';
 
 // Makerverse OAuth login mechanism.
 // The oidc-client handles token hand-off and validation.
 
-const devServer = false;
-const authority = devServer ? 'http://localhost:5000' : 'https://openwork.shop';
 const self = window.location.origin;
 const oauthConfig = {
     client_id: 'Makerverse',
@@ -19,10 +18,11 @@ const oauthConfig = {
     post_logout_redirect_uri: `${self}/#/login`,
     response_type: 'code',
     scope: 'OpenWorkShopAPI openid profile',
-    authority: `${authority}/`,
+    authority: `${prodHost}/`,
     silent_redirect_uri: `${self}/silent_renew.html`,
     automaticSilentRenew: true,
     filterProtocolClaims: true,
+    AccessTokenLifetime: (60 * 60 * 24 * 30), // 30 days
     loadUserInfo: true,
     monitorSession: false,
 };
@@ -56,6 +56,8 @@ const signin = (oidc) => new Promise((resolve, reject) => {
                 config.set('session.token', token);
                 auth.user = body.user;
                 log.debug('login successful for', auth.user.username);
+                config.set('session.name', auth.user.username);
+                config.set('session.enabled', true);
                 auth.host = '';
                 auth.socket = {
                     transportOptions: {
@@ -103,12 +105,14 @@ const signin = (oidc) => new Promise((resolve, reject) => {
         })
         .catch((e) => {
             log.error('login error', e);
+            config.set('session.enabled', false);
             resolve({ success: false, error: e });
         });
 });
 
 const signout = () => new Promise((resolve, reject) => {
     config.unset('session.token');
+    config.set('session.enabled', false);
     auth.socket = {};
     authManager.signoutRedirect();
     _authenticated = false;

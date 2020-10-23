@@ -377,12 +377,12 @@ class Workspaces extends events.EventEmitter {
             });
         },
         'controller:state': (type, state) => {
-            log.debug(type, 'state changed', state);
+            // log.debug(type, 'state changed', state);
             this.activeState.updateControllerState(state);
             this._controllerState = state;
         },
         'controller:settings': (type, settings) => {
-            log.debug(type, 'settings changed', settings);
+            // log.debug(type, 'settings changed', settings);
             this.hardware.updateControllerSettings(settings);
             this.machineSettings.update(settings);
             this._controllerSettings = settings;

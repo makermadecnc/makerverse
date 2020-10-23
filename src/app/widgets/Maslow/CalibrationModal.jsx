@@ -400,7 +400,7 @@ class CalibrationModal extends PureComponent {
                 <div>
                     {'Your machine appears to have been previously calibrated.'}
                     <br />
-                    {'To change the frame, you must first clear the effects of edge/precision calibration.'}
+                    {'To change this setting, you must first clear the effects of edge/precision calibration.'}
                 </div>
                 <Button
                     btnSize="medium"

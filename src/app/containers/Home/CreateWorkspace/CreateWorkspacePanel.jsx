@@ -1,0 +1,217 @@
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import cx from 'classnames';
+import React, { PureComponent } from 'react';
+import i18n from 'app/lib/i18n';
+import log from 'app/lib/log';
+import analytics from 'app/lib/analytics';
+import { ToastNotification } from 'app/components/Notifications';
+import { fetchMachineProfiles } from 'app/lib/ows/machines';
+import ChooseMachine from './ChooseMachine';
+import CustomMachine from './CustomMachine';
+import ConnectedHardware from './ConnectedHardware';
+import Connection, { ConnectionStatusType } from './Connection';
+import CustomizeWorkspace from './CustomizeWorkspace';
+import styles from './index.styl';
+
+class CreateWorkspacePanel extends PureComponent {
+    static propTypes = {
+        connectionStatus: ConnectionStatusType,
+        state: PropTypes.object,
+        actions: PropTypes.object
+    };
+
+    state = { machineProfiles: null, isCustomMachine: false };
+
+    componentDidMount() {
+        fetchMachineProfiles().then((res) => {
+            this.setState({ machineProfiles: res });
+        }).catch((err) => {
+            this.setState({ machineProfiles: [] });
+        });
+    }
+
+    onSelectedCustomMachine = (firmware, customMachine) => {
+        const workspaceSettings = {
+            ...this.props.workspaceSettings,
+            name: customMachine.model,
+            customMachine: customMachine,
+            firmware: firmware,
+            parts: [],
+            // axes: [],
+            // features: [],
+        };
+        delete workspaceSettings.machineProfileId;
+        this.props.actions.updateWorkspace(workspaceSettings);
+    };
+
+    // When firmware is provided by a machine profile, select one from the list...
+    selectFirmware = (firmwareList, idx) => {
+        const firmware = firmwareList[idx];
+        const controllerType = firmware.controllerType.toLowerCase();
+        this.props.connectionStatus.controller.loadedControllers.forEach((ct) => {
+            // Controller types are case
+            if (controllerType === ct.toLowerCase()) {
+                firmware.controllerType = ct;
+            }
+        });
+        return firmware;
+    };
+
+    onSelectedMachineProfileAndParts = (machineProfileId, machinePartIds) => {
+        if (!machinePartIds) {
+            this.props.actions.updateWorkspace({});
+            return;
+        }
+
+        const profile = _.find(this.state.machineProfiles, { id: machineProfileId });
+        const parts = _.filter(profile.parts, p => machinePartIds[p.partType] === p.id);
+        log.debug('machine profile', profile, 'and parts', parts);
+
+        const workspaceSettings = {
+            ...this.props.workspaceSettings,
+            machineProfileId: profile.id,
+            name: profile.name,
+            icon: profile.icon,
+            firmware: this.selectFirmware(profile.firmware, 0), // ChooseMachine guarantees len == 1
+            parts: profile.parts,
+            axes: profile.axes,
+            features: profile.features,
+        };
+        delete workspaceSettings.customMachine;
+        this.props.actions.updateWorkspace(workspaceSettings);
+    };
+
+    handleOpenPort = (port) => {
+        const { controllerType, baudRate, rtscts } = this.props.workspaceSettings.firmware;
+        console.log('connecting', port, baudRate);
+        this.props.actions.handleOpenPort(controllerType, port, baudRate, rtscts);
+    };
+
+    renderAlert = (alertMessage) => {
+        if (!alertMessage) {
+            return <span />;
+        }
+        return (
+            <ToastNotification type="error" onDismiss={this.props.actions.clearAlert}>
+                {alertMessage}
+            </ToastNotification>
+        );
+    };
+
+    renderConnectionWidget = (disabled, isLoading, connectionStatus) => {
+        const actions = this.props.actions;
+        if (connectionStatus.connected) {
+            return (<ConnectedHardware
+                actions={actions}
+                connectionStatus={connectionStatus}
+                requiredFirmware={this.props.workspaceSettings.firmware}
+            />);
+        }
+        return <Connection
+            actions={actions}
+            connectionStatus={connectionStatus}
+            disabled={disabled || connectionStatus.loadingPorts}
+            handleOpenPort={this.handleOpenPort}
+            handleRefreshPorts={actions.handleRefreshPorts}
+            isLoading={isLoading}
+        />;
+    }
+
+    render() {
+        const { isCustomMachine, machineProfiles } = this.state;
+        const { connectionStatus, alertMessage } = this.props;
+        const { firmware, customMachine, machineProfileId } = this.props.workspaceSettings;
+        const { baudRate, controllerType } = firmware || {};
+
+        const hasCustomMachine = !!(isCustomMachine && customMachine &&
+            customMachine.brand.length && customMachine.model.length);
+        const hasMachineProfile = !isCustomMachine && machineProfileId;
+        const hasMachine = hasMachineProfile || hasCustomMachine;
+
+        const isLoadingMachineProfiles = !machineProfiles;
+        const isLoading = connectionStatus.connecting || isLoadingMachineProfiles;
+        const disabled = isLoading;
+        const canUseConnection = controllerType && baudRate && hasMachine;
+        const canSwitchMachineMode = !canUseConnection;
+
+        const sw1 = isCustomMachine ? 'Not sure what settings to use?'
+            : 'Can\'t find your machine?';
+        const sw2 = isCustomMachine ? 'Search for pre-configured machines'
+            : 'Switch to manual connection mode';
+
+        return (
+            <div className="container-fluid" style={{ padding: 0, margin: -10 }} >
+                <div className="row" style={{ padding: 0, margin: 0 }}>
+                    <div className={ cx('col-lg-6', styles.widgetLeft) } >
+                        {!isCustomMachine && <ChooseMachine
+                            onSelectedMachineProfileAndParts={this.onSelectedMachineProfileAndParts}
+                            machineProfiles={machineProfiles}
+                        />}
+                        {isCustomMachine && <CustomMachine
+                            controller={connectionStatus.controller}
+                            onSelected={this.onSelectedCustomMachine}
+                            disabled={disabled}
+                        />}
+                        <div
+                            className={
+                                cx('container-fluid', styles.widgetFooter)
+                            }
+                            style={{ textAlign: 'center' }}
+                        >
+                            <div className="row">
+                                <div className="col-lg-3" />
+                                <div
+                                    className="col-lg-6"
+                                >
+                                    {this.renderAlert(alertMessage)}
+                                    {canSwitchMachineMode && (
+                                        <div>
+                                            <i>{sw1}</i>
+                                            <br />
+                                            <button
+                                                type="button"
+                                                className="btn btn-sm btn-default"
+                                                onClick={() => {
+                                                    this.setState({
+                                                        isCustomMachine: !isCustomMachine
+                                                    });
+                                                }}
+                                                disabled={!!disabled}
+                                            >
+                                                {sw2}
+                                            </button>
+                                            <br />
+                                            <i>
+                                                Makerverse can support almost any machine (
+                                                <analytics.OutboundLink
+                                                    eventLabel="machines"
+                                                    to="http://www.makerverse.com/machines/"
+                                                    target="_blank"
+                                                >
+                                                    {i18n._('learn more')}
+                                                </analytics.OutboundLink>).
+                                            </i>
+                                        </div>
+                                    )}
+                                    {canUseConnection && this.renderConnectionWidget(
+                                        disabled, isLoading, connectionStatus)}
+                                </div>
+                                <div className="col-lg-3" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className={ cx('h-100', 'col-lg-6') } style={{ padding: 0, margin: 0 }}>
+                        <div className={ cx('h-100', 'd-inline-block') } >
+                            <CustomizeWorkspace
+                                connectionStatus={connectionStatus}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}
+
+export default CreateWorkspacePanel;
