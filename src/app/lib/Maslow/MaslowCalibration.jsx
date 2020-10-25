@@ -1,3 +1,4 @@
+// import _ from 'lodash';
 import log from 'app/lib/log';
 import MaslowKinematics from './MaslowKinematics';
 
@@ -14,16 +15,39 @@ const calibrationDefaults = {
     cutHoles: false,
 };
 
-const sled = { type: 'Standard 18in Circle' };
+// const sleds = {
+//     'Standard 18in Circle': { top: 9 * 25.4, left: 9 * 25.4, right: 9 * 25.4, bottom: 9 * 25.4, desc: '18 inch diameter circle' },
+//     'MetalMaslow Square': { top: 6.325 * 25.4, left: 7.325 * 25.4, right: 7.325 * 25.4, bottom: 8.325 * 25.4, desc: '14.64 inch square, off-center' },
+//     'Custom': { top: 9 * 25.4, left: 9 * 25.4, right: 9 * 25.4, bottom: 9 * 25.4, desc: 'Enter your own measurements' },
+// };
 
+// Hardcoded from server
 const sleds = {
-    'Standard 18in Circle': { top: 9 * 25.4, left: 9 * 25.4, right: 9 * 25.4, bottom: 9 * 25.4, desc: '18 inch diameter circle' },
-    'MetalMaslow Square': { top: 6.325 * 25.4, left: 7.325 * 25.4, right: 7.325 * 25.4, bottom: 8.325 * 25.4, desc: '14.64 inch square, off-center' },
-    'Custom': { top: 9 * 25.4, left: 9 * 25.4, right: 9 * 25.4, bottom: 9 * 25.4, desc: 'Enter your own measurements' },
+    'maslow-mm-square-sled': {
+        'id': 'maslow-mm-square-sled',
+        'partType': 'SLED',
+        'title': 'Metal Maslow Square',
+        'description': 'The MetalMaslow square sled, with the tip of the cutter slightly above center.',
+        'dataBlob': '{\"top\":161.2875,\"right\":186.7875,\"bottom\":212.2875,\"left\":186.7875}',
+        'settings': []
+    },
+    'maslow-round-18-sled': {
+        'id': 'maslow-round-18-sled',
+        'partType': 'SLED',
+        'title': 'Standard 18-inch Circle',
+        'description': 'An 18-inch diameter sled, with the tip of the cutter 9 inches from each edge (most common).',
+        'dataBlob': '{\"top\":229.5,\"right\":229.5,\"bottom\":229.5,\"left\":229.5}',
+        'settings': []
+    }
 };
 
+const customSledDimensions = { top: 9 * 25.4, left: 9 * 25.4, right: 9 * 25.4, bottom: 9 * 25.4 };
+
+const selectedSled = { id: '', data: { ...customSledDimensions } };
+
 export {
-    sled,
+    selectedSled,
+    customSledDimensions,
     sleds
 };
 
@@ -33,8 +57,27 @@ export {
 class MaslowCalibration {
     opts = {};
 
-    static setSledType(st) {
-        sled.type = st;
+    // Accepts sled part object from server
+    static setSledId(sledId) {
+        selectedSled.id = sledId;
+        if (!sledId || !sleds[sledId]) {
+            // Custom sled.
+            selectedSled.id = '';
+            selectedSled.data = customSledDimensions;
+            return;
+        }
+        try {
+            selectedSled.data = JSON.parse(sleds[sledId].dataBlob);
+        } catch (e) {
+            log.error(e, 'sled selection');
+        }
+    }
+
+    static setCustomSledDimension(edge, value) {
+        customSledDimensions[edge] = value;
+        if (selectedSled.id.length <= 0) {
+            selectedSled.data = { ...customSledDimensions };
+        }
     }
 
     constructor(controller, opts) {
@@ -276,17 +319,22 @@ class MaslowCalibration {
     }
 
     get sledDimensions() {
-        if (this.opts.cutHoles) {
-            return { top: 0, left: 0, bottom: 0, right: 0 };
-        }
-        return sleds[sled.type];
+        const ret = selectedSled.data;
+        ['top', 'right', 'bottom', 'left'].forEach((k) => {
+            ret[k] = ret[k] || 0;
+        });
+        return ret;
+    }
+
+    get effectiveSledDimensions() {
+        return this.opts.cutHoles ? { top: 0, left: 0, bottom: 0, right: 0 } : this.sledDimensions;
     }
 
     calculateMeasurementCoordinates(ms) {
         const mm = this.opts.measuredInches ? 25.4 : 1;
         const h = this.kin.opts.machineHeight;
         const w = this.kin.opts.machineWidth;
-        const s = this.sledDimensions;
+        const s = this.effectiveSledDimensions;
         return [
             { x: (0), y: (h / 2 - ms[0] * mm - s.top) },
             { x: (w / 2 - ms[2] * mm - s.right), y: (h / 2 - ms[1] * mm - s.top) },
@@ -299,7 +347,7 @@ class MaslowCalibration {
 
     calculateIdealCoordinates() {
         const ed = this.opts.cutHoles ? this.opts.cutEdgeDistance : this.opts.edgeDistance;
-        const s = this.sledDimensions;
+        const s = this.effectiveSledDimensions;
         const aH1x = (this.kin.opts.machineWidth / 2.0 - ed);
         const aH1y = (this.kin.opts.machineHeight / 2.0 - ed);
         return [

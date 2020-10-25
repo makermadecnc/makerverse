@@ -95,6 +95,10 @@ class Workspaces extends events.EventEmitter {
         };
     }
 
+    get hasOnboarding() {
+        return this.partSettings.length > 0 || this.firmware.controllerType === MASLOW;
+    }
+
     get hasOnboarded() {
         return !!this._record.onboarded;
     }
@@ -186,6 +190,16 @@ class Workspaces extends events.EventEmitter {
     findPart(partType) {
         const part = _.find(this.parts, { partType: partType.toUpperCase() });
         return part ? { ...part } : null;
+    }
+
+    // All settings in parts
+    get partSettings() {
+        let ret = [];
+        this.parts.forEach((part) => {
+            const settings = part.settings || [];
+            ret = ret.concat(settings);
+        });
+        return ret;
     }
 
     // ---------------------------------------------------------------------------------------------

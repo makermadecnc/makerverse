@@ -6,6 +6,7 @@ import React, { PureComponent } from 'react';
 import Widget from 'app/components/Widget';
 import api from 'app/api';
 import i18n from 'app/lib/i18n';
+import { submitMachineProfileSuggestion } from 'app/lib/ows/machines';
 import log from 'app/lib/log';
 import auth from 'app/lib/auth';
 import Hardware from 'app/lib/hardware';
@@ -107,18 +108,31 @@ class CreateWorkspaceWidget extends PureComponent {
             });
             return ret;
         },
+        handleSubmitToCatalog: (submit, payload) => {
+            if (!submit) {
+                return new Promise((resolve, reject) => {
+                    resolve();
+                });
+            }
+            return submitMachineProfileSuggestion(payload);
+        },
         handleCreateWorkspace: (workspaceSettings) => {
             const payload = { ...workspaceSettings };
+            const { customMachine } = workspaceSettings;
             const axes = {};
             Object.keys(payload.axes).forEach((axisKey) => {
                 // Unwrap machine axis objects.
                 axes[axisKey] = payload.axes[axisKey]._record;
             });
             payload.axes = axes;
+            const submit = customMachine && customMachine.submit;
 
-            log.debug('create workspace', payload);
+            log.debug('create workspace', payload, 'submit?', submit);
             this.setState({ creating: true, createWorkspaceError: null });
-            api.workspaces.create(payload)
+            this.actions.handleSubmitToCatalog(submit, payload)
+                .then(() => {
+                    return api.workspaces.create(payload);
+                })
                 .then((res) => {
                     const record = res.body;
                     Workspaces.load(record);
@@ -126,8 +140,10 @@ class CreateWorkspaceWidget extends PureComponent {
                     window.location.reload();
                 })
                 .catch((res) => {
+                    const err = res.body && res.body.msg ? res.body.msg :
+                        i18n._('An unexpected error has occurred.');
                     this.setState({
-                        createWorkspaceError: res.body.msg || i18n._('An unexpected error has occurred.'),
+                        createWorkspaceError: err,
                         creating: false
                     });
                 });

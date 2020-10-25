@@ -77,7 +77,7 @@ class WorkspaceAxis {
     }
 
     get validRange() {
-        return this.max > this.min;
+        return (this.max - this.min) >= 10;
     }
 
     get validAccuracy() {

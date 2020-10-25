@@ -31,3 +31,4 @@ export const catcher = (err) => {
 
 // Conveniences
 export const get = (path) => authrequest.get(`${host}/api/${path}`).then(handler).catch(catcher);
+export const post = (path, data) => authrequest.post(`${host}/api/${path}`).send(data).then(handler).catch(catcher);

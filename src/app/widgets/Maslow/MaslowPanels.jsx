@@ -128,8 +128,10 @@ class MaslowPanels extends PureComponent {
                         </Button>
                     </ToastNotification>
                 )}
-                {firmware && (
-                    <FirmwareRequirement firmware={firmware} compatibility={compatibility} />
+                {firmware && hardware.hasFirmware && (
+                    <div style={{ marginBottom: 10 }}>
+                        <FirmwareRequirement firmware={firmware} compatibility={compatibility} />
+                    </div>
                 )}
                 <button
                     type="button"

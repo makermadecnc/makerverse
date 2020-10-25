@@ -1,6 +1,7 @@
 /*eslint no-bitwise: ["error", { "allow": ["<<", "&", "&=", "|=", "~"] }] */
 import _ from 'lodash';
 import log from 'app/lib/log';
+import i18n from 'app/lib/i18n';
 import {
     MASLOW,
     GRBL,
@@ -320,11 +321,11 @@ class MachineSettings {
             lines.push(`${setting.name}=${val}`);
         });
 
-        this._workspace.blockingText = 'Preparing Machine...';
+        this._workspace.blockingText = i18n._('Preparing Machine...');
         this._workspace.writeCommands(cmds, () => {
-            this._workspace.blockingText = 'Applying Settings...';
+            this._workspace.blockingText = i18n._('Applying Settings...');
             this._workspace.writeLines(lines, () => {
-                this._workspace.blockingText = 'Refreshing Settings...';
+                this._workspace.blockingText = i18n._('Refreshing Settings...');
                 this._workspace.controller.writeln('$$');
                 setTimeout(() => {
                     this._workspace.blockingText = null;

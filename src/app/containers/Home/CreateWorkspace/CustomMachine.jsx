@@ -59,10 +59,7 @@ class CustomMachine extends React.PureComponent {
 
         return (
             <div>
-                <div
-                    className={cx('form-group', styles.widgetHeader)}
-                    style={{ backgroundColor: this.props.bkColor }}
-                >
+                <div className={cx('form-group', styles.widgetHeader)}>
                     <div className="input-group input-group-sm">
                         <h6>Machine Controllers</h6>
                         {baudRate && (

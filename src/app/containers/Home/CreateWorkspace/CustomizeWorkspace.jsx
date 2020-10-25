@@ -36,7 +36,7 @@ class CustomizeWorkspace extends React.PureComponent {
                 />
                 {!axis.validRange && (
                     <ToastNotification type="warning">
-                        {i18n._('Axis has no size.')}
+                        {i18n._('Axis is very small (min and max close together).')}
                     </ToastNotification>
                 )}
                 {!axis.validAccuracy && (
@@ -68,6 +68,8 @@ class CustomizeWorkspace extends React.PureComponent {
             bkColor: workspaceSettings.bkColor || Workspaces.defaultBkColor,
             color: workspaceSettings.color || Workspaces.defaultColor,
             icon: workspaceSettings.icon || Workspaces.defaultIcon,
+            autoReconnect: this.state.autoReconnect,
+            preferImperial: this.state.preferImperial,
         });
     }
 
@@ -183,6 +185,7 @@ class CustomizeWorkspace extends React.PureComponent {
                                             onClick={() => {
                                                 this.createWorkspace(workspaceSettings);
                                             }}
+                                            disabled={this.props.creating}
                                         >
                                             <h6 style={{ color: 'white' }}>
                                                 {i18n._('Create Workspace')}
