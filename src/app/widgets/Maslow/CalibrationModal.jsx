@@ -9,7 +9,7 @@ import Space from 'app/components/Space';
 import i18n from 'app/lib/i18n';
 import Workspaces from 'app/lib/workspaces';
 import analytics from 'app/lib/analytics';
-import MaslowCalibration, { sleds, sled } from 'app/lib/Maslow/MaslowCalibration';
+import MaslowCalibration, { sleds, selectedSled } from 'app/lib/Maslow/MaslowCalibration';
 import styles from './index.styl';
 import MeasureChainsFlow from './MeasureChainsFlow';
 import {
@@ -59,7 +59,7 @@ class CalibrationModal extends PureComponent {
         return {
             cutDepth: this.fromMM(this.calibration.opts.cutDepth, inches), // mm to cut in the calibration pattern (zero = no cutting)
             cutHoles: this.calibration.opts.cutHoles,
-            sledType: sled.type,
+            sledId: selectedSled.id,
             measuredInches: inches,
             edgeDistance: this.fromMM(this.calibration.opts.edgeDistance, inches),
             cutEdgeDistance: this.fromMM(this.calibration.opts.cutEdgeDistance, inches),
@@ -131,6 +131,12 @@ class CalibrationModal extends PureComponent {
     componentDidMount() {
         this.workspace.addControllerEvents(this.controllerEvents);
         this.updateActiveTab();
+
+        const sled = this.workspace.findPart('SLED');
+        if (sled) {
+            MaslowCalibration.setSledId(sled.id);
+            this.setState({ sledId: sled.id });
+        }
     }
 
     componentWillUnmount() {
@@ -331,7 +337,8 @@ class CalibrationModal extends PureComponent {
     }
 
     setCustomSledDimension(edge, value) {
-        sleds.Custom[edge] = this.toMM(Number(value));
+        const mm = this.toMM(Number(value));
+        MaslowCalibration.setCustomSledDimension(edge, mm);
         this.setState({ sledDimensions: { ...this.state.sledDimensions, [edge]: value } });
     }
 
@@ -339,9 +346,13 @@ class CalibrationModal extends PureComponent {
         this.event({ label: 'frame' });
         this.workspace.hasOnboarded = true;
 
+        const chainLengths = this.calibration.kin.positionToChain(0, 0);
+        const origChainLength = Math.round((chainLengths[0] + chainLengths[1]) / 2);
+
         this.workspace.machineSettings.write({
             motorOffsetY: this.calibration.kin.opts.motorOffsetY,
             distBetweenMotors: this.calibration.kin.opts.distBetweenMotors,
+            origChainLength: origChainLength,
         });
         this.setState({ ...this.state, setFrameSettings: true }); //, chainError: null });
     }
@@ -400,7 +411,7 @@ class CalibrationModal extends PureComponent {
                 <div>
                     {'Your machine appears to have been previously calibrated.'}
                     <br />
-                    {'To change the frame, you must first clear the effects of edge/precision calibration.'}
+                    {'To change this setting, you must first clear the effects of edge/precision calibration.'}
                 </div>
                 <Button
                     btnSize="medium"
@@ -478,7 +489,7 @@ class CalibrationModal extends PureComponent {
             wiped,
             rotationDiskRadius,
             chainOverSprocket,
-            sledType,
+            sledId,
             calibrated,
             chainError,
             sledDimensions,
@@ -887,7 +898,7 @@ class CalibrationModal extends PureComponent {
                                         )}
                                         {setFrameSettings && (
                                             <span className={styles.nextStep}>
-                                                Now, move on to Chains.
+                                                Now, move on to the next tab.
                                             </span>
                                         )}
                                     </div>
@@ -908,28 +919,34 @@ class CalibrationModal extends PureComponent {
                                         <span>
                                             Sled Type:
                                             <select
-                                                value={sledType}
+                                                value={sledId || ''}
                                                 className={styles.selectInput}
                                                 onChange={e => {
-                                                    MaslowCalibration.setSledType(e.target.value);
-                                                    this.updateCalibrationOpts({ sledType: e.target.value });
+                                                    MaslowCalibration.setSledId(e.target.value);
+                                                    this.updateCalibrationOpts({ sledId: e.target.value });
                                                     // Reload state from calibration/kinematics to account many new values.
                                                     this.setState({
                                                         ...this.internalState,
-                                                        sledType: e.target.value,
+                                                        sledId: e.target.value,
                                                     });
                                                 }}
                                             >
-                                                {Object.keys(sleds).map((k) => {
+                                                {Object.keys(sleds).map((id) => {
                                                     return (
                                                         <option
-                                                            value={k}
-                                                            key={k}
+                                                            value={id}
+                                                            key={id}
                                                         >
-                                                            {k}
+                                                            {sleds[id].title}
                                                         </option>
                                                     );
                                                 })}
+                                                <option
+                                                    value=""
+                                                    key="sled_custom_other"
+                                                >
+                                                    {i18n._('Other')}
+                                                </option>
                                             </select>
                                         </span>
                                         {edges.map((edge) => {
@@ -943,7 +960,7 @@ class CalibrationModal extends PureComponent {
                                                         onChange={e => {
                                                             this.setCustomSledDimension(edge, e.target.value);
                                                         }}
-                                                        disabled={sledType !== 'Custom'}
+                                                        disabled={sledId.length > 0}
                                                     />
                                                 </div>
                                             );

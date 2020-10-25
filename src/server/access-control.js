@@ -1,7 +1,7 @@
 // import ensureArray from 'ensure-array';
 // import _ from 'lodash';
 // import rangeCheck from 'range_check';
-import { getUserByToken } from './api/api.users';
+import { getUserByToken, isGuestAccessEnabled, guestUser } from './api/api.users';
 import settings from './config/settings';
 // import config from './services/configstore';
 import urljoin from './lib/urljoin';
@@ -77,8 +77,12 @@ const getTokenFromHeader = (authHeader) => {
 
 // Return the associated token for a user (or throw an error)
 const validateToken = (token) => {
-    if (!token) {
-        throw new Error('No token provided');
+    if (!token || token.length <= 0) {
+        if (isGuestAccessEnabled()) {
+            return guestUser;
+        } else {
+            throw new Error('No token provided');
+        }
     }
     const user = getUserByToken(token);
     if (!user) {

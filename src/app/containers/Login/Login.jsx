@@ -2,10 +2,10 @@ import cx from 'classnames';
 import qs from 'qs';
 import React, { PureComponent } from 'react';
 import { withRouter, Redirect } from 'react-router-dom';
-import Anchor from 'app/components/Anchor';
 import Space from 'app/components/Space';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
+import { setCookie, deleteCookie } from 'app/lib/cookies';
 import auth from 'app/lib/auth';
 import settings from 'app/config/settings';
 import analytics from 'app/lib/analytics';
@@ -42,7 +42,36 @@ class Login extends PureComponent {
                     authenticating: false,
                 });
             });
-        }
+        },
+        handleGuest: (event) => {
+            event.preventDefault();
+
+            if (this.state.useCookies) {
+                setCookie(auth.GUEST_COOKIE_NAME, '1');
+            } else {
+                deleteCookie(auth.GUEST_COOKIE_NAME);
+            }
+
+            this.setState({
+                alertMessage: '',
+                authenticating: true,
+                redirectToReferrer: false,
+            });
+
+            auth.signin(null, true)
+                .then((r) => {
+                    this.setState({
+                        redirectToReferrer: true,
+                        authenticating: false
+                    });
+                })
+                .catch((e) => {
+                    this.setState({
+                        alertMessage: e.message,
+                        authenticating: false
+                    });
+                });
+        },
     };
 
     fields = {
@@ -61,7 +90,10 @@ class Login extends PureComponent {
             authenticating: false,
             redirectToReferrer: false,
             registered: false,
+            guest: null,
+            useCookies: false,
             errors: this.emptyErrors,
+            redirect: null,
         };
     }
 
@@ -148,13 +180,17 @@ class Login extends PureComponent {
         );
     }
 
+    componentDidMount() {
+        auth.guest().then((gm) => this.setState({ guest: !!gm }));
+    }
+
     render() {
         const error = decodeURIComponent(window.location.hash.split('error=')[1] || '');
 
         const { from } = this.props.location.state || { from: { pathname: '/' } };
         const state = { ...this.state };
         // const actions = { ...this.actions };
-        const { alertMessage, authenticating, registering } = state;
+        const { alertMessage, authenticating, registering, guest, dangerous, useCookies } = state;
         const docLink = 'http://www.makerverse.com/features/security/';
         const showLogout = error && error.includes('Wrong user');
         let enabled = !authenticating && this.fields.username && this.fields.username.value.length > 0 &&
@@ -268,9 +304,45 @@ class Login extends PureComponent {
                         </form>
                     </div>
                     <div className={styles.footer}>
-                        <Anchor href={docLink}>
-                            {i18n._('Why is it necessary to log in?')}
-                        </Anchor>
+                        {!guest && (
+                            <analytics.OutboundLink
+                                eventLabel="why_login"
+                                to={docLink}
+                                target="_blank"
+                            >
+                                {i18n._('Why is it necessary to log in?')}
+                            </analytics.OutboundLink>
+                        )}
+                        {guest && (
+                            <div>
+                                <div className="checkbox">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            defaultChecked={useCookies}
+                                            onChange={() => this.setState({ useCookies: !useCookies })}
+                                        />
+                                        {i18n._('Remember me (I consent to cookies)')}
+                                    </label>
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            defaultChecked={dangerous}
+                                            onChange={() => this.setState({ dangerous: !dangerous })}
+                                        />
+                                        {i18n._('I understand "guest mode" is hazardous. ')}
+                                    </label>
+                                </div>
+                                <br />
+                                <button
+                                    className="btn btn-block btn-secondary"
+                                    onClick={(e) => this.actions.handleGuest(e)}
+                                    disabled={authenticating || !dangerous}
+                                >
+                                    {i18n._('Continue as Guest')}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <br />

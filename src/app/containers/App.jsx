@@ -64,7 +64,7 @@ class App extends PureComponent {
                                     key={workspaceId}
                                     workspaceId={workspaceId}
                                     style={{
-                                        display: workspace.isActive ? 'block' : 'none'
+                                        display: workspace.isActive ? 'block' : 'none',
                                     }}
                                 />
                             );

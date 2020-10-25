@@ -30,10 +30,22 @@ These are merely customized versions of [the official Raspberry Pi OS images of 
 
 ## First Boot
 
-- SSH will already be enabled, and the default username/password (`pi`/`raspbian`) have been left unchanged.
-- The hostname defaults to `makerverse`, so if your router supports it you can connect to the pi at `ssh pi@makerverse.local` and `http://makerverse.local:8000`.
+You'll need to get to a terminal in order to setup the Pi. You can either:
 
-As soon as you are ablem to, SSH in to the Raspberry Pi and run `sudo raspi-config` to change the password. The Makerverse application will start automatically on port `8000`. However, especially during the first boot, it will take some time to download (_~600MB_) and unpack the application. On a Raspberry Pi 3 B+ Rev.1.3 (about the  worst device which can handle Makerverse), this has been known to take 20-30 minutes. A RPi4 on a decent internet connection should only take a few minutes.
+- Attach a mouse and keyboard.
+- Use SSH to connect from your computer: `ssh pi@makerverse.local` (SSH is enabled by default in the Pi image).
+
+_**Note**: if the SSH command does not work, either the Pi is not connected to your home network via ethernet, or your router does not support looking up the Pi by its name. In either case, you should open your router's admin interface and try to find the Pi's IP address on the network. If you can find the IP address, you can use it instead of `makerverse.local`._
+
+The username/password (`pi`/`raspberry`) have been left unchanged from a "normal" Raspberry Pi OS. Use this whenever prompted for a username and password.
+
+Once you've got a terminal open, type `sudo raspi-config` to run the official Raspberry Pi configuration tool.
+
+- You should **definitely** change the password, to keep the device secure!
+- You might also change the hostname from `makerverse` to something more memorable, like `maslow`, so you can use `maslow.local` instead of `makerverse.local`.
+- You might also want to turn on WiFi, so you do not need to use an ethernet connection on the Raspberry Pi to have access to Makerverse.
+
+The Makerverse application will start automatically on port `8000`. However, especially during the first boot, it will take some time to download (_~600MB_) and unpack the application. On a Raspberry Pi 3 B+ Rev.1.3 (about the  worst device which can handle Makerverse), this has been known to take 20-30 minutes. A RPi4 on a decent internet connection should only take a few minutes.
 
 _**Tip**: read the [useful commands in the Linux Service section](/installation/web-server/linux-service/#useful-commands)!_
 

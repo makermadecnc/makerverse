@@ -11,21 +11,15 @@ Pull requests welcome!
 
 See [issues](/about/#issues) for reporting bugs or problems.
 
-## Development
+## Documentation
 
-See the [build from source](/installation/build-from-source/) section to get started.
+These docs are located within the same Github repository that is home to Makerverse. You'll find them in the `docs/` folder, stored as `.md` (markdown) files. Therefore, the contribution process is the same as changing the Makerverse code...
 
-## Localization
+## How to Contribute
 
-If you'd like to help contribute translations, you can fork the repository, update resource files in the `src/app/i18n` directory, and create a pull request to submit your changes.
+As with contributing to most Github projects, the process is to (1) fork the repository, (2) make and push changes, and then (3) create a pull request. The pull request can then be reviewed and accepted into Makerverse.
 
 ### Fork the repository
-
-To fork the makerverse repository, click the <b>Fork</b> button in the header of the repository.
-
-![image](https://user-images.githubusercontent.com/447801/30472117-d757e742-9a2d-11e7-80f8-4ba9ffba97d8.png)
-
-When it’s finished, you’ll be taken to your copy of the makerverse repository. Now you can update the resource files on GitHub, or clone it to your computer.
 
 If you're using <b>GitHub for Desktop</b> application, navigate over to the toolbar, open the <b>Clone or download</b> dropdown, and click <b>Open in Desktop</b> to clone makermadecnc/makerverse to your computer and use it in GitHub Desktop.
 
@@ -53,6 +47,14 @@ You can continue to make more changes and create new commits. When you’re read
   ![image](https://user-images.githubusercontent.com/447801/30476803-bd3b1428-9a3d-11e7-8588-90d77f3680b5.png)
 
 4. That's done.
+
+## Development
+
+See the [build from source](/installation/build-from-source/) section to get started.
+
+## Localization
+
+If you'd like to help contribute translations, you can fork the repository, update resource files in the `src/app/i18n` directory, and create a pull request to submit your changes.
 
 ## Translation Validation
 

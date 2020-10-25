@@ -202,7 +202,7 @@ class MeasureChainsFlow extends PureComponent {
                 <h3>Previously Calibrated?</h3>
                 Were the chains on this machine previously calibrated?
                 <br />
-                {'Only select "Previously Calibrated" if you already have marks on the chains at a well-known length.'}
+                {'Only select "Previously Calibrated" if you already have marks on the chains.'}
                 <br />
                 <br />
                 <div >

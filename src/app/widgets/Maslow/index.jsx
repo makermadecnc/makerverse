@@ -10,13 +10,15 @@ import WidgetConfig from '../WidgetConfig';
 import MaslowPanels from './MaslowPanels';
 import InformationModal from './InformationModal';
 import CalibrationModal from './CalibrationModal';
+import OnboardingModal from './OnboardingModal';
 import {
     MASLOW
 } from '../../constants';
 import {
     MODAL_NONE,
     MODAL_CONTROLLER,
-    MODAL_CALIBRATION
+    MODAL_CALIBRATION,
+    MODAL_ONBOARDING,
 } from './constants';
 import styles from './index.styl';
 
@@ -211,9 +213,12 @@ class MaslowWidget extends PureComponent {
         this.config.set('panel.statusReports.expanded', panel.statusReports.expanded);
         this.config.set('panel.modalGroups.expanded', panel.modalGroups.expanded);
 
-        const canOnboard = this.state.modal.name === MODAL_NONE && !this.state.modal.startedOnboarding;
-        if (canOnboard && !this.workspace.hasOnboarded && this.isConnectedToMaslow) {
-            this.actions.openModal(MODAL_CALIBRATION, null, { startedOnboarding: true });
+        const shouldOnboard = this.workspace.hasOnboarding && !this.workspace.hasOnboarded;
+        const canOpenModal = shouldOnboard
+            && !this.state.modal.startedOnboarding
+            && this.state.modal.name === MODAL_NONE;
+        if (canOpenModal && this.isConnectedToMaslow) {
+            this.actions.openModal(MODAL_ONBOARDING, null, { startedOnboarding: true });
         }
     }
 
@@ -454,6 +459,13 @@ class MaslowWidget extends PureComponent {
                             state={state}
                             activeTab={state.modal.params.activeTab}
                             calibrated={state.modal.params.calibrated}
+                            actions={actions}
+                        />
+                        }
+                        {state.modal.name === MODAL_ONBOARDING &&
+                        <OnboardingModal
+                            workspaceId={this.workspace.id}
+                            state={state}
                             actions={actions}
                         />
                         }

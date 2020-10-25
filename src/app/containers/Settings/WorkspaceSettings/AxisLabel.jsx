@@ -1,16 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const Axis = ({ value, sub }) => (
+const AxisLabel = ({ value, sub }) => (
     <div style={{ display: 'inline-block' }}>
         {value}
-        <sub style={{ marginLeft: 2 }}>{sub}</sub>
+        <sub style={{ marginLeft: 2 }}>{sub} (mm)</sub>
     </div>
 );
 
-Axis.propTypes = {
+AxisLabel.propTypes = {
     value: PropTypes.string,
     sub: PropTypes.string,
 };
 
-export default Axis;
+export default AxisLabel;

@@ -14,8 +14,8 @@ Find your machine, below, and click on the appropriate link for the latest firmw
 
 _Please read the [Maslow-specific instructions](/machines/cnc/maslow)._
 
-- [Arduino Mega](https://github.com/WebControlCNC/Firmware/tree/release/holey): Maslow "Classic" (JumpStart Kit) (Baud Rate: 38400)
-- [Arduino Due](https://github.com/makermadecnc/MaslowDue): M2 (Baud Rate: 57600)
+- [Arduino Mega](https://github.com/WebControlCNC/Firmware/tree/release/holey): Maslow "Classic" (JumpStart Kit) (Baud Rate: 57600)
+- [Arduino Due](https://github.com/makermadecnc/MaslowDue): M2 (Baud Rate: 38400)
 
 #### Tested On
 

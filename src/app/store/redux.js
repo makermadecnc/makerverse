@@ -1,5 +1,6 @@
 import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import * as Oidc from 'redux-oidc';
+import OidcClient from 'oidc-client';
 
 const reducers = {
 };
@@ -7,8 +8,8 @@ const reducers = {
 // This is pretty ugly. The CNCjs app had a concept of a "store," then Redux was added.
 // The two should be unufied.
 export default function configureStore(history, initialState) {
-    // Oidc.Log.logger = console;
-    // Oidc.Log.level = Oidc.Log.DEBUG;
+    OidcClient.Log.logger = console;
+    OidcClient.Log.level = OidcClient.Log.DEBUG;
 
     const middleware = [];
 

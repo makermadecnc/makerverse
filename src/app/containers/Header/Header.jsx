@@ -6,6 +6,7 @@ import { withRouter } from 'react-router-dom';
 import without from 'lodash/without';
 import Push from 'push.js';
 import api from 'app/api';
+import { deleteCookie } from 'app/lib/cookies';
 import { Tooltip } from 'app/components/Tooltip';
 import Anchor from 'app/components/Anchor';
 import Space from 'app/components/Space';
@@ -256,7 +257,7 @@ class Header extends PureComponent {
                 fixedTop
                 fluid
                 style={{
-                    margin: 0
+                    margin: 0,
                 }}
             >
                 <Navbar.Header style={{ display: 'flex', alignItems: 'center' }}>
@@ -319,10 +320,13 @@ class Header extends PureComponent {
                             </MenuItem>
                             <MenuItem
                                 onClick={() => {
-                                    if (auth.isAuthenticated()) {
-                                        log.debug('Destroy and cleanup the WebSocket connection');
-                                        Workspaces.disconnect();
+                                    log.debug('Destroy and cleanup the WebSocket connection');
+                                    Workspaces.disconnect();
+                                    deleteCookie(auth.GUEST_COOKIE_NAME);
 
+                                    if (auth.isGuest()) {
+                                        window.location.replace('/#/login');
+                                    } else {
                                         auth.signout();
 
                                         // Remember current location

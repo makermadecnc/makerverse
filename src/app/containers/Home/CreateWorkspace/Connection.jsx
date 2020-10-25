@@ -1,5 +1,4 @@
 import find from 'lodash/find';
-import get from 'lodash/get';
 import map from 'lodash/map';
 import cx from 'classnames';
 import PropTypes from 'prop-types';
@@ -8,12 +7,25 @@ import Select from 'react-select';
 import Space from 'app/components/Space';
 import i18n from 'app/lib/i18n';
 
+export const ConnectionStatusType = PropTypes.shape({
+    ports: PropTypes.arrayOf(PropTypes.object), // List of serial ports
+    loadingPorts: PropTypes.bool.isRequired, // Are we querying for USB serial ports?
+    controller: PropTypes.object.isRequired, // the Controller instance with which to connect.
+    connecting: PropTypes.bool.isRequired, // Are we trying to establish serial connection?
+    connected: PropTypes.bool.isRequired, // Are we connected?
+    // -- if connected --
+    controllerType: PropTypes.string, // The internal controller implementation name
+    hardware: PropTypes.object, // the MachineHardware instance
+    settings: PropTypes.object, // controller settings, as they came from the websocket
+    firmwareCompatibility: PropTypes.object, // firmware mismatch or detection error from hardware
+    hasValidFirmware: PropTypes.bool, // All is good, we can create a workspace?
+    serialOutput: PropTypes.arrayOf(PropTypes.string).isRequired, // Direct from the console.
+}).isRequired;
+
 class Connection extends PureComponent {
-    static propTypes = {
-        controller: PropTypes.object.isRequired,
-        state: PropTypes.object,
-        actions: PropTypes.object
-    };
+    static propTypes = { connectionStatus: ConnectionStatusType };
+
+    state = { port: null };
 
     isPortInUse = (port) => {
         const { state } = this.props;
@@ -51,10 +63,8 @@ class Connection extends PureComponent {
     }
 
     renderPortValue = (option) => {
-        const { state } = this.props;
         const { label, inuse } = option;
-        const notLoading = !(state.loading);
-        const canChangePort = notLoading;
+        const canChangePort = !this.props.loading;
         const style = {
             color: canChangePort ? '#333' : '#ccc',
             textOverflow: 'ellipsis',
@@ -73,77 +83,30 @@ class Connection extends PureComponent {
         );
     };
 
-    renderBaudrateValue = (option) => {
-        const style = {
-            color: '#333',
-            textOverflow: 'ellipsis',
-            overflow: 'hidden'
-        };
-        return (
-            <div style={style} title={option.label}>{option.label}</div>
-        );
-    };
-
     render() {
-        const { state, actions, controller } = this.props;
         const {
-            loading, connecting, connected,
-            controllerType,
-            ports, baudrates,
-            port, baudrate,
-            autoReconnect,
-            connection
-        } = state;
-        const enableHardwareFlowControl = get(connection, 'serial.rtscts', false);
-        const notLoading = !loading;
-        const notConnecting = !connecting;
-        const notConnected = !connected;
-        const canRefresh = notLoading && notConnected;
-        const canChangeController = notLoading && notConnected;
-        const canChangePort = notLoading && notConnected;
-        const canToggleHardwareFlowControl = notConnected;
-        const canOpenPort = port && baudrate && notConnecting && notConnected;
+            connectionStatus,
+            disabled,
+            isLoading,
+            handleRefreshPorts,
+        } = this.props;
+        const { port } = this.state;
+        const canConnect = !disabled && port && !connectionStatus.connected;
 
         return (
             <div>
-                <div className="form-group">
-                    <div className="input-group input-group-sm">
-                        <div className="input-group-btn">
-                            {controller.loadedControllers.map((ct) => {
-                                return (
-                                    <button
-                                        type="button"
-                                        key={ct}
-                                        className={cx(
-                                            'btn',
-                                            'btn-default',
-                                            { 'btn-select': controllerType === ct }
-                                        )}
-                                        disabled={!canChangeController}
-                                        onClick={() => {
-                                            actions.changeController(ct);
-                                        }}
-                                    >
-                                        {ct}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <label className="control-label">{i18n._('Port')}</label>
+                <div className={cx('form-group')}>
                     <div className="input-group input-group-sm">
                         <Select
                             backspaceRemoves={false}
                             className="sm"
                             clearable={false}
-                            disabled={!canChangePort}
+                            disabled={disabled}
                             name="port"
                             noResultsText={i18n._('No ports available')}
-                            onChange={actions.onChangePortOption}
+                            onChange={(o) => this.setState({ port: o.value })}
                             optionRenderer={this.renderPortOption}
-                            options={map(ports, (o) => ({
+                            options={map(connectionStatus.ports, (o) => ({
                                 value: o.port,
                                 label: o.port,
                                 manufacturer: o.manufacturer,
@@ -160,79 +123,32 @@ class Connection extends PureComponent {
                                 className="btn btn-default"
                                 name="btn-refresh"
                                 title={i18n._('Refresh')}
-                                onClick={actions.handleRefreshPorts}
-                                disabled={!canRefresh}
+                                onClick={handleRefreshPorts}
+                                disabled={disabled}
                             >
                                 <i
                                     className={cx(
                                         'fa',
                                         'fa-refresh',
-                                        { 'fa-spin': loading }
+                                        { 'fa-spin': isLoading }
                                     )}
                                 />
                             </button>
                         </div>
+                        <div className="input-group-btn">
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                disabled={!canConnect}
+                                onClick={() => this.props.handleOpenPort(port)}
+                                title="Open connection to control board"
+                            >
+                                <i className="fa fa-toggle-off" />
+                                <Space width="8" />
+                                {i18n._('Connect')}
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div className="form-group">
-                    <label className="control-label">{i18n._('Baud rate')}</label>
-                    <Select
-                        backspaceRemoves={false}
-                        className="sm"
-                        clearable={false}
-                        menuContainerStyle={{ zIndex: 5 }}
-                        name="baudrate"
-                        onChange={actions.onChangeBaudrateOption}
-                        options={map(baudrates, (value) => ({
-                            value: value,
-                            label: Number(value).toString()
-                        }))}
-                        placeholder={i18n._('Choose a baud rate')}
-                        searchable={false}
-                        value={baudrate}
-                        valueRenderer={this.renderBaudrateValue}
-                    />
-                </div>
-                <div
-                    className={cx('checkbox', {
-                        'disabled': !canToggleHardwareFlowControl
-                    })}
-                >
-                    <label>
-                        <input
-                            type="checkbox"
-                            defaultChecked={enableHardwareFlowControl}
-                            onChange={actions.toggleHardwareFlowControl}
-                            disabled={!canToggleHardwareFlowControl}
-                        />
-                        {i18n._('Enable hardware flow control')}
-                    </label>
-                </div>
-                <div className="checkbox">
-                    <label>
-                        <input
-                            type="checkbox"
-                            defaultChecked={autoReconnect}
-                            onChange={actions.toggleAutoReconnect}
-                        />
-                        {i18n._('Connect automatically')}
-                    </label>
-                </div>
-                <div className="btn-group btn-group-sm">
-                    {notConnected && (
-                        <button
-                            type="button"
-                            style={{ float: 'right' }}
-                            className="btn btn-primary"
-                            disabled={!canOpenPort}
-                            onClick={actions.handleOpenPort}
-                            title="Open connection to control board"
-                        >
-                            <i className="fa fa-toggle-off" />
-                            <Space width="8" />
-                            {i18n._('Connect')}
-                        </button>
-                    )}
                 </div>
             </div>
         );

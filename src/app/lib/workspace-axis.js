@@ -13,7 +13,7 @@ class WorkspaceAxis {
 
     constructor(workspace, axis, record) {
         this._workspace = workspace;
-        this._axis = axis;
+        this._axis = axis.toLowerCase();
         this._record = { ...WorkspaceAxis.empty, ...record };
     }
 
@@ -69,6 +69,23 @@ class WorkspaceAxis {
     // Range between min & max
     get range() {
         return Math.abs(this.max - this.min);
+    }
+
+    // Has this axis been configured correctly?
+    get isValid() {
+        return this.validRange && this.validAccuracy && this.validPrecision;
+    }
+
+    get validRange() {
+        return (this.max - this.min) >= 10;
+    }
+
+    get validAccuracy() {
+        return this.accuracy >= 0.0000001 && this.accuracy <= 1;
+    }
+
+    get validPrecision() {
+        return this.precision >= 0 && !`${this.precision}`.includes('.');
     }
 
     // The minimum value the machine can step on this axis.
