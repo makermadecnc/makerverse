@@ -5,6 +5,7 @@ import React, { PureComponent } from 'react';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import analytics from 'app/lib/analytics';
+import Workspaces from 'app/lib/workspaces';
 import { ToastNotification } from 'app/components/Notifications';
 import { fetchMachineProfiles } from 'app/lib/ows/machines';
 import ChooseMachine from './ChooseMachine';
@@ -35,10 +36,11 @@ class CreateWorkspacePanel extends PureComponent {
         const workspaceSettings = {
             ...this.props.workspaceSettings,
             name: customMachine.model,
+            icon: Workspaces.getControllerTypeIconName(firmware.controllerType),
             customMachine: customMachine,
             firmware: firmware,
             parts: [],
-            // axes: [],
+            axes: this.props.actions.getAxisMap([], this.props.workspaceSettings.axes),
             // features: [],
         };
         delete workspaceSettings.machineProfileId;
@@ -64,9 +66,14 @@ class CreateWorkspacePanel extends PureComponent {
             return;
         }
 
+        const partTypeCount = Object.keys(machinePartIds).length;
         const profile = _.find(this.state.machineProfiles, { id: machineProfileId });
         const parts = _.filter(profile.parts, p => machinePartIds[p.partType] === p.id);
-        log.debug('machine profile', profile, 'and parts', parts);
+        if (parts.length !== partTypeCount) {
+            log.error('Could not find', (partTypeCount - parts.length), 'parts');
+        }
+        const actions = this.props.actions;
+        log.debug('machine profile', profile, 'and', partTypeCount, 'parts', parts);
 
         const workspaceSettings = {
             ...this.props.workspaceSettings,
@@ -74,18 +81,26 @@ class CreateWorkspacePanel extends PureComponent {
             name: profile.name,
             icon: profile.icon,
             firmware: this.selectFirmware(profile.firmware, 0), // ChooseMachine guarantees len == 1
-            parts: profile.parts,
-            axes: profile.axes,
-            features: profile.features,
+            parts: parts,
+            axes: actions.getAxisMap(profile.axes),
+            features: actions.packFeatures(profile.features),
         };
         delete workspaceSettings.customMachine;
-        this.props.actions.updateWorkspace(workspaceSettings);
+        actions.updateWorkspace(workspaceSettings);
     };
 
     handleOpenPort = (port) => {
-        const { controllerType, baudRate, rtscts } = this.props.workspaceSettings.firmware;
-        console.log('connecting', port, baudRate);
-        this.props.actions.handleOpenPort(controllerType, port, baudRate, rtscts);
+        const firmware = this.props.workspaceSettings.firmware;
+        firmware.port = port;
+        this.props.actions.handleOpenPort(firmware);
+
+        const workspaceSettings = {
+            ...this.props.workspaceSettings,
+            firmware: {
+                ...firmware,
+            }
+        };
+        this.props.actions.updateWorkspace(workspaceSettings);
     };
 
     renderAlert = (alertMessage) => {
@@ -147,11 +162,13 @@ class CreateWorkspacePanel extends PureComponent {
                         {!isCustomMachine && <ChooseMachine
                             onSelectedMachineProfileAndParts={this.onSelectedMachineProfileAndParts}
                             machineProfiles={machineProfiles}
+                            bkColor={this.props.bkColor}
                         />}
                         {isCustomMachine && <CustomMachine
                             controller={connectionStatus.controller}
                             onSelected={this.onSelectedCustomMachine}
                             disabled={disabled}
+                            bkColor={this.props.bkColor}
                         />}
                         <div
                             className={
@@ -201,12 +218,14 @@ class CreateWorkspacePanel extends PureComponent {
                             </div>
                         </div>
                     </div>
-                    <div className={ cx('h-100', 'col-lg-6') } style={{ padding: 0, margin: 0 }}>
-                        <div className={ cx('h-100', 'd-inline-block') } >
-                            <CustomizeWorkspace
-                                connectionStatus={connectionStatus}
-                            />
-                        </div>
+                    <div className={ cx('h-100', 'col-lg-6', styles.widgetRight) }>
+                        <CustomizeWorkspace
+                            actions={this.props.actions}
+                            connectionStatus={connectionStatus}
+                            createError={this.props.createError}
+                            creating={this.props.creating}
+                            workspaceSettings={this.props.workspaceSettings}
+                        />
                     </div>
                 </div>
             </div>

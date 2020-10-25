@@ -65,7 +65,7 @@ class Workspaces extends events.EventEmitter {
         this._record = record;
         this.addControllerEvents(this._controllerEvents);
 
-        const controllerType = this.controllerAttributes.type;
+        const controllerType = this.firmware.controllerType;
         this.hardware = new Hardware(this, controllerType);
         this.machineSettings = new MachineSettings(this, controllerType);
         this.activeState = new ActiveState(controllerType);
@@ -84,13 +84,14 @@ class Workspaces extends events.EventEmitter {
         return this._record.name;
     }
 
-    get controllerAttributes() {
+    get firmware() {
         return {
-            type: this._record.controller.controllerType,
-            port: this._record.controller.port,
-            baudRate: Number(this._record.controller.baudRate),
-            rtscts: !!this._record.controller.rtscts,
-            reconnect: !!this._record.controller.reconnect,
+            ...this._record.firmware,
+            controllerType: this._record.firmware.controllerType || this._record.firmware.type,
+            port: this._record.firmware.port,
+            baudRate: Number(this._record.firmware.baudRate),
+            rtscts: !!this._record.firmware.rtscts,
+            reconnect: !!this._record.firmware.reconnect,
         };
     }
 
@@ -129,7 +130,7 @@ class Workspaces extends events.EventEmitter {
     }
 
     onActivated() {
-        if (this.controllerAttributes.reconnect) {
+        if (this._record.autoReconnect) {
             this.openPort();
         }
         this.hardware.onActivated();
@@ -137,26 +138,56 @@ class Workspaces extends events.EventEmitter {
 
     onDeactivated() { }
 
+    static getControllerTypeIconName(controllerType) {
+        if (controllerType === MASLOW) {
+            return 'maslow';
+        } else if (controllerType === GRBL) {
+            return 'cnc';
+        } else if (controllerType === MARLIN) {
+            return '3dp';
+        }
+        return Workspaces.defaultIcon;
+    }
+
+    static defaultColor = '#4078c0';
+    static defaultIcon = 'xyz';
+    static defaultBkColor = '#f6f7f8';
+
     // Sidebar icon.
     get icon() {
-        if (_.has(this._record, 'icon')) {
+        if (_.has(this._record, 'icon') && this._record.icon.includes('/')) {
             return this._record.icon;
         }
-        let icon = 'xyz';
-        if (this.controllerAttributes.type === MASLOW) {
-            icon = 'maslow';
-        } else if (this.controllerAttributes.type === GRBL) {
-            icon = 'cnc';
-        } else if (this.controllerAttributes.type === MARLIN) {
-            icon = '3dp';
-        }
+        const icon = this._record.icon ||
+            Workspaces.getControllerTypeIconName(this.firmware.controllerType);
         return `images/icons/${icon}.svg`;
+    }
+
+    get hexColor() {
+        return this._record.color || Workspaces.defaultColor;
+    }
+
+    get bkColor() {
+        return this._record.bkColor || Workspaces.defaultBkColor;
     }
 
     updateRecord(values) {
         this._record = { ...this._record, values };
         api.workspaces.update(this.id, values);
     }
+    // ---------------------------------------------------------------------------------------------
+    // PARTS
+    // ---------------------------------------------------------------------------------------------
+
+    get parts() {
+        return this._record.parts || [];
+    }
+
+    findPart(partType) {
+        const part = _.find(this.parts, { partType: partType.toUpperCase() });
+        return part ? { ...part } : null;
+    }
+
     // ---------------------------------------------------------------------------------------------
     // AXES
     // Each machine may have its own precision, accuracy, etc. for each axis.
@@ -327,14 +358,14 @@ class Workspaces extends events.EventEmitter {
     _controllerEvents = {
         'serialport:change': (options) => {
             const { port } = options;
-            if (port !== this.controllerAttributes.port) {
+            if (port !== this.firmware.port) {
                 return;
             }
             log.debug(`Changed ports to "${port}"`);
         },
         'serialport:open': (options) => {
             const { port } = options;
-            if (port !== this.controllerAttributes.port || !this._connecting) {
+            if (port !== this.firmware.port || !this._connecting) {
                 return;
             }
 
@@ -344,12 +375,12 @@ class Workspaces extends events.EventEmitter {
             analytics.event({
                 category: 'controller',
                 action: 'open',
-                label: this.controllerAttributes.type,
+                label: this.firmware.controllerType,
             });
         },
         'serialport:close': (options) => {
             const { port } = options;
-            if (port !== this.controllerAttributes.port) {
+            if (port !== this.firmware.port) {
                 return;
             }
 
@@ -359,12 +390,12 @@ class Workspaces extends events.EventEmitter {
             analytics.event({
                 category: 'controller',
                 action: 'close',
-                label: this.controllerAttributes.type,
+                label: this.firmware.controllerType,
             });
         },
         'serialport:error': (options) => {
             const { port } = options;
-            if (port !== this.controllerAttributes.port) {
+            if (port !== this.firmware.port) {
                 return;
             }
 
@@ -422,13 +453,14 @@ class Workspaces extends events.EventEmitter {
             }
             return;
         }
-        const atts = this.controllerAttributes;
+        const firmware = this.firmware;
         this._connecting = true;
         this._connected = false;
-        this.controller.openPort(atts.port, {
-            controllerType: atts.type,
-            baudrate: atts.baudRate,
-            rtscts: atts.rtscts
+        log.debug('Open port with firmware', firmware);
+        this.controller.openPort(firmware.port, {
+            controllerType: firmware.controllerType,
+            baudrate: firmware.baudRate || firmware.baudrate,
+            rtscts: !!firmware.rtscts
         }, (err) => {
             if (err) {
                 this._connecting = false;
@@ -449,7 +481,7 @@ class Workspaces extends events.EventEmitter {
         }
         this._connecting = false;
         this._connected = false;
-        this.controller.closePort(this.controllerAttributes.port, (err) => {
+        this.controller.closePort(this.firmware.port, (err) => {
             if (err) {
                 log.error(err);
             }
@@ -481,7 +513,7 @@ class Workspaces extends events.EventEmitter {
 
     // ---------------------------------------------------------------------------------------------
     get primaryWidgets() {
-        const controllerWidget = this.controllerAttributes.type.toLowerCase();
+        const controllerWidget = this.firmware.controllerType.toLowerCase();
         return ['connection', 'console', controllerWidget];
     }
 

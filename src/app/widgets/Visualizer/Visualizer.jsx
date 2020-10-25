@@ -549,7 +549,8 @@ class Visualizer extends Component {
         });
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.renderer.setClearColor(new THREE.Color(colornames('white')), 1);
+        // this.renderer.setClearColor(new THREE.Color(colornames('white')), 1);
+        // this.renderer.setClearColorHex(this.workspace.hexColor, 0.15);
         this.renderer.setSize(width, height);
         this.renderer.clear();
 
@@ -558,6 +559,7 @@ class Visualizer extends Component {
         // To actually be able to display anything with Three.js, we need three things:
         // A scene, a camera, and a renderer so we can render the scene with the camera.
         this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(this.workspace.bkColor);
 
         this.camera = this.createCombinedCamera(width, height);
         this.controls = this.createTrackballControls(this.camera, this.renderer.domElement);
@@ -1156,7 +1158,7 @@ class Visualizer extends Component {
         return (
             <div
                 style={{
-                    visibility: this.props.show ? 'visible' : 'hidden'
+                    visibility: this.props.show ? 'visible' : 'hidden',
                 }}
                 ref={this.setRef}
             />

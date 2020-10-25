@@ -256,7 +256,7 @@ class Header extends PureComponent {
                 fixedTop
                 fluid
                 style={{
-                    margin: 0
+                    margin: 0,
                 }}
             >
                 <Navbar.Header style={{ display: 'flex', alignItems: 'center' }}>

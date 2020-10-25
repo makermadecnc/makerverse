@@ -17,43 +17,13 @@ import {
     MODAL_UPDATE_RECORD
 } from './constants';
 import styles from './index.styl';
-import Axis from './Axis';
+import AxisGrid from './AxisGrid';
 
 class TableRecords extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
         actions: PropTypes.object
     };
-
-    renderAxis(name, axis) {
-        return (
-            <FlexContainer fluid gutterWidth={0}>
-                <Row>
-                    <Col width="auto">
-                        <div>
-                            <Axis value={name} sub="min" />
-                            {` = ${axis.min}`}
-                        </div>
-                        <div>
-                            <Axis value={name} sub="max" />
-                            {` = ${axis.max}`}
-                        </div>
-                    </Col>
-                    <Col width="auto" style={{ width: 16 }} />
-                    <Col width="auto">
-                        <div>
-                            <Axis value={name} sub="precision" />
-                            {` = ${axis.precision}`}
-                        </div>
-                        <div>
-                            <Axis value={name} sub="accuracy" />
-                            {` = ${axis.accuracy}`}
-                        </div>
-                    </Col>
-                </Row>
-            </FlexContainer>
-        );
-    }
 
     render() {
         const { state, actions } = this.props;
@@ -150,50 +120,18 @@ class TableRecords extends PureComponent {
                     {
                         title: 'X',
                         key: 'x',
-                        render: (value, row, index) => this.renderAxis('X', row.axes.x),
+                        render: (value, row, index) => <AxisGrid name="X" axis={row.axes.x} />,
                     },
                     {
                         title: 'Y',
                         key: 'y',
-                        render: (value, row, index) => this.renderAxis('Y', row.axes.y),
+                        render: (value, row, index) => <AxisGrid name="Y" axis={row.axes.y} />,
                     },
                     {
                         title: 'Z',
                         key: 'z',
-                        render: (value, row, index) => this.renderAxis('Z', row.axes.z),
+                        render: (value, row, index) => <AxisGrid name="Z" axis={row.axes.z} />,
                     },
-                    /*
-                    {
-                            title: (<Axis value="X" sub="min" />),
-                            key: 'xmin',
-                            render: (value, row, index) => row.xmin
-                    },
-                    {
-                        title: (<Axis value="X" sub="max" />),
-                        key: 'xmax',
-                        render: (value, row, index) => row.xmax
-                    },
-                    {
-                        title: (<Axis value="Y" sub="min" />),
-                        key: 'ymin',
-                        render: (value, row, index) => row.ymin
-                    },
-                    {
-                        title: (<Axis value="Y" sub="max" />),
-                        key: 'ymax',
-                        render: (value, row, index) => row.ymax
-                    },
-                    {
-                        title: (<Axis value="Z" sub="min" />),
-                        key: 'zmin',
-                        render: (value, row, index) => row.zmin
-                    },
-                    {
-                        title: (<Axis value="Z" sub="max" />),
-                        key: 'zmax',
-                        render: (value, row, index) => row.zmax
-                    },
-                    */
                     {
                         title: i18n._('Action'),
                         className: 'text-nowrap',

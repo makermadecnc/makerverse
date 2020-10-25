@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import classNames from 'classnames';
 import Controller from 'cncjs-controller';
 import io from 'socket.io-client';
@@ -10,6 +11,7 @@ import auth from 'app/lib/auth';
 import Hardware from 'app/lib/hardware';
 import Workspaces from 'app/lib/workspaces';
 import analytics from 'app/lib/analytics';
+import WorkspaceAxis from 'app/lib/workspace-axis';
 import CreateWorkspacePanel from './CreateWorkspacePanel';
 import styles from './index.styl';
 
@@ -30,11 +32,41 @@ class CreateWorkspaceWidget extends PureComponent {
     hardware = null;
 
     actions = {
+        setAxisValue: ((axisName, key, value, workspaceSettings) => {
+            const axes = this.actions.getAxisMap([], workspaceSettings.axes);
+            const axisKey = axisName.toLowerCase();
+            const vvv = Number(value);
+            log.debug('update', axisKey, 'on', axes[axisKey], 'set', key, 'to', vvv);
+            const record = { ...axes[axisKey]._record, [key]: vvv };
+            // Rebuild object for state change.
+            axes[axisKey] = new WorkspaceAxis(null, axisName, record);
+            this.setState({
+                workspaceSettings: {
+                    ...workspaceSettings,
+                    axes: axes,
+                },
+            });
+        }),
         updateWorkspace: (workspaceSettings) => {
             log.debug('workspace', workspaceSettings);
+            if (workspaceSettings.bkColor) {
+                this.props.setBackgroundColor(workspaceSettings.bkColor);
+            }
             this.setState({
                 workspaceSettings,
             });
+        },
+        getAxisMap(axesArray, existingMap = {}) {
+            const axes = { ...existingMap };
+            axesArray.forEach((axis) => {
+                axes[axis.name.toLowerCase()] = new WorkspaceAxis(null, axis.name, axis);
+            });
+            ['x', 'y', 'z'].forEach((key) => {
+                if (!axes[key]) {
+                    axes[key] = new WorkspaceAxis(null, key);
+                }
+            });
+            return axes;
         },
         toggleMinimized: () => {
             const { minimized } = this.state;
@@ -56,26 +88,37 @@ class CreateWorkspaceWidget extends PureComponent {
         handleRefreshPorts: (event) => {
             this.refreshPorts();
         },
-        handleOpenPort: (controllerType, port, baudRate, rtscts = false) => {
-            this.openPort({ controllerType, port, baudRate, rtscts });
+        handleOpenPort: (firmware) => {
+            this.openPort(firmware);
         },
         handleClosePort: (event) => {
             const { port } = this.state;
             this.closePort(port);
         },
-        handleCreateWorkspace: (event) => {
-            this.setState({ creating: true });
-            const { name, port, baudRate, controllerType, connection, autoReconnect } = this.state;
-            api.workspaces.create({
-                name: name,
-                controller: {
-                    controllerType,
-                    port,
-                    baudRate: baudRate,
-                    rtscts: connection.serial.rtscts,
-                    reconnect: autoReconnect,
+        // Convert API data into storage data.
+        packFeatures: (featureRecords) => {
+            const ret = {};
+            featureRecords.forEach(fr => {
+                if (fr.disabled) {
+                    ret[fr.key] = false;
+                } else {
+                    ret[fr.key] = fr;
                 }
-            })
+            });
+            return ret;
+        },
+        handleCreateWorkspace: (workspaceSettings) => {
+            const payload = { ...workspaceSettings };
+            const axes = {};
+            Object.keys(payload.axes).forEach((axisKey) => {
+                // Unwrap machine axis objects.
+                axes[axisKey] = payload.axes[axisKey]._record;
+            });
+            payload.axes = axes;
+
+            log.debug('create workspace', payload);
+            this.setState({ creating: true, createWorkspaceError: null });
+            api.workspaces.create(payload)
                 .then((res) => {
                     const record = res.body;
                     Workspaces.load(record);
@@ -84,7 +127,7 @@ class CreateWorkspaceWidget extends PureComponent {
                 })
                 .catch((res) => {
                     this.setState({
-                        alertMessage: res.body.msg || i18n._('An unexpected error has occurred.'),
+                        createWorkspaceError: res.body.msg || i18n._('An unexpected error has occurred.'),
                         creating: false
                     });
                 });
@@ -93,7 +136,7 @@ class CreateWorkspaceWidget extends PureComponent {
 
     setPortList(ports, settings = {}) {
         const usedPorts = Object.keys(Workspaces.all).map((k) => {
-            return Workspaces.all[k].controllerAttributes.port;
+            return Workspaces.all[k].firmware.port;
         });
         ports.forEach((p) => {
             p.inUse = usedPorts.includes(p.port);
@@ -130,6 +173,8 @@ class CreateWorkspaceWidget extends PureComponent {
                 alertMessage: '',
                 connecting: false,
                 connected: true,
+                hasValidFirmware: false,
+                serialOutput: [],
                 controllerType: controllerType,
             });
             log.debug(`Established a connection to ${controllerType} on the serial port "${port}"`);
@@ -145,6 +190,8 @@ class CreateWorkspaceWidget extends PureComponent {
                 alertMessage: '',
                 connecting: false,
                 connected: false,
+                hasValidFirmware: false,
+                serialOutput: [],
                 controllerType: null,
             }));
 
@@ -157,6 +204,7 @@ class CreateWorkspaceWidget extends PureComponent {
                 alertMessage: i18n._('Error opening serial port \'{{- port}}\'', { port: port }),
                 connecting: false,
                 connected: false,
+                hasValidFirmware: false,
                 controllerType: null,
             }));
 
@@ -170,17 +218,23 @@ class CreateWorkspaceWidget extends PureComponent {
             log.debug('Got', type, 'settings:', controllerSettings);
             this.hardware.updateControllerSettings(controllerSettings);
             const reqFw = this.state.workspaceSettings.firmware;
-            const fwError = this.hardware.getFirmwareCompatibilityError(reqFw);
-            console.log('firmware', fwError, reqFw);
+            const compatibility = this.hardware.getFirmwareCompatibility(reqFw);
+            const hasFwError = compatibility && _.has(compatibility, 'error');
+            const hasValidFirmware = !!(this.hardware.isValid && !hasFwError);
+            log.debug('Firmware', reqFw, 'valid?', hasValidFirmware, 'error', compatibility);
             this.setState({
                 controllerSettings: controllerSettings,
                 hardware: this.hardware,
                 controllerType: type,
-                firmwareError: fwError,
+                firmwareCompatibility: compatibility,
+                hasValidFirmware: hasValidFirmware,
             });
         },
         'serialport:read': (data) => {
             log.debug('serialport read', data);
+            const serialOutput = this.state.serialOutput;
+            serialOutput.push(data);
+            this.setState({ serialOutput: serialOutput });
         },
     };
 
@@ -200,6 +254,9 @@ class CreateWorkspaceWidget extends PureComponent {
     getInitialState() {
         return {
             workspaceSettings: {},
+            serialOutput: [],
+            firmwareCompatibility: null,
+            hasValidFirmware: false,
             name: null,
             minimized: false,
             loadingPorts: false,
@@ -276,7 +333,8 @@ class CreateWorkspaceWidget extends PureComponent {
                 this.setState(state => ({
                     alertMessage: i18n._('Error opening serial port \'{{- port}}\'', { port: port }),
                     connecting: false,
-                    connected: false
+                    connected: false,
+                    hasValidFirmware: false,
                 }));
 
                 log.error(err);
@@ -288,7 +346,8 @@ class CreateWorkspaceWidget extends PureComponent {
     closePort(port = this.state.port) {
         this.setState(state => ({
             connecting: false,
-            connected: false
+            connected: false,
+            hasValidFirmware: false,
         }));
         this.controller.closePort(port, (err) => {
             if (err) {
@@ -319,8 +378,12 @@ class CreateWorkspaceWidget extends PureComponent {
             ports: state.ports,
             connecting: state.connecting,
             connected: state.connected,
-            firmwareError: state.firmwareError,
+            firmwareCompatibility: state.firmwareCompatibility,
+            hasValidFirmware: state.hasValidFirmware,
+            serialOutput: state.serialOutput,
         };
+
+        const bkColor = state.workspaceSettings.bkColor || Workspaces.defaultBkColor;
 
         return (
             <Widget className={styles.widgetWide}>
@@ -355,6 +418,9 @@ class CreateWorkspaceWidget extends PureComponent {
                         workspaceSettings={state.workspaceSettings}
                         actions={actions}
                         alertMessage={state.alertMessage}
+                        creating={state.creating}
+                        createError={state.createWorkspaceError}
+                        bkColor={bkColor}
                     />
                 </Widget.Content>
             </Widget>

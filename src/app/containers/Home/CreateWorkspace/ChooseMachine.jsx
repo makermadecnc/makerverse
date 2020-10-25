@@ -4,6 +4,7 @@ import _ from 'lodash';
 import cx from 'classnames';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
+import { ToastNotification } from 'app/components/Notifications';
 import { Input } from 'app/components/FormControl';
 import FirmwareRequirement from './FirmwareRequirement';
 import styles from './index.styl';
@@ -56,7 +57,7 @@ class ChooseMachine extends React.PureComponent {
         if (unselectedPartTypes.length <= 0) {
             this.props.onSelectedMachineProfileAndParts(
                 this.state.selectedMachineProfileId,
-                this.state.selectedPartIds,
+                selectedPartIds,
             );
         }
     }
@@ -68,9 +69,7 @@ class ChooseMachine extends React.PureComponent {
                 className={styles.widgetDropdownOption}
                 title={`[${part.partType.toLowerCase()}] ${part.name}`}
             >
-                <strong>{part.name}</strong>
-                <br />
-                <i>{part.description}</i>
+                <strong>{part.title}</strong>
             </div>
         );
     };
@@ -118,7 +117,7 @@ class ChooseMachine extends React.PureComponent {
                     <br />
                     {onlyPart && ( // No part options; just telling the user.
                         <div>
-                            <h6>{onlyPart.name}</h6>
+                            <h6>{onlyPart.title}</h6>
                             <i>{i18n._('Required Part')}</i>
                         </div>
                     )}
@@ -127,12 +126,14 @@ class ChooseMachine extends React.PureComponent {
                             backspaceRemoves={false}
                             className="sm"
                             clearable={false}
+                            classNamePrefix="lp-copy-sel"
+                            menuIsOpen
                             menuContainerStyle={{ zIndex: 999999 }}
                             name={`part_${pt}`}
                             onChange={(o) => this.selectPart(pt, o)}
                             options={_.map(parts, p => ({
                                 value: p.id,
-                                label: p.name,
+                                label: p.title,
                             }))}
                             style={{ marginTop: 20 }}
                             placeholder={
@@ -143,6 +144,13 @@ class ChooseMachine extends React.PureComponent {
                             valueRenderer={this.renderPartOption}
                             // disabled={disabled}
                         />
+                    )}
+                    {!onlyPart && selectedPart && (
+                        <div style={{ marginTop: 10 }}>
+                            <ToastNotification type="info" style={{ minWidth: 200 }} >
+                                {selectedPart.description}
+                            </ToastNotification>
+                        </div>
                     )}
                 </div>
             );
@@ -171,7 +179,7 @@ class ChooseMachine extends React.PureComponent {
                         className="col-lg-6"
                         style={{ textAlign: 'center', fontStyle: 'italic', padding: 20 }}
                     >
-                        <FirmwareRequirement firmware={mp.firmware} >
+                        <FirmwareRequirement firmware={mp.firmware[0]} >
                         </FirmwareRequirement>
                     </div>
                     <div className="col-lg-3" />
@@ -214,8 +222,11 @@ class ChooseMachine extends React.PureComponent {
             searchText,
         } = this.state;
 
-        const machineProfile = selectedMachineProfileId ?
+        const hasData = machineProfiles && machineProfiles.length > 0;
+        const machineProfile = selectedMachineProfileId && hasData ?
             _.find(machineProfiles, { id: selectedMachineProfileId }) : null;
+        const showMachineList = hasData && !machineProfile;
+        const showMachineProfile = !!machineProfile;
 
         const title = i18n._('Connect to a Machine');
 
@@ -229,10 +240,12 @@ class ChooseMachine extends React.PureComponent {
 
         return (
             <div>
-                <div className={cx('form-group', styles.widgetHeader)}>
+                <div
+                    className={cx('form-group', styles.widgetHeader)}
+                >
                     <div className="input-group input-group-sm" >
                         <h6>{title}</h6>
-                        {!machineProfile && (
+                        {showMachineList && (
                             <div className="input-group-prepend input-group-btn">
                                 {Object.keys(groupedMPs).map((ct) => {
                                     return (
@@ -254,8 +267,8 @@ class ChooseMachine extends React.PureComponent {
                                 })}
                             </div>
                         )}
-                        {!machineProfile && (
-                            <div className="input-group-prepend input-group-btn">
+                        {showMachineList && (
+                            <div className="input-group-btn">
                                 <Input
                                     type="text"
                                     name="name"
@@ -269,7 +282,7 @@ class ChooseMachine extends React.PureComponent {
                                 />
                             </div>
                         )}
-                        {machineProfile && (
+                        {showMachineProfile && (
                             <div className="input-group-btn">
                                 <button
                                     type="button"
@@ -283,9 +296,16 @@ class ChooseMachine extends React.PureComponent {
                     </div>
                 </div>
                 <div className={ cx(styles.widgetCenter, styles.customMachine) }>
-                    {!machineProfiles && <center><i>Loading...</i></center>}
-                    {machineProfiles && machineProfile && this.renderMachineProfile(machineProfile)}
-                    {machineProfiles && !machineProfile && this.renderMachineProfiles(filteredMPs)}
+                    {!machineProfiles && <div className={styles.widgetEmpty}>Loading...</div>}
+                    {!hasData && (
+                        <div className={styles.widgetEmpty}>
+                            {i18n._('Could not download machine profiles.')}
+                            <br />
+                            {i18n._('You will need to use "manual connection mode," below.')}
+                        </div>
+                    )}
+                    {showMachineProfile && this.renderMachineProfile(machineProfile)}
+                    {showMachineList && this.renderMachineProfiles(filteredMPs)}
                 </div>
             </div>
         );

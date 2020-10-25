@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import analytics from 'app/lib/analytics';
@@ -67,31 +66,57 @@ class Hardware {
     }
 
     // Examine some firmware record from the server. Check if it is compatible with this hardware.
-    // Returns null if no error, i.e., successful firmware match.
-    getFirmwareCompatibilityError(requiredFirmware) {
-        const hasRequiredVersion = _.has(requiredFirmware, 'requiredVersion');
-        if (!hasRequiredVersion) {
+    // Returns null if no requirement provided by the firmware
+    getFirmwareCompatibility(requiredFirmware) {
+        const { name, requiredVersion, suggestedVersion } = requiredFirmware;
+        if (!name || !requiredVersion) {
             return null;
         }
-
-        const hasDetectedVersion = this.hasFirmware;
-        const reqVer = Number(requiredFirmware.requiredVersion);
-
-        if (hasDetectedVersion) {
-            try {
-                const actVer = Number(this.firmware.version);
-                if (reqVer > actVer) {
-                    return i18n._('Detected version: {{ actVer }}', { actVer });
-                }
-            } catch (e) {
-                log.error(e, 'Failed to check version.');
-                return e.message;
-            }
-        } else {
-            return i18n._('Unable to detect firmware version.');
+        if (!this.hasFirmware) {
+            return { 'error': i18n._('Unable to detect firmware version.') };
+        }
+        if (name !== this.firmware.name) {
+            return {
+                'error': i18n._('Unexpected firmware type: {{ name }}', { name: this.firmware.name })
+            };
+        }
+        if (!this.hasFirmwareVersion(requiredVersion)) {
+            return {
+                'error': i18n._('Required version: v{{ requiredVersion }}', { requiredVersion })
+            };
+        }
+        if (!this.hasFirmwareVersion(suggestedVersion)) {
+            return {
+                'warning': i18n._('Update available: v{{ suggestedVersion }}', { suggestedVersion })
+            };
         }
 
-        return null;
+        return { 'info': i18n._('You have the latest firmware.') };
+    }
+
+    // Cast the internal firmware.version to a number, if it exists.
+    get firmwareVersion() {
+        if (!this.hasFirmware) {
+            return null;
+        }
+        try {
+            return Number(this.firmware.version) || 0;
+        } catch (e) {
+            log.error(e, 'Failed to retrieve firmware version.');
+            return null;
+        }
+    }
+
+    // Simple numeric comparies of requiredVersion against the internal firmware version.
+    hasFirmwareVersion(requiredVersion) {
+        if (!requiredVersion) {
+            return true;
+        }
+        const actualVersion = this.firmwareVersion;
+        if (!actualVersion) {
+            return false;
+        }
+        return actualVersion >= requiredVersion;
     }
 
     // When this hardware is activated in the current workspace
@@ -132,7 +157,8 @@ class Hardware {
     }
 
     get hasFirmware() {
-        return this.firmware && this.firmware.name && this.firmware.version;
+        const fw = this.firmware;
+        return fw && fw.name && fw.name.length && fw.version;
     }
 
     get hasProtocol() {

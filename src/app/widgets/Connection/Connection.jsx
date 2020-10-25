@@ -20,7 +20,7 @@ class Connection extends PureComponent {
     render() {
         const { state, actions } = this.props;
         const { connecting, connected, alertMessage } = state;
-        const controllerConfig = this.workspace._record.controller;
+        const controllerConfig = this.workspace._record.firmware;
         const port = controllerConfig.port;
         const baudrate = controllerConfig.baudRate;
         const canOpenPort = port && baudrate && !connecting && !connected;

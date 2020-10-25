@@ -154,7 +154,7 @@ class ConnectionWidget extends PureComponent {
         }));
         this.workspace.openPort((err) => {
             if (err) {
-                const v = { port: this.workspace.controllerAttributes.port };
+                const v = { port: this.workspace.firmware.port };
                 this.setState(state => ({
                     alertMessage: i18n._('Error opening serial port \'{{- port}}\'', v),
                     connecting: false,

@@ -485,6 +485,7 @@ class Workspace extends PureComponent {
                                     styles.primaryContainer,
                                     { [styles.hidden]: hidePrimaryContainer }
                                 )}
+                                style={{ backgroundColor: this.workspace.bkColor }}
                             >
                                 <ButtonToolbar style={{ margin: '5px 0', display: 'flex', justifyContent: 'space-between' }}>
                                     <ButtonGroup
@@ -599,6 +600,7 @@ class Workspace extends PureComponent {
                                     styles.secondaryContainer,
                                     { [styles.hidden]: hideSecondaryContainer }
                                 )}
+                                style={{ backgroundColor: this.workspace.bkColor }}
                             >
                                 <ButtonToolbar style={{ margin: '5px 0' }}>
                                     <div className="pull-left">

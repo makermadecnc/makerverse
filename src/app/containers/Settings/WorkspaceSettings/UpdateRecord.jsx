@@ -13,7 +13,7 @@ import SectionTitle from 'app/components/SectionTitle';
 import i18n from 'app/lib/i18n';
 import Error from '../common/Error';
 import * as validations from '../common/validations';
-import Axis from './Axis';
+import AxisLabel from './AxisLabel';
 
 class UpdateRecord extends Component {
     static propTypes = {
@@ -63,7 +63,7 @@ class UpdateRecord extends Component {
                     <Field name={`axes.${axisKey}.min`}>
                         {({ input, meta }) => (
                             <FormGroup>
-                                <label><Axis value={axisKey.toUpperCase()} sub="min" /></label>
+                                <label><AxisLabel value={axisKey.toUpperCase()} sub="min" /></label>
                                 <Input {...input} type="number" />
                                 {meta.touched && meta.error && <Error>{meta.error}</Error>}
                             </FormGroup>
@@ -75,7 +75,7 @@ class UpdateRecord extends Component {
                     <Field name={`axes.${axisKey}.max`}>
                         {({ input, meta }) => (
                             <FormGroup>
-                                <label><Axis value={axisKey.toUpperCase()} sub="max" /></label>
+                                <label><AxisLabel value={axisKey.toUpperCase()} sub="max" /></label>
                                 <Input {...input} type="number" />
                                 {meta.touched && meta.error && <Error>{meta.error}</Error>}
                             </FormGroup>
@@ -88,7 +88,7 @@ class UpdateRecord extends Component {
                     <Field name={`axes.${axisKey}.precision`}>
                         {({ input, meta }) => (
                             <FormGroup>
-                                <label><Axis value={axisKey.toUpperCase()} sub="precision" /></label>
+                                <label><AxisLabel value={axisKey.toUpperCase()} sub="precision" /></label>
                                 <Input {...input} type="number" />
                                 {meta.touched && meta.error && <Error>{meta.error}</Error>}
                             </FormGroup>
@@ -100,7 +100,7 @@ class UpdateRecord extends Component {
                     <Field name={`axes.${axisKey}.accuracy`}>
                         {({ input, meta }) => (
                             <FormGroup>
-                                <label><Axis value={axisKey.toUpperCase()} sub="accuracy" /></label>
+                                <label><AxisLabel value={axisKey.toUpperCase()} sub="accuracy" /></label>
                                 <Input {...input} type="number" />
                                 {meta.touched && meta.error && <Error>{meta.error}</Error>}
                             </FormGroup>

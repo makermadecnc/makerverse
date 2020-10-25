@@ -14,6 +14,7 @@ class CustomMachine extends React.PureComponent {
         customMachine: {
             brand: '',
             model: '',
+            submit: true,
         },
         firmwareSettings: {
             baudRate: null,
@@ -43,7 +44,7 @@ class CustomMachine extends React.PureComponent {
     render() {
         const { controller, disabled } = this.props;
         const { firmwareSettings, customMachine } = this.state;
-        const { brand, model } = customMachine;
+        const { brand, model, submit } = customMachine;
         const { baudRate, rtscts, controllerType } = firmwareSettings;
         const defaultBaudrates = [
             250000,
@@ -58,7 +59,10 @@ class CustomMachine extends React.PureComponent {
 
         return (
             <div>
-                <div className={cx('form-group', styles.widgetHeader)}>
+                <div
+                    className={cx('form-group', styles.widgetHeader)}
+                    style={{ backgroundColor: this.props.bkColor }}
+                >
                     <div className="input-group input-group-sm">
                         <h6>Machine Controllers</h6>
                         {baudRate && (
@@ -153,22 +157,49 @@ class CustomMachine extends React.PureComponent {
                                 </div>
                             </div>
                         </div>
-                        <div
-                            className={cx('checkbox', {
-                                'disabled': disabled
-                            })}
-                        >
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    defaultChecked={rtscts}
-                                    onChange={() => {
-                                        this.onChange('firmwareSettings', 'rtscts', !rtscts);
-                                    }}
-                                    disabled={disabled}
-                                />
-                                {i18n._('Enable hardware flow control')}
-                            </label>
+                        <div className="container-fluid">
+                            <div className="row">
+                                <div className="form-group col-lg-3" />
+                                <div className="form-group col-lg-3">
+                                    <div
+                                        className={cx('checkbox', {
+                                            'disabled': disabled
+                                        })}
+                                    >
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                defaultChecked={rtscts}
+                                                onChange={() => {
+                                                    this.onChange('firmwareSettings', 'rtscts', !rtscts);
+                                                }}
+                                                disabled={disabled}
+                                            />
+                                            {i18n._('Enable hardware flow control')}
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="form-group col-lg-3">
+                                    <div
+                                        className={cx('checkbox', {
+                                            'disabled': disabled
+                                        })}
+                                    >
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                defaultChecked={submit}
+                                                onChange={() => {
+                                                    this.onChange('customMachine', 'submit', !submit);
+                                                }}
+                                                disabled={disabled}
+                                            />
+                                            {i18n._('Submit to community catalog')}
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="form-group col-lg-3" />
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -17,7 +17,9 @@ export const ConnectionStatusType = PropTypes.shape({
     controllerType: PropTypes.string, // The internal controller implementation name
     hardware: PropTypes.object, // the MachineHardware instance
     settings: PropTypes.object, // controller settings, as they came from the websocket
-    firmwareError: PropTypes.string, // firmware mismatch or detection error
+    firmwareCompatibility: PropTypes.object, // firmware mismatch or detection error from hardware
+    hasValidFirmware: PropTypes.bool, // All is good, we can create a workspace?
+    serialOutput: PropTypes.arrayOf(PropTypes.string).isRequired, // Direct from the console.
 }).isRequired;
 
 class Connection extends PureComponent {

@@ -2,7 +2,6 @@ import React from 'react';
 import Space from 'app/components/Space';
 import i18n from 'app/lib/i18n';
 import analytics from 'app/lib/analytics';
-import log from 'app/lib/log';
 import { ToastNotification } from 'app/components/Notifications';
 import FirmwareRequirement from './FirmwareRequirement';
 
@@ -42,12 +41,22 @@ class ConnectedHardware extends React.PureComponent {
         );
     }
 
-    renderProtocolError(hw, requiredFirmware) {
+    renderProtocolError(hw, requiredFirmware, serialOutput) {
+        const ack = serialOutput.length > 0;
         return !hw.isValid && (
             <ToastNotification type="error">
                 {i18n._('Unable to validate protocol')}
                 <br />
-                {i18n._('(board not speaking at baud rate, or port is busy)')}
+                {!ack && i18n._('(board not speaking at baud rate, or port is busy)')}
+                {ack && (
+                    <div>
+                        <strong>{i18n._('Invalid response from board:')}</strong>
+                        <br />
+                        {serialOutput.map((line) => {
+                            return <div key={line}><i>{line}</i></div>;
+                        })}
+                    </div>
+                )}
             </ToastNotification>
         );
     }
@@ -63,7 +72,7 @@ class ConnectedHardware extends React.PureComponent {
     renderControllerTypeAndBaudRate(hw, baudRate) {
         return (
             <ToastNotification type={hw.isValid ? 'info' : ''}>
-                {hw.isValid ? i18n._('Confirmed Protocol: ') : i18n._('Requested Protocol: ')}
+                {hw.isValid ? i18n._('Confirmed Protocol: ') : i18n._('Request Protocol: ')}
                 <strong>{hw.controllerType}</strong>
                 <br />
                 {i18n._('At Baud Rate: ')}<strong>{baudRate}</strong>
@@ -93,20 +102,15 @@ class ConnectedHardware extends React.PureComponent {
     }
 
     renderRequiredFirmware(hw, requiredFirmware) {
-        const firmwareError = this.props.connectionStatus.firmwareError;
-        return firmwareError && (
-            <ToastNotification type="error">
-                {firmwareError}
-                <br />
-                <FirmwareRequirement firmware={[requiredFirmware]} />
-            </ToastNotification>
+        return requiredFirmware && requiredFirmware.requiredVersion && (
+            <FirmwareRequirement
+                firmware={requiredFirmware}
+                compatibility={this.props.connectionStatus.firmwareCompatibility}
+            />
         );
     }
 
     componentDidMount() {
-        setTimeout(() => {
-
-        }, 100);
         setTimeout(() => {
             this.setState({ timeoutElapsed: true });
         }, 5000);
@@ -116,15 +120,12 @@ class ConnectedHardware extends React.PureComponent {
         const { actions, connectionStatus, requiredFirmware } = this.props;
         const { timeoutElapsed } = this.state;
         const hw = connectionStatus.hardware;
+        const serialOutput = connectionStatus.serialOutput;
         const showRequiredFirmware = hw.isValid && requiredFirmware;
-        // const settings = connectionStatus.settings;
-        // const firmwareError = hw.getFirmwareCompatibilityError(requiredFirmware);
-
-        log.debug('required?', requiredFirmware, 'vs reality', hw.asDictionary);
 
         return (
             <div>
-                {timeoutElapsed && this.renderProtocolError(hw, requiredFirmware)}
+                {timeoutElapsed && this.renderProtocolError(hw, requiredFirmware, serialOutput)}
                 {showRequiredFirmware && this.renderRequiredFirmware(hw, requiredFirmware)}
                 {this.renderControllerTypeAndBaudRate(hw, requiredFirmware.baudRate)}
                 {!timeoutElapsed && this.renderProtocolPending(hw, requiredFirmware)}

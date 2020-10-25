@@ -156,6 +156,7 @@ const getSanitizedRecords = () => {
 const ensureAxis = (payload) => {
     const { min, max, precision, accuracy } = { ...payload };
     return {
+        ...payload,
         precision: ensureNumber(precision) || 0,
         accuracy: ensureNumber(accuracy) || 0,
         min: ensureNumber(min) || 0,
@@ -164,8 +165,10 @@ const ensureAxis = (payload) => {
 };
 
 const ensureWorkspace = (payload) => {
-    const { name, onboarded, controller, features, axes } = { ...payload };
-    const { port, baudRate, reconnect, controllerType, rtscts } = { ...controller };
+    const { name, color, bkColor, icon, autoReconnect, preferImperial, onboarded, features, axes } = { ...payload };
+    const parts = payload.parts || [];
+    const firmware = _.has(payload, 'firmware') ? payload.firmware : payload.controller;
+    const { port, baudRate, controllerType, rtscts } = { ...firmware };
     const id = payload.id || slugify(name);
     const path = payload.path || `/${id}`;
     const ax = { ...(defaultAxes[controllerType] || defaultAxes['']), ...ensureObject(axes) };
@@ -178,18 +181,26 @@ const ensureWorkspace = (payload) => {
     return {
         id,
         path,
+        machineProfileId: payload.machineProfileId,
+        customMachine: payload.customMachine,
+        color: ensureString(color),
+        bkColor: ensureString(bkColor),
+        icon: ensureString(icon),
         name: ensureString(name),
         onboarded: ensureBoolean(onboarded),
-        controller: {
+        autoReconnect: ensureBoolean(autoReconnect),
+        preferImperial: ensureBoolean(preferImperial),
+        firmware: {
+            ...firmware,
             controllerType: ensureString(controllerType),
             port: ensureString(port),
             baudRate: ensureNumber(baudRate),
             rtscts: ensureBoolean(rtscts),
-            reconnect: ensureBoolean(reconnect),
         },
         axes: ax,
         features: ft,
         commands: cmds,
+        parts: parts,
     };
 };
 
@@ -291,9 +302,9 @@ export const update = (req, res) => {
         let validators = [ // [key, ensureType]
             ['name', ensureString],
             ['onboarded', ensureBoolean],
-            ['controller.controllerType', ensureString],
-            ['controller.port', ensureString],
-            ['controller.baudRate', ensureNumber],
+            ['firmware.controllerType', ensureString],
+            ['firmware.port', ensureString],
+            ['firmware.baudRate', ensureNumber],
             ['features', ensureObject],
             ['axes', ensureObject],
         ];

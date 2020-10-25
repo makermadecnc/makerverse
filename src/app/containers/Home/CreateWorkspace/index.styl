@@ -30,8 +30,16 @@
 }
 
 .widget-content {
+    background-color: #f6f7f8;
+
     .highlight {
         background-color: #ffff0022;
+    }
+
+    .widget-empty {
+        padding: 20px;
+        text-align: center;
+        font-style: italic;
     }
 
     .widget-header, .widget-footer {
@@ -45,10 +53,27 @@
         font-weight: bold;
     }
 
+    .widget-right, widget-left {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .widget-right {
+        margin: 0px;
+        padding: 0px;
+        border-left: 1px solid #ccc;
+    }
+
     .widget-left {
         margin: 0px;
         padding: 0px;
         border-right: 1px solid #ccc;
+    }
+
+    .widget-control {
+        float: left;
+        margin-top: 10px;
+        margin-right: 20px;
     }
 
     .widget-center {

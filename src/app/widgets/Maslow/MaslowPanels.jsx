@@ -10,14 +10,11 @@ import Space from 'app/components/Space';
 import { Button } from 'app/components/Buttons';
 import Workspaces from 'app/lib/workspaces';
 import { ToastNotification } from 'app/components/Notifications';
+import FirmwareRequirement from 'app/containers/Home/CreateWorkspace/FirmwareRequirement';
 import styles from './index.styl';
 import {
     MODAL_CALIBRATION
 } from './constants';
-
-const MASLOW_MIN_FIRMWARE_CLASSIC = 51.28;
-const MASLOW_MIN_FIRMWARE_DUE = 20200905;
-const MASLOW_CUR_FIRMWARE_DUE = 20200915;
 
 class MaslowPanels extends PureComponent {
     static propTypes = {
@@ -53,18 +50,6 @@ class MaslowPanels extends PureComponent {
     receiveBufferMax = 128;
 
     receiveBufferMin = 0;
-
-    renderError(top) {
-        return (
-            <div className={styles.noConnection}>
-                {top}
-                <hr style={{ marginTop: '10px', marginBottom: '10px' }} />
-                <div>
-                    Download the <a href="http://www.makerverse.com/machines/cnc/#maslow" target="_blank" rel="noopener noreferrer">Arduino Firmware</a>.
-                </div>
-            </div>
-        );
-    }
 
     saveSetting(code) {
         const { settingsEdits } = this.state;
@@ -121,43 +106,9 @@ class MaslowPanels extends PureComponent {
         this.receiveBufferMax = Math.max(this.receiveBufferMax, buf.rx) || this.receiveBufferMax;
 
         const allSettings = this.workspace.machineSettings.all;
-        const hasFirmware = this.workspace.hardware.hasFirmware;
-        const firmware = this.workspace.hardware.firmware;
-        const fv = hasFirmware ? (Number(firmware.version) || 0) : 0;
-        const fn = hasFirmware ? firmware.name : null;
-
-        let banner = null;
-
-        if (!fn || fn.length <= 0) {
-            return this.renderError((
-                <span>
-                    No compatible device detected.
-                    <br /><br />
-                    The firmware is not reporting any known Maslow versions.
-                    This is common if you plugged in a regular Grbl device, like the M2 with factory firmware.
-                </span>),
-            );
-        } else if (fn === 'MaslowClassic') {
-            if (fv < MASLOW_MIN_FIRMWARE_CLASSIC) {
-                return this.renderError(`Please upgrade your Maslow Holey firmware (${MASLOW_MIN_FIRMWARE_CLASSIC} or later).`);
-            }
-        } else if (fn === 'MaslowDue') {
-            if (fv < MASLOW_MIN_FIRMWARE_DUE) {
-                return this.renderError(`Please upgrade your Maslow Due firmware (${MASLOW_MIN_FIRMWARE_DUE} or later).`);
-            }
-            if (fv < MASLOW_CUR_FIRMWARE_DUE) {
-                banner = this.renderError('There is an update available for your Maslow Due firmware.');
-            }
-        } else {
-            return this.renderError(
-                <span>
-                    {fn + 'is not a Maslow.'}
-                    <br /><br />
-                    {`The firmware reported it was of type ${fn}, but 'Maslow' was expected.`}
-                    Please use an Arduino Due or Mega with the appropriate firmware.
-                </span>
-            );
-        }
+        const firmware = this.workspace.firmware;
+        const hardware = this.workspace.hardware;
+        const compatibility = hardware.getFirmwareCompatibility(firmware);
 
         return (
             <div>
@@ -177,14 +128,8 @@ class MaslowPanels extends PureComponent {
                         </Button>
                     </ToastNotification>
                 )}
-                {banner && (
-                    <ToastNotification
-                        style={{ marginBottom: '10px' }}
-                        type="warning"
-                        dismissible={false}
-                    >
-                        {banner}
-                    </ToastNotification>
+                {firmware && (
+                    <FirmwareRequirement firmware={firmware} compatibility={compatibility} />
                 )}
                 <button
                     type="button"
@@ -524,42 +469,48 @@ class MaslowPanels extends PureComponent {
                     </Panel.Heading>
                     {panel.about.expanded && (
                         <Panel.Body>
-                            <div className="row no-gutters">
-                                <div className="col col-xs-4">
-                                    <div className={styles.textEllipsis} title={i18n._('Edition')}>
-                                        {i18n._('Edition')}
+                            {this.workspace.hardware.hasFirmware && (
+                                <div className="row no-gutters">
+                                    <div className="col col-xs-4">
+                                        <div className={styles.textEllipsis} title={i18n._('Firmware')}>
+                                            {i18n._('Firmware')}
+                                        </div>
+                                    </div>
+                                    <div className="col col-xs-8">
+                                        <div className={styles.well}>
+                                            {this.workspace.hardware.firmwareStr}
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="col col-xs-8">
-                                    <div className={styles.well}>
-                                        {fn}
+                            )}
+                            {this.workspace.hardware.hasProtocol && (
+                                <div className="row no-gutters">
+                                    <div className="col col-xs-4">
+                                        <div className={styles.textEllipsis} title={i18n._('Protocol')}>
+                                            {i18n._('Protocol')}
+                                        </div>
+                                    </div>
+                                    <div className="col col-xs-8">
+                                        <div className={styles.well}>
+                                            {this.workspace.hardware.protocolStr}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="row no-gutters">
-                                <div className="col col-xs-4">
-                                    <div className={styles.textEllipsis} title={i18n._('Version')}>
-                                        {i18n._('Version')}
+                            )}
+                            {this.workspace.hardware.hasPlainVersion && (
+                                <div className="row no-gutters">
+                                    <div className="col col-xs-4">
+                                        <div className={styles.textEllipsis} title={i18n._('Version')}>
+                                            {i18n._('Version')}
+                                        </div>
+                                    </div>
+                                    <div className="col col-xs-8">
+                                        <div className={styles.well}>
+                                            {this.workspace.hardware.versionStr}
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="col col-xs-8">
-                                    <div className={styles.well}>
-                                        {fv}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="row no-gutters">
-                                <div className="col col-xs-4">
-                                    <div className={styles.textEllipsis} title={i18n._('Protocol')}>
-                                        {i18n._('Protocol')}
-                                    </div>
-                                </div>
-                                <div className="col col-xs-8">
-                                    <div className={styles.well}>
-                                        {this.workspace.hardware.protocolStr}
-                                    </div>
-                                </div>
-                            </div>
+                            )}
                         </Panel.Body>
                     )}
                 </Panel>
