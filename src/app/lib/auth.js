@@ -4,6 +4,7 @@ import { createUserManager, loadUser } from 'redux-oidc';
 import Workspaces from 'app/lib/workspaces';
 import log from 'app/lib/log';
 import analytics from 'app/lib/analytics';
+import { getCookie } from 'app/lib/cookies';
 import series from 'app/lib/promise-series';
 import promisify from 'app/lib/promisify';
 import { prodHost } from 'app/lib/ows/api';
@@ -36,17 +37,30 @@ const resume = (reduxStore) => new Promise((resolve, reject) => {
     });
 });
 
-const signin = (oidc) => new Promise((resolve, reject) => {
+const guest = () => new Promise((resolve, reject) => {
+    authrequest
+        .post('/api/signin')
+        .then((res) => {
+            resolve(res.body && res.body.guest);
+        })
+        .catch((e) => {
+            log.error('login error', e);
+        });
+});
+
+const signin = (oidc, guest = false) => new Promise((resolve, reject) => {
     const token = oidc ? oidc.access_token : config.get('session.token');
-    if (!token) {
+    const isGuest = guest || hasGuestCookie();
+    if (!token && !isGuest) {
         log.debug('no token in storage');
         resolve({ success: false });
         return;
     }
+    const payload = isGuest ? {} : { token };
     log.debug('resuming login...');
     authrequest
         .post('/api/signin')
-        .send({ token })
+        .send(payload)
         .then((res) => {
             const body = res ? res.body : {};
 
@@ -81,13 +95,12 @@ const signin = (oidc) => new Promise((resolve, reject) => {
         .then(({ body }) => {
             if (body && body.records) {
                 body.records.forEach((record) => {
-                    log.debug(`loading workspace: ${record.name}`);
                     Workspaces.load(record);
                 });
             } else {
                 log.error('workspaces load error');
             }
-            log.debug('login connecting to', Workspaces.all.length, 'workspaces...');
+            log.debug('login connecting to workspaces:', Object.keys(Workspaces.all));
             const funcs = Object.keys(Workspaces.all).map((id) => {
                 return () => promisify(next => {
                     const workspace = Workspaces.all[id];
@@ -119,18 +132,37 @@ const signout = () => new Promise((resolve, reject) => {
     resolve();
 });
 
+const GUEST_COOKIE_NAME = 'mvguest';
+
+const hasGuestCookie = () => {
+    return getCookie(GUEST_COOKIE_NAME) === '1';
+};
+
 const isAuthenticated = () => {
-    return _authenticated;
+    return _authenticated || hasGuestCookie();
+};
+
+const setAuthenticated = (auth) => {
+    _authenticated = !!auth;
+};
+
+const isGuest = () => {
+    return isAuthenticated() && auth.user && auth.user.username === 'guest';
 };
 
 const auth = {
     host: '',
     socket: { },
     isAuthenticated: isAuthenticated,
+    setAuthenticated: setAuthenticated,
+    hasGuestCookie: hasGuestCookie,
     manager: authManager,
     signout: signout,
     signin: signin,
     resume: resume,
+    isGuest: isGuest,
+    guest: guest,
+    GUEST_COOKIE_NAME: GUEST_COOKIE_NAME,
     user: null,
 };
 

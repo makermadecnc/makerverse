@@ -22,9 +22,10 @@ class CreateWorkspacePanel extends PureComponent {
         actions: PropTypes.object
     };
 
-    state = { machineProfiles: null, isCustomMachine: false };
+    state = { machineProfiles: null, isCustomMachine: false, fetchBegan: false };
 
-    componentDidMount() {
+    fetchMachineProfiles() {
+        this.setState({ fetchBegan: true });
         fetchMachineProfiles().then((res) => {
             this.setState({ machineProfiles: res });
         }).catch((err) => {
@@ -134,7 +135,7 @@ class CreateWorkspacePanel extends PureComponent {
     }
 
     render() {
-        const { isCustomMachine, machineProfiles } = this.state;
+        const { isCustomMachine, machineProfiles, fetchBegan } = this.state;
         const { connectionStatus, alertMessage } = this.props;
         const { firmware, customMachine, machineProfileId } = this.props.workspaceSettings;
         const { baudRate, controllerType } = firmware || {};
@@ -154,6 +155,19 @@ class CreateWorkspacePanel extends PureComponent {
             : 'Can\'t find your machine?';
         const sw2 = isCustomMachine ? 'Search for pre-configured machines'
             : 'Switch to manual connection mode';
+
+        if (!fetchBegan) {
+            return (
+                <div className={styles.widgetEmpty} >
+                    <button
+                        className="btn btn-lg btn-primary"
+                        onClick={() => this.fetchMachineProfiles()}
+                    >
+                        {i18n._('Connect to a New Machine')}
+                    </button>
+                </div>
+            );
+        }
 
         return (
             <div className="container-fluid" style={{ padding: 0, margin: -10 }} >

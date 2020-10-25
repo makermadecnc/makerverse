@@ -573,7 +573,6 @@
     "Could not download machine profiles.": "",
     "You will need to use \"manual connection mode,\" below.": "",
     "{{ axis }}-Axis": "",
-    "Axis has no size.": "",
     "Accuracy is unusual": "",
     "Precision is unusual.": "",
     "Axes have been set by your machine profile.": "",
@@ -592,5 +591,14 @@
     "Required version: v{{ requiredVersion }}": "",
     "Update available: v{{ suggestedVersion }}": "",
     "You have the latest firmware.": "",
-    "Firmware": ""
+    "Firmware": "",
+    "Axis is very small (min and max close together).": "",
+    "Preparing Machine...": "",
+    "Applying Settings...": "",
+    "Refreshing Settings...": "",
+    "Other": "",
+    "Is this a new machine?": "",
+    "Or, have you installed new firmware?": "",
+    "Selecting \"yes\" will reset (erase) and apply reccomended settings.": "",
+    "Welcome": ""
 }

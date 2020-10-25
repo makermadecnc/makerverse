@@ -39,6 +39,13 @@ const noCache = (request) => {
     }
 };
 
+const GUEST_KEY = 'insecureDangerousGuestAccess';
+
+export const isGuestAccessEnabled = () => {
+    const gk = config.get(GUEST_KEY, false);
+    return gk === true;
+};
+
 export const owsreq = superagentUse(superagent);
 owsreq.use(noCache);
 
@@ -85,6 +92,8 @@ const getSanitizedRecords = () => {
     return records;
 };
 
+export const guestUser = { username: 'guest' };
+
 // Get all users which may be used for login purposes.
 export const getValidUsers = () => {
     const users = getSanitizedRecords();
@@ -99,6 +108,10 @@ export const getUserByToken = (token) => {
 
 export const signin = (req, res) => {
     const { token = '' } = { ...req.body };
+
+    if (token.length <= 0 && isGuestAccessEnabled()) {
+        res.send({ enabled: true, guest: true, user: guestUser });
+    }
 
     owsreq.use((request) => {
         request.set('Authorization', 'Bearer ' + token);
