@@ -128,7 +128,7 @@ class MaslowPanels extends PureComponent {
                         </Button>
                     </ToastNotification>
                 )}
-                {firmware && hardware.hasFirmware && (
+                {firmware && hardware.hasFirmware && firmware.requiredVersion && (
                     <div style={{ marginBottom: 10 }}>
                         <FirmwareRequirement firmware={firmware} compatibility={compatibility} />
                     </div>
