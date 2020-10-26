@@ -1,6 +1,12 @@
 #!/bin/bash
 un="$2"
-port="$3"
+
+# Startup options (prepended to launch command), i.e., "export MAKERVERSE_PORT=80"
+cmd_opts=""
+if [[ ! -z "$3" ]]; then
+  cmd_opts="$3 && "
+fi
+
 echo "Makerverse Server will be controlled by $un"
 
 sv="makerverse.service"
@@ -40,10 +46,7 @@ if [ "$1" = "install" ]; then
   echo "" >> $sf
 
   echo "[Service]" >> $sf
-  if [[ ! -z "$port" ]]; then
-    echo "Environment=MAKERVERSE_PORT=${port}"
-  fi
-  echo "ExecStart=runuser -l ${un} -c \"${lf}\"" >> $sf
+  echo "ExecStart=runuser -l ${un} -c \"${cmd_opts}${lf}\"" >> $sf
   echo "Restart=always" >> $sf
   echo "StandardOutput=syslog" >> $sf
   echo "StandardError=syslog" >> $sf

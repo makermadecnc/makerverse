@@ -11,9 +11,11 @@ Pull requests welcome!
 
 See [issues](/about/#issues) for reporting bugs or problems.
 
-## Documentation
+## Updating the Documentation
 
-These docs are located within the same Github repository that is home to Makerverse. You'll find them in the `docs/` folder, stored as `.md` (markdown) files. Therefore, the contribution process is the same as changing the Makerverse code...
+These docs are located within the same Github repository that is home to Makerverse. You'll find them in the `docs/` folder, stored as `.md` (markdown) files. Therefore, the contribution process is the same as changing the Makerverse code (_see below_). Once a pull request containing docs has been approved and merged, it will appear automatically on Makerverse.com.
+
+_**Note**: to test your changes to the docs, run `bundle exec jekyll serve` from the `docs/` folder. You will need to have Ruby & Jekyll installed ([see their docs](https://jekyllrb.com/docs/installation/))._
 
 ## How to Contribute
 

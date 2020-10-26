@@ -65,8 +65,9 @@ class FirmwareRequirement extends React.PureComponent {
         const isOk = severity !== 'warning' && severity !== 'error';
         const showHelp = !compatibility || !isOk;
         const hasProblem = compatibility && !isOk;
+        const showDownload = hasProblem || !compatibility;
         const latestVersion = firmware.suggestedVersion || firmware.requiredVersion;
-        const downloadText = hasProblem ? compatibility[severity] :
+        const dlText = hasProblem ? compatibility[severity] :
             i18n._('Download v{{ version }}', { version: latestVersion });
 
         return (
@@ -74,7 +75,7 @@ class FirmwareRequirement extends React.PureComponent {
                 <h6 style={{ marginTop: 0 }}>
                     {i18n._('Firmware: {{ name }}', { name: firmware.name })}
                 </h6>
-                {this.renderDownloadText(firmware, downloadText)}
+                {showDownload && this.renderDownloadText(firmware, dlText)}
                 <br />
                 {showHelp && this.renderHelpLink(firmware)}
             </ToastNotification>

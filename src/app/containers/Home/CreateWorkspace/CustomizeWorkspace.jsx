@@ -41,12 +41,12 @@ class CustomizeWorkspace extends React.PureComponent {
                 )}
                 {!axis.validAccuracy && (
                     <ToastNotification type="warning">
-                        {i18n._('Accuracy is unusual')}
+                        {i18n._('Accuracy is unusual (defines minimum travel distance on axis).')}
                     </ToastNotification>
                 )}
                 {!axis.validPrecision && (
                     <ToastNotification type="warning">
-                        {i18n._('Precision is unusual.')}
+                        {i18n._('Precision is unusual (defines number of digits for rounding).')}
                     </ToastNotification>
                 )}
             </div>

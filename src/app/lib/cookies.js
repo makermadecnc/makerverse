@@ -3,8 +3,8 @@ export function setCookie(name, val) {
     const date = new Date();
     const value = val;
 
-    // Set it expire in 30 days
-    date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+    // Set it expire in 7 days
+    date.setTime(date.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     console.log('set cookie', name, value);
     // Set it

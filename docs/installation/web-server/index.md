@@ -14,21 +14,12 @@ _**Tip**: the easiest setup is the [Raspberry Pi Image](/installation/web-server
 
 If you don't wish to use the pre-built image, you can achieve the same thing on a Raspberry Pi (or any Debian computer) using the [Linux Service](/installation/web-server/linux-service/) installation. For all other cases, refer directly to the [Docker](/installation/web-server/docker/) instructions.
 
-## Configuration
-
-You can set the following environment variables to configure Makerverse on any Web Server:
-
-- `MAKERVERSE_PORT`: Which port to listen on (default: `8000`).
-- `MAKERVERSE_HOME`: Where the settings files should be stored (default: `$HOME`).
-- `MAKERVERSE_SRC_DIR`: Where the Makerverse code is located (default: `$HOME/makerverse`).
-- `MAKERVERSE_LAUNCH_METHOD`: Use Docker or Node? (default: `docker`).
-
 ## Updating
 
 The web server installation automatically updates when it restarts.
 
-To update a web-server install, just run the `bin/launch` script:
+To manually update a **Linux Service** install, use `sudo systemctl restart makerverse`.
 
-```
-$HOME/makerverse/bin/launch
-```
+_**Note**: while the update is downloaded, Makerverse will continue to run the old installation. You can check on the update progress with `journalctl -xe`. Once the update is complete, refresh your internet browser and look at the "About" screen to confirm the new version._
+
+To manually update a Docker install (without a Linux service), run `bin/launch` from within the Makerverse directory. This can also be useful if you would like more feedback on the update progress (this approach happens in the foreground, instead of requiring that you use the `journalctl` command to view logs).

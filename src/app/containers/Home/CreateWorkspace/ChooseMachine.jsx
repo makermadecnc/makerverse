@@ -299,9 +299,9 @@ class ChooseMachine extends React.PureComponent {
                     {!machineProfiles && <div className={styles.widgetEmpty}>Loading...</div>}
                     {!hasData && (
                         <div className={styles.widgetEmpty}>
-                            {i18n._('Could not download machine profiles.')}
+                            {i18n._('Could not download from the community catalog.')}
                             <br />
-                            {i18n._('You will need to use "manual connection mode," below.')}
+                            {i18n._('You will need to create a new machine, below.')}
                         </div>
                     )}
                     {showMachineProfile && this.renderMachineProfile(machineProfile)}

@@ -75,6 +75,15 @@ docker run --rm --privileged --name makerverse \
   "makerverse/core:latest"
 ```
 
+## Configuration
+
+You can set the following environment variables to configure Makerverse on any Web Server:
+
+- `MAKERVERSE_PORT`: Which port to listen on (default: `8000`).
+- `MAKERVERSE_HOME`: Where the settings files should be stored (default: `$HOME`).
+- `MAKERVERSE_SRC_DIR`: Where the Makerverse code is located (default: `$HOME/makerverse`).
+- `MAKERVERSE_LAUNCH_METHOD`: Use Docker or Node? (default: `docker`).
+
 ## Updating
 
 Each time the `bin/launch` script is run, it will automatically update the application by pulling the latest docker image. If you use the [linux service](/installation/web-server/linux-service/#updating), this happens each time you restart the service.

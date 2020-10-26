@@ -151,10 +151,10 @@ class CreateWorkspacePanel extends PureComponent {
         const canUseConnection = controllerType && baudRate && hasMachine;
         const canSwitchMachineMode = !canUseConnection;
 
-        const sw1 = isCustomMachine ? 'Not sure what settings to use?'
-            : 'Can\'t find your machine?';
-        const sw2 = isCustomMachine ? 'Search for pre-configured machines'
-            : 'Switch to manual connection mode';
+        const sw1 = isCustomMachine ? i18n._('Not sure what settings to use?')
+            : i18n._('Can\'t find your machine?');
+        const sw2 = isCustomMachine ? i18n._('Search the Community Catalog')
+            : i18n._('Create a New Machine');
 
         if (!fetchBegan) {
             return (
@@ -212,6 +212,7 @@ class CreateWorkspacePanel extends PureComponent {
                                             >
                                                 {sw2}
                                             </button>
+                                            <br />
                                             <br />
                                             <i>
                                                 Makerverse can support almost any machine (

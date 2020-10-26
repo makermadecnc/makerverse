@@ -29,6 +29,17 @@ Type `sudo systemctl [command] makerverse`, replacing **[command]** with one of 
 - `stop`: Stop the application.
 - `disable`: Do not start the application automatically.
 
+## Configuration
+
+If you would like to set one or more [configuration (environment) variables](/installation/web-server/docker/#configuration), you will need to pass them to the service. For example, to set the port to 80 (_which is done by default on the Raspberry Pi image_), **reinstall the service** as follows (from the Makerverse directory):
+
+```
+sudo bin/build-service.sh install $(whoami) "export MAKERVERSE_PORT=80"
+```
+
+- The second parameter is the username (e.g., `pi`) which will run the service.
+- The third parameter will be prepended to the start command, in this case exporting the environment variable.
+
 ## Troubleshooting
 
 The following commands are helpful if something is not working:

@@ -90,7 +90,7 @@ class CalibrationModal extends PureComponent {
     state = {
         ...this.internalState,
         measurements: defaultMeasurements,
-        activeTab: this.props.activeTab || 'machine',
+        activeTab: this.props.activeTab || 'welcome',
         setMachineSettings: false,
         setWorkspaceSettings: false,
         setFrameSettings: false,
@@ -128,14 +128,22 @@ class CalibrationModal extends PureComponent {
         }
     }
 
+    setSledId(sledId) {
+        // setSled may fail...
+        const sled = MaslowCalibration.setSledId(sledId);
+        this.setState({
+            sledId: sled.id,
+            sledDimensions: sled.data,
+        });
+    }
+
     componentDidMount() {
         this.workspace.addControllerEvents(this.controllerEvents);
         this.updateActiveTab();
 
         const sled = this.workspace.findPart('SLED');
         if (sled) {
-            MaslowCalibration.setSledId(sled.id);
-            this.setState({ sledId: sled.id });
+            this.setSledId(sled.id);
         }
     }
 
@@ -240,7 +248,6 @@ class CalibrationModal extends PureComponent {
         const pt = { x: this.toMM(xOff), y: this.toMM(yOff) };
         const hp = { x: 0, y: this.state.yHome };
         const res = this.calibration.calibrateOrigin(hp, pt);
-        log.debug('Center offset calibration', res);
         this.writeCalibrationResult(res);
         this.setState({ ...this.state, measuredChains: res });
     }
@@ -537,7 +544,7 @@ class CalibrationModal extends PureComponent {
         const zAxisDistancePerRotation = this.workspace.machineSettings.map.zAxisDistancePerRotation;
 
         const zAxisResSetting = this.workspace.machineSettings.map.zAxisRes;
-        const canShowTabs = curTab !== 'triangular';
+        const canShowTabs = curTab !== 'welcome';
 
         return (
             <Modal
@@ -614,6 +621,24 @@ class CalibrationModal extends PureComponent {
                         </Nav>
                     )}
                     <div className={styles.navContent} style={{ height: height }}>
+                        {curTab === 'welcome' && (
+                            <div className={styles.tabFull}>
+                                <h6>{i18n._('Welcome')}</h6>
+                                If you have not tested your frame before, please run a pre-flight check.
+                                <br />
+                                For help with this (or any other step), see the Calibration Help at the bottom.
+                                <br />
+                                <br />
+                                <Button
+                                    btnSize="medium"
+                                    btnStyle="primary"
+                                    onClick={() => this.setState({ activeTab: 'machine' })}
+                                >
+                                    <i className="fa fa-check" />
+                                    {'Let\'s Begin!'}
+                                </Button>
+                            </div>
+                        )}
                         {curTab === 'triangular' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.center} style={ this.getBkImageStyle('calibration_overview.png') } />
@@ -921,15 +946,7 @@ class CalibrationModal extends PureComponent {
                                             <select
                                                 value={sledId || ''}
                                                 className={styles.selectInput}
-                                                onChange={e => {
-                                                    MaslowCalibration.setSledId(e.target.value);
-                                                    this.updateCalibrationOpts({ sledId: e.target.value });
-                                                    // Reload state from calibration/kinematics to account many new values.
-                                                    this.setState({
-                                                        ...this.internalState,
-                                                        sledId: e.target.value,
-                                                    });
-                                                }}
+                                                onChange={e => this.setSledId(e.target.value)}
                                             >
                                                 {Object.keys(sleds).map((id) => {
                                                     return (

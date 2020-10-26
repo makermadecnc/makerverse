@@ -226,8 +226,8 @@ class MeasureChainsFlow extends PureComponent {
                         type="button"
                         className="btn btn-medium btn-primary"
                         onClick={() => {
+                            this.pageNum = 1;
                             this.runHoming();
-                            this.nextPage();
                         }}
                     >
                         Begin Measuring Chains
@@ -339,14 +339,19 @@ class MeasureChainsFlow extends PureComponent {
                 <button
                     type="button"
                     className="btn btn-medium btn-primary"
-                    onClick={() => this.props.moveToCenter()}
+                    onClick={() => {
+                        this.props.moveToCenter();
+                        this.setState({ movedToCenter: true });
+                    }}
                 >
                     Move to Center
                 </button>
                 <br /><br /><br />
                 {this.renderShuttleControls(['z'])}
                 <br />
-                {'X Offset: '}
+                {'Enter the distance from the center, e.g., x="2" is right of center, and y="-5" is below center.'}
+                <br />
+                {'X Error: '}
                 <input
                     type="text"
                     name="xOff"
@@ -355,7 +360,7 @@ class MeasureChainsFlow extends PureComponent {
                         this.setState({ xOff: e.target.value });
                     }}
                 />
-                {' Y Offset: '}
+                {' Y Error: '}
                 <input
                     type="text"
                     name="yOff"
@@ -365,7 +370,7 @@ class MeasureChainsFlow extends PureComponent {
                     }}
                 />
                 <hr />
-                {this.renderToolbar(this.renderPrevPage(), this.renderFinish())}
+                {this.renderToolbar(this.renderPrevPage(), this.state.movedToCenter && this.renderFinish())}
             </div>
         );
     }

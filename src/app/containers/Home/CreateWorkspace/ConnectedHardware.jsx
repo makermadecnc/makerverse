@@ -113,7 +113,7 @@ class ConnectedHardware extends React.PureComponent {
     componentDidMount() {
         setTimeout(() => {
             this.setState({ timeoutElapsed: true });
-        }, 5000);
+        }, 10000);
     }
 
     render() {

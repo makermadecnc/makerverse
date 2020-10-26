@@ -64,13 +64,14 @@ class MaslowCalibration {
             // Custom sled.
             selectedSled.id = '';
             selectedSled.data = customSledDimensions;
-            return;
+            return selectedSled;
         }
         try {
             selectedSled.data = JSON.parse(sleds[sledId].dataBlob);
         } catch (e) {
             log.error(e, 'sled selection');
         }
+        return selectedSled;
     }
 
     static setCustomSledDimension(edge, value) {
@@ -121,13 +122,14 @@ class MaslowCalibration {
         };
         const origErr = this.calculateError(measured, this.idealCoordinates);
         const orig = { ...origSettings, ...origErr };
+        log.debug('calibration begin', origSettings, origErr, orig);
 
         let op = { ...orig };
         // Start by offsetting the motor offset by the y error, so it's a reasonable guess.
-        op.motorOffsetY -= Math.round(yError);
+        op.motorOffsetY -= yError ? Math.round(yError) : 0;
         const decimals = 4;
         for (let i = 0; i < decimals; i++) {
-            log.debug('calibration #', i);
+            log.debug('calibration #', i, op);
             op = this.optimize(measured, op, i, decimals, callback);
         }
 
@@ -152,6 +154,7 @@ class MaslowCalibration {
         this.idealCoordinates = [homePoint, { x: 0, y: 0 }];
         this.idealChainLengths = this.calculateChainLengths(this.idealCoordinates);
         this.opts.chainBounds = 0;
+        log.debug('Calibrate origin', this.opts, this.kin.opts);
         const ret = this._calibrate(measured);
         this.opts.chainBounds = chainBounds;
         this.recomputeIdeals();
@@ -244,9 +247,6 @@ class MaslowCalibration {
                             start.motorOffsetY + mh,
                             start.distBetweenMotors + mw
                         );
-                        if (!opt) {
-                            log.warn('Failed to compute location', left, right, mw);
-                        }
                         if (opt.maxErrDist < best.maxErrDist && opt.totalErrDist <= best.totalErrDist) {
                             log.debug('new best', opt, 'change=', this.calculateChange(best, opt));
                             best = opt;
@@ -285,6 +285,8 @@ class MaslowCalibration {
             const p = this.kin.chainToPosition(cl[0], cl[1], measured[x].x, measured[x].y);
             if (!p) {
                 // Position would not be within bounds. Ignore the possibility.
+                log.warn('Failed to compute location', measured, leftChainTolerance,
+                    rightChainTolerance, motorOffsetY, distBetweenMotors, this.idealChainLengths);
                 return false;
             }
             points.push(p);

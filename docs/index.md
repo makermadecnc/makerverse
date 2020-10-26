@@ -14,7 +14,6 @@ A full-featured web-based controller platform for CNC & 3DP machines.
 ## Quickstart
 
 - Follow the [installation](/installation/) guide.
+- [Connect to the application](/tutorial/open-makerverse/) and [create a workspace](/tutorial/create-workspace/).
 - Follow your [machine-specific](/machines/) instructions.
-- Launch the application and create a workspace (_coming soon_).
-- Calibrate and test your machine (_coming soon_).
-- Run your first print/cut (_coming soon_).
+- Upload and [run your first cut or print](/tutorial/run-programs/).
