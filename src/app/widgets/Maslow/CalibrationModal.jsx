@@ -624,7 +624,16 @@ class CalibrationModal extends PureComponent {
                         {curTab === 'welcome' && (
                             <div className={styles.tabFull}>
                                 <h6>{i18n._('Welcome')}</h6>
-                                If you have not tested your frame before, please run a pre-flight check.
+                                !!! WARNING !!!
+                                <br/>
+                                --  DAMAGE MAY OCCUR --
+                                <br/>
+                                If this is the first use of your system and you have not yet tested sled movement please close this window and reset your chains.
+                                <br />
+                                Please run a pre-flight check before attempting to calibrate.
+                                <br />
+                                !!! WARNING !!!
+                                <br />
                                 <br />
                                 For help with this (or any other step), see the Calibration Help at the bottom.
                                 <br />
