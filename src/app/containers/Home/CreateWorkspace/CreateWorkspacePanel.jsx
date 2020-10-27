@@ -90,9 +90,10 @@ class CreateWorkspacePanel extends PureComponent {
         actions.updateWorkspace(workspaceSettings);
     };
 
-    handleOpenPort = (port) => {
+    handleOpenPort = (port, manufacturer) => {
         const firmware = this.props.workspaceSettings.firmware;
         firmware.port = port;
+        firmware.manufacturer = manufacturer;
         this.props.actions.handleOpenPort(firmware);
 
         const workspaceSettings = {

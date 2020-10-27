@@ -25,7 +25,7 @@ export const ConnectionStatusType = PropTypes.shape({
 class Connection extends PureComponent {
     static propTypes = { connectionStatus: ConnectionStatusType };
 
-    state = { port: null };
+    state = { port: null, manufacturer: null };
 
     isPortInUse = (port) => {
         const { state } = this.props;
@@ -90,7 +90,7 @@ class Connection extends PureComponent {
             isLoading,
             handleRefreshPorts,
         } = this.props;
-        const { port } = this.state;
+        const { port, manufacturer } = this.state;
         const canConnect = !disabled && port && !connectionStatus.connected;
 
         return (
@@ -104,7 +104,10 @@ class Connection extends PureComponent {
                             disabled={disabled}
                             name="port"
                             noResultsText={i18n._('No ports available')}
-                            onChange={(o) => this.setState({ port: o.value })}
+                            onChange={(o) => this.setState({
+                                port: o.value,
+                                manufacturer: o.manufacturer,
+                            })}
                             optionRenderer={this.renderPortOption}
                             options={map(connectionStatus.ports, (o) => ({
                                 value: o.port,
@@ -140,7 +143,7 @@ class Connection extends PureComponent {
                                 type="button"
                                 className="btn btn-primary"
                                 disabled={!canConnect}
-                                onClick={() => this.props.handleOpenPort(port)}
+                                onClick={() => this.props.handleOpenPort(port, manufacturer)}
                                 title="Open connection to control board"
                             >
                                 <i className="fa fa-toggle-off" />

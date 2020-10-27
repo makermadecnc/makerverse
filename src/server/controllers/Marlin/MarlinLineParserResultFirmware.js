@@ -14,7 +14,13 @@ class MarlinLineParserResultFirmware {
         { // FIRMWARE_NAME
             const r = line.match(/FIRMWARE_NAME:([a-zA-Z\_\-]+(\s+[\d\.]+)?)/);
             if (r) {
-                payload.firmware.name = r[1];
+                const parts = r[1].split(' ');
+                if (parts.length === 2) {
+                    payload.firmware.name = parts[0];
+                    payload.firmware.version = parts[1];
+                } else {
+                    payload.firmware.name = r[1];
+                }
             }
         }
 
