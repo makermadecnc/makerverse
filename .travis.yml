@@ -151,7 +151,7 @@ deploy:
   file:
     - "releases/*.*"
   token:
-    secure: NFvrOvBDkBwvJWANXEbkRtrFE0msZF+269Q4VHWL44izsIF/uTooIPt5FlMBvsroiDunwA6Zs/kX8Nnrf/D1zePybNu9zf8JarJuCzZuu80pWSn2aJQHCqH6mKkprSa6BoqxnptJG7Qdr0e16FaSOiDNE68DRhFYztlLZynf4EdD6k40UkP0k+6+v1Wg6qkNNykexP6SZDOzDBTyOLH3KVYvQdTaaiNL6+B1/HYWVF+D+QwGQVp2/k7FDUkaPJMY+1FLmjGuu/5Snl6I9+HqOEkS0zyrob/9DDZx158KhrfnTfx4IKmACA9lGo1eVFb1ZngupA7VYp329kHd7FVYWFbY1lcc2FdBP74xhilzJ4S1wtvDL6FTRbwTai0B7/c0Tsad31e2/2zucldv7Xh2UAzeCv4SPyihFA7cMpzqXncRH9N/JTTArspn9fFXbGsvU1Xo+0GppMHO0PQf77vjUoT7v6wPyE5OYcd9n1/xrTNTX9mttBF864qYEi8gGdZXaIN5ziaVvmaeYXOFuFww+hmRFGuBlNGueTdsHndAKW8oxPKjcQziiTpjuoWokXjp7zg2UUp9F5azihHo1whPmjNNnzfC8Vu2OHgXb3Nj2ugm1NXMRhTKyRt6Lsa8rKL8ZW8J3WpD65Jcm0Wq42q9JfOOgVn/+vf0olKu5wGT0rc=
+    secure: "$GITHUB_TOKEN"
   overwrite: true
   name: "$RELEASE_NAME"
   # Travis does not support multi-line change logs / formatting.
