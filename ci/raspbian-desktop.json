@@ -86,7 +86,8 @@
         "sudo usermod -aG docker pi",
         "sudo systemctl enable docker",
         "sudo systemctl start docker",
-        "cd /home/pi/makerverse && bash bin/build-service.sh install pi 80"
+        "cd /home/pi/makerverse && bash bin/build-service.sh install pi \"export MAKERVERSE_PORT=80\"",
+        "echo \"export MAKERVERSE_PORT=80\" >> /home/pi/.bashrc"
       ]
     }
   ]
