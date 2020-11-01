@@ -8,6 +8,8 @@ DOCKER_REPO="makerverse/core"
 
 echo "Docker '$@' for $BUILD_PLATFORMS"
 
+TAG2=""
+
 if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
   if [ "$1" = "build" ]; then
     # Master branch has a deploy step. Others use the build as the deploy.
@@ -19,6 +21,7 @@ if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
     TAG="prerelease"
   else
     TAG="latest"
+    TAG2="prerelease"
   fi
 else
   if [ "$TRAVIS_BRANCH" = "master" ]; then
@@ -38,9 +41,18 @@ echo "Logged in to Docker."
 # n.b., this ALWAYS pushes the resulting image. This is because the --load flag does not
 # support multi-arch. https://github.com/docker/buildx/issues/59
 if [[ ! -z "$CI_VERSION" ]]; then
-  docker buildx build --push "--platform=$BUILD_PLATFORMS" -t "$DOCKER_REPO:$TAG" -t "$DOCKER_REPO:v$CI_VERSION" .
+  if [[ -z "$TAG2" ]]; then
+    docker buildx build --push "--platform=$BUILD_PLATFORMS" -t "$DOCKER_REPO:$TAG" -t "$DOCKER_REPO:v$CI_VERSION" .
+  else
+    docker buildx build --push "--platform=$BUILD_PLATFORMS" -t "$DOCKER_REPO:$TAG" \
+      -t "$DOCKER_REPO:$TAG2" -t "$DOCKER_REPO:v$CI_VERSION" .
+  fi
 else
-  docker buildx build --push "--platform=$BUILD_PLATFORMS" -t "$DOCKER_REPO:$TAG" .
+  if [[ -z "$TAG2" ]]; then
+    docker buildx build --push "--platform=$BUILD_PLATFORMS" -t "$DOCKER_REPO:$TAG" .
+  else
+    docker buildx build --push "--platform=$BUILD_PLATFORMS" -t "$DOCKER_REPO:$TAG" -t "$DOCKER_REPO:$TAG2" .
+  fi
 fi
 
 if [ $? -eq 0 ]; then

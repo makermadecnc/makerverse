@@ -103,7 +103,7 @@ assign_positional_args 1 "${_positionals[@]}"
 sed -i 's/"exited_cleanly": false/"exited_cleanly": true/' ~/.config/chromium/Default/Preferences
 
 # Start chromium
-cmd="/usr/bin/chromium-browser $_arg_chromium_flags --kiosk --app=$_arg_kiosk_url"
+cmd="/usr/bin/chromium-browser $_arg_chromium_flags --app=$_arg_kiosk_url"
 echo "Opening chromium: $cmd"
 $cmd &
 

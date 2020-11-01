@@ -36,6 +36,8 @@ There are two download options in the [Latest Release](https://github.com/makerm
 
 These are merely customized versions of [the official Raspberry Pi OS images of the same names](https://www.raspberrypi.org/downloads/raspberry-pi-os/) (Lite vs. Desktop). Once you have downloaded the appropriate release file, unzip it and flash the `.img` to your SD card with your preferred application (e.g., Balena Etcher).
 
+_**Note**: the `lite` image means that there is no GUI! It is "command-line only" (headless), so everything will be text based (no desktop)._
+
 Then, just plug the RPi in and power it up!
 
 ## Connecting to the RPi
@@ -79,22 +81,26 @@ However, this UI is not the default UI because it is much less full-featured (it
 
 When running the `makerverse-raspberrypi-os-dekstop.**` (desktop version), you will need to follow on-screen instructions after the first boot to configure your Raspberry Pi. This image is based upon a standard Raspberry Pi OS Desktop installation, so please refer to the official documentation for any help.
 
-You can open a web browser and navigate to Makerverse at `http://localhost`. Or, you can enable Kiosk mode...
+You can find the Makerverse "application" in the "Other" section of the start menu. In fact, the "application" really just opens a web browser to `http://localhost`.
 
 ### Kiosk Mode
 
-When running the "Desktop" variation, you can enable Kiosk mode:
+When running the Desktop variation, you can enable "Kiosk" mode. This turn your Raspberry Pi into a dedicated Makerverse device.
+
+_**Note**: kiosk mode causes Makerverse to run full-screen and effectively disable the Raspberry Pi desktop. It is best suited for scenarios where you only want to use Makerverse on the Raspberry Pi (single-purpose device). It also can fit more on the screen, and doesn't require a keyboard/mouse to use (e.g., touchscreen)._
+
+To enable Kiosk mode, run the following command:
 
 ```
-echo "@bash /home/pi/makerverse/bin/kiosk /" > /home/pi/.config/lxsession/LXDE-pi/autostart
+echo "@bash /home/pi/makerverse/bin/kiosk" > /home/pi/.config/lxsession/LXDE-pi/autostart
 ```
 
-Once configured, it will automatically launch Chromium in "Kiosk" mode during boot. This will load the Makerverse application in a full-screen web browser. Makerverse is still running as a Web Server in the background, so other clients can also simultaneously connect. In this mode, Chromium takes over the desktop, hiding all menus in order to maximize screen-space.
+... and then reboot the Raspberry Pi. Once it has rebooted, you should notice that the normal desktop does not open. Instead, the screen stays black while Makerverse starts. Makerverse is still running as a Web Server in the background, so other clients can also simultaneously connect. In this mode, Chromium takes over the desktop, hiding all menus in order to maximize screen-space.
 
 - If your keyboard/mouse are attached directly to the Pi, use the `Alt + F4` hotkey to close the full-screen web browser, and/or `Ctrl + Alt + T` to open a terminal.
 - If you don't have an extra keyboard/mouse, just SSH and use `sudo raspi-config` to turn on the VNC in `Interfacing Options`. Then use an app like VNC Viewer to connect from your computer.
 
-_**Note**: if your screen is smaller than 7" or so, you will likely want your Kiosk to use the Tablet UI specified above. To do so, edit the `/home/pi/.config/lxsession/LXDE-pi/autostart` file to become: `@bash /home/pi/makerverse/bin/kiosk /tablet`._
+_**Note**: if your screen is smaller than 7" or so, you will likely want your Kiosk to use the Tablet UI specified above. To do so, use `sudo nano /etc/environment` to add the new line: `MAKERVERSE_PATH=/tablet`._
 
 ## Shared Directories
 
