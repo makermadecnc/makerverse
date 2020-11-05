@@ -1,9 +1,9 @@
 import React from 'react';
 import Select from 'react-select';
+import log from 'js-logger';
 import _ from 'lodash';
 import cx from 'classnames';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
 import { ToastNotification } from 'app/components/Notifications';
 import { Input } from 'app/components/FormControl';
 import FirmwareRequirement from './FirmwareRequirement';

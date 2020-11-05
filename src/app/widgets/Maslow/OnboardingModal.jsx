@@ -1,9 +1,9 @@
 import _ from 'lodash';
+import log from 'js-logger';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'app/components/Buttons';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
 import analytics from 'app/lib/analytics';
 import Modal from 'app/components/Modal';
 import Workspaces from 'app/lib/workspaces';

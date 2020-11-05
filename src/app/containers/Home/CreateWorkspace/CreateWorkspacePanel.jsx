@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import log from 'js-logger';
 import cx from 'classnames';
 import React, { PureComponent } from 'react';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
 import analytics from 'app/lib/analytics';
 import Workspaces from 'app/lib/workspaces';
 import { ToastNotification } from 'app/components/Notifications';

@@ -1,6 +1,6 @@
 /*eslint no-bitwise: ["error", { "allow": ["<<", "&", "&=", "|=", "~"] }] */
 import _ from 'lodash';
-import log from 'app/lib/log';
+import log from 'js-logger';
 import i18n from 'app/lib/i18n';
 import {
     MASLOW,

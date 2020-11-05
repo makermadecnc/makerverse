@@ -1,7 +1,7 @@
 import _ from 'lodash';
+import log from 'js-logger';
 import ReactGA from 'react-ga';
 import settings from 'app/config/settings';
-import log from 'app/lib/log';
 
 // https://github.com/ReactTraining/react-router/issues/4278#issuecomment-299692502
 ReactGA.initialize(settings.analytics.trackingId, {

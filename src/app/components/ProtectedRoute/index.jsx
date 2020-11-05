@@ -1,9 +1,9 @@
 import React from 'react';
+import log from 'js-logger';
 // import PropTypes from 'prop-types';
 import auth from 'app/lib/auth';
 import { connect } from 'react-redux';
 import { Route, Redirect, withRouter } from 'react-router-dom';
-import log from 'app/lib/log';
 
 const ProtectedRoute = ({ component: Component, ...rest }) => (
     <Route

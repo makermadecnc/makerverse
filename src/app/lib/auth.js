@@ -1,7 +1,7 @@
+import log from 'js-logger';
 import api, { authrequest } from 'app/api';
 import config from 'app/store';
 import Workspaces from 'app/lib/workspaces';
-import log from 'app/lib/log';
 import owsCore from '@openworkshop/lib/OpenWorkShopCore';
 import analytics from 'app/lib/analytics';
 import { getCookie } from 'app/lib/cookies';

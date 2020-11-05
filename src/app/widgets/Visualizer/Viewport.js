@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import log from 'app/lib/log';
+import log from 'js-logger';
 import CombinedCamera from 'app/lib/three/CombinedCamera';
 
 const FOV_MIN = 15;

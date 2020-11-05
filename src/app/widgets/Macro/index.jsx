@@ -1,26 +1,19 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import get from 'lodash/get';
-import includes from 'lodash/includes';
+import log from 'js-logger';
 import React, { PureComponent } from 'react';
 import api from 'app/api';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
 import analytics from 'app/lib/analytics';
-import ActiveState from 'app/lib/active-state';
 import WidgetConfig from '../WidgetConfig';
 import Macro from './Macro';
 import AddMacro from './AddMacro';
 import EditMacro from './EditMacro';
 import RunMacro from './RunMacro';
 import {
-    // Grbl
-    GRBL,
-    // Marlin
-    MARLIN,
     // Workflow
     WORKFLOW_STATE_RUNNING
 } from '../../constants';

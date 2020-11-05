@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import moment from 'moment';
+import log from 'js-logger';
 import React, { PureComponent } from 'react';
 import { Nav, Navbar, NavDropdown, MenuItem } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
@@ -12,7 +13,6 @@ import Anchor from 'app/components/Anchor';
 import Space from 'app/components/Space';
 import combokeys from 'app/lib/combokeys';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
 import auth from 'app/lib/auth';
 import Workspaces from 'app/lib/workspaces';
 import settings from 'app/config/settings';
@@ -353,7 +353,7 @@ class Header extends PureComponent {
                                                 right: 4
                                             }}
                                         >
-                                        N
+                                            N
                                         </span>
                                     )}
                                 </div>

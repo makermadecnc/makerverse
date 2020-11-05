@@ -1,5 +1,5 @@
+import log from 'js-logger';
 import { authrequest } from 'app/api';
-import log from 'app/lib/log';
 
 export const prodHost = 'https://openwork.shop';
 export const stagingHost = 'https://staging.openwork.shop';

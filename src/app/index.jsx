@@ -6,42 +6,42 @@ import {
 } from 'react-router-dom';
 import moment from 'moment';
 import pubsub from 'pubsub-js';
-import qs from 'qs';
+// import qs from 'qs';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import i18next from 'i18next';
+import log from 'js-logger';
 import usePromise from 'react-promise-suspense';
 import { OpenWorkShopProvider } from '@openworkshop/ui/components';
 import { configureStore } from '@openworkshop/lib/store';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 import XHR from 'i18next-xhr-backend';
-import { TRACE, DEBUG, INFO, WARN, ERROR } from 'universal-logger';
 import { Provider as GridSystemProvider } from './components/GridSystem';
 import ProtectedRoute from './components/ProtectedRoute';
 import settings from './config/settings';
 import App from './containers/App';
+import AppCorrupted from './containers/AppCorrupted';
 import Login from './containers/Login';
 import Callback from './containers/Login/Callback';
-import log from './lib/log';
 import auth from './lib/auth';
 import store from './store';
 import './styles/vendor.styl';
 import './styles/app.styl';
 
 const reduxStore = configureStore();
-
-function getLogLevel() {
-    const obj = qs.parse(window.location.search.slice(1));
-    return {
-        trace: TRACE,
-        debug: DEBUG,
-        info: INFO,
-        warn: WARN,
-        error: ERROR
-    }[obj.log_level || settings.log.level];
-}
+//
+// function getLogLevel() {
+//     const obj = qs.parse(window.location.search.slice(1));
+//     return {
+//         trace: TRACE,
+//         debug: DEBUG,
+//         info: INFO,
+//         warn: WARN,
+//         error: ERROR
+//     }[obj.log_level || settings.log.level];
+// }
 
 function addListeners() {
     // Cross-origin communication
@@ -78,39 +78,9 @@ function addListeners() {
     }
 }
 
-// series([
-//     () => {
-//     },
-//     () => promisify(next => {
-//     })(),
-//     () => promisify(next => {
-//     })(),
-//     // () => auth.resume(reduxStore),
-// ]).then(async () => {
-//     log.info(`${settings.productName}`);
-//     addListeners();
-//
-//     { // Hide loading
-//         const loading = document.getElementById('loading');
-//         loading && loading.remove();
-//     }
-//
-//     { // Change backgrond color after loading complete
-//         const body = document.querySelector('body');
-//         body.style.backgroundColor = '#222'; // sidebar background color
-//     }
-//
-//     // if (true || settings.error.corruptedWorkspaceSettings) {
-//     // }
-//
-//     renderPage();
-// }).catch(err => {
-//     log.error(err);
-// });
-
 const LoadedApp = () => {
     usePromise(async() => {
-        log.setLevel(getLogLevel());
+        // log.setLevel(getLogLevel());
 
         await i18next
             .use(XHR)
@@ -130,6 +100,10 @@ const LoadedApp = () => {
 
         addListeners();
     }, []);
+
+    if (settings.error.corruptedWorkspaceSettings) {
+        return <AppCorrupted />;
+    }
 
     return (
         <GridSystemProvider

@@ -21,7 +21,8 @@ ADD --chown=node:node . /home/node
 
 # The node_modules are intentionally excluded by .dockerignore.
 # Some modules have architecture-dependent install candidates, which are resolved here.
-RUN npm install
+RUN npm install -g yarn
+RUN yarn install
 
 EXPOSE 8000
 ENTRYPOINT ["/home/node/bin/docker-entrypoint"]

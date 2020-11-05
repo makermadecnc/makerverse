@@ -1,6 +1,6 @@
 import _ from 'lodash';
+import log from 'js-logger';
 import PropTypes from 'prop-types';
-import log from 'app/lib/log';
 import React, { PureComponent } from 'react';
 import { Button } from 'app/components/Buttons';
 import Modal from 'app/components/Modal';
@@ -416,9 +416,9 @@ class CalibrationModal extends PureComponent {
         return (
             <div className={styles.bottom}>
                 <div>
-                    {'Your machine appears to have been previously calibrated.'}
+                    Your machine appears to have been previously calibrated.
                     <br />
-                    {'To change this setting, you must first clear the effects of edge/precision calibration.'}
+                    To change this setting, you must first clear the effects of edge/precision calibration.
                 </div>
                 <Button
                     btnSize="medium"
@@ -641,16 +641,16 @@ class CalibrationModal extends PureComponent {
                         )}
                         {curTab === 'triangular' && (
                             <div className={styles.tabFull}>
-                                <div className={styles.center} style={ this.getBkImageStyle('calibration_overview.png') } />
+                                <div className={styles.center} style={this.getBkImageStyle('calibration_overview.png')} />
                                 <div className={styles.top}>
-                                    {'Your Maslow is not using "triangular" kinematics.'}
+                                    Your Maslow is not using &quot;triangular&quot; kinematics.
                                     <br />
-                                    {'Make sure your Maslow chains look like the picture (creating a triangle).'}
+                                    Make sure your Maslow chains look like the picture (creating a triangle).
                                 </div>
                                 <div className={styles.bottom}>
-                                    {'This message may be normal after wiping your settings.'}
+                                    This message may be normal after wiping your settings.
                                     <br />
-                                    {'If you are certain your machine matches, press the button to the right.'}
+                                    If you are certain your machine matches, press the button to the right.
                                 </div>
                                 <div className={styles.nextStep}>
                                     <Button
@@ -681,13 +681,13 @@ class CalibrationModal extends PureComponent {
                                     />
                                 </div>
                                 <div className={styles.top}>
-                                    {'Save the following text into a file.'}
+                                    Save the following text into a file.
                                     <br />
-                                    {'To import, replace these contents and press the "Import" button in the bottom-right.'}
+                                    To import, replace these contents and press the &quot;Import&quot; button in the bottom-right.
                                 </div>
                                 {importFailure && (
                                     <div className={styles.bottom}>
-                                        {'There was an error during the import process:'}
+                                        There was an error during the import process:
                                         <br />
                                         {importFailure}
                                     </div>
@@ -711,19 +711,18 @@ class CalibrationModal extends PureComponent {
                         )}
                         {curTab === 'machine' && (
                             <div className={styles.tabFull}>
-                                <div className={styles.center} style={ this.getBkImageStyle('calibration_overview.png') }>
+                                <div className={styles.center} style={this.getBkImageStyle('calibration_overview.png')}>
                                     <div style={{ position: 'absolute', bottom: '0px', right: '30%' }}>
                                         (Newtons)
                                     </div>
-                                    <div style={{ position: 'absolute', bottom: '20%', right: '5%' }}>
-                                    </div>
+                                    <div style={{ position: 'absolute', bottom: '20%', right: '5%' }} />
                                 </div>
                                 <div className={styles.top}>
-                                    {'Your Maslow must be calibrated to account for the variables below.'}
+                                    Your Maslow must be calibrated to account for the variables below.
                                     <br />
-                                    {'Please validate the four settings (inputs) on this tab, then press "Next Step."'}
+                                    Please validate the four settings (inputs) on this tab, then press &quot;Next Step.&quot;
                                     <br />
-                                    {'For help, or to change units, see the lower-left corner of this dialog.'}
+                                    For help, or to change units, see the lower-left corner of this dialog.
                                 </div>
                                 <div className={styles.bottom}>
                                     {!setMachineSettings && (
@@ -796,7 +795,7 @@ class CalibrationModal extends PureComponent {
                                     )}
                                     {setMachineSettings && (
                                         <div className={styles.nextStep}>
-                                            {'When you are ready, make your way through each of the tabs, from left to right.'}
+                                            When you are ready, make your way through each of the tabs, from left to right.
                                         </div>
                                     )}
                                 </div>
@@ -804,15 +803,15 @@ class CalibrationModal extends PureComponent {
                         )}
                         {curTab === 'stock' && (
                             <div className={styles.tabFull}>
-                                <div className={styles.center} style={ this.getBkImageStyle('calibration_dimensions.png') } />
+                                <div className={styles.center} style={this.getBkImageStyle('calibration_dimensions.png')} />
                                 <div className={styles.top}>
-                                    {'Please be certain of the size of your stock before pressing "Next Step."'}
+                                    Please be certain of the size of your stock before pressing &quot;Next Step.&quot;
                                     <br />
                                     {'Most Maslows use 8\'x4\' plywood. Later calibration steps will rely on this measurement being accurate.'}
                                 </div>
                                 <div className={styles.bottom}>
                                     <div>
-                                        {'Note: if your sled is not yet attached, it will be done later in Calibration.'}
+                                        Note: if your sled is not yet attached, it will be done later in Calibration.
                                     </div>
                                     <div>
                                         Stock Width:
@@ -857,7 +856,7 @@ class CalibrationModal extends PureComponent {
                                     )}
                                     {setWorkspaceSettings && (
                                         <div className={styles.nextStep}>
-                                            {'Now proceed to the "Frame" tab.'}
+                                            Now proceed to the &quot;Frame&quot; tab.
                                         </div>
                                     )}
                                 </div>
@@ -865,18 +864,18 @@ class CalibrationModal extends PureComponent {
                         )}
                         {curTab === 'frame' && (
                             <div className={styles.tabFull}>
-                                <div className={styles.center} style={ this.getBkImageStyle('calibration_motor.png') } />
+                                <div className={styles.center} style={this.getBkImageStyle('calibration_motor.png')} />
                                 <div className={styles.top}>
                                     {chainError && (
                                         <div>
-                                            {'Setting chains failed!'}
+                                            Setting chains failed!
                                             <br />
-                                            {'Your machine has already begun calibration, and the new chain position differs from the old.'}
+                                            Your machine has already begun calibration, and the new chain position differs from the old.
                                         </div>
                                     )}
                                     {!chainError && (
                                         <div>
-                                            {'Enter approximate measurements, within 6mm (1/4") tolerance. Then, press "Set Frame".'}
+                                            Enter approximate measurements, within 6mm (1/4&quot;) tolerance. Then, press &quot;Set Frame&quot;.
                                         </div>
                                     )}
                                 </div>
@@ -884,9 +883,9 @@ class CalibrationModal extends PureComponent {
                                 {!alreadyStartedCalibration && (
                                     <div className={styles.bottom}>
                                         <div>
-                                            {'Use the center of the sprocket (motor axis) for both motor measurements.'}
+                                            Use the center of the sprocket (motor axis) for both motor measurements.
                                             <br />
-                                            {'Measure motor height coplanar with the stock.'}
+                                            Measure motor height coplanar with the stock.
                                         </div>
                                         Motor Height:
                                         <input
@@ -933,14 +932,14 @@ class CalibrationModal extends PureComponent {
                         {curTab === 'sled' && (
                             <div>
                                 <div className={styles.top}>
-                                    {'Occasionally during calibration, you will be asked to measure from the edge of your sled.'}
+                                    Occasionally during calibration, you will be asked to measure from the edge of your sled.
                                     <br />
-                                    {'But first, please enter your sled dimensions (or select from a preset).'}
+                                    But first, please enter your sled dimensions (or select from a preset).
                                     <br />
-                                    {'This allows calibration to determine the end-mill location based upon the edge of the sled.'}
+                                    This allows calibration to determine the end-mill location based upon the edge of the sled.
                                 </div>
                                 <div className={styles.center}>
-                                    <div style={{ paddingTop: '20px' }} >
+                                    <div style={{ paddingTop: '20px' }}>
                                         <span>
                                             Sled Type:
                                             <select
@@ -989,11 +988,11 @@ class CalibrationModal extends PureComponent {
                         {curTab === 'z' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.top}>
-                                    {'This step checks that your Z-axis is moving up and down correctly.'}
+                                    This step checks that your Z-axis is moving up and down correctly.
                                     <br />
-                                    {'It may be skipped if you have already tested the Z-axis, or your machine came preconfigured for Z-movement.'}
+                                    It may be skipped if you have already tested the Z-axis, or your machine came preconfigured for Z-movement.
                                 </div>
-                                <div className={styles.center} >
+                                <div className={styles.center}>
                                     {stepDirectionInvert && (
                                         <div>
                                             {'Invert Z-axis motion? '}
@@ -1186,14 +1185,14 @@ class CalibrationModal extends PureComponent {
                         {curTab === 'chains' && (
                             <div className={styles.tabFull}>
                                 <div className={styles.top}>
-                                    {'Now the Maslow will learn how long the chains are currently extended.'}
+                                    Now the Maslow will learn how long the chains are currently extended.
                                     <br />
-                                    {'This will also create a "save point" to restore calibration (if chains ever come off sprockets).'}
+                                    This will also create a &quot;save point&quot; to restore calibration (if chains ever come off sprockets).
                                     <br />
-                                    {'Please read carefully; "Chains" are the most important step in all of calibration.'}
+                                    Please read carefully; &quot;Chains&quot; are the most important step in all of calibration.
                                 </div>
                                 {!alreadyStartedCalibration && !measuredChains && (
-                                    <div className={styles.center} >
+                                    <div className={styles.center}>
                                         <MeasureChainsFlow
                                             calibration={this.calibration}
                                             step={this.state.chainsStep}
@@ -1207,7 +1206,7 @@ class CalibrationModal extends PureComponent {
                                     </div>
                                 )}
                                 {!alreadyStartedCalibration && measuredChains && (
-                                    <div className={styles.center} >
+                                    <div className={styles.center}>
                                         <h4>Chains Set</h4>
                                         <span>
                                             Accuracy is currently at {Math.max(1, Math.round(measuredChains.optimized.maxErrDist * 10) / 10)}mm
@@ -1344,16 +1343,16 @@ class CalibrationModal extends PureComponent {
                                 )}
                                 {isEdgeTab && (
                                     <div className={styles.top}>
-                                        {'Press each "Move" button to move the sled to that position.'}
+                                        Press each &quot;Move&quot; button to move the sled to that position.
                                         <br />
-                                        {'Enter the measurements from the edge of the sled to the edge of the stock.'}
+                                        Enter the measurements from the edge of the sled to the edge of the stock.
                                     </div>
                                 )}
                                 {isPrecisionTab && (
                                     <div className={styles.top}>
-                                        {'This step is optional; it works like Edge calibration, but is more accurate.'}
+                                        This step is optional; it works like Edge calibration, but is more accurate.
                                         <br />
-                                        {'Each location will cut a hole; measure from the center of the hole to the edge of the stock.'}
+                                        Each location will cut a hole; measure from the center of the hole to the edge of the stock.
                                     </div>
                                 )}
                                 <div className={styles.bottom}>
@@ -1410,14 +1409,14 @@ class CalibrationModal extends PureComponent {
                                         <div>
                                             {calibrated && (
                                                 <span style={{ fontStyle: 'italic' }}>
-                                                    {'Calibration results have been applied.'}
+                                                    Calibration results have been applied.
                                                     <br /><br />
-                                                    {'You can run calibration again now, or close this dialog.'}
+                                                    You can run calibration again now, or close this dialog.
                                                 </span>
                                             )}
                                             {!calibrated && (
                                                 <span style={{ fontStyle: 'italic' }}>
-                                                    {'Once all measurements have been entered, the "Calibrate" button will appear.'}
+                                                    Once all measurements have been entered, the &quot;Calibrate&quot; button will appear.
                                                 </span>
                                             )}
                                         </div>

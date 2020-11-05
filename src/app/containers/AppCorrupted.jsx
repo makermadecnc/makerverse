@@ -1,12 +1,13 @@
 import React from 'react';
-import store from 'store';
 import chainedFunction from 'chained-function';
-import i18n from 'lib/i18n';
-import Modal from 'components/Modal';
-import ModalTemplate from 'components/ModalTemplate';
-import Anchor from 'components/Anchor';
-import { Button } from 'components/Buttons';
-import Space from 'components/Space';
+import store from '../store';
+import i18n from '../lib/i18n';
+import Modal from '../components/Modal';
+import ModalTemplate from '../components/ModalTemplate';
+import Anchor from '../components/Anchor';
+import { Button } from '../components/Buttons';
+import Space from '../components/Space';
+import settings from '../config/settings';
 
 const AppCorrupted = () => {
     const text = store.getConfig();

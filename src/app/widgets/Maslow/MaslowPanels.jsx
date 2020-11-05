@@ -212,7 +212,7 @@ class MaslowPanels extends PureComponent {
                 )}
                 {!this.workspace.machineSettings.isValid && (
                     <span style={{ fontStyle: 'italic' }}>
-                        {'Problems detected with Maslow settings:'}
+                        Problems detected with Maslow settings:
                         <ul>
                             {this.workspace.machineSettings.errors.map((err) => {
                                 return (

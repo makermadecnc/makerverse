@@ -1,5 +1,6 @@
 import _each from 'lodash/each';
 import _tail from 'lodash/tail';
+import log from 'js-logger';
 import _throttle from 'lodash/throttle';
 import colornames from 'colornames';
 import pubsub from 'pubsub-js';
@@ -14,7 +15,6 @@ import {
 import CombinedCamera from 'app/lib/three/CombinedCamera';
 import TrackballControls from 'app/lib/three/TrackballControls';
 import * as WebGL from 'app/lib/three/WebGL';
-import log from 'app/lib/log';
 import Workspaces from 'app/lib/workspaces';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
 import Viewport from './Viewport';

@@ -33,7 +33,8 @@ sudo apt-get install -y nodejs
 Enter the source code directory from the command line and run:
 
 ```
-npm install
+npm install -g yarn
+yarn install
 ```
 
 This will download and install all required software. It generally only needs to be done once (unless a major update happens).

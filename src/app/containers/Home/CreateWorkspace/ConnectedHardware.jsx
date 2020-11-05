@@ -27,7 +27,7 @@ class ConnectedHardware extends React.PureComponent {
                 >
                     {i18n._('Update Firmware')}
                 </analytics.OutboundLink>
-                {'.'}
+                .
             </span>
         );
     }

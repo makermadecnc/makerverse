@@ -202,10 +202,10 @@ class MeasureChainsFlow extends PureComponent {
                 <h3>Previously Calibrated?</h3>
                 Were the chains on this machine previously calibrated?
                 <br />
-                {'Only select "Previously Calibrated" if you already have marks on the chains.'}
+                Only select &quot;Previously Calibrated&quot; if you already have marks on the chains.
                 <br />
                 <br />
-                <div >
+                <div>
                     <button
                         type="button"
                         className="btn btn-medium btn-warning"
@@ -221,7 +221,7 @@ class MeasureChainsFlow extends PureComponent {
                 Take one of the Cotter pins and insert it through the hole at the tip of both chains, so they are attached together.
                 <br />
                 <br />
-                <div >
+                <div>
                     <button
                         type="button"
                         className="btn btn-medium btn-primary"
@@ -290,9 +290,9 @@ class MeasureChainsFlow extends PureComponent {
                 <img style={{ maxHeight: '180px' }} alt="sprocket at noon" src="images/calibration_chain_noon.png" />
                 {this.renderShuttleControls(['y'])}
                 <br />
-                {'Once this chain calibration tab is complete, you can use this as your "Reset Chains" location.'}<br />
-                {'Simply return the sprockets & chains to this location, which should cause the chains to be precisely the same length as they are now.'}<br />
-                {'Then, pressing "Reset Chains" will tell the Maslow they are back at this well-known length.'}<br />
+                Once this chain calibration tab is complete, you can use this as your &quot;Reset Chains&quot; location.<br />
+                Simply return the sprockets & chains to this location, which should cause the chains to be precisely the same length as they are now.<br />
+                Then, pressing &quot;Reset Chains&quot; will tell the Maslow they are back at this well-known length.<br />
                 But first, we need to finish this chain calibration tab so that we can calculate the length.<br />
                 <hr />
                 {this.renderToolbar(this.renderPrevPage(), this.renderNextPage())}
@@ -329,7 +329,7 @@ class MeasureChainsFlow extends PureComponent {
                 <h3>Axes Checks</h3>
                 Ensure that the stock is loaded. Make a mark at the exact middle (0, 0).
                 <br />
-                {'When you press the "Move to Center" button below, the Maslow will try to move to this center location.'}
+                When you press the &quot;Move to Center&quot; button below, the Maslow will try to move to this center location.
                 <br />
                 Once it is there, measure the distance from the <strong>tip of the end-mill</strong> to the center mark you made.
                 <br />
@@ -349,7 +349,7 @@ class MeasureChainsFlow extends PureComponent {
                 <br /><br /><br />
                 {this.renderShuttleControls(['z'])}
                 <br />
-                {'Enter the distance from the center, e.g., x="2" is right of center, and y="-5" is below center.'}
+                Enter the distance from the center, e.g., x=&quot;2&quot; is right of center, and y=&quot;-5&quot; is below center.
                 <br />
                 {'X Error: '}
                 <input

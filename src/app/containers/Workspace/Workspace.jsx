@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import log from 'js-logger';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone';
@@ -12,7 +13,6 @@ import {
     WORKFLOW_STATE_IDLE
 } from 'app/constants';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
 import store from 'app/store';
 import analytics from 'app/lib/analytics';
 import * as widgetManager from './WidgetManager';
@@ -675,8 +675,8 @@ class Workspace extends PureComponent {
                     </div>
                 </Dropzone>
                 {blockingText && (
-                    <div className={ styles.mask }>
-                        <div className={ styles.maskOverlay }>
+                    <div className={styles.mask}>
+                        <div className={styles.maskOverlay}>
                             {blockingText}
                         </div>
                     </div>

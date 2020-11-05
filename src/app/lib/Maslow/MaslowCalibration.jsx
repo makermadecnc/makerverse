@@ -1,5 +1,5 @@
 // import _ from 'lodash';
-import log from 'app/lib/log';
+import log from 'js-logger';
 import MaslowKinematics from './MaslowKinematics';
 
 const calibrationDefaults = {

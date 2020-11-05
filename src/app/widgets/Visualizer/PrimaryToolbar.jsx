@@ -199,7 +199,7 @@ class PrimaryToolbar extends PureComponent {
                                     <I18n>
                                         {'WebGL: '}
                                         <span style={{ color: colornames('royalblue') }}>
-                                        Enabled
+                                            Enabled
                                         </span>
                                     </I18n>
                                 )}
@@ -207,7 +207,7 @@ class PrimaryToolbar extends PureComponent {
                                     <I18n>
                                         {'WebGL: '}
                                         <span style={{ color: colornames('crimson') }}>
-                                        Disabled
+                                            Disabled
                                         </span>
                                     </I18n>
                                 )}

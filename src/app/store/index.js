@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import log from 'js-logger';
 import ensureArray from 'ensure-array';
 import debounce from 'lodash/debounce';
 import get from 'lodash/get';
@@ -7,7 +8,6 @@ import merge from 'lodash/merge';
 import semver from 'semver';
 import settings from '../config/settings';
 import ImmutableStore from '../lib/immutable-store';
-import log from '../lib/log';
 import defaultState from './defaultState';
 
 const store = new ImmutableStore(defaultState);

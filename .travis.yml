@@ -16,7 +16,7 @@ jobs:
   # services:
   #   - docker
   before_install:
-    - npm install -g npm
+    - npm install yarn
     # Install Docker 19.x, not 18
     - curl -fsSL https://get.docker.com | sh
     - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
@@ -31,7 +31,7 @@ jobs:
     - docker context ls
   install:
     # With a multi-arch build, installing on the host machine first is faster.
-    - npm install
+    - yarn install
     # Create a multi-arch buildx user: https://github.com/docker/buildx/issues/138
     - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
     - docker buildx create --platform linux/arm64,linux/arm/v7 --name xbuilder --use
@@ -39,7 +39,7 @@ jobs:
   script:
     - echo "Building $CI_SEMVER"
     # Pre-build assets; this prevents the multi-arch from running each build in the Dockerfile.
-    - npm run build-latest
+    - yarn run build-latest
     # Only the master branch supports a "deploy" step. For others, go ahead and push a dev image.
     - scripts/docker.sh build
   after_success: [] # Override.
@@ -82,9 +82,9 @@ jobs:
 - name: "Linux"
   os: linux
   script:
-  - npm run build-latest
-  - npm run build:linux-ia32
-  - npm run build:linux-x64
+  - yarn run build-latest
+  - yarn run build:linux-ia32
+  - yarn run build:linux-x64
 # [Job] MacOS (Electron App)
 - name: "MacOS"
   os: osx
@@ -94,14 +94,14 @@ jobs:
   # before_deploy:
   # - scripts/add-osx-cert.sh
   script:
-  - npm run build-latest
-  - npm run build:mac-x64
+  - yarn run build-latest
+  - yarn run build:mac-x64
 # [Job] Windows (Electron App)
 - name: "Windows"
   os: windows
   script:
-  - npm run build-latest
-  - npm run build:win-x64
+  - yarn run build-latest
+  - yarn run build:win-x64
 
 # --------------------------------------------------------------------------------------------------
 # Default job settings, when not overwritten by specific jobs.
@@ -113,6 +113,9 @@ os: linux
 language: node_js
 node_js:
   - "12"
+
+before_install:
+  - npm install yarn
 
 before_script:
 - chmod -R +x scripts/
@@ -133,7 +136,7 @@ cache:
     - $HOME/.electron
     - packer_cache
 
-install: npm install
+install: yarn install
 addons:
   apt:
     packages:

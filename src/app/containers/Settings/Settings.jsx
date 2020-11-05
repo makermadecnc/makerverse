@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import ensureArray from 'ensure-array';
+import log from 'js-logger';
 import i18next from 'i18next';
 import Uri from 'jsuri';
 import _camelCase from 'lodash/camelCase';
@@ -19,7 +20,6 @@ import settings from 'app/config/settings';
 import Breadcrumbs from 'app/components/Breadcrumbs';
 import analytics from 'app/lib/analytics';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
 import Workspaces from 'app/lib/workspaces';
 import General from './General';
 import WorkspaceSettings from './WorkspaceSettings';

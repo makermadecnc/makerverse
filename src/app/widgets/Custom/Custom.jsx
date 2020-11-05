@@ -1,5 +1,6 @@
 import get from 'lodash/get';
 import Uri from 'jsuri';
+import log from 'js-logger';
 import pubsub from 'pubsub-js';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
@@ -10,7 +11,6 @@ import Iframe from 'app/components/Iframe';
 import ResizeObserver from 'app/lib/ResizeObserver';
 import Workspaces from 'app/lib/workspaces';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
 import styles from './index.styl';
 
 class Custom extends PureComponent {

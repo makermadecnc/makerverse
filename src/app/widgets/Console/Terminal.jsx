@@ -1,4 +1,5 @@
 import cx from 'classnames';
+import log from 'js-logger';
 import color from 'cli-color';
 import trimEnd from 'lodash/trimEnd';
 import PerfectScrollbar from 'perfect-scrollbar';
@@ -7,7 +8,6 @@ import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom';
 import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
-import log from 'app/lib/log';
 import History from './History';
 import styles from './index.styl';
 

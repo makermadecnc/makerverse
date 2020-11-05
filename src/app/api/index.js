@@ -1,10 +1,10 @@
 import ensureArray from 'ensure-array';
 import superagent from 'superagent';
 import semver from 'semver';
+import log from 'js-logger';
 import superagentUse from 'superagent-use';
 import settings from 'app/config/settings';
 import { parseSemver } from 'app/lib/semvers';
-import log from 'app/lib/log';
 import store from '../store';
 
 const bearer = (request) => {

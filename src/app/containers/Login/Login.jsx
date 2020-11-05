@@ -1,10 +1,10 @@
 import cx from 'classnames';
 import qs from 'qs';
+import log from 'js-logger';
 import React, { PureComponent } from 'react';
 import { withRouter, Redirect } from 'react-router-dom';
 import Space from 'app/components/Space';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
 import { setCookie, deleteCookie } from 'app/lib/cookies';
 import auth from 'app/lib/auth';
 import settings from 'app/config/settings';

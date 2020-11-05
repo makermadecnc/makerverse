@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import log from 'app/lib/log';
+import log from 'js-logger';
 import events from 'events';
 import WorkspaceAxis from 'app/lib/workspace-axis';
 import MachineSettings from 'app/lib/MachineSettings';
@@ -154,7 +154,9 @@ class Workspaces extends events.EventEmitter {
     }
 
     static defaultColor = '#4078c0';
+
     static defaultIcon = 'xyz';
+
     static defaultBkColor = '#f6f7f8';
 
     // Sidebar icon.

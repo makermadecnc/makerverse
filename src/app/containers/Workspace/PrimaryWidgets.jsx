@@ -1,4 +1,5 @@
 import chainedFunction from 'chained-function';
+import log from 'js-logger';
 import classNames from 'classnames';
 import ensureArray from 'ensure-array';
 import get from 'lodash/get';
@@ -10,7 +11,6 @@ import uuid from 'uuid';
 import { Button } from 'app/components/Buttons';
 import Modal from 'app/components/Modal';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import store from 'app/store';
 import Widget from './Widget';

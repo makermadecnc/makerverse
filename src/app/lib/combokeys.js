@@ -1,6 +1,6 @@
 import events from 'events';
+import log from 'js-logger';
 import Mousetrap from 'mousetrap';
-import log from './log';
 import { preventDefault } from './dom-events';
 
 const AXIS_X = 'x';
