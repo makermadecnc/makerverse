@@ -1,10 +1,21 @@
 import { authrequest } from 'app/api';
 import log from 'app/lib/log';
 
-export const devServer = window.location.origin.includes('dev.makerverse');
 export const prodHost = 'https://openwork.shop';
+export const stagingHost = 'https://staging.openwork.shop';
 export const devHost = 'http://dev.openwork.shop:5000';
-export const host = devServer ? devHost : prodHost;
+
+function getOwsHost(origin) {
+    if (origin.includes('dev.makerverse')) {
+        return devHost;
+    }
+    if (origin.includes('staging.makerverse')) {
+        return stagingHost;
+    }
+    return prodHost;
+}
+
+export const host = getOwsHost(window.location.origin);
 
 // Generic OWS API response handler.
 export const handler = (res) => {

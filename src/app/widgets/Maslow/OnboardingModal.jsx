@@ -54,6 +54,7 @@ class OnboardingModal extends React.PureComponent {
         workspace.controller.command('wipe');
         setTimeout(() => {
             workspace.machineSettings.write(grblSettings, () => {
+                workspace.controller.command('homing');
                 this.closeModal(true);
             });
         }, 2000);

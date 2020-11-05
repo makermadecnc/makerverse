@@ -1,38 +1,22 @@
 import api, { authrequest } from 'app/api';
 import config from 'app/store';
-import { createUserManager, loadUser } from 'redux-oidc';
 import Workspaces from 'app/lib/workspaces';
 import log from 'app/lib/log';
+import owsCore from '@openworkshop/lib/OpenWorkShopCore';
 import analytics from 'app/lib/analytics';
 import { getCookie } from 'app/lib/cookies';
 import series from 'app/lib/promise-series';
 import promisify from 'app/lib/promisify';
-import { prodHost } from 'app/lib/ows/api';
 
 // Makerverse OAuth login mechanism.
 // The oidc-client handles token hand-off and validation.
 
 const self = window.location.origin;
-const oauthConfig = {
-    client_id: 'Makerverse',
-    redirect_uri: `${self}/#/callback`,
-    post_logout_redirect_uri: `${self}/#/login`,
-    response_type: 'code',
-    scope: 'OpenWorkShopAPI openid profile',
-    authority: `${prodHost}/`,
-    silent_redirect_uri: `${self}/silent_renew.html`,
-    automaticSilentRenew: true,
-    filterProtocolClaims: true,
-    AccessTokenLifetime: (60 * 60 * 24 * 30), // 30 days
-    loadUserInfo: true,
-    monitorSession: false,
-};
-const authManager = createUserManager(oauthConfig);
 
 let _authenticated = false;
 
 const resume = (reduxStore) => new Promise((resolve, reject) => {
-    loadUser(reduxStore, auth.manager).then(signin).then(({ success }) => {
+    signin(owsCore.user).then(({ success }) => {
         resolve(success);
     });
 });
@@ -127,7 +111,7 @@ const signout = () => new Promise((resolve, reject) => {
     config.unset('session.token');
     config.set('session.enabled', false);
     auth.socket = {};
-    authManager.signoutRedirect();
+    owsCore.authManager.signoutRedirect();
     _authenticated = false;
     resolve();
 });
@@ -156,7 +140,23 @@ const auth = {
     isAuthenticated: isAuthenticated,
     setAuthenticated: setAuthenticated,
     hasGuestCookie: hasGuestCookie,
-    manager: authManager,
+    client: {
+        client_id: 'Makerverse',
+        redirect_uri: `${self}/#/callback`,
+        post_logout_redirect_uri: `${self}/#/login`,
+        response_type: 'code',
+        scope: 'OpenWorkShopAPI openid profile',
+        silent_redirect_uri: `${self}/silent_renew.html`,
+        automaticSilentRenew: true,
+        filterProtocolClaims: true,
+        AccessTokenLifetime: (60 * 60 * 24 * 30), // 30 days
+        loadUserInfo: true,
+        monitorSession: false,
+    },
+    hosts: {
+        'dev.makerverse': 'Development',
+        'staging.makerverse': 'Staging',
+    },
     signout: signout,
     signin: signin,
     resume: resume,

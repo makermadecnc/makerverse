@@ -1,4 +1,4 @@
-import _trim from 'lodash/trim';
+import GrblLineParserResultVersion from '../Grbl/GrblLineParserResultVersion';
 import {
     MASLOW_FIRMWARE_CLASSIC,
     MASLOW_FIRMWARE_DUE,
@@ -23,16 +23,14 @@ class MaslowLineParserResultVersion {
             return null;
         }
 
-        const parts = _trim(r[1], ' :.').split('.'),
-            numParts = parts.length;
-        if (numParts < 2) {
-            return null;
+        const ret = GrblLineParserResultVersion.parseVersion(r[1]);
+
+        if (ret.name === 'MazDue') {
+            // Legacy firmware name.
+            ret.name = MASLOW_FIRMWARE_DUE;
         }
 
-        return {
-            name: parts[numParts - 1] === 'MazDue' ? MASLOW_FIRMWARE_DUE : parts[numParts - 1],
-            version: parts[numParts - 2],
-        };
+        return ret;
     }
 
     static parseMaslowClassic(line) {
@@ -50,7 +48,7 @@ class MaslowLineParserResultVersion {
             ret.version = fw[1];
         }
         if (pcb) {
-            ret.pcb = pcb[1];
+            ret.edition = pcb[1];
         }
         return ret;
     }

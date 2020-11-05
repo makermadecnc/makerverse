@@ -459,6 +459,14 @@ class GrblController {
             this.feeder.next();
         });
 
+        this.runner.on('firmware', (res) => {
+            this.emit('serialport:read', res.raw);
+
+            const fw = { ...res };
+            delete fw.raw;
+            this.runner.settings.firmware = fw;
+        });
+
         this.runner.on('error', (res) => {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
@@ -705,8 +713,12 @@ class GrblController {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
         this.writeln('$$');
-
         await delay(50);
+
+        // Print firmware / version.
+        this.writeln('$I');
+        await delay(50);
+
         this.event.trigger('controller:ready');
     }
 

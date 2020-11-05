@@ -706,9 +706,13 @@ class VisualizerWidget extends PureComponent {
     pubsubTokens = [];
 
     // refs
-    widgetContent = null;
+    // widgetContent = React.createRef();
 
-    visualizer = null;
+    visualizerRef = React.createRef();
+
+    get visualizer() {
+        return this.visualizerRef.current;
+    }
 
     componentDidMount() {
         this.workspace.addControllerEvents(this.controllerEvents);
@@ -877,9 +881,6 @@ class VisualizerWidget extends PureComponent {
                     />
                 </Widget.Header>
                 <Widget.Content
-                    ref={node => {
-                        this.widgetContent = node;
-                    }}
                     className={classNames(
                         styles.widgetContent,
                         { [styles.view3D]: capable.view3D }
@@ -913,9 +914,7 @@ class VisualizerWidget extends PureComponent {
                             workspaceId={this.workspace.id}
                             show={showVisualizer}
                             cameraPosition={state.cameraPosition}
-                            ref={node => {
-                                this.visualizer = node;
-                            }}
+                            ref={this.visualizerRef}
                             state={state}
                         />
                     )}

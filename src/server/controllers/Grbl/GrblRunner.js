@@ -11,6 +11,7 @@ import GrblLineParserResultParameters from './GrblLineParserResultParameters';
 import GrblLineParserResultFeedback from './GrblLineParserResultFeedback';
 import GrblLineParserResultSettings from './GrblLineParserResultSettings';
 import GrblLineParserResultStartup from './GrblLineParserResultStartup';
+import GrblLineParserResultVersion from './GrblLineParserResultVersion';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_ALARM
@@ -52,6 +53,7 @@ class GrblRunner extends events.EventEmitter {
 
     settings = {
         version: '',
+        firmware: {},
         parameters: {
         },
         settings: {
@@ -111,6 +113,10 @@ class GrblRunner extends events.EventEmitter {
         }
         if (type === GrblLineParserResultOk) {
             this.emit('ok', payload);
+            return;
+        }
+        if (type === GrblLineParserResultVersion) {
+            this.emit('firmware', payload);
             return;
         }
         if (type === GrblLineParserResultError) {

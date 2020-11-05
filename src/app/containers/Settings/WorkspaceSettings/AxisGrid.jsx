@@ -8,7 +8,9 @@ const GetField = ({ onChange, key, axis }) => (
     onChange ? (
         <Input
             type="number"
-            name="name"
+            name={key}
+            min={-10000}
+            max={10000}
             className="form-control"
             placeholder={key}
             value={axis[key]}

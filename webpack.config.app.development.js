@@ -181,10 +181,14 @@ module.exports = {
         })
     ],
     resolve: {
+        alias: {
+            'react-dom': '@hot-loader/react-dom',
+        },
         modules: [
             path.resolve(__dirname, 'src'),
             'node_modules'
         ],
+        symlinks: false,
         extensions: ['.js', '.jsx']
     }
 };

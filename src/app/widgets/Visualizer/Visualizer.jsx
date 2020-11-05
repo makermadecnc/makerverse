@@ -39,6 +39,15 @@ const CAMERA_DISTANCE = 200; // Move the camera out a bit from the origin (0, 0,
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 
+const VizBox = React.forwardRef((props, ref) => (
+    <div
+        style={{
+            visibility: props.show ? 'visible' : 'hidden',
+        }}
+        ref={ref}
+    />
+));
+
 class Visualizer extends Component {
     static propTypes = {
         workspaceId: PropTypes.string.isRequired,
@@ -69,11 +78,7 @@ class Visualizer extends Component {
 
     group = new THREE.Group();
 
-    node = null;
-
-    setRef = (node) => {
-        this.node = node;
-    };
+    node = React.createRef();
 
     throttledResize = _throttle(() => {
         this.resizeRenderer();
@@ -113,8 +118,8 @@ class Visualizer extends Component {
     componentDidMount() {
         this.subscribe();
         this.addResizeEventListener();
-        if (this.node) {
-            const el = ReactDOM.findDOMNode(this.node);
+        if (this.node.current) {
+            const el = ReactDOM.findDOMNode(this.node.current);
             this.createScene(el);
             this.resizeRenderer();
         }
@@ -334,7 +339,7 @@ class Visualizer extends Component {
     }
 
     getVisibleWidth() {
-        const el = ReactDOM.findDOMNode(this.node);
+        const el = ReactDOM.findDOMNode(this.node.current);
         const visibleWidth = Math.max(
             Number(el && el.parentNode && el.parentNode.clientWidth) || 0,
             360
@@ -1155,14 +1160,7 @@ class Visualizer extends Component {
             return null;
         }
 
-        return (
-            <div
-                style={{
-                    visibility: this.props.show ? 'visible' : 'hidden',
-                }}
-                ref={this.setRef}
-            />
-        );
+        return <VizBox ref={this.node} show={this.props.show} />;
     }
 }
 

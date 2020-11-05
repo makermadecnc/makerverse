@@ -266,7 +266,7 @@ export const MASLOW_ALARMS = [
     {
         code: 1,
         message: 'Hard limit',
-        description: 'Hard limit has been triggered. Machine position is likely lost due to sudden halt. Re-homing is highly recommended.'
+        description: 'Hard limit has been triggered. Machine position is likely lost due to sudden halt.  If the machine position is incorrect, reset the chains.'
     },
     {
         code: 2,
@@ -276,7 +276,7 @@ export const MASLOW_ALARMS = [
     {
         code: 3,
         message: 'Abort during cycle',
-        description: 'Reset while in motion. Machine position is likely lost due to sudden halt. Re-homing is highly recommended.'
+        description: 'Reset while in motion; machine position may be corrupted. If the machine position is incorrect, reset the chains.'
     },
     {
         code: 4,
