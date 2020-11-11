@@ -3,7 +3,7 @@ layout: default
 title: Maslow
 grand_parent: Machines
 parent: CNC
-nav_order: 1
+nav_order: 2
 ---
 
 # Maslow

@@ -1,21 +1,39 @@
 #!/bin/bash
-path=${1:-/}
 
 # Figure out where the git checkout directory lives, if any:
 if [[ -z "$MAKERVERSE_SRC_DIR" ]]; then
   # Otherwise, the parent directory of this script should (hopefully) work.
   MAKERVERSE_SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
 fi
+
+fn="${MAKERVERSE_SRC_DIR}/kiosk.log"
+echo "Launching Makerverse kiosk..." > $fn
+printenv | grep "MAKERVERSE" >> $fn
+
 MAKERVERSE_PROTOCOL="${MAKERVERSE_PROTOCOL:-http}"
 MAKERVERSE_HOST="${MAKERVERSE_HOST:-localhost}"
 MAKERVERSE_PORT="${MAKERVERSE_PORT:-8000}"
-MAKERVERSE_KIOSK_SCALE="${MAKERVERSE_KIOSK_SCALE:-1.0}"
-url="${MAKERVERSE_PROTOCOL}://${MAKERVERSE_HOST}:${MAKERVERSE_PORT}${path}"
+MAKERVERSE_PATH="${MAKERVERSE_PATH:-/}"
+url="${MAKERVERSE_PROTOCOL}://${MAKERVERSE_HOST}:${MAKERVERSE_PORT}${MAKERVERSE_PATH}"
+flags=""
+
+if [[ ! -z "$MAKERVERSE_SCALE" ]]; then
+  flags="${flags} --force-device-scale-factor=${MAKERVERSE_SCALE}"
+fi
+
+if [[ ! -z "$MAKERVERSE_KIOSK" ]]; then
+  flags="${flags} --noerrdialogs --disable-infobars --kiosk"
+fi
 
 while [[ ! $(curl -s $url) ]]; do
-  echo "Waiting for $url"
+  echo "Waiting for $url" >> $fn
   sleep 1;
 done
 
-bash ${MAKERVERSE_SRC_DIR}/scripts/kiosk.sh "$url" \
-  -f "--noerrdialogs --disable-infobars --ignore-certificate-errors --force-device-scale-factor=${MAKERVERSE_KIOSK_SCALE}"
+echo "Ready to launch: ${flags}" >> $fn
+
+if [[ ! -z "${flags}" ]]; then
+  bash ${MAKERVERSE_SRC_DIR}/scripts/kiosk.sh "$url" -f "${flags}"
+else
+  bash ${MAKERVERSE_SRC_DIR}/scripts/kiosk.sh "$url"
+fi
