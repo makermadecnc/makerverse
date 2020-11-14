@@ -43,8 +43,8 @@ class Hardware {
         }
 
         const hadPlainVersion = this.hasPlainVersion;
-        this.version = controllerSettings.version ?
-            { name: this._controllerType, version: controllerSettings.version } : {};
+        this.version = controllerSettings.version
+            ? { name: this._controllerType, version: controllerSettings.version } : {};
         this.versionStr = this._getVersionStr(this.version);
         const updatedVersion = this.hasPlainVersion && !hadPlainVersion;
         if (updatedVersion) {
@@ -77,7 +77,7 @@ class Hardware {
         }
         if (name !== this.firmware.name) {
             return {
-                'error': i18n._('Unexpected firmware type: {{ name }}', { name: this.firmware.name })
+                'warning': i18n._('Unexpected firmware type: {{ name }}', { name: this.firmware.name })
             };
         }
         if (!this.hasFirmwareVersion(requiredVersion)) {
@@ -91,7 +91,7 @@ class Hardware {
             };
         }
 
-        return { 'info': i18n._('You have the latest firmware.') };
+        return { 'success': i18n._('You have the latest firmware.') };
     }
 
     // Cast the internal firmware.version to a number, if it exists.

@@ -23,9 +23,6 @@ import {
 const log = logger('api:users');
 const CONFIG_KEY = 'users';
 
-const useLocal = false;
-const owsUrl = useLocal ? 'http://localhost:5000' : 'https://openwork.shop';
-
 // Modify request headers and query parameters to prevent caching
 const noCache = (request) => {
     const now = Date.now();
@@ -108,6 +105,7 @@ export const getUserByToken = (token) => {
 
 export const signin = (req, res) => {
     const { token = '' } = { ...req.body };
+    const { ows } = { ...req.query };
 
     if (token.length <= 0 && isGuestAccessEnabled()) {
         res.send({ enabled: true, guest: true, user: guestUser });
@@ -117,15 +115,18 @@ export const signin = (req, res) => {
         request.set('Authorization', 'Bearer ' + token);
         request.set('ClientVersion', pkg.version);
     });
-    owsreq.get(`${owsUrl}/api/users/me`)
+
+    const owsUrl = ows ?? 'https://openwork.shop';
+    const url = `${owsUrl}/api/users/me`;
+    owsreq.get(url)
         .send()
         .then((result) => {
             const body = result ? result.body : {};
             const record = body && body.data ? body.data : {};
 
             if (!record || !record.username) {
-                log.warn('Login Failure Result', body);
-                throw new Error('User not found');
+                log.warn('Login Failure Result', url, body);
+                throw new Error('User profile could not be loaded.');
             }
 
             const users = getValidUsers();

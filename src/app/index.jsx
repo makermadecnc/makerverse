@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom';
 import moment from 'moment';
 import pubsub from 'pubsub-js';
+import OpenWorkShopContext from '@openworkshop/lib/OpenWorkShopContext';
 // import qs from 'qs';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -18,6 +19,7 @@ import { configureStore } from '@openworkshop/lib/store';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 import XHR from 'i18next-xhr-backend';
+import { setOwsSettings } from './lib/ows/settings';
 import { Provider as GridSystemProvider } from './components/GridSystem';
 import ProtectedRoute from './components/ProtectedRoute';
 import settings from './config/settings';
@@ -79,7 +81,10 @@ function addListeners() {
 }
 
 const LoadedApp = () => {
+    const owsCore = React.useContext(OpenWorkShopContext);
+
     usePromise(async() => {
+        log.debug('loading...');
         // log.setLevel(getLogLevel());
 
         await i18next
@@ -96,7 +101,8 @@ const LoadedApp = () => {
             return;
         }
 
-        await auth.resume();
+        setOwsSettings(owsCore.settings);
+        await auth.resume(owsCore);
 
         addListeners();
     }, []);
@@ -115,8 +121,8 @@ const LoadedApp = () => {
         >
             <Router>
                 <Switch>
-                    <Route path="/login" component={Login} />
-                    <Route path="/callback" component={Callback} />
+                    <Route path="/login"><Login owsCore={owsCore} /></Route>
+                    <Route path="/callback"><Callback owsCore={owsCore} /></Route>
                     <ProtectedRoute path="/" component={App} />
                 </Switch>
             </Router>
@@ -127,13 +133,14 @@ const LoadedApp = () => {
 const container = document.createElement('div');
 document.body.appendChild(container);
 
+log.debug('startup');
 ReactDOM.render(
     <Provider store={reduxStore}>
         <OpenWorkShopProvider
             store={reduxStore}
             client={auth.client}
             hostnameMap={auth.hosts}
-            i18nMiddleware={initReactI18next}
+            i18nMiddleware={[initReactI18next]}
         >
             <LoadedApp />
         </OpenWorkShopProvider>

@@ -10,7 +10,10 @@ import {
     ERR_NOT_FOUND,
     ERR_INTERNAL_SERVER_ERROR
 } from '../constants';
-import { MASLOW, GRBL, MARLIN, TINYG } from '../controllers/Maslow/constants';
+import { MASLOW } from '../controllers/Maslow/constants';
+import { GRBL } from '../controllers/Grbl/constants';
+import { MARLIN } from '../controllers/Marlin/constants';
+import { TINYG } from '../controllers/TinyG/constants';
 
 const log = logger('api:workspaces');
 const CONFIG_KEY = 'workspaces';

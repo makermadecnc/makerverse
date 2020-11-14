@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import React from 'react';
+import { Alert } from '@material-ui/lab';
 import i18n from 'app/lib/i18n';
 import analytics from 'app/lib/analytics';
-import { ToastNotification } from 'app/components/Notifications';
 
 class FirmwareRequirement extends React.PureComponent {
     state = { };
@@ -24,13 +24,17 @@ class FirmwareRequirement extends React.PureComponent {
         }
 
         return (
-            <analytics.OutboundLink
-                eventLabel="firmware_help"
-                to={fw.helpUrl}
-                target="_blank"
-            >
-                {i18n._('Get Help')}
-            </analytics.OutboundLink>
+            <span>
+                {' ('}
+                <analytics.OutboundLink
+                    eventLabel="firmware_help"
+                    to={fw.helpUrl}
+                    target="_blank"
+                >
+                    {i18n._('Get Help')}
+                </analytics.OutboundLink>
+                )
+            </span>
         );
     }
 
@@ -50,8 +54,8 @@ class FirmwareRequirement extends React.PureComponent {
     }
 
     getSeverity(compatibility) {
-        const levels = ['error', 'warning', 'info'];
-        for (var i = 0; i < levels.length; i++) {
+        const levels = ['error', 'warning', 'info', 'success'];
+        for (let i = 0; i < levels.length; i++) {
             if (_.has(compatibility || {}, levels[i])) {
                 return levels[i];
             }
@@ -67,18 +71,16 @@ class FirmwareRequirement extends React.PureComponent {
         const hasProblem = compatibility && !isOk;
         const showDownload = hasProblem || !compatibility;
         const latestVersion = firmware.suggestedVersion || firmware.requiredVersion;
-        const dlText = hasProblem ? compatibility[severity] :
-            i18n._('Download v{{ version }}', { version: latestVersion });
+        const dlText = hasProblem ? compatibility[severity]
+            : i18n._('Download v{{ version }}', { version: latestVersion });
 
         return (
-            <ToastNotification type={severity}>
-                <h6 style={{ marginTop: 0 }}>
-                    {i18n._('Firmware: {{ name }}', { name: firmware.name })}
-                </h6>
+            <Alert severity={severity}>
                 {showDownload && this.renderDownloadText(firmware, dlText)}
+                {!showDownload && compatibility[severity]}
                 <br />
                 {showHelp && this.renderHelpLink(firmware)}
-            </ToastNotification>
+            </Alert>
         );
     }
 }

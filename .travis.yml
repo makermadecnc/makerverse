@@ -16,7 +16,6 @@ jobs:
   # services:
   #   - docker
   before_install:
-    - npm install yarn
     # Install Docker 19.x, not 18
     - curl -fsSL https://get.docker.com | sh
     - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
@@ -31,7 +30,7 @@ jobs:
     - docker context ls
   install:
     # With a multi-arch build, installing on the host machine first is faster.
-    - yarn install
+    - yarn install --production
     # Create a multi-arch buildx user: https://github.com/docker/buildx/issues/138
     - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
     - docker buildx create --platform linux/arm64,linux/arm/v7 --name xbuilder --use
@@ -113,9 +112,6 @@ os: linux
 language: node_js
 node_js:
   - "12"
-
-before_install:
-  - npm install yarn
 
 before_script:
 - chmod -R +x scripts/

@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import 'typeface-roboto';
+import 'typeface-cabin';
 import classNames from 'classnames';
 import Controller from 'cncjs-controller';
 import io from 'socket.io-client';

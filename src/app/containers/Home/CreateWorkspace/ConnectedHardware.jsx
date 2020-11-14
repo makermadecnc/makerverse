@@ -1,8 +1,9 @@
 import React from 'react';
+import AlertList from '@openworkshop/ui/components/Alerts/AlertList';
+import { Alert } from '@material-ui/lab';
 import Space from 'app/components/Space';
 import i18n from 'app/lib/i18n';
 import analytics from 'app/lib/analytics';
-import { ToastNotification } from 'app/components/Notifications';
 import FirmwareRequirement from './FirmwareRequirement';
 
 class ConnectedHardware extends React.PureComponent {
@@ -35,16 +36,16 @@ class ConnectedHardware extends React.PureComponent {
     renderControllerMismatch(hw, requiredFirmware) {
         const controllerMismatch = hw.controllerType !== requiredFirmware.controllerType;
         return controllerMismatch && (
-            <ToastNotification type="error">
+            <Alert severity="error">
                 {i18n._('Expected controller type:')}: <strong>{hw.controllerType}</strong>
-            </ToastNotification>
+            </Alert>
         );
     }
 
     renderProtocolError(hw, requiredFirmware, serialOutput) {
         const ack = serialOutput.length > 0;
         return !hw.isValid && (
-            <ToastNotification type="error">
+            <Alert severity="error">
                 {i18n._('Unable to validate protocol')}
                 <br />
                 {!ack && i18n._('(board not speaking at baud rate, or port is busy)')}
@@ -57,26 +58,26 @@ class ConnectedHardware extends React.PureComponent {
                         })}
                     </div>
                 )}
-            </ToastNotification>
+            </Alert>
         );
     }
 
     renderProtocolPending(hw, requiredFirmware) {
         return !hw.isValid && (
-            <ToastNotification type="">
+            <Alert>
                 {i18n._('Attempting to validate machine protocol...')}
-            </ToastNotification>
+            </Alert>
         );
     }
 
     renderControllerTypeAndBaudRate(hw, baudRate) {
         return (
-            <ToastNotification type={hw.isValid ? 'info' : ''}>
+            <Alert severity={hw.isValid ? 'success' : 'info'}>
                 {hw.isValid ? i18n._('Confirmed Protocol: ') : i18n._('Request Protocol: ')}
                 <strong>{hw.controllerType}</strong>
                 <br />
                 {i18n._('At Baud Rate: ')}<strong>{baudRate}</strong>
-            </ToastNotification>
+            </Alert>
         );
     }
 
@@ -95,9 +96,9 @@ class ConnectedHardware extends React.PureComponent {
             );
         });
         return cnt > 0 && (
-            <ToastNotification type="">
+            <Alert >
                 {divs}
-            </ToastNotification>
+            </Alert>
         );
     }
 
@@ -124,7 +125,7 @@ class ConnectedHardware extends React.PureComponent {
         const showRequiredFirmware = hw.isValid && requiredFirmware;
 
         return (
-            <div>
+            <AlertList>
                 {timeoutElapsed && this.renderProtocolError(hw, requiredFirmware, serialOutput)}
                 {showRequiredFirmware && this.renderRequiredFirmware(hw, requiredFirmware)}
                 {this.renderControllerTypeAndBaudRate(hw, requiredFirmware.baudRate)}
@@ -137,7 +138,7 @@ class ConnectedHardware extends React.PureComponent {
                 })}
                 <button
                     type="button"
-                    style={{ position: 'absolute', top: -4, right: 0 }}
+                    style={{ marginTop: 10 }}
                     className="btn btn-danger"
                     onClick={actions.handleClosePort}
                     title="Close connection with control board"
@@ -146,7 +147,7 @@ class ConnectedHardware extends React.PureComponent {
                     <Space width="8" />
                     {i18n._('Disconnect')}
                 </button>
-            </div>
+            </AlertList>
         );
     }
 }

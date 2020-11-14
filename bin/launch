@@ -16,8 +16,17 @@ fi
 MAKERVERSE_GIT_DIR="${MAKERVERSE_SRC_DIR}"
 MAKERVERSE_LAUNCH_METHOD=${MAKERVERSE_LAUNCH_METHOD:-docker}
 MAKERVERSE_SETTINGS_FILE="${MAKERVERSE_HOME}/.makerverse"
+MAKERVERSE_STATUS_FILE="${MAKERVERSE_GIT_DIR}/.makerverse-status"
 MAKERVERSE_WATCH_DIR="${MAKERVERSE_WATCH_DIR:-${MAKERVERSE_HOME}/gcode}"
 MAKERVERSE_PORT="${MAKERVERSE_PORT:-8000}"
+
+# Write $1 to the status file and echo $2 to the console.
+set_status() {
+  echo "$1" > "${MAKERVERSE_STATUS_FILE}"
+  if [[ ! -z "$2" ]]; then
+    echo "$2"
+  fi
+}
 
 # Scan dependency versions
 if [[ $(which node) ]]; then
@@ -92,6 +101,7 @@ checkout() {
 
 # Prompt for installation, giving prompt $1 on aptitude and $2 for downloads
 installPrompt() {
+  set_status "install:prompt"
   if [[ $(which apt) ]]; then
     echo "You appear to be on a Debian system (e.g., Ubuntu, Raspbian). Here is the one-line install script:"
     echo "$1"
@@ -118,6 +128,7 @@ launch() {
   method="${1}"
   channel="${2}"
   echo "Makerverse:${channel} settings: ${MAKERVERSE_SETTINGS_FILE} (project at: ${MAKERVERSE_GIT_DIR})"
+  set_status "${method}:${channel}:launch"
 
   if [ "$method" = "node" ]; then
     createSettings ".makerverse.default"
@@ -155,15 +166,15 @@ launch() {
 
     docker_tagged="${docker_img}:${channel}"
     if [[ "$_arg_update" = "on" ]]; then
-      echo "Removing old versions (pruning docker)..."
+      set_status "${method}:${channel}:prune" "Removing old versions (pruning docker)..."
       docker system prune --force
 
-      echo "Updating $docker_tagged..."
+      set_status "${method}:${channel}:pull" "Updating $docker_tagged..."
       docker pull "$docker_tagged"
     fi
-    echo "Killing prior instances..."
+    set_status "${method}:${channel}:kill" "Killing prior instances..."
     docker kill makerverse || true
-    echo "Launching $docker_tagged..."
+    set_status "${method}:${channel}:launch" "Launching $docker_tagged..."
     docker run --rm --privileged --name makerverse \
       -p "${MAKERVERSE_PORT}:8000" \
       -v /dev:/dev \

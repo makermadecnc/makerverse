@@ -1,6 +1,7 @@
 class GrblLineParserResultVersion {
     // SainSmart / standard Grbl: "1.1f.20170801:LASER"
     // Maslow / etc.: "1.1g.20200909.MaslowDue:""
+    // Carvey: [VER:2.0.0.20170522::CTRL0] => 2.0.0.20170522:CARVEY:R13:969-9510604:CTRL0
     static parseVersion(ver) {
         const p = ver.split(':');
         const ret = {};

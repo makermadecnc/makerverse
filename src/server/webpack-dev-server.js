@@ -21,7 +21,7 @@ const webpackDevServer = (app) => {
         // https://webpack.github.io/docs/node.js-api.html#compiler
         watchOptions: {
             poll: true, // use polling instead of native watchers
-            ignored: /node_modules/
+            ignored: /node_modules\/(?!@openworkshop\/.+)/
         },
         publicPath: webpackConfig.output.publicPath,
         stats: {

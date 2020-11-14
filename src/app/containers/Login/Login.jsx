@@ -13,7 +13,7 @@ import styles from './index.styl';
 
 class Login extends PureComponent {
     static propTypes = {
-        ...withRouter.propTypes
+        ...withRouter.propTypes,
     };
 
     state = this.getDefaultState();
@@ -33,7 +33,7 @@ class Login extends PureComponent {
                 action: register ? 'register' : 'login',
             });
 
-            auth.manager.createSigninRequest().then(r => {
+            this.props.owsCore.authManager.createSigninRequest().then(r => {
                 const url = register ? r.url.replace('/login?', '/register?') : r.url;
                 window.location.replace(url);
             }).catch((e) => {
@@ -255,7 +255,7 @@ class Login extends PureComponent {
                             <button
                                 type="submit"
                                 className="btn btn-block btn-primary"
-                                onClick={(e) => auth.signout()}
+                                onClick={(e) => auth.signout(this.props.owsCore)}
                                 disabled={authenticating}
                             >
                                 <i

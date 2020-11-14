@@ -1,12 +1,13 @@
 import log from 'js-logger';
-import api, { authrequest } from 'app/api';
+import api from 'app/api';
+import authrequest from 'app/lib/ows/authrequest';
 import config from 'app/store';
 import Workspaces from 'app/lib/workspaces';
-import owsCore from '@openworkshop/lib/OpenWorkShopCore';
 import analytics from 'app/lib/analytics';
 import { getCookie } from 'app/lib/cookies';
 import series from 'app/lib/promise-series';
 import promisify from 'app/lib/promisify';
+
 
 // Makerverse OAuth login mechanism.
 // The oidc-client handles token hand-off and validation.
@@ -15,7 +16,7 @@ const self = window.location.origin;
 
 let _authenticated = false;
 
-const resume = (reduxStore) => new Promise((resolve, reject) => {
+const resume = (owsCore, reduxStore) => new Promise((resolve, reject) => {
     signin(owsCore.user).then(({ success }) => {
         resolve(success);
     });
@@ -107,7 +108,7 @@ const signin = (oidc, guest = false) => new Promise((resolve, reject) => {
         });
 });
 
-const signout = () => new Promise((resolve, reject) => {
+const signout = (owsCore) => new Promise((resolve, reject) => {
     config.unset('session.token');
     config.set('session.enabled', false);
     auth.socket = {};

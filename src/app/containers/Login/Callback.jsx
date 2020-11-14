@@ -50,7 +50,7 @@ class Callback extends PureComponent {
 
         return (
             <CallbackComponent
-                userManager={auth.manager}
+                userManager={this.props.owsCore.authManager}
                 successCallback={(s) => this.handleSuccess(s)}
                 errorCallback={(e) => this.handleError(e)}
             >

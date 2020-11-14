@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 // AXIS
 export const AXIS_E = 'e';
 export const AXIS_X = 'x';
@@ -25,6 +27,16 @@ export const CONTROLLERS = [
     TINYG,
     MASLOW,
 ];
+
+// Get one of the const values from a name
+// e.g., "mAsLoW" => MASLOW
+export function controllerTypeToConst(name) {
+    const n = name.toUpperCase();
+    if (n === 'tiny_g') {
+        return TINYG;
+    }
+    return _.find(CONTROLLERS, c => c.toUpperCase() === n);
+}
 
 // Workflow State
 export const WORKFLOW_STATE_IDLE = 'idle';

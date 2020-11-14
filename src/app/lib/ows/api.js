@@ -1,21 +1,6 @@
 import log from 'js-logger';
-import { authrequest } from 'app/api';
-
-export const prodHost = 'https://openwork.shop';
-export const stagingHost = 'https://staging.openwork.shop';
-export const devHost = 'http://dev.openwork.shop:5000';
-
-function getOwsHost(origin) {
-    if (origin.includes('dev.makerverse')) {
-        return devHost;
-    }
-    if (origin.includes('staging.makerverse')) {
-        return stagingHost;
-    }
-    return prodHost;
-}
-
-export const host = getOwsHost(window.location.origin);
+import authrequest from './authrequest';
+import { getOwsHost } from './settings';
 
 // Generic OWS API response handler.
 export const handler = (res) => {
@@ -41,5 +26,5 @@ export const catcher = (err) => {
 };
 
 // Conveniences
-export const get = (path) => authrequest.get(`${host}/api/${path}`).then(handler).catch(catcher);
-export const post = (path, data) => authrequest.post(`${host}/api/${path}`).send(data).then(handler).catch(catcher);
+export const get = (path) => authrequest.get(`${getOwsHost().origin}/api/${path}`).then(handler).catch(catcher);
+export const post = (path, data) => authrequest.post(`${getOwsHost().origin}/api/${path}`).send(data).then(handler).catch(catcher);

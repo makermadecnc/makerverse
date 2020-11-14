@@ -1,10 +1,10 @@
 FROM node:12
-MAINTAINER Zane Claes <zane@technicallywizardry.com>
+MAINTAINER Zane Claes <zane@openwork.shop>
 
 # Install global dependencies
 RUN apt-get update -y && \
   apt-get install --no-install-recommends -y \
-    python-pip git curl make g++ udev && \
+    python-pip git curl make g++ udev yarn && \
   apt-get -y autoclean
 
 # Install Docker, for access within the container.
@@ -21,8 +21,7 @@ ADD --chown=node:node . /home/node
 
 # The node_modules are intentionally excluded by .dockerignore.
 # Some modules have architecture-dependent install candidates, which are resolved here.
-RUN npm install -g yarn
-RUN yarn install
+RUN yarn install --production
 
 EXPOSE 8000
 ENTRYPOINT ["/home/node/bin/docker-entrypoint"]
