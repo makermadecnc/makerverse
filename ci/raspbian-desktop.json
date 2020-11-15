@@ -35,7 +35,7 @@
       ["mkdir", "$MOUNTPOINT/home/pi/makerverse/widgets"],
       ["cp", "/build/docs/assets/logo.png", "$MOUNTPOINT/home/pi/makerverse/logo.png"],
       ["cp", "/build/bin/Makerverse.desktop", "$MOUNTPOINT/usr/share/applications/Makerverse.desktop"],
-      ["cp", "/build/.makerverse.docker", "$MOUNTPOINT/home/pi/.makerverse"],
+      ["cp", "/build/ci/makerverse.docker", "$MOUNTPOINT/home/pi/.makerverse"],
       ["cp", "/build/scripts/gpio.sh", "$MOUNTPOINT/home/pi/makerverse/commands/gpio.sh"],
       ["cp", "-r", "/build/bin", "$MOUNTPOINT/home/pi/makerverse/"],
       ["cp", "-r", "/build/scripts", "$MOUNTPOINT/home/pi/makerverse/"]

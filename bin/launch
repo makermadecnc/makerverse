@@ -18,7 +18,7 @@ MAKERVERSE_LAUNCH_METHOD=${MAKERVERSE_LAUNCH_METHOD:-docker}
 MAKERVERSE_SETTINGS_FILE="${MAKERVERSE_HOME}/.makerverse"
 MAKERVERSE_STATUS_FILE="${MAKERVERSE_GIT_DIR}/.makerverse-status"
 MAKERVERSE_WATCH_DIR="${MAKERVERSE_WATCH_DIR:-${MAKERVERSE_HOME}/gcode}"
-MAKERVERSE_PORT="${MAKERVERSE_PORT:-8000}"
+MAKERVERSE_PORT="${MAKERVERSE_PORT:-8000}"¨¨
 
 # Write $1 to the status file and echo $2 to the console.
 set_status() {
@@ -131,7 +131,7 @@ launch() {
   set_status "${method}:${channel}:launch"
 
   if [ "$method" = "node" ]; then
-    createSettings ".makerverse.default"
+    createSettings "ci/makerverse.default"
     # Update Makerverse, build, and run the Node.js application directly.
     if [[ "$nv" =~ "v12." ]]; then
       echo "NodeJS $nv detected"
@@ -151,7 +151,7 @@ launch() {
     npm run build-prod
     node ./bin/makerverse -p "${MAKERVERSE_PORT}"
   elif [ "$method" = "docker" ] || [ "$method" = "" ]; then
-    createSettings ".makerverse.docker"
+    createSettings "ci/makerverse.docker"
     # Launch via a docker image
     if [[ "$dv" = "-" ]]; then
       echo "Docker is not running."

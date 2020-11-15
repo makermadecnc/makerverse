@@ -81,9 +81,7 @@ jobs:
 - name: "Linux"
   os: linux
   script:
-  - yarn run build-latest
-  - yarn run build:linux-ia32
-  - yarn run build:linux-x64
+  - scripts/build-os.sh linux-ia32 linux-x64
 # [Job] MacOS (Electron App)
 - name: "MacOS"
   os: osx
@@ -93,14 +91,12 @@ jobs:
   # before_deploy:
   # - scripts/add-osx-cert.sh
   script:
-  - yarn run build-latest
-  - yarn run build:mac-x64
+  - scripts/build-os.sh mac-x64
 # [Job] Windows (Electron App)
 - name: "Windows"
   os: windows
   script:
-  - yarn run build-latest
-  - yarn run build:win-x64
+  - scripts/build-os.sh win-x64
 
 # --------------------------------------------------------------------------------------------------
 # Default job settings, when not overwritten by specific jobs.
@@ -111,7 +107,7 @@ group: travis_latest
 os: linux
 language: node_js
 node_js:
-  - "12"
+  - "14"
 
 before_script:
 - chmod -R +x scripts/
@@ -126,6 +122,7 @@ env:
     - RELEASE_NAME="${PRODUCT_NAME} v${CI_VERSION}"
     - RELEASE_FILE="makerverse-${CI_SEMVER}"
     - LAST_COMMIT_DATE=`git log -1 --pretty=%cD`
+    - IS_MASTER_RELEASE=$(if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then echo "true"; else echo "false"; fi)
 
 cache:
   directories:

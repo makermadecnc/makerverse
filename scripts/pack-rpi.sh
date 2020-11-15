@@ -11,13 +11,11 @@ else
   edition="lite"
 fi
 
-if [[ ! -z "$CI_SEMVER" ]]; then
-  if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
-    echo "Building ${name} v${vers}"
-  else
-    echo "Skipping building ${name} until deployment."
-    exit 0
-  fi
+if [ "$IS_MASTER_RELEASE" = "true" ]; then
+  echo "Building ${name} v${vers}"
+else
+  echo "Skipping building ${name} until deployment."
+  exit 0
 fi
 cf="raspbian-${edition}.json"
 
@@ -26,7 +24,7 @@ prereleases="false"
 if [[ $(echo $CI_VERSION | grep '-') ]]; then
   prereleases="true"
 fi
-mvfn="./.makerverse.docker"
+mvfn="./ci/makerverse.docker"
 echo "Setting prereleases = ${prereleases} in ${mvfn}"
 sed -i "s/\"prereleases\": true/\"prereleases\": ${prereleases}/g" $mvfn
 sed -i "s/\"prereleases\": false/\"prereleases\": ${prereleases}/g" $mvfn

@@ -10,7 +10,7 @@ echo "Docker '$@' for $BUILD_PLATFORMS"
 
 TAG2=""
 
-if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
+if [ "$IS_MASTER_RELEASE" = "true" ]; then
   if [ "$1" = "build" ]; then
     # Master branch has a deploy step. Others use the build as the deploy.
     echo "Skipping Docker build until Deploy step on master branch."
