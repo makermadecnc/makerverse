@@ -9,7 +9,6 @@ const without = require('lodash/without');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const nib = require('nib');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const stylusLoader = require('stylus-loader');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
@@ -40,7 +39,7 @@ module.exports = {
     cache: true,
     target: 'web',
     context: path.resolve(__dirname, 'src/app'),
-    devtool: 'cheap-module-source-map',
+    devtool: 'eval-cheap-module-source-map',
     entry: {
         polyfill: [
             path.resolve(__dirname, 'src/app/polyfill/index.js')
@@ -82,7 +81,7 @@ module.exports = {
                         loader: 'css-loader',
                         options: {
                             modules: true,
-                            localIdentName: '[path][name]__[local]--[hash:base64:5]',
+                            localIdentName: '[path][name]__[local]--[fullhash:base64:5]',
                             camelCase: true,
                             importLoaders: 1,
                         }
@@ -118,6 +117,17 @@ module.exports = {
                 ]
             },
             {
+                loader: 'stylus-loader',
+                options: {
+                    stylusOptions: {
+                        // nib - CSS3 extensions for Stylus
+                        use: [nib()],
+                        // no need to have a '@import "nib"' in the stylesheet
+                        import: ['~nib/lib/nib/index.styl']
+                    }
+                }
+            },
+            {
                 test: /\.(png|jpg|svg)$/,
                 loader: 'url-loader',
                 options: {
@@ -138,11 +148,11 @@ module.exports = {
             }
         ].filter(Boolean)
     },
-    node: {
-        fs: 'empty',
-        net: 'empty',
-        tls: 'empty'
-    },
+    // node: {
+    //     fs: 'empty',
+    //     net: 'empty',
+    //     tls: 'empty'
+    // },
     optimization: {
         minimizer: [
             USE_TERSER_PLUGIN && (
@@ -162,14 +172,14 @@ module.exports = {
                 TRACKING_ID: JSON.stringify(buildConfig.analytics.trackingId)
             }
         }),
-        new stylusLoader.OptionsPlugin({
-            default: {
-                // nib - CSS3 extensions for Stylus
-                use: [nib()],
-                // no need to have a '@import "nib"' in the stylesheet
-                import: ['~nib/lib/nib/index.styl']
-            }
-        }),
+        // new stylusLoader.OptionsPlugin({
+        //     default: {
+        //         // nib - CSS3 extensions for Stylus
+        //         use: [nib()],
+        //         // no need to have a '@import "nib"' in the stylesheet
+        //         import: ['~nib/lib/nib/index.styl']
+        //     }
+        // }),
         new webpack.ContextReplacementPlugin(
             /moment[\/\\]locale$/,
             new RegExp('^\./(' + without(buildConfig.languages, 'en').join('|') + ')$')
@@ -191,7 +201,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: 'index.hbs',
             template: path.resolve(__dirname, 'index.hbs'),
-            chunksSortMode: 'dependency' // Sort chunks by dependency
+            chunksSortMode: 'auto'
         })
     ],
     resolve: {

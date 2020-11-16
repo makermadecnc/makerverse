@@ -1,13 +1,13 @@
 const path = require('path');
-const CSSSplitWebpackPlugin = require('css-split-webpack-plugin').default;
+// const CSSSplitWebpackPlugin = require('css-split-webpack-plugin').default;
 const dotenv = require('dotenv');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const without = require('lodash/without');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const nib = require('nib');
-const stylusLoader = require('stylus-loader');
+// const stylusLoader = require('stylus-loader');
 const webpack = require('webpack');
-const ManifestPlugin = require('webpack-manifest-plugin');
+// const ManifestPlugin = require('webpack-manifest-plugin');
 const WriteFileWebpackPlugin = require('write-file-webpack-plugin');
 const babelConfig = require('./babel.config');
 const buildConfig = require('./build.config');
@@ -24,7 +24,7 @@ module.exports = {
     cache: true,
     target: 'web',
     context: path.resolve(__dirname, 'src/app'),
-    devtool: 'cheap-module-eval-source-map',
+    devtool: 'eval-cheap-module-source-map', //cheap-module-eval-source-map
     entry: {
         polyfill: [
             path.resolve(__dirname, 'src/app/polyfill/index.js'),
@@ -35,10 +35,15 @@ module.exports = {
             'webpack-hot-middleware/client?path=/__webpack_hmr&reload=true',
         ]
     },
+    watch: true,
+    watchOptions: {
+        poll: true, // use polling instead of native watchers
+        ignored: /node_modules\/(?!@openworkshop\/.+)/
+    },
     output: {
         path: path.resolve(__dirname, 'output/app'),
-        chunkFilename: `[name].[hash].bundle.js?_=${timestamp}`,
-        filename: `[name].[hash].bundle.js?_=${timestamp}`,
+        chunkFilename: `[name].[fullhash].bundle.js?_=${timestamp}`,
+        filename: `[name].[fullhash].bundle.js?_=${timestamp}`,
         pathinfo: true,
         publicPath: publicPath
     },
@@ -71,7 +76,7 @@ module.exports = {
                         loader: 'css-loader',
                         options: {
                             modules: true,
-                            localIdentName: '[path][name]__[local]--[hash:base64:5]',
+                            localIdentName: '[path][name]__[local]--[fullhash:base64:5]',
                             camelCase: true,
                             importLoaders: 1
                         }
@@ -106,6 +111,17 @@ module.exports = {
                     'css-loader'
                 ]
             },
+            // {
+            //     loader: 'stylus-loader',
+            //     options: {
+            //         stylusOptions: {
+            //             // nib - CSS3 extensions for Stylus
+            //             use: [nib()],
+            //             // no need to have a '@import "nib"' in the stylesheet
+            //             import: ['~nib/lib/nib/index.styl']
+            //         }
+            //     }
+            // },
             {
                 test: /\.(png|jpg|svg)$/,
                 loader: 'url-loader',
@@ -127,11 +143,11 @@ module.exports = {
             }
         ]
     },
-    node: {
-        fs: 'empty',
-        net: 'empty',
-        tls: 'empty'
-    },
+    // node: {
+    //     fs: 'empty',
+    //     net: 'empty',
+    //     tls: 'empty'
+    // },
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new webpack.DefinePlugin({
@@ -145,14 +161,14 @@ module.exports = {
         new webpack.LoaderOptionsPlugin({
             debug: true
         }),
-        new stylusLoader.OptionsPlugin({
-            default: {
-                // nib - CSS3 extensions for Stylus
-                use: [nib()],
-                // no need to have a '@import "nib"' in the stylesheet
-                import: ['~nib/lib/nib/index.styl']
-            }
-        }),
+        // new stylusLoader.OptionsPlugin({
+        //     default: {
+        //         // nib - CSS3 extensions for Stylus
+        //         use: [nib()],
+        //         // no need to have a '@import "nib"' in the stylesheet
+        //         import: ['~nib/lib/nib/index.styl']
+        //     }
+        // }),
         // https://github.com/gajus/write-file-webpack-plugin
         // Forces webpack-dev-server to write bundle files to the file system.
         new WriteFileWebpackPlugin(),
@@ -161,23 +177,23 @@ module.exports = {
             new RegExp('^\./(' + without(buildConfig.languages, 'en').join('|') + ')$')
         ),
         // Generates a manifest.json file in your root output directory with a mapping of all source file names to their corresponding output file.
-        new ManifestPlugin({
-            fileName: 'manifest.json'
-        }),
+        // new ManifestPlugin({
+        //     fileName: 'manifest.json'
+        // }),
         new MiniCssExtractPlugin({
             filename: `[name].css?_=${timestamp}`,
             chunkFilename: `[id].css?_=${timestamp}`
         }),
-        new CSSSplitWebpackPlugin({
-            size: 4000,
-            imports: '[name].[ext]?[hash]',
-            filename: '[name]-[part].[ext]?[hash]',
-            preserve: false
-        }),
+        // new CSSSplitWebpackPlugin({
+        //     size: 4000,
+        //     imports: '[name].[ext]?[hash]',
+        //     filename: '[name]-[part].[ext]?[hash]',
+        //     preserve: false
+        // }),
         new HtmlWebpackPlugin({
             filename: 'index.hbs',
             template: path.resolve(__dirname, 'index.hbs'),
-            chunksSortMode: 'dependency' // Sort chunks by dependency
+            chunksSortMode: 'auto' // Sort chunks by dependency
         })
     ],
     resolve: {

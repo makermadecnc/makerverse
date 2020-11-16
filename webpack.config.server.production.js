@@ -27,7 +27,7 @@ const buildVersion = pkg.version;
 
 module.exports = {
     mode: 'production',
-    devtool: 'cheap-module-source-map',
+    devtool: 'eval-cheap-module-source-map',
     target: 'node', // ignore built-in modules like path, fs, etc.
     context: path.resolve(__dirname, 'src/server'),
     entry: {
@@ -79,13 +79,13 @@ module.exports = {
             path.resolve(__dirname, 'node_modules')
         ]
     },
-    node: {
-        console: true,
-        global: true,
-        process: true,
-        Buffer: true,
-        __filename: true, // Use relative path
-        __dirname: true, // Use relative path
-        setImmediate: true
-    }
+    // node: {
+    //     console: true,
+    //     global: true,
+    //     process: true,
+    //     Buffer: true,
+    //     __filename: true, // Use relative path
+    //     __dirname: true, // Use relative path
+    //     setImmediate: true
+    // }
 };

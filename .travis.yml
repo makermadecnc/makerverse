@@ -55,6 +55,9 @@ jobs:
     skip_cleanup: true # Leave build artifacts in place (don't git clean)
     provider: script
     script: scripts/docker.sh deploy
+    on:
+      branch: master
+      tags: true
 # [Job] Raspberry Pi Image built with Docker
 - name: "Raspberry Pi OS Lite"
   language: shell
@@ -154,3 +157,6 @@ deploy:
   # body: "$(scripts/changelog.sh)"
   body: "Build #${TRAVIS_BUILD_NUMBER} (${LAST_COMMIT_DATE})"
   prerelease: true
+  on:
+    branch: master
+    tags: true
