@@ -8,7 +8,7 @@ namespace Makerverse.Api.UserSettings {
     protected override void OnChanged(MakerverseConfig data) {
       base.OnChanged(data);
       Log.Information("Users: {users}", Data.Users);
-      Log.Information("Workspaces: {@users}", Data.Workspaces);
+      Log.Information("Workspaces: {@workspaces}", Data.Workspaces);
     }
   }
 }
