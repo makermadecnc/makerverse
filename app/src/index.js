@@ -131,6 +131,7 @@ const container = document.createElement('div');
 document.body.appendChild(container);
 
 log.debug('startup');
+
 ReactDOM.render(
     <Provider store={reduxStore}>
         <OpenWorkShopProvider

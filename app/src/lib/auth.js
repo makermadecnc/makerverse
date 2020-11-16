@@ -24,7 +24,7 @@ const resume = (owsCore, reduxStore) => new Promise((resolve, reject) => {
 
 const guest = () => new Promise((resolve, reject) => {
     authrequest
-        .post('/api/signin')
+        .post('/api/users/login')
         .then((res) => {
             resolve(res.body && res.body.guest);
         })
@@ -44,7 +44,7 @@ const signin = (oidc, guest = false) => new Promise((resolve, reject) => {
     const payload = isGuest ? {} : { token };
     log.debug('resuming login...');
     authrequest
-        .post('/api/signin')
+        .post('/api/users/login')
         .send(payload)
         .then((res) => {
             const body = res ? res.body : {};

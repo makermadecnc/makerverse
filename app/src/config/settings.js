@@ -22,7 +22,7 @@ const settings = {
         level: 'debug' // trace, debug, info, warn, error
     },
     analytics: {
-        trackingId: process.env.TRACKING_ID
+        trackingId: "3920215-30",
     },
     i18next: {
         lowerCaseLng: true,
