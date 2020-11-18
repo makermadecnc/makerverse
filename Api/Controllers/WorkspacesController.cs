@@ -1,27 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Makerverse.Api.UserSettings;
+using Makerverse.Api.UserSettings.ConfigObjects;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 
 namespace Makerverse.Api.Controllers {
-  public class UsersController : ApiControllerBase {
-
-    [HttpPost("login")]
-    public IActionResult Login() {
-      Log.Information("LOGIN!");
-      object body = new {
-        enabled = true,
-        user = new {
-          username = "zane"
-        }
-      };
-      return new JsonResult(body);
-    }
-
+  public class WorkspacesController : ApiControllerBase {
     [HttpGet]
     public IActionResult List() {
-      throw new NotImplementedException();
+      // Config.Data.Workspaces)
+      return new JsonResult(new List<WorkspaceConfig>());
     }
 
     [HttpPost]
@@ -34,16 +22,21 @@ namespace Makerverse.Api.Controllers {
       throw new NotImplementedException();
     }
 
-    [HttpDelete("{id}")]
-    public IActionResult Delete(string id) {
-      throw new NotImplementedException();
-    }
-
     [HttpPatch("{id}")]
     public IActionResult Update(string id) {
       throw new NotImplementedException();
     }
 
-    public UsersController(ConfigFile config) : base(config) { }
+    [HttpDelete("{id}")]
+    public IActionResult Delete(string id) {
+      throw new NotImplementedException();
+    }
+
+    [HttpPost("{id}")]
+    public IActionResult Run(string id) {
+      throw new NotImplementedException();
+    }
+
+    public WorkspacesController(ConfigFile config) : base(config) { }
   }
 }

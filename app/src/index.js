@@ -83,11 +83,11 @@ const LoadedApp = () => {
     usePromise(async() => {
         log.debug('loading...');
         // log.setLevel(getLogLevel());
-
-        await i18next
-            .use(XHR)
-            .use(LanguageDetector)
-            .init(settings.i18next);
+        //
+        // await i18next
+        //     .use(XHR)
+        //     .use(LanguageDetector)
+        //     .init(settings.i18next);
 
         // const locale = i18next.language;
         // if (locale !== 'en') {
@@ -138,7 +138,6 @@ ReactDOM.render(
             store={reduxStore}
             client={auth.client}
             hostnameMap={auth.hosts}
-            i18nMiddleware={[initReactI18next]}
         >
             <LoadedApp />
         </OpenWorkShopProvider>

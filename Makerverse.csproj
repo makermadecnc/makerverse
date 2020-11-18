@@ -40,8 +40,109 @@
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
     <Content Remove="$(SpaRoot)**" />
+    <Content Include="App\package.json" />
     <None Remove="$(SpaRoot)**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+    <None Remove="output\**" />
+    <Content Remove="output\**" />
+    <None Include="App\public\i18n\cs\controller.json" />
+    <None Include="App\public\i18n\cs\gcode.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="output\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="output\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="output\app\i18n\cs\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\cs\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\cs\resource.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\de\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\de\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\de\resource.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\en\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\en\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\en\resource.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\es\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\es\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\es\resource.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\fr\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\fr\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\fr\resource.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\hu\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\hu\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\hu\resource.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\it\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\it\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\it\resource.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\ja\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\ja\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\ja\resource.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\nl\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\nl\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\nl\resource.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\pt-br\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\pt-br\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\pt-br\resource.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\ru\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\ru\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\ru\resource.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\tr\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\tr\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\tr\resource.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\zh-cn\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\zh-cn\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\zh-cn\resource.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\zh-tw\controller.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\zh-tw\gcode.json" />
+    <_ContentIncludedByDefault Remove="output\app\i18n\zh-tw\resource.json" />
+    <_ContentIncludedByDefault Remove="output\package.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\cs\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\cs\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\cs\resource.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\de\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\de\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\de\resource.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\en\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\en\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\en\resource.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\es\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\es\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\es\resource.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\fr\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\fr\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\fr\resource.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\hu\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\hu\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\hu\resource.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\it\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\it\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\it\resource.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\ja\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\ja\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\ja\resource.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\nl\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\nl\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\nl\resource.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\pt-br\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\pt-br\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\pt-br\resource.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\ru\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\ru\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\ru\resource.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\tr\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\tr\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\tr\resource.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\zh-cn\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\zh-cn\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\zh-cn\resource.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\zh-tw\controller.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\zh-tw\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\src\i18n\zh-tw\resource.json" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ElectronNET.API;
+using Makerverse.Api.Controllers;
 using Makerverse.Api.UserSettings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
+using OpenController.Api.Lib;
 using OpenController.Hubs;
 using Serilog;
 
@@ -36,6 +38,9 @@ namespace Makerverse {
       if (env.IsDevelopment()) {
         app.UseDeveloperExceptionPage();
       }
+      app.UseExceptionHandler(new ExceptionHandlerOptions() {
+        ExceptionHandler = new ApiExceptionMiddleware().Invoke
+      });
 
       app.UseRouting();
       app.UseSerilogRequestLogging();

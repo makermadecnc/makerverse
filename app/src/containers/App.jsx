@@ -40,6 +40,8 @@ class App extends PureComponent {
 
         analytics.trackPage(location, workspace);
 
+        console.log('header', Header);
+
         return (
             <div>
                 <Header {...this.props} />

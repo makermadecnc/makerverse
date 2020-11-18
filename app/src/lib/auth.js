@@ -47,7 +47,8 @@ const signin = (oidc, guest = false) => new Promise((resolve, reject) => {
         .post('/api/users/login')
         .send(payload)
         .then((res) => {
-            const body = res ? res.body : {};
+            const body = res && res.body ? res.body : {};
+            console.log('body', body);
 
             if (!body.enabled || !body.user) {
                 throw new Error(body.error ?? 'Login failed');
@@ -78,12 +79,12 @@ const signin = (oidc, guest = false) => new Promise((resolve, reject) => {
             return api.workspaces.fetch();
         })
         .then(({ body }) => {
-            if (body && body.records) {
-                body.records.forEach((record) => {
+            if (body) {
+                body.forEach((record) => {
                     Workspaces.load(record);
                 });
             } else {
-                log.error('workspaces load error');
+                log.error('workspaces load error', body);
             }
             log.debug('login connecting to workspaces:', Object.keys(Workspaces.all));
             const funcs = Object.keys(Workspaces.all).map((id) => {

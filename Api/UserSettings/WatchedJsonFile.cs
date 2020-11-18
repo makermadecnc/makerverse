@@ -7,7 +7,7 @@ namespace Makerverse.Api.UserSettings {
   public abstract class WatchedJsonFile<TJson> : IDisposable {
     public TJson? Data { get; protected set; }
 
-    protected ILogger Log { get; }
+    public ILogger Log { get; }
 
     private readonly FileSystemWatcher _watcher;
 

@@ -1,3 +1,4 @@
+using Makerverse.Api.UserSettings;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -6,10 +7,13 @@ namespace Makerverse.Api.Controllers {
   [ApiRoute("[controller]")]
   [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
   public abstract class ApiControllerBase : ControllerBase {
-    private ILogger Log { get; }
+    public ILogger Log { get; }
 
-    public ApiControllerBase(ILogger logger) {
-      Log = logger.ForContext("Api", GetType().Name);
+    public ConfigFile Config { get; }
+
+    public ApiControllerBase(ConfigFile config) {
+      Config = config;
+      Log = config.Log.ForContext("ApiController", GetType().Name);
     }
   }
 }

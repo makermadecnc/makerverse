@@ -15,7 +15,7 @@ import Toggler from 'components/Toggler';
 import FadeInOut from './FadeInOut';
 import Overrides from './Overrides';
 import styles from './index.styl';
-import { HeatedBedIcon, ExtruderIcon } from '@openworkshop/ui/components/Icons';
+import Icons from '@openworkshop/ui/components/Icons';
 
 class Marlin extends PureComponent {
     static propTypes = {
@@ -104,7 +104,8 @@ class Marlin extends PureComponent {
                                 <div className="table-form-row">
                                     <div className="table-form-col table-form-col-label">
                                         <FadeInOut disabled={!extruderIsHeating} from={0.3} to={1}>
-                                            <ExtruderIcon
+                                            <Icons
+                                                name='extruder'
                                                 color={extruderIsHeating ? '#000' : '#666'}
                                                 size={24}
                                             />
@@ -164,7 +165,8 @@ class Marlin extends PureComponent {
                                 <div className="table-form-row">
                                     <div className="table-form-col table-form-col-label">
                                         <FadeInOut disabled={!heatedBedIsHeating} from={0.3} to={1}>
-                                            <HeatedBedIcon
+                                            <Icons
+                                                name='heated-bed'
                                                 color={heatedBedIsHeating ? '#000' : '#666'}
                                                 size={24}
                                             />
