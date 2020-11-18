@@ -1,4 +1,2 @@
 # /node_modules and /bower_components ignored by default
 dist/
-*App/packages/ui*
-*App/packages/lib*
