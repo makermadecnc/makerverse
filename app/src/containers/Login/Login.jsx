@@ -215,29 +215,6 @@ class Login extends PureComponent {
 
       log.debug(`Redirect from "/login" to "${from.pathname}"`);
       return <Redirect to={from} />;
-      // <center>
-      //     <i>
-      //         - or -
-      //     </i>
-      // </center>
-      // <button
-      //     type="submit"
-      //     className="btn btn-block btn-primary"
-      //     onClick={(e) => this.actions.handleSignIn(e, true)}
-      //     disabled={authenticating}
-      // >
-      //     <i
-      //         className={cx(
-      //             'fa',
-      //             'fa-fw',
-      //             { 'fa-spin': authenticating },
-      //             { 'fa-circle-o-notch': authenticating },
-      //             { 'fa-user-plus': !authenticating },
-      //         )}
-      //     />
-      //     <Space width="8" />
-      //     {i18n._('Create an Account')}
-      // </button>
     }
 
     return (

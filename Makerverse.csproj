@@ -42,6 +42,7 @@
     <Content Remove="$(SpaRoot)**" />
     <Content Include="App\.prettierrc.json" />
     <Content Include="App\package.json" />
+    <Content Include="App\src\config\i18n.js" />
     <Content Include="App\tsconfig.json" />
     <None Remove="$(SpaRoot)**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
@@ -269,9 +270,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="App\src\components\Login\CallbackPage.tsx" />
+    <TypeScriptCompile Include="App\src\components\Login\LoginPage.tsx" />
+    <TypeScriptCompile Include="App\src\components\Login\Styles.ts" />
+    <TypeScriptCompile Include="App\src\constants\docs.ts" />
     <TypeScriptCompile Include="App\src\containers\Routes.tsx" />
     <TypeScriptCompile Include="App\src\languages.ts" />
     <TypeScriptCompile Include="App\src\store\redux.ts" />
+    <TypeScriptCompile Include="App\src\styles\index.ts" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

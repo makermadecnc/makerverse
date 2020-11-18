@@ -3,7 +3,7 @@ import ProtectedRoute from 'components-old/ProtectedRoute';
 import React, { FunctionComponent } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import App from './App';
-import Login from './Login';
+import LoginPage from 'components/Login/LoginPage';
 import Callback from './Login/Callback';
 
 interface OwnProps {
@@ -16,9 +16,7 @@ const Routes: FunctionComponent<Props> = (props) => {
 
   return (
     <Switch>
-      <Route path='/login'>
-        <Login owsCore={owsCore} />
-      </Route>
+      <Route path='/login' component={LoginPage} />
       <Route path='/callback'>
         <Callback owsCore={owsCore} />
       </Route>

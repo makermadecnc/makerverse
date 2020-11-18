@@ -17,6 +17,7 @@ import XHR from 'i18next-xhr-backend';
 import { setOwsSettings } from './lib/ows/settings';
 import Routes from './containers/Routes';
 import settings from './config/settings';
+import i18nConfig from './config/i18n';
 import AppCorrupted from './containers/AppCorrupted';
 import auth from './lib/auth';
 import internalStore from './store';
@@ -96,7 +97,7 @@ const LoadedRoutes = () => {
     log.debug('loading...', history);
     // log.setLevel(getLogLevel());
     //
-    await i18next.use(XHR).use(LanguageDetector).init(settings.i18next);
+    await i18next.use(XHR).use(LanguageDetector).init(i18nConfig);
 
     // const locale = i18next.language;
     // if (locale !== 'en') {

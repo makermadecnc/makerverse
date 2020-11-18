@@ -1,7 +1,15 @@
+import { AxisName, MachineAxis } from '@openworkshop/lib/api/graphql';
+import { normalizeAxisName } from '@openworkshop/lib/api/Machines/AxisName';
 import _ from 'lodash';
-import colornames from 'colornames';
+import { Workspace } from './workspaces';
 
 const INCH = 25.4;
+
+interface IJogStepsOpts {
+  imperialUnits?: boolean;
+  min: number;
+  max: number;
+}
 
 class WorkspaceAxis {
   static empty = {
@@ -11,118 +19,121 @@ class WorkspaceAxis {
     accuracy: 0.001,
   };
 
-  constructor(workspace, axis, record) {
+  _workspace: Workspace;
+  _axis: AxisName;
+  _record: MachineAxis;
+
+  constructor(workspace: Workspace, axis: string, record: MachineAxis) {
     this._workspace = workspace;
-    this._axis = axis.toLowerCase();
+    this._axis = normalizeAxisName(axis) || AxisName.X;
     this._record = { ...WorkspaceAxis.empty, ...record };
   }
 
   // Convert a value on the axis to a string, rounding it to the appropriate precision.
-  getAxisValueString(val, isImperial = null) {
+  getAxisValueString(val: string | number, isImperial?: boolean): string {
     // Since inches are ~= 1 order of magnitude less precise than millimeters...
     const precision = this.precision + (this._checkImperialUnits(isImperial) ? 1 : 0);
     const str = Number(val || 0).toFixed(precision);
     return precision > 0 ? str : str.split('.')[0];
   }
 
-  round(val, isImperialUnits = null) {
+  round(val: string | number, isImperialUnits?: boolean): number {
     return Number(this.getAxisValueString(val, isImperialUnits));
   }
 
   // When used without an argument, uses the workspace setting.
-  _checkImperialUnits(isImperial = null) {
-    return isImperial === null ? this.workspace.isImperialUnits : !!isImperial;
+  _checkImperialUnits(isImperial?: boolean): boolean {
+    return isImperial === undefined ? this.workspace.isImperialUnits : isImperial;
   }
 
-  get workspace() {
+  get workspace(): Workspace {
     return this._workspace;
   }
 
-  // x, y, z
-  get key() {
+  get key(): AxisName {
     return this._axis;
   }
 
-  get name() {
+  get name(): string {
     return this.key.toUpperCase();
   }
 
-  _getNumber(key) {
+  _getNumber(key: 'min' | 'max' | 'precision' | 'accuracy'): number {
     return _.has(this._record, key) ? Number(this._record[key]) : 0;
   }
 
   // Limits: minimum value
-  get min() {
+  get min(): number {
     return Math.min(this._getNumber('min'), 0);
   }
 
   // Limits: maximum value
-  get max() {
+  get max(): number {
     return Math.max(this._getNumber('max'), 1);
   }
 
   // Center point between min & max
-  get middle() {
+  get middle(): number {
     return (this.max + this.min) / 2;
   }
 
   // Range between min & max
-  get range() {
+  get range(): number {
     return Math.abs(this.max - this.min);
   }
 
   // Has this axis been configured correctly?
-  get isValid() {
+  get isValid(): boolean {
     return this.validRange && this.validAccuracy && this.validPrecision;
   }
 
-  get validRange() {
+  get validRange(): boolean {
     return this.max - this.min >= 10;
   }
 
-  get validAccuracy() {
+  get validAccuracy(): boolean {
     return this.accuracy >= 0.0000001 && this.accuracy <= 1;
   }
 
-  get validPrecision() {
+  get validPrecision(): boolean {
     return this.precision >= 0 && !`${this.precision}`.includes('.');
   }
 
   // The minimum value the machine can step on this axis.
-  get accuracy() {
+  get accuracy(): number {
     return this._getNumber('accuracy');
   }
 
   // The number of digits for rounding on this axis.
-  get precision() {
+  get precision(): number {
     // do NOT use _getNumber (prevent recursion).
     return Number(this._record.precision);
   }
 
-  get hasLimits() {
+  get hasLimits(): boolean {
     return this.range !== 0;
   }
 
   // How much mm to add to each axis around the edges?
-  get pad() {
+  get pad(): number {
     return 50;
   }
 
   // Color for the axis when shown in the visualizer.
-  get color() {
-    return colornames('black');
+  get color(): string {
+    return '#000000';
     // const defs = { x: 'red', y: 'green', z: 'blue' };
     // return defs[this.key] || 'gray';
   }
 
-  getAxisLength(imperialUnits = null) {
+  getAxisLength(imperialUnits?: boolean): number {
     const div = this._checkImperialUnits(imperialUnits) ? INCH : 1;
     return this.range / div;
   }
 
   // Iterate all cells in the axis, invoking the callback with the position, as well as boolean majorStep?
   // Guaranteed to use even steps, as well as contain a zero position.
-  eachGridLine(callback, imperialUnits = null) {
+  public eachGridLine(callback: (dist: number, isMajor: boolean) => void, imperialUnits?: boolean) {
     const isImperialUnits = this._checkImperialUnits(imperialUnits);
     const step = isImperialUnits ? INCH : 10;
     const majorStep = isImperialUnits ? 12 : 10;
@@ -136,7 +147,7 @@ class WorkspaceAxis {
   }
 
   // Returns an array of jog steps for this axis.
-  getJogSteps(opts) {
+  public getJogSteps(opts: IJogStepsOpts): number[] {
     const isImperialUnits = this._checkImperialUnits(opts.imperialUnits);
     const max = opts.max || this.range / 2;
     const min = opts.min || this.accuracy;
@@ -149,7 +160,7 @@ class WorkspaceAxis {
       }
     }
     // Remove the last element and add it in-order with the second-biggest element.
-    const last = steps.pop();
+    const last = steps.pop() || 0;
     const next = this.round(max / 2, isImperialUnits);
     steps.push(Math.min(last, next));
     steps.push(Math.max(last, next));

@@ -1,6 +1,17 @@
 import semver from 'semver';
 
-const parseSemver = (v) => {
+export interface ISemver {
+  major: number;
+  minor: number;
+  patch: number;
+  branch: string | null;
+  build: string | number;
+  full: string;
+  public: string;
+  readable: string;
+}
+
+function parseSemver(v: string): ISemver {
   if (!semver.valid(v)) {
     return parseSemver('0.0.0-corrupted.0');
   }
@@ -29,6 +40,6 @@ const parseSemver = (v) => {
     public: pub, // The public, easy to read string
     readable: readable, // long, human readable full version string
   };
-};
+}
 
 export { parseSemver };

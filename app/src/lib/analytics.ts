@@ -2,6 +2,8 @@ import _ from 'lodash';
 import log from 'js-logger';
 import ReactGA from 'react-ga';
 import settings from 'config/settings';
+import { Workspace } from './workspaces';
+import { ISemver } from './semvers';
 
 // https://github.com/ReactTraining/react-router/issues/4278#issuecomment-299692502
 ReactGA.initialize(settings.analytics.trackingId, {
@@ -11,7 +13,7 @@ ReactGA.initialize(settings.analytics.trackingId, {
 });
 
 // Common names for dimensions
-const DIMENSION_MAP = {
+const DIMENSION_MAP: { [key: string]: number } = {
   // page: 1,
   version: 2,
   build: 3,
@@ -24,21 +26,25 @@ const DIMENSION_MAP = {
   controllerType: 10,
 };
 
+interface IFunc {
+  name: string;
+}
+
 // When in development mode, analytics go into the console and not to the server.
-const wrapDev = (func) => {
-  const branch = _.get(settings, 'version.branch');
-  if (branch === 'dev') {
-    return (args) => {
+function wrapDev<TFunc extends IFunc>(func: TFunc) {
+  const version: ISemver = settings.version;
+  if (version.branch === 'dev') {
+    return (...args: unknown[]) => {
       log.debug('analytcs', func.name, args);
     };
   }
   return func;
-};
+}
 
 const pageview = wrapDev(ReactGA.pageview);
 const set = wrapDev(ReactGA.set);
 
-const setDimensions = (opts) => {
+const setDimensions = (opts: { [key: string]: string }) => {
   Object.keys(DIMENSION_MAP).forEach((d) => {
     if (_.has(opts, d)) {
       const dNum = DIMENSION_MAP[d];
@@ -49,12 +55,16 @@ const setDimensions = (opts) => {
   set(opts);
 };
 
-const trackPage = (location, workspace) => {
+interface ILocation {
+  pathname: string;
+}
+
+const trackPage = (location: ILocation, workspace: Workspace) => {
   setDimensions({
     version: settings.version.public,
-    build: settings.version.build,
+    build: settings.version.build.toString(),
   });
-  const path = workspace ? workspace.hardware.path : location.pathname;
+  const path: string = workspace ? workspace.hardware.path : location.pathname;
   pageview(path);
 };
 
