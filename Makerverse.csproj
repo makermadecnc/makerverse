@@ -269,7 +269,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="App\src\containers\Routes.tsx" />
     <TypeScriptCompile Include="App\src\languages.ts" />
+    <TypeScriptCompile Include="App\src\store\redux.ts" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

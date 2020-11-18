@@ -20,22 +20,16 @@ export const MARLIN = 'Marlin';
 export const SMOOTHIE = 'Smoothie';
 export const TINYG = 'TinyG';
 export const MASLOW = 'Maslow';
-export const CONTROLLERS = [
-    GRBL,
-    MARLIN,
-    SMOOTHIE,
-    TINYG,
-    MASLOW,
-];
+export const CONTROLLERS = [GRBL, MARLIN, SMOOTHIE, TINYG, MASLOW];
 
 // Get one of the const values from a name
 // e.g., "mAsLoW" => MASLOW
 export function controllerTypeToConst(name) {
-    const n = name.toUpperCase();
-    if (n === 'tiny_g') {
-        return TINYG;
-    }
-    return _.find(CONTROLLERS, c => c.toUpperCase() === n);
+  const n = name.toUpperCase();
+  if (n === 'tiny_g') {
+    return TINYG;
+  }
+  return _.find(CONTROLLERS, (c) => c.toUpperCase() === n);
 }
 
 // Workflow State

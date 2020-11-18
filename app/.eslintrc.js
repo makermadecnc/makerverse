@@ -1,38 +1,24 @@
-const path = require('path');
-
 module.exports = {
-    // extends: 'trendmicro',
-    root: true,
-    parser: 'babel-eslint',
-    env: {
-        browser: true,
-        node: true
-    },
-    settings: {
-        'import/resolver': {
-            webpack: {
-                config: {
-                    resolve: {
-                        modules: [
-                            path.resolve(__dirname, 'src'),
-                            'node_modules'
-                        ],
-                        extensions: ['.js', '.jsx']
-                    }
-                }
-            }
-        }
-    },
-    rules: {
-        'max-lines-per-function': [1, {
-            max: 512,
-            skipBlankLines: true,
-            skipComments: true
-        }],
-        'react/jsx-no-bind': [1, {
-            allowArrowFunctions: true
-        }],
-        'react/prefer-stateless-function': 0,
-        'react/no-access-state-in-setstate': 0
-    }
+  root: true,
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint', 'eslint-plugin-react', 'eslint-plugin-react-hooks'],
+  extends: [
+    'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    'prettier',
+    'prettier/@typescript-eslint',
+  ],
+  rules: {
+    'indent': ['error', 2],
+    'linebreak-style': ['error', 'unix'],
+    'quotes': ['error', 'single'],
+    'semi': ['error', 'always'],
+  },
+  env: {
+    amd: true,
+  },
+  parserOptions: {
+    project: './tsconfig.json',
+    tsconfigRootDir: __dirname,
+  },
 };

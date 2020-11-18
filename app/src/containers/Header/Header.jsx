@@ -3,15 +3,15 @@ import moment from 'moment';
 import log from 'js-logger';
 import React, { PureComponent } from 'react';
 import { Nav, Navbar, NavDropdown, Dropdown } from 'react-bootstrap';
-import { MenuItem } from 'components/Dropdown';
+import { MenuItem } from 'components-old/Dropdown';
 import { withRouter } from 'react-router-dom';
 import without from 'lodash/without';
 import Push from 'push.js';
 import api from 'api';
 import { deleteCookie } from 'lib/cookies';
-import { Tooltip } from 'components/Tooltip';
-import Anchor from 'components/Anchor';
-import { Space } from 'components/';
+import { Tooltip } from 'components-old/Tooltip';
+import Anchor from 'components-old/Anchor';
+import { Space } from 'components-old/';
 import combokeys from 'lib/combokeys';
 import i18n from 'lib/i18n';
 import auth from 'lib/auth';
@@ -20,10 +20,8 @@ import settings from 'config/settings';
 import styles from './index.styl';
 
 const Header = () => {
-    return (
-        <div />
-    );
-}
+  return <div />;
+};
 
 // class Header extends PureComponent {
 //     static propTypes = {
