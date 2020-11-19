@@ -206,26 +206,24 @@ class ActiveState {
   }
 
   get stateStyle(): string {
-    switch (this.stateKey) {
-      case ACTIVE_STATE_IDLE:
-        return 'controller-state-default';
-      case ACTIVE_STATE_RUN:
-        return 'controller-state-primary';
-      case ACTIVE_STATE_HOLD:
-        return 'controller-state-warning';
-      case ACTIVE_STATE_DOOR:
-        return 'controller-state-warning';
-      case ACTIVE_STATE_HOME:
-        return 'controller-state-primary';
-      case ACTIVE_STATE_SLEEP:
-        return 'controller-state-success';
-      case ACTIVE_STATE_ALARM:
-        return 'controller-state-danger';
-      case ACTIVE_STATE_CHECK:
-        return 'controller-state-info';
-      default:
-        return 'controller-state-info';
-    }
+    const sk = this.stateKey;
+    if (sk === ACTIVE_STATE_IDLE)
+      return 'controller-state-default';
+    if (sk === ACTIVE_STATE_RUN)
+      return 'controller-state-primary';
+    if (sk === ACTIVE_STATE_HOLD)
+      return 'controller-state-warning';
+    if (sk === ACTIVE_STATE_DOOR)
+      return 'controller-state-warning';
+    if (sk === ACTIVE_STATE_HOME)
+      return 'controller-state-primary';
+    if (sk === ACTIVE_STATE_SLEEP)
+      return 'controller-state-success';
+    if (sk === ACTIVE_STATE_ALARM)
+      return 'controller-state-danger';
+    if (sk ===  ACTIVE_STATE_CHECK)
+      return 'controller-state-info';
+    return 'controller-state-info';
   }
 
   get isValid(): boolean {

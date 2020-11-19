@@ -18,6 +18,7 @@ import { faUsb } from '@fortawesome/free-brands-svg-icons';
 import { useTranslation } from 'react-i18next';
 import Workspaces from 'lib/workspaces';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { Link } from 'react-router-dom';
 
 interface OwnProps {
   isPermanent: boolean;
@@ -55,8 +56,9 @@ const ListMenu: FunctionComponent<Props> = (props) => {
 
   function renderItem(route: string, text: string, icon: React.ReactNode, t2?: string) {
     const s = t2 ? <Typography variant='subtitle2'>{t2}</Typography> : null;
+    const link = (p: unknown) => <Link to={route} {...p} />;
     return (
-      <ListItem selected={isRouteActive(route)} button key={route} onClick={() => handleRoute('/settings')}>
+      <ListItem selected={isRouteActive(route)} button key={route} component={link}>
         <ListItemIcon>{icon}</ListItemIcon>
         <ListItemText primary={<Typography variant='h6'>{text}</Typography>} secondary={s} />
       </ListItem>
@@ -73,7 +75,6 @@ const ListMenu: FunctionComponent<Props> = (props) => {
       <div className={classes.toolbar} />
       <Divider />
       <List>
-        {renderRouteItem('/home', t('Home'), faHome)}
         {workspaceIds.map((workspaceId) => {
           const workspace = Workspaces.all[workspaceId];
           const route = `/workspaces/${workspace.id}`;
@@ -83,10 +84,11 @@ const ListMenu: FunctionComponent<Props> = (props) => {
 
           return renderItem(route, workspace.name, icon);
         })}
-        {renderRouteItem('/workspaces', t('Create Workspace'), faUsb)}
       </List>
       <Divider />
       <List>
+        {renderRouteItem('/home', t('Home'), faHome)}
+        {renderRouteItem('/workspaces', t('Create Workspace'), faUsb)}
         {renderRouteItem('/settings', t('Settings'), faCogs)}
         {renderRouteItem('/docs', t('Documentation'), faQuestionCircle)}
       </List>
