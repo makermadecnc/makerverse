@@ -214,11 +214,7 @@ export class Workspace extends events.EventEmitter {
 
   // Sidebar icon.
   get icon(): string {
-    if (_.has(this._record, 'icon') && this._record.icon.includes('/')) {
-      return this._record.icon;
-    }
-    const icon = this._record.icon || Workspace.getControllerTypeIconName(this.firmware.controllerType);
-    return `images/icons/${icon}.svg`;
+    return this._record.icon || Workspace.getControllerTypeIconName(this.firmware.controllerType);
   }
 
   get hexColor(): string {

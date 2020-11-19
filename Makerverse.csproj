@@ -270,14 +270,26 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="App\src\components\Navigation\HeaderBar.tsx" />
+    <TypeScriptCompile Include="App\src\components\Navigation\ListMenu.tsx" />
+    <TypeScriptCompile Include="App\src\components\Navigation\index.tsx" />
+    <TypeScriptCompile Include="App\src\components\Navigation\SideDrawer.tsx" />
     <TypeScriptCompile Include="App\src\components\Login\CallbackPage.tsx" />
     <TypeScriptCompile Include="App\src\components\Login\LoginPage.tsx" />
     <TypeScriptCompile Include="App\src\components\Login\Styles.ts" />
+    <TypeScriptCompile Include="App\src\components\Navigation\Styles.ts" />
     <TypeScriptCompile Include="App\src\constants\docs.ts" />
     <TypeScriptCompile Include="App\src\containers\Routes.tsx" />
     <TypeScriptCompile Include="App\src\languages.ts" />
     <TypeScriptCompile Include="App\src\store\redux.ts" />
     <TypeScriptCompile Include="App\src\styles\index.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="App\src\views\Home" />
+    <Folder Include="App\src\views\Settings" />
+    <Folder Include="App\src\views\Workspace" />
+    <Folder Include="App\src\views\WorkspaceCreator" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

@@ -8,8 +8,7 @@ namespace Makerverse.Api.Controllers {
   public class WorkspacesController : ApiControllerBase {
     [HttpGet]
     public IActionResult List() {
-      // Config.Data.Workspaces)
-      return new JsonResult(new List<WorkspaceConfig>());
+      return new JsonResult(new List<WorkspaceConfig>(Config.Data.Workspaces));
     }
 
     [HttpPost]

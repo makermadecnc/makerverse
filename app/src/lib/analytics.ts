@@ -59,7 +59,7 @@ interface ILocation {
   pathname: string;
 }
 
-const trackPage = (location: ILocation, workspace: Workspace) => {
+const trackPage = (location: ILocation, workspace?: Workspace) => {
   setDimensions({
     version: settings.version.public,
     build: settings.version.build.toString(),

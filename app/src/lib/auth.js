@@ -89,7 +89,7 @@ const signin = (oidc, guest = false) =>
           log.error('workspaces load error', body);
         }
         log.debug('login connecting to workspaces:', Object.keys(Workspaces.all));
-        const funcs = Object.keys(Workspaces.all).map((id) => {
+        const funcs = []; /*Object.keys(Workspaces.all).map((id) => {
           return () =>
             promisify((next) => {
               const workspace = Workspaces.all[id];
@@ -98,7 +98,8 @@ const signin = (oidc, guest = false) =>
                 next();
               });
             })();
-        });
+        });*/
+        log.warn('skipping connections');
         return series(funcs);
       })
       .then(() => {

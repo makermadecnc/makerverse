@@ -5,7 +5,10 @@ import { headerBar } from 'styles/';
 const useStyles = makeStyles((theme) => ({
   cardHeader: headerBar(theme),
   cardFooter: cardFooter(theme),
-  root: {},
+  root: {
+    margin: theme.spacing(4),
+    minWidth: 300,
+  },
   form: {},
   centered: {
     height: '100%',

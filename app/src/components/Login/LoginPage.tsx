@@ -5,13 +5,13 @@ import {
   CardContent,
   CardHeader,
   Checkbox,
+  CircularProgress,
   FormControlLabel,
   Grid,
   Typography,
 } from '@material-ui/core';
 import OpenWorkShopContext from '@openworkshop/lib/OpenWorkShopContext';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
-import { FullCentered } from '@openworkshop/ui/components';
 import React, { FunctionComponent } from 'react';
 import auth from '../../lib/auth';
 import useStyles from './Styles';
@@ -44,7 +44,7 @@ const LoginPage: FunctionComponent<Props> = (props) => {
 
   if (auth.isAuthenticated()) {
     log.debug('Already logged in; redirecting.');
-    return <Redirect to='/home' />;
+    // return <Redirect to='/home' />;
   }
 
   function handleGuest() {
@@ -57,6 +57,7 @@ const LoginPage: FunctionComponent<Props> = (props) => {
       category: 'interaction',
       action: register ? 'register' : 'login',
     });
+    setAuthenticating(true);
 
     ows.authManager
       .createSigninRequest()
@@ -71,49 +72,62 @@ const LoginPage: FunctionComponent<Props> = (props) => {
   }
 
   return (
-    <FullCentered>
-      <Card>
-        <CardHeader className={classes.cardHeader} title={t('Login to {{ productName }}', settings)} />
-        <CardContent>
-          <Grid container>
-            <Grid item xs={12} sm={3}>
-              <img src='/images/logo.png' alt='' style={{ maxWidth: '64px', marginRight: '10px' }} />
+    <Grid container direction='column' alignItems='center' justify='center'>
+      <Grid item xs={12} sm={6} md={4}>
+        <Card className={classes.root}>
+          <CardHeader className={classes.cardHeader} title={t('Login to {{ productName }}', settings)} />
+          <CardContent>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={3} className={classes.centered}>
+                <img src='/images/logo.png' alt='' style={{ maxWidth: '64px', marginRight: '10px' }} />
+              </Grid>
+              <Grid item xs={12} sm={9} className={classes.centered}>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  disabled={authenticating}
+                  onClick={() => handleLogin(false)}>
+                  {!authenticating && (
+                    <span>
+                      {t('Login')}
+                      <br />
+                      {t('(or Create Account)')}
+                    </span>
+                  )}
+                  {authenticating && <CircularProgress />}
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={9} className={classes.centered}>
-              <Button variant='contained' color='primary' onClick={() => handleGuest()}>
-                {t('Authenticate (or Create Account)')}
-              </Button>
-            </Grid>
-          </Grid>
-        </CardContent>
-        <CardActions className={classes.cardFooter}>
-          {!guest && (
-            <analytics.OutboundLink eventLabel='why_login' to={docs.urlSecurity} target='_blank'>
-              {t('Why is it necessary to log in?')}
-            </analytics.OutboundLink>
-          )}
-          {guest && (
-            <div>
-              <FormControlLabel
-                control={<Checkbox checked={useCookies} onChange={() => setUseCookies(!useCookies)} />}
-                label={t('Remember me (I consent to cookies)')}
-              />
-              <FormControlLabel
-                control={<Checkbox checked={dangerous} onChange={() => setDangerous(!dangerous)} />}
-                label={t('I understand "guest mode" is hazardous. ')}
-              />
-              <br />
-              <Button onClick={() => handleGuest()} disabled={authenticating || !dangerous}>
-                {t('Continue as Guest')}
-              </Button>
-            </div>
-          )}
-        </CardActions>
-      </Card>
-      <div className={classes.bottom}>
-        <Typography variant='subtitle2'>v. {settings.version.full}</Typography>
-      </div>
-    </FullCentered>
+          </CardContent>
+          <CardActions className={classes.cardFooter}>
+            {!guest && (
+              <analytics.OutboundLink eventLabel='why_login' to={docs.urlSecurity} target='_blank'>
+                {t('Why is it necessary to log in?')}
+              </analytics.OutboundLink>
+            )}
+            {guest && (
+              <div>
+                <FormControlLabel
+                  control={<Checkbox checked={useCookies} onChange={() => setUseCookies(!useCookies)} />}
+                  label={t('Remember me (I consent to cookies)')}
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={dangerous} onChange={() => setDangerous(!dangerous)} />}
+                  label={t('I understand "guest mode" is hazardous. ')}
+                />
+                <br />
+                <Button onClick={() => handleGuest()} disabled={authenticating || !dangerous}>
+                  {t('Continue as Guest')}
+                </Button>
+              </div>
+            )}
+          </CardActions>
+        </Card>
+        <div className={classes.bottom}>
+          <Typography variant='subtitle2'>v. {settings.version.full}</Typography>
+        </div>
+      </Grid>
+    </Grid>
   );
 };
 
