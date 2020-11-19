@@ -187,12 +187,8 @@
     }
   },
   "lint-staged": {
-    "*.{png,jpeg,jpg,gif,svg}": [
-        "imagemin-lint-staged"
-    ],
-    "*.{js,jsx,ts,tsx}": [
-      "pretty-quick --write",
-      "eslint --fix"
-    ]
+    "*.{png,jpeg,jpg,gif,svg}": "imagemin-lint-staged",
+    "*.{js,jsx,ts,tsx,md,html,css}": "prettier --write",
+    "*.{js,jsx,ts,tsx}": "eslint --fix"
   }
 }
