@@ -1,0 +1,758 @@
+{"0": {
+    "doc": "3D Printers",
+    "title": "3D Printers",
+    "content": " ",
+    "url": "http://localhost:4000/machines/3dp/",
+    "relUrl": "/machines/3dp/"
+  },"1": {
+    "doc": "3D Printers",
+    "title": "Marlin",
+    "content": ". | Marlin (Download) | . Tested On: . | Prusa MK3S (Baud Rate: 115200) | . ",
+    "url": "http://localhost:4000/machines/3dp/#marlin",
+    "relUrl": "/machines/3dp/#marlin"
+  },"2": {
+    "doc": "Advanced",
+    "title": "Advanced",
+    "content": " ",
+    "url": "http://localhost:4000/features/advanced/",
+    "relUrl": "/features/advanced/"
+  },"3": {
+    "doc": "Advanced",
+    "title": "Turn Off Login (Guest Mode)",
+    "content": "In extreme cases this may result in a risk to your physical safety!! . Edit the ~/.makerverse to include the top-level insecureDangerousGuestAccess boolean key. In keeping with Makerverse’s “easier to be secure” philosophy, guests are required to bypass the login screen at regular intervals (whereas logged-in users stay logged in). ",
+    "url": "http://localhost:4000/features/advanced/#turn-off-login-guest-mode",
+    "relUrl": "/features/advanced/#turn-off-login-guest-mode"
+  },"4": {
+    "doc": "Build from Source",
+    "title": "Build from Source",
+    "content": "This should only be used by developers or those who cannot use Docker. ",
+    "url": "http://localhost:4000/installation/build-from-source/",
+    "relUrl": "/installation/build-from-source/"
+  },"5": {
+    "doc": "Build from Source",
+    "title": "Git",
+    "content": "Start by cloning the git repository: . git clone https://github.com/makermadecnc/makerverse.git . ",
+    "url": "http://localhost:4000/installation/build-from-source/#git",
+    "relUrl": "/installation/build-from-source/#git"
+  },"6": {
+    "doc": "Build from Source",
+    "title": "Node.js",
+    "content": "You will need node (Node.js) version 12.xx.y. Downloads for Windows, Mac, and Linux can be found here (including via package managers). On a Raspberry Pi or Debian Linux system, use the following: . curl -sL https://deb.nodesource.com/setup_12.x | sudo bash - sudo apt-get install -y nodejs . ",
+    "url": "http://localhost:4000/installation/build-from-source/#nodejs",
+    "relUrl": "/installation/build-from-source/#nodejs"
+  },"7": {
+    "doc": "Build from Source",
+    "title": "Build and Run",
+    "content": "Dependencies . Enter the source code directory from the command line and run: . npm install . This will download and install all required software. It generally only needs to be done once (unless a major update happens). Production Build . To build and run the production application: . npm run build-latest bin/makerverse . Development Mode . Instead of the Production Build, you can start the webserver in development mode with hot-reloading for the frontend (UI): . npm run dev . ",
+    "url": "http://localhost:4000/installation/build-from-source/#build-and-run",
+    "relUrl": "/installation/build-from-source/#build-and-run"
+  },"8": {
+    "doc": "Build from Source",
+    "title": "Troubleshooting Node.js",
+    "content": "Node.js 12 is recommended. You can install Node Version Manager to manage multiple Node.js versions. If you have git installed, just clone the nvm repo, and check out the latest version: . git clone https://github.com/creationix/nvm.git ~/.nvm cd ~/.nvm git checkout `git describe --abbrev=0 --tags` cd .. ~/.nvm/nvm.sh . Add these lines to your ~/.bash_profile, ~/.bashrc, or ~/.profile file to have it automatically sourced upon login: . export NVM_DIR=\"$HOME/.nvm\" [ -s \"$NVM_DIR/nvm.sh\" ] &amp;&amp; . \"$NVM_DIR/nvm.sh\" # This loads nvm . Once installed, you can select Node.js versions with: . nvm install 10 nvm use 10 . It’s also recommended that you upgrade npm to the latest version. To upgrade, run: . npm install npm@latest -g . ",
+    "url": "http://localhost:4000/installation/build-from-source/#troubleshooting-nodejs",
+    "relUrl": "/installation/build-from-source/#troubleshooting-nodejs"
+  },"9": {
+    "doc": "Build from Source",
+    "title": "Command-Line Usage",
+    "content": "For help, type ./bin/makerverse --help: . Usage: app [options] Options: -V, --version output the version number -p, --port &lt;port&gt; Set listen port (default: 8000) (default: 8000) -H, --host &lt;host&gt; Set listen address or hostname (default: 0.0.0.0) (default: \"0.0.0.0\") -b, --backlog &lt;backlog&gt; Set listen backlog (default: 511) (default: 511) -c, --config &lt;filename&gt; Set config file (default: ~/.makerverse) -v, --verbose Increase the verbosity level (-v, -vv, -vvv) -m, --mount &lt;route-path&gt;:&lt;target&gt; Add a mount point for serving static files (default: []) -w, --watch-directory &lt;path&gt; Watch a directory for changes --access-token-lifetime &lt;lifetime&gt; Access token lifetime in seconds or a time span string (default: 30d) --allow-remote-access Allow remote access to the server (default: false) -h, --help output usage information . ",
+    "url": "http://localhost:4000/installation/build-from-source/#command-line-usage",
+    "relUrl": "/installation/build-from-source/#command-line-usage"
+  },"10": {
+    "doc": "Build from Source",
+    "title": "Updating",
+    "content": ". | Use git pull to update the source code. | You probably don’t need to update dependencies, but it doesn’t hurt to run the Dependencies step again. | Follow either the Production Build or Development Mode step. | . ",
+    "url": "http://localhost:4000/installation/build-from-source/#updating",
+    "relUrl": "/installation/build-from-source/#updating"
+  },"11": {
+    "doc": "Commands",
+    "title": "Commands",
+    "content": "Commands are manually triggered actions (via the drop-down menu in the top-right). ",
+    "url": "http://localhost:4000/features/commands/",
+    "relUrl": "/features/commands/"
+  },"12": {
+    "doc": "Commands",
+    "title": "Creating",
+    "content": "To create a command: . | Go to Settings -&gt; Commands and press “+ Add”. | Give the command a name. | Type anything in the box that would work in the terminal (command prompt). | Save &amp; reload the Makerverse page. | . Usually, you’ll want to trigger some script which performs the action… . ",
+    "url": "http://localhost:4000/features/commands/#creating",
+    "relUrl": "/features/commands/#creating"
+  },"13": {
+    "doc": "Commands",
+    "title": "Examples",
+    "content": "Restart Makerverse . If you used the web-server installation, you already have one command: “Restart Makerverse.” . This simple command runs pkill node, which terminates the web server. The Docker-based installation will automatically restart itself, and the server should come back up within a minute. Raspberry Pi GPIO . The Raspberry Pi GPIO pins can be used to turn on/off switches/relays, lights, etc. Let’s say you have a relay switch connected to GPIO pin #19, which turns your shop-vac on/off. Note: if you are using the Raspberry Pi image, the first two steps below (“Enable GPIO” and “Create the Script”) have already been completed. Enable GPIO . First, you would SSH into the Raspberry Pi and enable remote GPIO access. Type sudo raspi-config and choose Interfacing Options to enable Remote GPIO. Then, turn on the daemon: . sudo systemctl enable pigpiod sudo systemctl start pigpiod . Create the Script . Next, it’s time to create the script. Assuming your makerverse project directory is located at $HOME/makerverse (see: scripts &amp; widgets), you can just use tho following: . mkdir -p $HOME/makerverse/commands nano $HOME/makerverse/commands/gpio.sh . Then, paste the following contents: . #!/bin/bash pin=\"${1}\" flag=\"${2:-0}\" echo \"w ${pin} ${flag}\" &gt; /dev/pigpio . Create the Command . To turn on the shopvac located at GPIO #19, create a new command and give it the contents: . bash /home/node/makerverse/commands/gpio.sh 19 1 . To create a second command to turn it off, replace the 1 with a 0 at the end. To target a different GPIO pin, replace the 19 with the desired pin number. ",
+    "url": "http://localhost:4000/features/commands/#examples",
+    "relUrl": "/features/commands/#examples"
+  },"14": {
+    "doc": "Contribution",
+    "title": "Contributions",
+    "content": "Pull requests welcome! . See issues for reporting bugs or problems. ",
+    "url": "http://localhost:4000/about/contribution/#contributions",
+    "relUrl": "/about/contribution/#contributions"
+  },"15": {
+    "doc": "Contribution",
+    "title": "Updating the Documentation",
+    "content": "These docs are located within the same Github repository that is home to Makerverse. You’ll find them in the docs/ folder, stored as .md (markdown) files. Therefore, the contribution process is the same as changing the Makerverse code (see below). Once a pull request containing docs has been approved and merged, it will appear automatically on Makerverse.com. Note: to test your changes to the docs, run bundle exec jekyll serve from the docs/ folder. You will need to have Ruby &amp; Jekyll installed (see their docs). ",
+    "url": "http://localhost:4000/about/contribution/#updating-the-documentation",
+    "relUrl": "/about/contribution/#updating-the-documentation"
+  },"16": {
+    "doc": "Contribution",
+    "title": "How to Contribute",
+    "content": "As with contributing to most Github projects, the process is to (1) fork the repository, (2) make and push changes, and then (3) create a pull request. The pull request can then be reviewed and accepted into Makerverse. Fork the repository . If you’re using GitHub for Desktop application, navigate over to the toolbar, open the Clone or download dropdown, and click Open in Desktop to clone makermadecnc/makerverse to your computer and use it in GitHub Desktop. Making and pushing changes . Go ahead and make a few changes to the project using your favorite text editor. When you’re ready to submit your changes, type up a commit summary in GitHub for Desktop, and click Commit to master. You can continue to make more changes and create new commits. When you’re ready to push your changes, click on the Sync button to synchronize master with the remote server. Creating the pull request . | Head on over to the repository on GitHub.com where your project lives. For your example, it would be at https://www.github.com/&lt;your_username&gt;/makerverse. | To the right of the branch menu, click New pull request. | Click Create pull request. | That’s done. | . ",
+    "url": "http://localhost:4000/about/contribution/#how-to-contribute",
+    "relUrl": "/about/contribution/#how-to-contribute"
+  },"17": {
+    "doc": "Contribution",
+    "title": "Development",
+    "content": "See the build from source section to get started. ",
+    "url": "http://localhost:4000/about/contribution/#development",
+    "relUrl": "/about/contribution/#development"
+  },"18": {
+    "doc": "Contribution",
+    "title": "Localization",
+    "content": "If you’d like to help contribute translations, you can fork the repository, update resource files in the src/app/i18n directory, and create a pull request to submit your changes. ",
+    "url": "http://localhost:4000/about/contribution/#localization",
+    "relUrl": "/about/contribution/#localization"
+  },"19": {
+    "doc": "Contribution",
+    "title": "Translation Validation",
+    "content": "You can validate the translation by copying translated resource files to the installed directory. Note that your path may differ based on the Node installation path you have in place. $ cd $(dirname `which makerverse`)/../lib/node_modules/cncmakerversejs/dist/app/i18n/ $ pwd /home/cheton/.nvm/versions/node/v10.15.3/lib/node_modules/makerverse/dist/app/i18n . To verify your changes during runtime, it’s recommended that you open Developer Tools and disable browser cache. For example: . Step 1: Open Developer Tools and click [Settings] . Step 2: Disable cache . Now you can copy resource files to the dist/makerverse/app/i18n directory and refresh your browser to see new updates. Note that you should not close DevTools to make sure your browser won’t cache anything. ",
+    "url": "http://localhost:4000/about/contribution/#translation-validation",
+    "relUrl": "/about/contribution/#translation-validation"
+  },"20": {
+    "doc": "Contribution",
+    "title": "Contribution",
+    "content": " ",
+    "url": "http://localhost:4000/about/contribution/",
+    "relUrl": "/about/contribution/"
+  },"21": {
+    "doc": "Create Workspace",
+    "title": "Creating a Workspace",
+    "content": "With Makerverse open, you can now create a Workspace. ",
+    "url": "http://localhost:4000/tutorial/create-workspace/#creating-a-workspace",
+    "relUrl": "/tutorial/create-workspace/#creating-a-workspace"
+  },"22": {
+    "doc": "Create Workspace",
+    "title": "What’s in a Workspace?",
+    "content": "A workspace holds a connection to a single machine (CNC, 3D printer, etc.) . It knows how to “talk to” the machine (what port the machine uses, for example). It will run your prints/cuts and generally be the home of your machine. A workspace does not store machine settings. In almost every case, your machine itself stores things like the calibration settings. This means that you can detach the machine from the USB port and safely connect it to a different computer (running Makerverse, or any other program compatible with your machine) and the machine will continue to function. ",
+    "url": "http://localhost:4000/tutorial/create-workspace/#whats-in-a-workspace",
+    "relUrl": "/tutorial/create-workspace/#whats-in-a-workspace"
+  },"23": {
+    "doc": "Create Workspace",
+    "title": "New Workspace",
+    "content": "Find the New Workspace window on the Home (first tab) of makerverse. Pre-Configured Machines . OpenWorkShop maintains a “community catalog” of pre-configured machines. When you choose from the catalog, Makerverse will automatically choose the correct options for you. Pre-configured machines will also check that you are running the correct firmware version. Just choose the name of your machine from the “New Workspace” screen. Create New Machine . If you cannot find your machine in the community catalog, you will need to use the “Create New Machine” button. On this screen, you will need to enter the controller type (e.g., Grbl, Marlin), baud rate, and eventually the size of each axis. Connect . Once you’ve configured the machine, the Connect button will appear. You will need to choose the correct port to which the machine is connected. If you see a simple error opening serial port when you try to connect, either you do not have permission to open the port, or it is otherwise busy. ",
+    "url": "http://localhost:4000/tutorial/create-workspace/#new-workspace",
+    "relUrl": "/tutorial/create-workspace/#new-workspace"
+  },"24": {
+    "doc": "Create Workspace",
+    "title": "Customize Workspace",
+    "content": "You can choose the name, background color, icon, and other traits of your workspace. Axes . If you used a pre-configured machine, your axes are already set. In other cases, you should take the time to make sure your axes are correctly set. Note: axes settings have no impact upon the actual functioning of the machine. They merely change the UI to be more conveniently sized. The accuracy value specifies the minimum distance the machine can move along that axis. For example, 0.1mm might be appropriate to a CNC machine, but not to a 3D printer. The precision value indicates the number of digits used for rounding the (displayed) value of the axis. For example, 0 would round the value to the whole mm. ",
+    "url": "http://localhost:4000/tutorial/create-workspace/#customize-workspace",
+    "relUrl": "/tutorial/create-workspace/#customize-workspace"
+  },"25": {
+    "doc": "Create Workspace",
+    "title": "New Machine?",
+    "content": "Some machines, like the Maslow, may ask if this is a new machine (or the firmware has been recently re-installed). If you select “Yes,” the machine settings will be reset and the recommended settings will be applied. You may then be asked to calibrate the machine before moving on… . ",
+    "url": "http://localhost:4000/tutorial/create-workspace/#new-machine",
+    "relUrl": "/tutorial/create-workspace/#new-machine"
+  },"26": {
+    "doc": "Create Workspace",
+    "title": "Next Steps",
+    "content": "Learn how to control your machine manually in the workspace basics. ",
+    "url": "http://localhost:4000/tutorial/create-workspace/#next-steps",
+    "relUrl": "/tutorial/create-workspace/#next-steps"
+  },"27": {
+    "doc": "Create Workspace",
+    "title": "Create Workspace",
+    "content": " ",
+    "url": "http://localhost:4000/tutorial/create-workspace/",
+    "relUrl": "/tutorial/create-workspace/"
+  },"28": {
+    "doc": "Docker",
+    "title": "Docker",
+    "content": "Makerverse is distributed as a multi-architecture Docker image, so it can run on nearly any computer. ",
+    "url": "http://localhost:4000/installation/web-server/docker/",
+    "relUrl": "/installation/web-server/docker/"
+  },"29": {
+    "doc": "Docker",
+    "title": "Installing Docker",
+    "content": "It is recommended to use the Windows / MacOS installers, when applicable. For Linux users, a few extra steps must be taken to grant the necessary permissions. Note: these steps are already performed on the Raspberry Pi image. Install docker: . curl -sSL https://get.docker.com | sh . And then grant your current user access to Docker, and start it: . sudo usermod -aG docker \"$(whoami)\" sudo systemctl enable docker sudo systemctl start docker . At this point, you probably need to logout (or quit the SSH session) and log back in again. You should have just given your current user (e.g., pi) access to Docker. To check that this is true, you can do docker container ls. Notice this time we did not use sudo. As long as it doesn’t give an error about permissions, your current user now has access to Docker. ",
+    "url": "http://localhost:4000/installation/web-server/docker/#installing-docker",
+    "relUrl": "/installation/web-server/docker/#installing-docker"
+  },"30": {
+    "doc": "Docker",
+    "title": "Granting USB Access",
+    "content": "On Linux (including Raspbian), you will also probably need to grant Docker access to your USB devices. Do a sudo nano /etc/udev/rules.d/49-makerverse.rules to create a file with the following contents: . KERNEL==\"ttyUSB[0-9]*\",MODE=\"0666\" KERNEL==\"ttyACM[0-9]*\",MODE=\"0666\" . Unplug any USB ports connected to a machine, and then re-connect them. The rule we just added will now take effect forevermore, giving Makerverse access to the USB ports. ",
+    "url": "http://localhost:4000/installation/web-server/docker/#granting-usb-access",
+    "relUrl": "/installation/web-server/docker/#granting-usb-access"
+  },"31": {
+    "doc": "Docker",
+    "title": "Launching Makerverse",
+    "content": "Start by downloading the Source Code from the latest release (or clone the git repository). There is a launch script located at bin/launch. For most users, you should simply type bin/launch in the terminal to start the application. If you have git installed, you can just copy-and-paste: . git clone https://github.com/makermadecnc/makerverse.git makerverse/bin/launch . After a few minutes, you should be able to connect to Makerverse via port 8000 on the IP address of the computer. For example, http://localhost:8000 (when on the same computer), or http://192.168.0.100:8000 (if connecting to a computer with the IP address 192.168.0.100). Once this works, Linux users may optionally move on to the Linux Service section to run the application automatically. Run Manually (Optional) . If you prefer to run the Docker image directly instead of using bin/launch, you should do the following: . | Pull the makerverse/core image tagged :latest, :prerelease, or specific version number. | Use --privileged mode and -v /dev:/dev for USB access. | Mount your .makerverse config file at /home/node/.makerverse. | Mount your gcode files at /home/node/gcode. | Map the external port to 8000 (-p 8000:8000). | . For example: . docker run --rm --privileged --name makerverse \\ -p \"8000:8000\" \\ -v /dev:/dev \\ -v \"$HOME/gcode:/home/node/gcode\" \\ -v \"$HOME/.makerverse:/home/node/.makerverse\" \\ -v \"$HOME/makerverse:/home/node/makerverse\" \\ \"makerverse/core:latest\" . ",
+    "url": "http://localhost:4000/installation/web-server/docker/#launching-makerverse",
+    "relUrl": "/installation/web-server/docker/#launching-makerverse"
+  },"32": {
+    "doc": "Docker",
+    "title": "Configuration",
+    "content": "You can set the following environment variables to configure Makerverse on any Web Server: . | MAKERVERSE_PORT: Which port to listen on (default: 8000). | MAKERVERSE_HOME: Where the settings files should be stored (default: $HOME). | MAKERVERSE_SRC_DIR: Where the Makerverse code is located (default: $HOME/makerverse). | MAKERVERSE_LAUNCH_METHOD: Use Docker or Node? (default: docker). | . ",
+    "url": "http://localhost:4000/installation/web-server/docker/#configuration",
+    "relUrl": "/installation/web-server/docker/#configuration"
+  },"33": {
+    "doc": "Docker",
+    "title": "Updating",
+    "content": "Each time the bin/launch script is run, it will automatically update the application by pulling the latest docker image. If you use the linux service, this happens each time you restart the service. ",
+    "url": "http://localhost:4000/installation/web-server/docker/#updating",
+    "relUrl": "/installation/web-server/docker/#updating"
+  },"34": {
+    "doc": "Docker",
+    "title": "Shared Directories",
+    "content": "Sometimes, you need to create a file or folder which Makerverse can access. This is slightly complicated when using Docker: . | The folder where Makerverse is located is called the “project path.” | Anything in this folder is “shared” with the Makerverse application. | However, while inside the Makerverse application, the path to the shared folder is /home/node/makerverse. | . Project Path . When you run the bin/launch script, you should see something like this (example taken from a Raspberry Pi): . Makerverse:latest settings: /home/pi/.makerverse (project at: /home/pi/makerverse) . On a Mac, the project might be at something like /Users/zaneclaes/makerverse. Inside Makerverse, you always use /home/node/makerverse to refer to the project path. Example . For example, on your Raspberry Pi or Linux computer running Makerverse, you could run: . cd makerverse mkdir -p commands . And then perhaps create a command script to turn on/off your shopvac. If this script file were named shopvac.sh, you would reference it as /home/node/makerverse/commands/shopvac.sh. Gcode Folder . In addition to the project path, Makerverse will look for a folder at $HOME/gcode which contains .nc (gcode) files. Any files located in this directory will be available in the “watch directory” from Makerverse. Instead of uploading a new program, you can just use the drop-down to “Browse” for the existing programs in the folder. ",
+    "url": "http://localhost:4000/installation/web-server/docker/#shared-directories",
+    "relUrl": "/installation/web-server/docker/#shared-directories"
+  },"35": {
+    "doc": "Events",
+    "title": "Events",
+    "content": ". | Are triggered automatically, such as when a machine connects. | Can run a script (command) or GCode | . ",
+    "url": "http://localhost:4000/features/events/",
+    "relUrl": "/features/events/"
+  },"36": {
+    "doc": "Events",
+    "title": "List Of Events",
+    "content": ". | Startup | Open a Serial Port | Close a Serial Port | Ready | Program: Start | Program: Stop | Program: Pause | Program: Resume | Feed Hold | Cycle Start | Set Home | Sleep | Run Macro | Load Macro | . ",
+    "url": "http://localhost:4000/features/events/#list-of-events",
+    "relUrl": "/features/events/#list-of-events"
+  },"37": {
+    "doc": "Events",
+    "title": "Creating an Event",
+    "content": ". | Go to Settings -&gt; Events and press “+ Add” | To run scripts, use a “system” trigger and follow the commands instructions. | To run Gcode, use a “G-code” trigger and enter any gcode you wish. | . ",
+    "url": "http://localhost:4000/features/events/#creating-an-event",
+    "relUrl": "/features/events/#creating-an-event"
+  },"38": {
+    "doc": "Grbl",
+    "title": "Grbl",
+    "content": "Grbl is an extremely common firmware/protocol option for CNC machines. Many manufacturers simply ship their CNC machines with Grbl, as it is such a well-known open-source (free) piece of Arduino code. If you’re not sure what controller your CNC machine uses, chances are pretty good it uses Grbl. ",
+    "url": "http://localhost:4000/machines/cnc/grbl/",
+    "relUrl": "/machines/cnc/grbl/"
+  },"39": {
+    "doc": "Grbl",
+    "title": "Grbl Versions",
+    "content": "Find all versions on the Grbl releases page. | Major versions of Grbl are 1.1h, 1.1g, etc. | Minor versions are designated by the date of the release (20190825 was released on August 25th, 2019). | . ",
+    "url": "http://localhost:4000/machines/cnc/grbl/#grbl-versions",
+    "relUrl": "/machines/cnc/grbl/#grbl-versions"
+  },"40": {
+    "doc": "Grbl",
+    "title": "Updating Grbl",
+    "content": "Please see the Github README for Grbl. ",
+    "url": "http://localhost:4000/machines/cnc/grbl/#updating-grbl",
+    "relUrl": "/machines/cnc/grbl/#updating-grbl"
+  },"41": {
+    "doc": "History",
+    "title": "History",
+    "content": "This is a fork of the CNCjs project which spawned from the Maslow CNC ecosystem. Several members of the Maslow community worked together to make the Maslow and M2 (Due) firmware compatible with CNCjs. At the same time, the CNCjs project development was paused due to extenuating circumstances. As a result, Makerverse evolved its own vision of an application which supports a wide variety of CNC &amp; 3DP hardware with a clean interface and powerful widgets. ",
+    "url": "http://localhost:4000/about/history/",
+    "relUrl": "/about/history/"
+  },"42": {
+    "doc": "History",
+    "title": "Original CNCjs Contributors",
+    "content": "Original CNCjs contributors: . | Locale | Language | Status | Contributors | . | cs | Čeština (Czech) | ✔ | Miroslav Zuzelka | . | de | Deutsch (German) | ✔ | Thorsten Godau, Max B. | . | es | Español (Spanish) | ✔ | Juan Biondi | . | fr | Français (French) | ✔ | Simon Maillard, CorentinBrulé | . | hu | Magyar (Hungarian) | ✔ | Sipos Péter | . | it | Italiano (Italian) | ✔ | vince87 | . | ja | 日本語 (Japanese) | ✔ | Naoki Okamoto | . | nl | Nederlands (Netherlands) | ✔ | dutchpatriot | . | pt-br | Português (Brasil) | ✔ | cmsteinBR | . | ru | Ру́сский (Russian) | ✔ | Denis Yusupov | . | tr | Türkçe (Turkish) | ✔ | Ali GÜNDOĞDU | . | zh-cn | 简体中文 (Simplified Chinese) | ✔ | Mandy Chien, Terry Lee | . | zh-tw | 繁體中文 (Traditional Chinese) | ✔ | Cheton Wu | . ",
+    "url": "http://localhost:4000/about/history/#original-cncjs-contributors",
+    "relUrl": "/about/history/#original-cncjs-contributors"
+  },"43": {
+    "doc": "CNC",
+    "title": "CNC",
+    "content": "Find your machine, below, and click on the appropriate link for the latest firmware and instructions. If you click on one of the links and are taken to a Github page, use the green Code button at the top to download the latest version, (unless specified otherwise in the instructions). ",
+    "url": "http://localhost:4000/machines/cnc/",
+    "relUrl": "/machines/cnc/"
+  },"44": {
+    "doc": "CNC",
+    "title": "Maslow",
+    "content": "Please read the Maslow-specific instructions. There are two common types of Maslow, built with two different Arduino boards: . | Arduino Mega: Maslow “Classic” (JumpStart Kit) | Arduino Due: M2, or similar | . Tip: Coming from GroundControl/WebControl with an original Maslow Mega? Read this forum post for help upgrading firmware. Note: the firmware for the Arduino Due underwent significant changes in September, 2020. If your firmware was installed before this point, it is actually a Grbl machine (below) and does not have support for the Maslow-specific features, like correcting for chain-sag effects (rounding) that happen in the corners of the stock. ",
+    "url": "http://localhost:4000/machines/cnc/#maslow",
+    "relUrl": "/machines/cnc/#maslow"
+  },"45": {
+    "doc": "CNC",
+    "title": "Grbl",
+    "content": ". | Grbl (Download) | Grbl-Mega (Download) | . Tested On . | SainSmart Genmitsu 3180 Pro (Baud Rate: 115200) | . ",
+    "url": "http://localhost:4000/machines/cnc/#grbl",
+    "relUrl": "/machines/cnc/#grbl"
+  },"46": {
+    "doc": "Makerverse Documentation",
+    "title": "Makerverse Documentation",
+    "content": "A full-featured web-based controller platform for CNC &amp; 3DP machines. ",
+    "url": "http://localhost:4000/",
+    "relUrl": "/"
+  },"47": {
+    "doc": "Makerverse Documentation",
+    "title": "Quickstart",
+    "content": ". | Follow the installation guide. | Connect to the application and create a workspace. | Follow your machine-specific instructions. | Upload and run your first cut or print. | . ",
+    "url": "http://localhost:4000/#quickstart",
+    "relUrl": "/#quickstart"
+  },"48": {
+    "doc": "Tutorial",
+    "title": "Tutorial",
+    "content": " ",
+    "url": "http://localhost:4000/tutorial/",
+    "relUrl": "/tutorial/"
+  },"49": {
+    "doc": "Machines",
+    "title": "Machines",
+    "content": "Makerverse uses various controllers to speak to different machines. ",
+    "url": "http://localhost:4000/machines/",
+    "relUrl": "/machines/"
+  },"50": {
+    "doc": "Machines",
+    "title": "Supported Machines",
+    "content": "Note: when creating a workspace, some machines come pre-configured via the community catalog. If you cannot find your machine (in the app or in this documentation), it is nevertheless likely to still be supported (as long as it uses a standard protocol). You will need to identify the correct controller for the protocol, as well as the baud rate (which is probably buried somewhere in your machine’s documentation). ",
+    "url": "http://localhost:4000/machines/#supported-machines",
+    "relUrl": "/machines/#supported-machines"
+  },"51": {
+    "doc": "Machines",
+    "title": "Firmware",
+    "content": "Firmware is the code which runs on the machine itself (usually, an Arduino board connected via USB). Your machine likely came pre-installed with some firmware. Generally, you should be certain you are using the latest firmware for your machine. If you have selected a machine from the community catalog, you will receive recommendations and support links for your firmware. ",
+    "url": "http://localhost:4000/machines/#firmware",
+    "relUrl": "/machines/#firmware"
+  },"52": {
+    "doc": "Machines",
+    "title": "Machine-Specific Instructions",
+    "content": "In some cases, like with the Maslow CNC, there are also important machine-specific instructions to follow. Please be sure to read any instructions related to your machine in this documentation or in the app. ",
+    "url": "http://localhost:4000/machines/#machine-specific-instructions",
+    "relUrl": "/machines/#machine-specific-instructions"
+  },"53": {
+    "doc": "Features",
+    "title": "Features",
+    "content": " ",
+    "url": "http://localhost:4000/features/",
+    "relUrl": "/features/"
+  },"54": {
+    "doc": "Features",
+    "title": "Controllers",
+    "content": "Many machines use a standard protocol, like Grbl (CNC) or Marlin (3DP). Makerverse interfaces with various machines through its supported controllers: . | Grbl | Maslow | Marlin | TinyG (experimental) | Smoothie (experimental) | . In Makerverse, when creating a New Workspace, you will need to select the controller appropriate to how your machine communicates. ",
+    "url": "http://localhost:4000/features/#controllers",
+    "relUrl": "/features/#controllers"
+  },"55": {
+    "doc": "Features",
+    "title": "The Settings File",
+    "content": "Settings are loaded from the $HOME/.makerverse file (e.g., /home/pi/.makerverse); a sample file is located here. ",
+    "url": "http://localhost:4000/features/#the-settings-file",
+    "relUrl": "/features/#the-settings-file"
+  },"56": {
+    "doc": "Features",
+    "title": "Core Features",
+    "content": ". | 6-axis digital readout (DRO) | Tool path 3D visualization | Simultaneously communicate with multiple clients | Customizable workspace | Custom MDI (Multiple Document Interface) command buttons (since 1.9.13) | My Account | Commands | Events | Keyboard Shortcuts | Contour ShuttleXpress | Multi-Language Support | Watch Directory | Laser | Tool Change (since 1.9.11) | Z-Probe | . ",
+    "url": "http://localhost:4000/features/#core-features",
+    "relUrl": "/features/#core-features"
+  },"57": {
+    "doc": "About",
+    "title": "About",
+    "content": "Makerverse is an open-source project. ",
+    "url": "http://localhost:4000/about/",
+    "relUrl": "/about/"
+  },"58": {
+    "doc": "About",
+    "title": "Issues",
+    "content": "For bugs, problems, questions, and general requests: use GitHub issues. ",
+    "url": "http://localhost:4000/about/#issues",
+    "relUrl": "/about/#issues"
+  },"59": {
+    "doc": "About",
+    "title": "Maintainers",
+    "content": "The servers, build tools, and other expenses are paid for and maintained as a collaboration between MakerMade and OpenWorkShop, Inc. ",
+    "url": "http://localhost:4000/about/#maintainers",
+    "relUrl": "/about/#maintainers"
+  },"60": {
+    "doc": "About",
+    "title": "Contact",
+    "content": ". | Zane: @zaneclaes (GitHub), email | Chris: @skilescm (GitHub) | . ",
+    "url": "http://localhost:4000/about/#contact",
+    "relUrl": "/about/#contact"
+  },"61": {
+    "doc": "About",
+    "title": "License",
+    "content": "Licensed under the GNU GPL v3. ",
+    "url": "http://localhost:4000/about/#license",
+    "relUrl": "/about/#license"
+  },"62": {
+    "doc": "Web Server",
+    "title": "Web Server",
+    "content": "With this approach, you can connect to the Makerverse app from any web browser on the same network. This should work on any computer, but it is best suited for a Linux computer which can act as a dedicated web server. Tip: the easiest setup is the Raspberry Pi Image, which configures the web server for you. If you don’t wish to use the pre-built image, you can achieve the same thing on a Raspberry Pi (or any Debian computer) using the Linux Service installation. For all other cases, refer directly to the Docker instructions. ",
+    "url": "http://localhost:4000/installation/web-server/",
+    "relUrl": "/installation/web-server/"
+  },"63": {
+    "doc": "Web Server",
+    "title": "Updating",
+    "content": "The web server installation automatically updates when it restarts. To manually update a Linux Service install, use sudo systemctl restart makerverse. Note: while the update is downloaded, Makerverse will continue to run the old installation. You can check on the update progress with journalctl -xe. Once the update is complete, refresh your internet browser and look at the “About” screen to confirm the new version. To manually update a Docker install (without a Linux service), run bin/launch from within the Makerverse directory. This can also be useful if you would like more feedback on the update progress (this approach happens in the foreground, instead of requiring that you use the journalctl command to view logs). ",
+    "url": "http://localhost:4000/installation/web-server/#updating",
+    "relUrl": "/installation/web-server/#updating"
+  },"64": {
+    "doc": "Installation",
+    "title": "Installation",
+    "content": "You can always find the latest versions on the Releases page. ",
+    "url": "http://localhost:4000/installation/",
+    "relUrl": "/installation/"
+  },"65": {
+    "doc": "Installation",
+    "title": "Methods",
+    "content": "There are two primary ways to run Makerverse. | Stand-Alone: easy to install on Mac and Windows; harder to update. | Web Server: works on any computer; has automatic updates. | . ",
+    "url": "http://localhost:4000/installation/#methods",
+    "relUrl": "/installation/#methods"
+  },"66": {
+    "doc": "Installation",
+    "title": "Recommendations",
+    "content": ". | If you have a Raspberry Pi, just flash the pre-built image for the easiest, most full-featured solution. | If you’re non-technical and only using Makerverse on a Mac/Windows computer, use the stand-alone install. | Otherwise, use the generic web server install (works with just about any computer). | . ",
+    "url": "http://localhost:4000/installation/#recommendations",
+    "relUrl": "/installation/#recommendations"
+  },"67": {
+    "doc": "Installation",
+    "title": "Prereleases (Beta Versions)",
+    "content": "Prereleases (a.k.a. “Beta” versions) are also available on the Releases page. Make sure to turn on the “Preleases” in Settings -&gt; General after installing the application. ",
+    "url": "http://localhost:4000/installation/#prereleases-beta-versions",
+    "relUrl": "/installation/#prereleases-beta-versions"
+  },"68": {
+    "doc": "Linux Service",
+    "title": "Linux Service",
+    "content": "On a Raspberry Pi, Ubuntu, and other Linux machines you can use systemd to run Makerverse as a service. This means it will start automatically on boot, and run in the background. Note: these steps are already performed on the Raspberry Pi image. | Read the Docker launch instructions and make sure bin/launch works. | Once you’re sure the server is running the way you want it, terminate the server. | Now run bin/server install to create the service. | . ",
+    "url": "http://localhost:4000/installation/web-server/linux-service/",
+    "relUrl": "/installation/web-server/linux-service/"
+  },"69": {
+    "doc": "Linux Service",
+    "title": "Useful Commands",
+    "content": "Since Makerverse runs as a service, you can use all the standard systemd commands. Type sudo systemctl [command] makerverse, replacing [command] with one of the following: . | start: Run the application. | enable: Start the application automatically. | status: See application health. | restart: Restart the application. | stop: Stop the application. | disable: Do not start the application automatically. | . ",
+    "url": "http://localhost:4000/installation/web-server/linux-service/#useful-commands",
+    "relUrl": "/installation/web-server/linux-service/#useful-commands"
+  },"70": {
+    "doc": "Linux Service",
+    "title": "Configuration",
+    "content": "If you would like to set one or more configuration (environment) variables, you will need to pass them to the service. For example, to set the port to 80 (which is done by default on the Raspberry Pi image), reinstall the service as follows (from the Makerverse directory): . sudo bin/build-service.sh install $(whoami) \"export MAKERVERSE_PORT=80\" . | The second parameter is the username (e.g., pi) which will run the service. | The third parameter will be prepended to the start command, in this case exporting the environment variable. | . ",
+    "url": "http://localhost:4000/installation/web-server/linux-service/#configuration",
+    "relUrl": "/installation/web-server/linux-service/#configuration"
+  },"71": {
+    "doc": "Linux Service",
+    "title": "Troubleshooting",
+    "content": "The following commands are helpful if something is not working: . | Check if Makerverse is running: sudo systemctl status makerverse | Restart (and update!) Makerverse: sudo systemctl restart makerverse | See Makerverse server logs: docker logs makerverse | See all system logs (find problems with boot): journalctl -xe | . ",
+    "url": "http://localhost:4000/installation/web-server/linux-service/#troubleshooting",
+    "relUrl": "/installation/web-server/linux-service/#troubleshooting"
+  },"72": {
+    "doc": "Linux Service",
+    "title": "Updating",
+    "content": "Just run the launch script, i.e., makerverse/bin/launch. Details about the updating progress (if any) will be displayed on the screen before the server is restarted. Note that any clients will be disconnected, and any cuts/prints halted. ",
+    "url": "http://localhost:4000/installation/web-server/linux-service/#updating",
+    "relUrl": "/installation/web-server/linux-service/#updating"
+  },"73": {
+    "doc": "Maslow",
+    "title": "Maslow",
+    "content": "The Maslow is a unique CNC machine due to its “hanging pendant” design. First, determine which version you have and install the latest firmware. ",
+    "url": "http://localhost:4000/machines/cnc/maslow/",
+    "relUrl": "/machines/cnc/maslow/"
+  },"74": {
+    "doc": "Maslow",
+    "title": "Calibration",
+    "content": "The Maslow requires calibration to correct “chain sag” (catenary effects). Before you Start . Do a pre-flight check. Maslow frames are generally built from hand-cut, imprecise materials. Catching errors early will greatly improve the chances of an easy, successful calibration. Use the Shuttle controls to move your sled to all 4 corners of the stock. Check that it can reach each corner easily and without obstruction. Do not attempt to calibrate if you have any of these problems: . | Bowing or warping of the stock. | Sled lifting or tilting while moving. | Wires or obstructions preventing movement. | Anything in the way of the sled, such as protruding wood on the frame. | Chains not attached to the sled correctly (e.g., rollers came off the disk). | . Note: rather than fixing a frame problem, you can use the Frame Settings (below) to make your machine size smaller than the standard 8 ft. x 4 ft. This will prevent the machine from attempting to access the inaccessible corners. However, after later making changes to the frame to clear the obstruction, the calibration process should be repeated. Machine . These options may not need to be changed, as they default to match standard Maslow kits. However, you should take a moment to review them, just in case: . | Sled Weight: Measured in Newtons, including the router and all. | Rotational Radius: The radius from the center of the bit to where the chains attach. | Chain Direction: The image above depicts Off Bottom. Only choose Off Top if the chains come off the sprockets in the opposite direction. | Chain Full Length: The total length of each chain (usually 12 feet, or 3360mm). | . Stock . During calibration, you should make sure that these values match the stock you have loaded. Measure your stock! . Most plywood is exactly 8x4 feet, but it is important to be certain about these values before calibrating. | Width: the width of the stock. | Height: the height of the stock. | . After calibration, you may change the frame settings (machine size) for different sizes of stock, as needed. The machine’s origin (at the center of the calibration stock) will remain in exactly the same place. You can therefore load a different size stock on this same origin point without re-calibrating. Frame . Frames can vary a lot, as they are usually hand-made. It’s important to get a roughly accurate measurement (+/- 5mm) of these two values: . | Motor Height: The distance from the top of the stock to the middle of the motor’s sprockets (coplanar with the stock). | Motor Width: The distance between the two motors (measured from the center of each sprocket). | . If these two values are not accurate within +/- 5mm, it is likely that the subsequent calibration steps will fail to ever achieve high precision. Sled . If you used a pre-configured machine from the community catalog when setting up your workspace, this step should already be completed. This step measures the distance from the end-mill (tip of the router) to the four edges of the sled. If you have “standard” Maslow kit (with a circular sled 18” in diameter), it is likely that you do not need to change anything. The purpose of this step is to allow calibration to infer where the end-mill is located based upon a measurement from an edge of the sled to the edge of the stock. In other words, later in calibration, you will measure from “the top of the sled to the top of the stock.” The Calibration process will use the sled values to infer where the center of the sled (and thus the cutter) is located. Z-Axis . If you used a pre-configured machine from the community catalog when setting up your workspace, this step should already be completed. This step will ensure that the Z-axis travels the correct distance, and invert the Z-axis (if needed). You will move the Z-axis by some amount (up or down), and then enter the actual distance moved. Calibration will simply scale the Z-axis based upon the actual distance moved. Alterantively, you can use the “Edit Raw Z-Axis Values” at the bottom of the screen to enter well-known settings values. Chains . This step will tell the machine where the end-mill is currently located. It is a one-time process that will create a “save point” to return to (home) in case the machine ever becomes un-calibrated (such as chains slipping or being removed from the sprockets). This “save point” is really just a measurement of the length of both chains. Internally, the chain length is what the Maslow uses to compute the X/Y position. This step will help the Maslow find the correct chain length, and then save that length into its internal memory. As you complete the “Set Chains” instructions in the app, you will use a sharpie or paint to mark exactly which link of the chain is at the top of each sprocket. If your machine ever comes out of alignment, such as if chains slip or are removed from the sprockets, you will need to return it to this position. It is important that the chains are exactly in the same position. Do not try to visually move the sled back to the same position. It is more accurate to use the 12 o’clock (noon) position on the sprocket matching up with your mark on the chain. Once you are certain the chain is in the exact same position, press the “Reset Chains” button on the main screen and Makerverse will tell the Maslow it is back at this saved location. There is no need to re-calibrate after resetting chains. Edge Calibration . Edge calibration is a way to refine X/Y positioning without actually cutting (destroying) stock. Both Edge and Precision calibration will use measurements to correct for chain sag and ensure that your sled is in the correct X/Y position. They can be performed again and again, if necessary, to incrementally improve calibration. Tip: For the best results, use a millimeter tape measure to take measurements in these steps. | First ensure that you have selected the correct sled type from the bottom of the screen. The default is a circular sled with a 9” radius. | Press each of the six move buttons to move the sled into that location. | Measure the distance from the edge of the sled to the edge of the stock and enter it into the appropriate field. If the edge of the sled is outside the stock, use a negative value. | When you are done, press the Calibrate button. | . Tip: if any measurement is more than 1” (25mm) or so, something is wrong with your build. One of the previous settings or measurements is almost certainly wrong, or something is preventing your sled from moving freely. If the calibration results look good, press Apply Calibration Results. You can repeat the Edge Calibration (or move on to Precision Calibration) until you are satisfied with the results. In general, anything more than 6mm (1/4”) of average/total error will likely hurt your ability to cut straight lines/corners… especially in the edges of the stock. Precision Calibration . This is very similar to Edge Calibration, except that this time the Maslow will cut holes in the stock. You can choose the distance from the edge at which the holes are cut, and the depth to which they are cut. With each hole, measure the distance from the center of the hole to the edge of the stock. Using a 1/8” end-mill, it should be possible to easily achieve an average error distance of less that 2mm and a max error distance of less than 4mm. With several rounds of calibration, values of less than 1mm and 2mm should be entirely attainable. ",
+    "url": "http://localhost:4000/machines/cnc/maslow/#calibration",
+    "relUrl": "/machines/cnc/maslow/#calibration"
+  },"75": {
+    "doc": "Maslow",
+    "title": "Further Reading",
+    "content": ". | Getting Starting with the Maslow CNC Router | Upgrading the Frame for Better Accuracy | . ",
+    "url": "http://localhost:4000/machines/cnc/maslow/#further-reading",
+    "relUrl": "/machines/cnc/maslow/#further-reading"
+  },"76": {
+    "doc": "Open Makerverse",
+    "title": "Open Makerverse",
+    "content": "If you used a Stand-Alone installation, Makerverse should already be open and running. ",
+    "url": "http://localhost:4000/tutorial/open-makerverse/",
+    "relUrl": "/tutorial/open-makerverse/"
+  },"77": {
+    "doc": "Open Makerverse",
+    "title": "Web Browser",
+    "content": "To connect to Makerverse from any internet browser on the same network, you first need to know the address and port of Makerverse. Tip: with the Raspberry Pi image, the address is makerverse.local and the default port is 80. On all other installations, the default port is 8000. The address of Makerverse can be the IP address of the computer on the network, or the name of that computer. Here’s how to find your hostname or IP address. Now, put the two together into your internet browser: . http://[hostname-or-ip]:[port]/ . Tip: if you use port 80, you don’t need to include the port. ",
+    "url": "http://localhost:4000/tutorial/open-makerverse/#web-browser",
+    "relUrl": "/tutorial/open-makerverse/#web-browser"
+  },"78": {
+    "doc": "Open Makerverse",
+    "title": "Examples",
+    "content": "Raspberry Pi installation . makerverse.local + port 80: http://makerverse.local/ . Using a Hostname . mycomputer.local + port 8000: http://mycomputer.local:8000/ . Using an IP address . IP 192.168.0.100 + port 8000: http://192.168.0.100:8000/ . ",
+    "url": "http://localhost:4000/tutorial/open-makerverse/#examples",
+    "relUrl": "/tutorial/open-makerverse/#examples"
+  },"79": {
+    "doc": "Open Makerverse",
+    "title": "Troubleshooting",
+    "content": "If your browser fails to connect to Makerverse, first make sure you have typed http:// correctly (sometimes https:// is inserted automatically). Next, check that you can access Makerverse on the same computer which is running Makerverse. Instead of the IP address or hostname, just use localhost. For example, try to open a web browser on the same computer to http://localhost:8000. If that works, then something about your network (e.g., firewall) is preventing the second computer from talking to the Makerverse computer. If it does not work, then Makerverse is not actually running. ",
+    "url": "http://localhost:4000/tutorial/open-makerverse/#troubleshooting",
+    "relUrl": "/tutorial/open-makerverse/#troubleshooting"
+  },"80": {
+    "doc": "Programs",
+    "title": "Programs",
+    "content": "Makerverse runs gcode (.nc) programs. ",
+    "url": "http://localhost:4000/features/programs/",
+    "relUrl": "/features/programs/"
+  },"81": {
+    "doc": "Programs",
+    "title": "Load",
+    "content": "Upload Program . From your workspace, press the “Upload Program” button. You will be able to select a file from your current device. Watch Directory . On the right side of the “Upload Program” button is an arrow. Clicking it lets you explore the “Watch Directory.” For example, with a Web Server installation, you can instead place the .nc file into the folder at $HOME/gcode on the computer where Makerverse is installed. On the Raspberry Pi image, the watch directory is /home/pi/gcode. *Note*: Makerverse does not (yet) support folders within the watch directory. ",
+    "url": "http://localhost:4000/features/programs/#load",
+    "relUrl": "/features/programs/#load"
+  },"82": {
+    "doc": "Programs",
+    "title": "Run",
+    "content": "To run the program, just press the play button (next to “Upload Program”). You can monitor the execution with the G-code widget. Multiple Devices . With a Web Server installation, you can upload a program from one computer (e.g., desktop) and then run/monitor Makerverse from another (e.g., shopfloor tablet or smartphone). ",
+    "url": "http://localhost:4000/features/programs/#run",
+    "relUrl": "/features/programs/#run"
+  },"83": {
+    "doc": "Raspberry Pi Image",
+    "title": "Raspberry Pi Image",
+    "content": "This is the easiest approach. It does all the work of setting up the Docker environment (and Linux service) for you. If you prefer to set up your Raspberry Pi manually (instead of using a pre-built SD card), see the Linux Service instructions. ",
+    "url": "http://localhost:4000/installation/web-server/raspberry-pi/",
+    "relUrl": "/installation/web-server/raspberry-pi/"
+  },"84": {
+    "doc": "Raspberry Pi Image",
+    "title": "Requirements",
+    "content": ". | Raspberry Pi 3B+ (or better). | 16 GB micro SD card (or bigger). | Power supply for the RPi. | . At least one of the following: . | An ethernet connection (plugged in to the RPi). | A keyboard, monitor, and mouse. | . Note: you will be able to configure WiFi later in the setup. If neither of the above two options are available to you, you will need to use a wpa_supplicant.conf to pre-configure WiFi. Additionally, the first time Makerverse starts, you will need an active internet connection. ",
+    "url": "http://localhost:4000/installation/web-server/raspberry-pi/#requirements",
+    "relUrl": "/installation/web-server/raspberry-pi/#requirements"
+  },"85": {
+    "doc": "Raspberry Pi Image",
+    "title": "Choose Release",
+    "content": "There are two download options in the Latest Release: . | makerverse-raspberry-pi-os-lite-x.y.z.img.gz | makerverse-raspberry-pi-os-desktop-x.y.z.img.gz | . These are merely customized versions of the official Raspberry Pi OS images of the same names (Lite vs. Desktop). Once you have downloaded the appropriate release file, unzip it and flash the .img to your SD card with your preferred application (e.g., Balena Etcher). Then, just plug the RPi in and power it up! . ",
+    "url": "http://localhost:4000/installation/web-server/raspberry-pi/#choose-release",
+    "relUrl": "/installation/web-server/raspberry-pi/#choose-release"
+  },"86": {
+    "doc": "Raspberry Pi Image",
+    "title": "Connecting to the RPi",
+    "content": "You’ll need to get to a terminal in order to setup the Pi. You can either: . | Attach a mouse and keyboard. | Use SSH to connect from your computer: ssh pi@makerverse.local. | . Note: SSH is enabled by default in the Pi image. If the SSH command cannot connect (does not show a login prompt), either the Pi is not connected to the same network as the computer from which you are attempting to access it, or your router does not support looking up the Pi by its name. In either case, you should open your router’s admin interface and try to find the Pi’s IP address on the network. If you can find the IP address, you can use it instead of makerverse.local. The username/password (pi/raspberry) have been left unchanged from a “normal” Raspberry Pi OS. Use this whenever prompted for a username and password. ",
+    "url": "http://localhost:4000/installation/web-server/raspberry-pi/#connecting-to-the-rpi",
+    "relUrl": "/installation/web-server/raspberry-pi/#connecting-to-the-rpi"
+  },"87": {
+    "doc": "Raspberry Pi Image",
+    "title": "First Boot",
+    "content": "Once you’ve got a terminal open, type sudo raspi-config to run the official Raspberry Pi configuration tool. | You should definitely change the password, to keep the device secure! | You might also change the hostname from makerverse to something more memorable, like maslow, so you can use maslow.local instead of makerverse.local. | You might also want to turn on WiFi, so you do not need to use an ethernet connection on the Raspberry Pi to have access to Makerverse. | . Tip: read the useful commands in the Linux Service section! . Note: GPIO pin communication is enabled by default in Makerverse (meaning that pigpiod is enabled). This allows you to create commands that turn on and off the machine, for example. ",
+    "url": "http://localhost:4000/installation/web-server/raspberry-pi/#first-boot",
+    "relUrl": "/installation/web-server/raspberry-pi/#first-boot"
+  },"88": {
+    "doc": "Raspberry Pi Image",
+    "title": "Opening Makerverse",
+    "content": "You can connect to Makerverse from any web browser on the same network. Note: the Raspberry Pi image, unlike other web server instals, will run the Makerverse server on port 80 instead of port 8000. This means that you can connect without specifying a port in your browser (e.g., http://makerverse.local instead of http://makerverse.local:8000). The Makerverse application will start automatically on port 80. However, especially during the first boot, it will take some time to download (~600MB) and unpack the application. On a Raspberry Pi 3 B+ Rev.1.3 (about the worst device which can handle Makerverse), this has been known to take 20-30 minutes. A RPi4 on a decent internet connection should only take a few minutes. To check on the status of the startup or update, see the useful commands in the Linux Service section. ",
+    "url": "http://localhost:4000/installation/web-server/raspberry-pi/#opening-makerverse",
+    "relUrl": "/installation/web-server/raspberry-pi/#opening-makerverse"
+  },"89": {
+    "doc": "Raspberry Pi Image",
+    "title": "Tablet UI",
+    "content": "The Raspberry Pi image comes pre-installed with a mobile/tablet UI. It can be accessed by adding /tablet to the URL, such as http://makerverse.local/tablet. However, this UI is not the default UI because it is much less full-featured (it is intended for simple controls, like jogging or pausing program execution, from the shopfloor). You will still need to perform setup and calibration using the normal, desktop UI. ",
+    "url": "http://localhost:4000/installation/web-server/raspberry-pi/#tablet-ui",
+    "relUrl": "/installation/web-server/raspberry-pi/#tablet-ui"
+  },"90": {
+    "doc": "Raspberry Pi Image",
+    "title": "Desktop",
+    "content": "When running the makerverse-raspberrypi-os-dekstop.** (desktop version), you will need to follow on-screen instructions after the first boot to configure your Raspberry Pi. This image is based upon a standard Raspberry Pi OS Desktop installation, so please refer to the official documentation for any help. You can open a web browser and navigate to Makerverse at http://localhost. Or, you can enable Kiosk mode… . Kiosk Mode . When running the “Desktop” variation, you can enable Kiosk mode: . echo \"@bash /home/pi/makerverse/bin/kiosk /\" &gt; /home/pi/.config/lxsession/LXDE-pi/autostart . Once configured, it will automatically launch Chromium in “Kiosk” mode during boot. This will load the Makerverse application in a full-screen web browser. Makerverse is still running as a Web Server in the background, so other clients can also simultaneously connect. In this mode, Chromium takes over the desktop, hiding all menus in order to maximize screen-space. | If your keyboard/mouse are attached directly to the Pi, use the Alt + F4 hotkey to close the full-screen web browser, and/or Ctrl + Alt + T to open a terminal. | If you don’t have an extra keyboard/mouse, just SSH and use sudo raspi-config to turn on the VNC in Interfacing Options. Then use an app like VNC Viewer to connect from your computer. | . Note: if your screen is smaller than 7” or so, you will likely want your Kiosk to use the Tablet UI specified above. To do so, edit the /home/pi/.config/lxsession/LXDE-pi/autostart file to become: @bash /home/pi/makerverse/bin/kiosk /tablet. ",
+    "url": "http://localhost:4000/installation/web-server/raspberry-pi/#desktop",
+    "relUrl": "/installation/web-server/raspberry-pi/#desktop"
+  },"91": {
+    "doc": "Raspberry Pi Image",
+    "title": "Shared Directories",
+    "content": ". | /home/pi/gcode should be used for .nc (gcode) files. | /home/pi/makerverse contains three subfolders (commands, events, and widgets). | . A more complete explanation of this topic may be found in the Docker section. ",
+    "url": "http://localhost:4000/installation/web-server/raspberry-pi/#shared-directories",
+    "relUrl": "/installation/web-server/raspberry-pi/#shared-directories"
+  },"92": {
+    "doc": "Raspberry Pi Image",
+    "title": "GPIO Pins",
+    "content": "The Raspberry Pi image comes with pigpiod enabled, which allows you to control the GPIO pins from within Makerverse. See the example of creating a command to turn on/off a shopvac. ",
+    "url": "http://localhost:4000/installation/web-server/raspberry-pi/#gpio-pins",
+    "relUrl": "/installation/web-server/raspberry-pi/#gpio-pins"
+  },"93": {
+    "doc": "Raspberry Pi Image",
+    "title": "Updating",
+    "content": "See: how to update the linux service installation. ",
+    "url": "http://localhost:4000/installation/web-server/raspberry-pi/#updating",
+    "relUrl": "/installation/web-server/raspberry-pi/#updating"
+  },"94": {
+    "doc": "Run Programs",
+    "title": "Run Programs",
+    "content": "A “program” is a set of instructions which tells your machine what to print, cut, etc. ",
+    "url": "http://localhost:4000/tutorial/run-programs/",
+    "relUrl": "/tutorial/run-programs/"
+  },"95": {
+    "doc": "Run Programs",
+    "title": "Supported Programs",
+    "content": "Makerverse supports gcode (.nc files). Note: this page assumes you already know how to create a program for your machine. Easel is popular for creating simple programs, while Fusion360 and other CAD programs are more feature-rich. Please refer to your machine’s documentation, owner’s group, or forums for more help. ",
+    "url": "http://localhost:4000/tutorial/run-programs/#supported-programs",
+    "relUrl": "/tutorial/run-programs/#supported-programs"
+  },"96": {
+    "doc": "Run Programs",
+    "title": "Upload Programs",
+    "content": "From your workspace, press the “Upload Program” button to select a file on the current computer. When using a web-server installation, you can also use the arrow on the right side of the button to browse the “Watch Directory.” This directory is located at $HOME/gcode on the computer running Makerverse. Any files placed directly in the folder (not in sub-folders) will be visible to Makerverse. Once the program has been selected, it will appear in the visualizer at the center of the screen. ",
+    "url": "http://localhost:4000/tutorial/run-programs/#upload-programs",
+    "relUrl": "/tutorial/run-programs/#upload-programs"
+  },"97": {
+    "doc": "Run Programs",
+    "title": "Align Work Position",
+    "content": "The Work Position defines where the program begins. Therefore, you may wish to change the work position to align the program in the visualizer with your desired location. However, note that each program also has an origin. For example, in Easel, the origin is the bottom-left of your design. In Fusion 360, the origin might be set to the center of the design. When you change the work position, you are setting the location for the origin of the program. ",
+    "url": "http://localhost:4000/tutorial/run-programs/#align-work-position",
+    "relUrl": "/tutorial/run-programs/#align-work-position"
+  },"98": {
+    "doc": "Run Programs",
+    "title": "Start the Program",
+    "content": "The “play” button to the right of the Upload button will start the program. Some programs may indicate feedback, or require user input via banners at the bottom of the screen. For example, a M6 (Tool Change) will pause the program and wait for you to press the Play button in order to resume. Once the program begins, you can use the pause button to stop execution. Tip: pausing execution stops sending commands. The current command will still finish. In case of emergency, use the red Reset/Halt button. Paused Programs . While paused, movement controls will remain deactivated. This prevents losing your position during the job. To regain control, you will need to use the stop button, to the right of the pause button. Stopped Programs . Once stopped, a program must be restarted from the beginning with the play button. You can also unload the program by using the red trash icon (which replaces the stop button). ",
+    "url": "http://localhost:4000/tutorial/run-programs/#start-the-program",
+    "relUrl": "/tutorial/run-programs/#start-the-program"
+  },"99": {
+    "doc": "Run Programs",
+    "title": "Completion",
+    "content": "You can use the G-code widget on the right side to watch the progress of the program, including an (estimated) remaining time. When the program completes, execution will simply stop. ",
+    "url": "http://localhost:4000/tutorial/run-programs/#completion",
+    "relUrl": "/tutorial/run-programs/#completion"
+  },"100": {
+    "doc": "Security",
+    "title": "Security",
+    "content": "Makerverse protects access to your machine(s) with an account/log-in system. ",
+    "url": "http://localhost:4000/features/security/",
+    "relUrl": "/features/security/"
+  },"101": {
+    "doc": "Security",
+    "title": "Account Creation",
+    "content": "When you create (or log in) to your account, it prevents your Makerverse installation from being accessed by malicious parties. The Makerverse account system is powered by OpenWorkShop (a for-Benefit organization, part of the Makerverse open-source initiative). You can create an account with just an email address (or use Github, Google, etc. to login). ",
+    "url": "http://localhost:4000/features/security/#account-creation",
+    "relUrl": "/features/security/#account-creation"
+  },"102": {
+    "doc": "Security",
+    "title": "Offline Usage",
+    "content": "When you first install Makerverse and log in to your account, an internet connection is required. After that point, Makerverse will continue to work even if there is no internet available. ",
+    "url": "http://localhost:4000/features/security/#offline-usage",
+    "relUrl": "/features/security/#offline-usage"
+  },"103": {
+    "doc": "Security",
+    "title": "Password Recovery",
+    "content": "If at any point you become locked out of your account, you can reset your password using the email address you used to create the account. ",
+    "url": "http://localhost:4000/features/security/#password-recovery",
+    "relUrl": "/features/security/#password-recovery"
+  },"104": {
+    "doc": "Security",
+    "title": "Potential Safety Hazards",
+    "content": "Though it may sound extreme, accounts are meant to protect against potential safety hazards. Makerverse can run large-scale heavy CNC machinery, laser cutters, plasma torches, and more. Many users enable full remote control over these tools, including the ability to turn them on and off via a web browser. It would be entirely possible for an uninformed guest to cause accidental human harm with such tools. Thus, accounts ensure that even well-intentioned guests cannot use the system. ",
+    "url": "http://localhost:4000/features/security/#potential-safety-hazards",
+    "relUrl": "/features/security/#potential-safety-hazards"
+  },"105": {
+    "doc": "Security",
+    "title": "Technical Explanation",
+    "content": "There’s a good blog post by the folks at Octoprint about why accounts are needed for security purposes. The blog post notes that security researchers have found thousands of totally exposed (“don’t even need to hack them”) OctoPrint installations. The blog post doesn’t discuss public (or poorly-secured) networks, but there are doubtlessly many times more installations vulnerable to hacking along this attack vector. Note: despite the above security report, the folks behind OctoPrint are extremely diligent in this matter. We simply feel that a tool like Makerverse, which comes with the above hazards, should make it easier to be secure than insecure. ",
+    "url": "http://localhost:4000/features/security/#technical-explanation",
+    "relUrl": "/features/security/#technical-explanation"
+  },"106": {
+    "doc": "Security",
+    "title": "Philosophy",
+    "content": "To prevent this from ever becoming a problem with Makerverse, we made the decision to be “secure by default.” Using a centralized authority (OpenWorkShop) allows authentication to happen via HTTPS (encrypted channels). Unlike with a “local-login,” your password is never transmitted via HTTP. Moreover, OpenWorkShop uses modern security best-practices (OAuth, as opposed to a simple username/password) and open-source security libraries (oidc-client). This means that even someone who has hacked your WiFi network will be unable to see your login credentials. If you still want to enable guest mode, despite the potential hazards, see the “advanced” features. ",
+    "url": "http://localhost:4000/features/security/#philosophy",
+    "relUrl": "/features/security/#philosophy"
+  },"107": {
+    "doc": "Stand Alone",
+    "title": "Stand-Alone Application",
+    "content": " ",
+    "url": "http://localhost:4000/installation/stand-alone/#stand-alone-application",
+    "relUrl": "/installation/stand-alone/#stand-alone-application"
+  },"108": {
+    "doc": "Stand Alone",
+    "title": "Downloading",
+    "content": "In the Latest Release, find the appropriate file, beginning with makerverse-app- and ending with… . | Windows: .exe | MacOS: .pkg | Linux: various | . ",
+    "url": "http://localhost:4000/installation/stand-alone/#downloading",
+    "relUrl": "/installation/stand-alone/#downloading"
+  },"109": {
+    "doc": "Stand Alone",
+    "title": "Installation",
+    "content": "When installing on Windows &amp; MacOS, you will need to bypass/accept the security systems because the app is not yet “signed.” Basically this means we’re working on making it AppStore compatible. | MacOS: opening a Mac app from an unidentified developer. | Windows 10: allow apps from anywhere. | . ",
+    "url": "http://localhost:4000/installation/stand-alone/#installation",
+    "relUrl": "/installation/stand-alone/#installation"
+  },"110": {
+    "doc": "Stand Alone",
+    "title": "First-Run",
+    "content": "These applications run a UI (app), which is really a dedicated web browser (called Electron). Connect your machine directly to the computer via the USB port, and you’re ready to go. ",
+    "url": "http://localhost:4000/installation/stand-alone/#first-run",
+    "relUrl": "/installation/stand-alone/#first-run"
+  },"111": {
+    "doc": "Stand Alone",
+    "title": "Updating",
+    "content": "To update the stand-alone application, you must download and install the latest release. ",
+    "url": "http://localhost:4000/installation/stand-alone/#updating",
+    "relUrl": "/installation/stand-alone/#updating"
+  },"112": {
+    "doc": "Stand Alone",
+    "title": "Stand Alone",
+    "content": " ",
+    "url": "http://localhost:4000/installation/stand-alone/",
+    "relUrl": "/installation/stand-alone/"
+  },"113": {
+    "doc": "Updating",
+    "title": "Updating",
+    "content": "If you have “Automatically check for updates” enabled (in Settings -&gt; General), Makerverse will automatically notify you when a new version is availible in the releases. To use preleases (beta versions), enable the Prereleases (Settings -&gt; General) in Makerverse. | How to update the Stand-Alone application | How to update the Web Server installation | How to update the built-from-source application | . ",
+    "url": "http://localhost:4000/installation/updating/",
+    "relUrl": "/installation/updating/"
+  },"114": {
+    "doc": "Widgets",
+    "title": "Widgets",
+    "content": "Widgets are additional, optional UI you can add. ",
+    "url": "http://localhost:4000/features/widgets/",
+    "relUrl": "/features/widgets/"
+  },"115": {
+    "doc": "Widgets",
+    "title": "Installing Widgets",
+    "content": "Place any widget code in the project path, such as $HOME/makerverse/widgets. The web-server project path can then be used within Makerverse as /home/pi/makerverse/widgets. Further installation instructions may be found in the widget-specific README (below). ",
+    "url": "http://localhost:4000/features/widgets/#installing-widgets",
+    "relUrl": "/features/widgets/#installing-widgets"
+  },"116": {
+    "doc": "Widgets",
+    "title": "Custom Widgets",
+    "content": ". | cncjs-widget-boilerplate - Boilerplate for custom widgets in Makerverse. | . ",
+    "url": "http://localhost:4000/features/widgets/#custom-widgets",
+    "relUrl": "/features/widgets/#custom-widgets"
+  },"117": {
+    "doc": "Widgets",
+    "title": "Existing Pendants",
+    "content": ". | cncjs-pendant-keyboard - A simple pendant (using wireless keyboard or usb) to CNCJS. | cncjs-pendant-lcd - CNCjs Web Kiosk for Raspberry Pi Touch Displays. | cncjs-pendant-ps3 - Dual Shock / PS3 Bluetooth Remote Pendant for CNCjs. | cncjs-pendant-raspi-gpio - Simple Raspberry Pi GPIO Pendant control for CNCjs. | Responsive view for small screen display with device width less than 720px . | Safari on an iPhone 5S [1] [2] | . | . ",
+    "url": "http://localhost:4000/features/widgets/#existing-pendants",
+    "relUrl": "/features/widgets/#existing-pendants"
+  },"118": {
+    "doc": "Widgets",
+    "title": "Tablet UI",
+    "content": ". | cncjs-pendant-tinyweb - A tiny web console for small 320x240 LCD display. | cncjs-shopfloor-tablet - A simplified UI for cncjs optimized for tablet computers in a production (shop floor) environment. | . ",
+    "url": "http://localhost:4000/features/widgets/#tablet-ui",
+    "relUrl": "/features/widgets/#tablet-ui"
+  },"119": {
+    "doc": "Workspace Basics",
+    "title": "Workspace Basics",
+    "content": "First, open the connection to your machine (via the top-left widget). ",
+    "url": "http://localhost:4000/tutorial/workspace-basics/",
+    "relUrl": "/tutorial/workspace-basics/"
+  },"120": {
+    "doc": "Workspace Basics",
+    "title": "Console",
+    "content": "Below the connection widget is the console. This shows the direct output from the machine as it runs. You can also use it to issue commands directly to the machine. Tip: watch the console! You can learn a lot from observing the commands issued to your machine. ",
+    "url": "http://localhost:4000/tutorial/workspace-basics/#console",
+    "relUrl": "/tutorial/workspace-basics/#console"
+  },"121": {
+    "doc": "Workspace Basics",
+    "title": "Machine",
+    "content": "Below the console, you will find your machine-specific settings, configurations, calibration, etc. (which will vary based upon the type of machine you have connected). ",
+    "url": "http://localhost:4000/tutorial/workspace-basics/#machine",
+    "relUrl": "/tutorial/workspace-basics/#machine"
+  },"122": {
+    "doc": "Workspace Basics",
+    "title": "Visualizer",
+    "content": "The center of the screen shows the visualizer. At the top, it will inform you of errors or alerts. In the main area, it will show any loaded programs. You can zoom, pan, and tilt in all three dimensions to observe your machine. ",
+    "url": "http://localhost:4000/tutorial/workspace-basics/#visualizer",
+    "relUrl": "/tutorial/workspace-basics/#visualizer"
+  },"123": {
+    "doc": "Workspace Basics",
+    "title": "Controls",
+    "content": "In the upper-right, you can find the controls widget. Use the yellow &amp; blue arrow buttons to manually move the machine. Tip: if the movement buttons are grayed out, your machine may need to be unlocked. As the machine moves, observe: . | Machine Position: the absolute, “real” location of the machine. | Work Position: the relative location, used when running a program. | . Tip: if your machine position is wrong, it may need to be calibrated or homed. Use the “pin” icons underneath any of the values to set the current position as zero. ",
+    "url": "http://localhost:4000/tutorial/workspace-basics/#controls",
+    "relUrl": "/tutorial/workspace-basics/#controls"
+  },"124": {
+    "doc": "Workspace Basics",
+    "title": "Other Widgets",
+    "content": ". | G-code: shows the status of any currently uploaded program. | Probe: runs a “probe” command to zero an axis (if your machine supports it). | Spindle: controls cutter speed, coolant, etc. (if your machine supports it). | Laser: controls laser power, etc. (if your machine supports it). | Webcam: connects to a camera attached to the Makerverse computer for monitoring. | . ",
+    "url": "http://localhost:4000/tutorial/workspace-basics/#other-widgets",
+    "relUrl": "/tutorial/workspace-basics/#other-widgets"
+  },"125": {
+    "doc": "Workspace Basics",
+    "title": "Next Steps",
+    "content": "See: running a program. ",
+    "url": "http://localhost:4000/tutorial/workspace-basics/#next-steps",
+    "relUrl": "/tutorial/workspace-basics/#next-steps"
+  }
+}

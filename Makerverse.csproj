@@ -16,19 +16,21 @@
 
   <ItemGroup>
     <PackageReference Include="ElectronNET.API" Version="9.31.2" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-rc.8" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.Json" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.0" />
+    <PackageReference Include="SemanticVersion" Version="2.1.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.1-dev-00188" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0-dev-00761" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2-dev-00741" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.2.0-dev-00747" />
-    <PackageReference Include="Serilog.Exceptions" Version="5.7.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="3.2.0-dev-00249" />
+    <PackageReference Include="Serilog.Exceptions" Version="6.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.2.0-dev-00257" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0-dev-00839" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <ProjectReference Include="..\OpenWorkEngine\OpenController\OpenController.csproj" />
+    <ProjectReference Include="..\OpenWorkEngine\OpenWorkEngine.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(BuildingInsideVisualStudio)'=='true'">
@@ -58,6 +60,14 @@
     <Content Remove="electron-build\**" />
     <None Remove="dist\**" />
     <Content Remove="dist\**" />
+    <None Include="App\src\lib\workspaces\active-state.ts" />
+    <None Include="App\src\lib\workspaces\hardware.js" />
+    <None Include="App\src\lib\workspaces\workspace-axis.ts" />
+    <None Include="App\src\lib\workspaces\workspaces.ts" />
+    <None Include="App\src\views\App.tsx" />
+    <None Include="App\src\views\AppCorrupted.jsx" />
+    <None Remove="MakerverseServerTests\**" />
+    <Content Remove="MakerverseServerTests\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -66,6 +76,7 @@
     <Compile Remove="server\**" />
     <Compile Remove="electron-build\**" />
     <Compile Remove="dist\**" />
+    <Compile Remove="MakerverseServerTests\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -74,6 +85,7 @@
     <EmbeddedResource Remove="server\**" />
     <EmbeddedResource Remove="electron-build\**" />
     <EmbeddedResource Remove="dist\**" />
+    <EmbeddedResource Remove="MakerverseServerTests\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -267,29 +279,50 @@
     <_ContentIncludedByDefault Remove="dist\makerverse\server\i18n\zh-cn\resource.json" />
     <_ContentIncludedByDefault Remove="dist\makerverse\server\i18n\zh-tw\config.json" />
     <_ContentIncludedByDefault Remove="dist\makerverse\server\i18n\zh-tw\resource.json" />
+    <_ContentIncludedByDefault Remove="MakerverseServerTests\bin\Debug\net5.0\MakerverseServerTests.deps.json" />
+    <_ContentIncludedByDefault Remove="MakerverseServerTests\bin\Debug\net5.0\MakerverseServerTests.runtimeconfig.dev.json" />
+    <_ContentIncludedByDefault Remove="MakerverseServerTests\bin\Debug\net5.0\MakerverseServerTests.runtimeconfig.json" />
+    <_ContentIncludedByDefault Remove="MakerverseServerTests\obj\MakerverseServerTests.csproj.nuget.dgspec.json" />
+    <_ContentIncludedByDefault Remove="MakerverseServerTests\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="MakerverseServerTests\obj\project.packagespec.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="App\src\components\Login\index.ts" />
     <TypeScriptCompile Include="App\src\components\Navigation\HeaderBar.tsx" />
     <TypeScriptCompile Include="App\src\components\Navigation\ListMenu.tsx" />
     <TypeScriptCompile Include="App\src\components\Navigation\index.tsx" />
+    <TypeScriptCompile Include="App\src\components\Navigation\ListMenuItem.tsx" />
+    <TypeScriptCompile Include="App\src\components\Navigation\NotFound.tsx" />
+    <TypeScriptCompile Include="App\src\components\Navigation\ProtectedRoute.tsx" />
     <TypeScriptCompile Include="App\src\components\Navigation\SideDrawer.tsx" />
     <TypeScriptCompile Include="App\src\components\Login\CallbackPage.tsx" />
     <TypeScriptCompile Include="App\src\components\Login\LoginPage.tsx" />
     <TypeScriptCompile Include="App\src\components\Login\Styles.ts" />
     <TypeScriptCompile Include="App\src\components\Navigation\Styles.ts" />
+    <TypeScriptCompile Include="App\src\components\Navigation\UserMenu.tsx" />
     <TypeScriptCompile Include="App\src\constants\docs.ts" />
-    <TypeScriptCompile Include="App\src\containers\Routes.tsx" />
     <TypeScriptCompile Include="App\src\languages.ts" />
+    <TypeScriptCompile Include="App\src\lib\Makerverse\Hooks.ts" />
+    <TypeScriptCompile Include="App\src\lib\Makerverse\index.ts" />
+    <TypeScriptCompile Include="App\src\lib\Makerverse\MakerverseContext.ts" />
+    <TypeScriptCompile Include="App\src\lib\Makerverse\User.ts" />
+    <TypeScriptCompile Include="App\src\lib\Makerverse\Workspaces.ts" />
+    <TypeScriptCompile Include="App\src\lib\workspaces\index.ts" />
+    <TypeScriptCompile Include="App\src\lib\workspaces\reducers.ts" />
+    <TypeScriptCompile Include="App\src\lib\workspaces\types.ts" />
+    <TypeScriptCompile Include="App\src\lib\workspaces\workspace.ts" />
     <TypeScriptCompile Include="App\src\store\redux.ts" />
-    <TypeScriptCompile Include="App\src\styles\index.ts" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="App\src\views\Home" />
-    <Folder Include="App\src\views\Settings" />
-    <Folder Include="App\src\views\Workspace" />
-    <Folder Include="App\src\views\WorkspaceCreator" />
+    <TypeScriptCompile Include="App\src\theme\index.ts" />
+    <TypeScriptCompile Include="App\src\theme\Styles.ts" />
+    <TypeScriptCompile Include="App\src\views\Docs\index.tsx" />
+    <TypeScriptCompile Include="App\src\views\Home\index.tsx" />
+    <TypeScriptCompile Include="App\src\views\index.ts" />
+    <TypeScriptCompile Include="App\src\views\Routes.tsx" />
+    <TypeScriptCompile Include="App\src\views\Settings\index.tsx" />
+    <TypeScriptCompile Include="App\src\views\WorkspaceCreator\index.tsx" />
+    <TypeScriptCompile Include="App\src\views\WorkspaceCreator\Styles.ts" />
+    <TypeScriptCompile Include="App\src\views\Workspace\index.tsx" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

@@ -1,0 +1,87 @@
+{
+  "variables": {},
+  "builders": [{
+    "type": "arm",
+    "file_urls" : ["https://downloads.raspberrypi.org/raspios_lite_armhf_latest"],
+    "file_checksum": "4522df4a29f9aac4b0166fbfee9f599dab55a997c855702bfe35329c13334668",
+    "file_checksum_type": "sha256",
+    "file_target_extension": "zip",
+    "image_build_method": "resize",
+    "image_path": "output/raspbian-lite.img",
+    "image_size": "6G",
+    "image_type": "dos",
+    "image_partitions": [
+      {
+        "name": "boot",
+        "type": "c",
+        "start_sector": "8192",
+        "filesystem": "vfat",
+        "size": "256M",
+        "mountpoint": "/boot"
+      },
+      {
+        "name": "root",
+        "type": "83",
+        "start_sector": "532480",
+        "filesystem": "ext4",
+        "size": "0",
+        "mountpoint": "/"
+      }
+    ],
+    "image_setup_extra": [
+      ["mkdir", "$MOUNTPOINT/home/pi/makerverse"],
+      ["mkdir", "$MOUNTPOINT/home/pi/makerverse/commands"],
+      ["mkdir", "$MOUNTPOINT/home/pi/makerverse/events"],
+      ["mkdir", "$MOUNTPOINT/home/pi/makerverse/widgets"],
+      ["cp", "/build/ci/makerverse.docker", "$MOUNTPOINT/home/pi/.makerverse"],
+      ["cp", "/build/scripts/gpio.sh", "$MOUNTPOINT/home/pi/makerverse/commands/gpio.sh"],
+      ["cp", "-r", "/build/bin", "$MOUNTPOINT/home/pi/makerverse/"],
+      ["cp", "-r", "/build/scripts", "$MOUNTPOINT/home/pi/makerverse/"]
+    ],
+    "image_chroot_env": ["PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"],
+    "qemu_binary_source_path": "/usr/bin/qemu-arm-static",
+    "qemu_binary_destination_path": "/usr/bin/qemu-arm-static"
+  }],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo touch /boot/ssh",
+        "sudo sed -i \"s/raspberrypi/makerverse/\" /etc/hostname",
+        "sudo sed -i \"s/raspberrypi/makerverse/\" /etc/hosts",
+        "sudo echo 'KERNEL==\"ttyUSB[0-9]*\",MODE=\"0666\"' >> /etc/udev/rules.d/49-makerverse.rules",
+        "sudo echo 'KERNEL==\"ttyACM[0-9]*\",MODE=\"0666\"' >> /etc/udev/rules.d/49-makerverse.rules",
+        "sudo hostname makerverse",
+        "sudo chown pi:pi /home/pi/.makerverse",
+        "sudo chown pi:pi -R /home/pi/makerverse",
+        "mkdir -p /home/pi/gcode"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo apt-get update -y",
+        "sudo apt-get install -y pigpiod git",
+        "sudo systemctl enable pigpiod",
+        "sudo systemctl start pigpiod"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "git clone https://github.com/cncjs/cncjs-shopfloor-tablet.git /home/pi/makerverse/widgets/cncjs-shopfloor-tablet"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "curl -sSL https://get.docker.com | sh",
+        "sudo usermod -aG docker pi",
+        "sudo systemctl enable docker",
+        "sudo systemctl start docker",
+        "echo \"MAKERVERSE_PORT=80\" >> /etc/environment",
+        "cd /home/pi/makerverse && bash bin/build-service.sh install pi \"export MAKERVERSE_PORT=80\""
+      ]
+    }
+  ]
+}

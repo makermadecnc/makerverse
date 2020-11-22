@@ -1,15 +1,15 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { headerBar } from '../../styles';
 
 export const drawerWidthSm = 50;
 export const drawerWidthLg = 240;
+
+const bkColor = '#dfdfdf';
 const drawerBreakpoint = 'sm';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     display: 'flex',
   },
-  headerBar: headerBar(theme),
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
@@ -30,11 +30,16 @@ const useStyles = makeStyles((theme: Theme) => ({
     }),
   },
   sidebarIcon: {
-    width: 48,
-    height: 48,
+    maxWidth: 48,
+    maxHeight: 48,
+  },
+  headerTitle: {
+    flexGrow: 1,
   },
   menuButton: {
-    marginRight: 36,
+    marginRight: theme.spacing(1),
+    marginLeft: 0,
+    color: theme.palette.secondary.contrastText,
   },
   hide: {
     display: 'none',
@@ -44,7 +49,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     whiteSpace: 'nowrap',
   },
   drawerOpen: {
+    // Open: icons-only on small screens, icons+text on large screens.
     width: drawerWidthSm,
+    backgroundColor: bkColor,
     [theme.breakpoints.up(drawerBreakpoint)]: {
       width: drawerWidthLg,
     },
@@ -54,23 +61,24 @@ const useStyles = makeStyles((theme: Theme) => ({
     }),
   },
   drawerClose: {
+    // Closed: invisible on small screens, icons-only on large screens.
+    width: 0,
+    [theme.breakpoints.up(drawerBreakpoint)]: {
+      width: drawerWidthSm,
+    },
+    backgroundColor: bkColor,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
     overflowX: 'hidden',
-    width: 0,
-    [theme.breakpoints.up(drawerBreakpoint)]: {
-      width: drawerWidthSm,
-    },
   },
   toolbar: {
+    ...theme.mixins.toolbar,
+    backgroundColor: undefined,
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-end',
     padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
   },
   content: {
     flexGrow: 1,

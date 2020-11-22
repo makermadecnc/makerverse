@@ -1,9 +1,8 @@
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, Theme } from '@material-ui/core/styles';
 import { cardFooter } from '@openworkshop/ui/components/Cards/CardStyles';
-import { headerBar } from 'styles/';
 
-const useStyles = makeStyles((theme) => ({
-  cardHeader: headerBar(theme),
+const useStyles = makeStyles((theme: Theme) => ({
+  cardHeader: {},
   cardFooter: cardFooter(theme),
   root: {
     margin: theme.spacing(4),

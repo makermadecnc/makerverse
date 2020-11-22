@@ -1,5 +1,4 @@
 import * as owsStore from '@openworkshop/lib/store';
-import { connectRouter, routerMiddleware } from 'connected-react-router';
 import { History } from 'history';
 import { Store } from 'redux';
 
@@ -18,8 +17,8 @@ export default function configureStore(history: History, initialState?: AppState
   }
 
   return owsStore.configureStore(
-    { router: connectRouter(history) },
-    [routerMiddleware(history)],
+    { },
+    [ ],
     enhancers,
     initialState,
   );

@@ -44,7 +44,8 @@ const SideDrawer: React.FunctionComponent<Props> = (props) => {
             [classes.drawerOpen]: open,
             [classes.drawerClose]: !open,
           }),
-        }}>
+        }}
+      >
         <ListMenu isPermanent={false} />
       </Drawer>
     </nav>

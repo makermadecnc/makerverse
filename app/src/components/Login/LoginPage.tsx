@@ -8,18 +8,20 @@ import {
   CircularProgress,
   FormControlLabel,
   Grid,
+  Toolbar,
   Typography,
 } from '@material-ui/core';
-import OpenWorkShopContext from '@openworkshop/lib/OpenWorkShopContext';
+import { OpenWorkShop } from '@openworkshop/lib';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
+import AlertList from '@openworkshop/ui/components/Alerts/AlertList';
 import React, { FunctionComponent } from 'react';
-import auth from '../../lib/auth';
+// import auth from '../../lib/auth';
+import {IMakerverseUser} from '../../lib/Makerverse';
 import useStyles from './Styles';
 import analytics from 'lib/analytics';
 import settings from 'config/settings';
 import docs from 'constants/docs';
 import { useTranslation } from 'react-i18next';
-import { Redirect } from 'react-router-dom';
 
 interface OwnProps {
   children: React.ReactNode;
@@ -27,25 +29,23 @@ interface OwnProps {
 
 type Props = OwnProps;
 
-interface IUser {
-  username: string;
-}
-
 const LoginPage: FunctionComponent<Props> = (props) => {
   const log = useLogger(LoginPage);
-  const ows = React.useContext(OpenWorkShopContext);
+  const ows = React.useContext(OpenWorkShop);
   const classes = useStyles();
   const { t } = useTranslation();
-  const [guest, setGuest] = React.useState<IUser | undefined>(undefined);
+  const [guest, setGuest] = React.useState<IMakerverseUser | undefined>(undefined);
   const [useCookies, setUseCookies] = React.useState<boolean>(false);
   const [dangerous, setDangerous] = React.useState<boolean>(false);
   const [authenticating, setAuthenticating] = React.useState<boolean>(false);
   const [error, setError] = React.useState<Error | undefined>(undefined);
+  //
+  // if (auth.isAuthenticated()) {
+  //   log.debug('Already logged in; redirecting.');
+  //   // return <Redirect to='/home' />;
+  // }
 
-  if (auth.isAuthenticated()) {
-    log.debug('Already logged in; redirecting.');
-    // return <Redirect to='/home' />;
-  }
+  if (error) log.error(error);
 
   function handleGuest() {
     log.debug('guest login');
@@ -58,6 +58,7 @@ const LoginPage: FunctionComponent<Props> = (props) => {
       action: register ? 'register' : 'login',
     });
     setAuthenticating(true);
+    setError(undefined);
 
     ows.authManager
       .createSigninRequest()
@@ -72,10 +73,13 @@ const LoginPage: FunctionComponent<Props> = (props) => {
   }
 
   return (
-    <Grid container direction='column' alignItems='center' justify='center'>
+    <Grid container direction='column' alignItems='center' >
       <Grid item xs={12} sm={6} md={4}>
         <Card className={classes.root}>
-          <CardHeader className={classes.cardHeader} title={t('Login to {{ productName }}', settings)} />
+          <CardHeader className={classes.cardHeader} title={<Toolbar>
+            {t('Login to {{ productName }}', settings)}
+          </Toolbar>} />
+          <AlertList error={error} />
           <CardContent>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={3} className={classes.centered}>

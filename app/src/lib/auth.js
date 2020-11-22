@@ -2,11 +2,9 @@ import log from 'js-logger';
 import api from 'api';
 import authrequest from 'lib/ows/authrequest';
 import config from 'store';
-import Workspaces from 'lib/workspaces';
 import analytics from 'lib/analytics';
 import { getCookie } from 'lib/cookies';
 import series from 'lib/promise-series';
-import promisify from 'lib/promisify';
 
 // Makerverse OAuth login mechanism.
 // The oidc-client handles token hand-off and validation.
@@ -15,9 +13,9 @@ const self = window.location.origin;
 
 let _authenticated = false;
 
-const resume = (owsCore, reduxStore) =>
+const resume = (makerverse) =>
   new Promise((resolve, reject) => {
-    signin(owsCore.user).then(({ success }) => {
+    signin(makerverse, makerverse.ows.user).then(({ success }) => {
       resolve(success);
     });
   });
@@ -34,7 +32,7 @@ const guest = () =>
       });
   });
 
-const signin = (oidc, guest = false) =>
+const signin = (makerverse, oidc, guest = false) =>
   new Promise((resolve, reject) => {
     const token = oidc ? oidc.access_token : config.get('session.token');
     const isGuest = guest || hasGuestCookie();
@@ -83,12 +81,12 @@ const signin = (oidc, guest = false) =>
       .then(({ body }) => {
         if (body) {
           body.forEach((record) => {
-            Workspaces.load(record);
+            makerverse.workspaces.load(record);
           });
         } else {
           log.error('workspaces load error', body);
         }
-        log.debug('login connecting to workspaces:', Object.keys(Workspaces.all));
+        log.debug('login connecting to workspaces:', Object.keys(makerverse.workspaces.all));
         const funcs = []; /*Object.keys(Workspaces.all).map((id) => {
           return () =>
             promisify((next) => {

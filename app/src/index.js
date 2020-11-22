@@ -1,11 +1,11 @@
 import pubsub from 'pubsub-js';
 import { CssBaseline } from '@material-ui/core';
-import OpenWorkShopContext from '@openworkshop/lib/OpenWorkShopContext';
+import OpenWorkShop from '@openworkshop/lib/OpenWorkShop';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import i18next from 'i18next';
-import { Router } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import log from 'js-logger';
 import usePromise from 'react-promise-suspense';
@@ -13,20 +13,24 @@ import { OpenWorkShopProvider } from '@openworkshop/ui/components';
 import configureStore from 'store/redux';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
+import { ThemeProvider } from '@material-ui/core';
 import XHR from 'i18next-xhr-backend';
+import analytics from "./lib/analytics";
+import {MakerverseContext, loadMakerverse} from "./lib/Makerverse";
 import { setOwsSettings } from './lib/ows/settings';
-import Routes from './containers/Routes';
+import theme from "./theme/";
+import Routes from './views/Routes';
 import settings from './config/settings';
 import i18nConfig from './config/i18n';
-import AppCorrupted from './containers/AppCorrupted';
+import AppCorrupted from './views/AppCorrupted';
 import auth from './lib/auth';
 import internalStore from './store';
 import './styles/vendor.styl';
 import './styles/app.styl';
 
 // Create browser history to use in the Redux store
-const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href');
-const history = createBrowserHistory({ basename: baseUrl });
+// const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href');
+const history = createBrowserHistory(); // { basename: baseUrl })
 
 const store = configureStore(history);
 
@@ -90,11 +94,14 @@ function addListeners() {
   }
 }
 
+// One reference for the entire application, loaded below.
+let makerverse = undefined;
+
 const LoadedRoutes = () => {
-  const owsCore = React.useContext(OpenWorkShopContext);
+  const ows = React.useContext(OpenWorkShop);
 
   usePromise(async () => {
-    log.debug('loading...', history);
+    log.debug('loading...', ows);
     // log.setLevel(getLogLevel());
     //
     await i18next.use(XHR).use(LanguageDetector).init(i18nConfig);
@@ -108,8 +115,9 @@ const LoadedRoutes = () => {
     //     return;
     // }
 
-    setOwsSettings(owsCore.settings);
-    await auth.resume(owsCore);
+    analytics.initialize(ows);
+    setOwsSettings(ows.settings);
+    makerverse = loadMakerverse(ows);
 
     addListeners();
   }, []);
@@ -118,7 +126,11 @@ const LoadedRoutes = () => {
     return <AppCorrupted />;
   }
 
-  return <Routes />;
+  return (
+    <MakerverseContext.Provider value={makerverse} >
+      <Routes />
+    </MakerverseContext.Provider>
+  );
 };
 
 const container = document.createElement('div');
@@ -133,10 +145,12 @@ ReactDOM.render(
       client={auth.client}
       hostnameMap={auth.hosts}
       i18nMiddleware={[initReactI18next]}>
-      <Router history={history}>
-        <CssBaseline />
-        <LoadedRoutes />
-      </Router>
+        <ThemeProvider theme={theme}>
+          <BrowserRouter >
+            <CssBaseline />
+            <LoadedRoutes />
+          </BrowserRouter>
+        </ThemeProvider>
     </OpenWorkShopProvider>
   </Provider>,
   container,

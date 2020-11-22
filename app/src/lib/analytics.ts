@@ -1,16 +1,12 @@
+import { IOpenWorkShop } from '@openworkshop/lib';
 import _ from 'lodash';
-import log from 'js-logger';
 import ReactGA from 'react-ga';
 import settings from 'config/settings';
 import { Workspace } from './workspaces';
 import { ISemver } from './semvers';
+import { Logger } from '@openworkshop/lib/utils/logging/Logger';
 
-// https://github.com/ReactTraining/react-router/issues/4278#issuecomment-299692502
-ReactGA.initialize(settings.analytics.trackingId, {
-  gaOptions: {
-    cookieDomain: 'none',
-  },
-});
+let log: Logger | undefined = undefined;
 
 // Common names for dimensions
 const DIMENSION_MAP: { [key: string]: number } = {
@@ -35,7 +31,7 @@ function wrapDev<TFunc extends IFunc>(func: TFunc) {
   const version: ISemver = settings.version;
   if (version.branch === 'dev') {
     return (...args: unknown[]) => {
-      log.debug('analytcs', func.name, args);
+      log?.debug(func.name, args);
     };
   }
   return func;
@@ -69,6 +65,15 @@ const trackPage = (location: ILocation, workspace?: Workspace) => {
 };
 
 const analytics = {
+  initialize: (ows: IOpenWorkShop) => {
+    log = ows.logManager.getLogger('analytics');
+    // https://github.com/ReactTraining/react-router/issues/4278#issuecomment-299692502
+    ReactGA.initialize(settings.analytics.trackingId, {
+      gaOptions: {
+        cookieDomain: 'none',
+      },
+    });
+  },
   modalview: wrapDev(ReactGA.modalview),
   // pageview: wrapDev(ReactGA.pageview),
   trackPage: trackPage,
