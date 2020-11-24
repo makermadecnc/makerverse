@@ -7,7 +7,7 @@ import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import React, { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
-import auth from '../../lib/auth';
+import {MakerverseContext} from '../../lib/Makerverse';
 
 const UserMenu: FunctionComponent = () => {
   const log = useLogger(UserMenu);
@@ -15,9 +15,10 @@ const UserMenu: FunctionComponent = () => {
   const { isOnline } = useNetworkStatus();
   const history = useHistory();
   const ows = React.useContext(OpenWorkShop);
-  const isAuthenticated = auth.isAuthenticated;
+  const makerverse = React.useContext(MakerverseContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const isAuthenticated = !!makerverse.user;
   const showUserMenu = isOnline && isAuthenticated;
   const icon = showUserMenu ? faUser : faUserSlash;
 
@@ -33,10 +34,10 @@ const UserMenu: FunctionComponent = () => {
     if (!isAuthenticated) {
       return <Alert severity="warning">{t('You are not logged in. Community features will be unavailable.')}</Alert>;
     }
-    return <Alert severity="info">{t('Welcome')}</Alert>;
+    return <Alert severity="info">{t('Welcome, {{ username }}', makerverse.user)}</Alert>;
   }
 
-  log.debug(isOnline, isAuthenticated, ows);
+  log.debug(isOnline, isAuthenticated);
 
   return (
     <div>

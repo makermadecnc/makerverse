@@ -40,6 +40,15 @@ namespace Makerverse.Lib {
       Reload();
     }
 
+    public void Save() {
+      try {
+        File.WriteAllText(_path, JsonConvert.SerializeObject(Data, Formatting.Indented));
+      } catch (Exception e) {
+        Log.Error(e, $"Failed to write config file: {_path}");
+        throw new SystemException($"Failed to write config file: {_path}", e);
+      }
+    }
+
     protected virtual void OnChanged(TJson data) {
       Data = data;
       Log.Information("Loaded new {filename} data: {@data}", _path, Data);

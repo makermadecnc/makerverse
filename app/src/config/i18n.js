@@ -19,7 +19,7 @@ export default {
   defaultNS: 'resource',
 
   // @see webpack.webconfig.xxx.js
-  whitelist: process.env.LANGUAGES,
+  // whitelist: process.env.LANGUAGES,
 
   // array of languages to preload
   preload: [],
@@ -28,7 +28,7 @@ export default {
   // 'all' --> ['en-US', 'en', 'dev']
   // 'currentOnly' --> 'en-US'
   // 'languageOnly' --> 'en'
-  load: 'currentOnly',
+  // load: 'currentOnly',
 
   // char to separate keys
   keySeparator: '.',

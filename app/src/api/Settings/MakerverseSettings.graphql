@@ -1,0 +1,24 @@
+fragment MakerverseSettingsStartup on MakerverseSettings {
+    fileSystem {
+        ...FileSystem
+    }
+    appUpdates {
+        checkForUpdates
+        prereleases
+    }
+    commands {
+        ...Command
+    }
+    events {
+        ...Event
+    }
+    macros {
+        id
+        mtime
+        name
+        content
+    }
+    users {
+        ...MakerverseUserFull
+    }
+}

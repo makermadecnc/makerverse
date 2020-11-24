@@ -1,0 +1,220 @@
+# This file was generated based on ".graphqlconfig". Do not edit manually.
+
+schema {
+    query: Query
+}
+
+type AppUpdates {
+    checkForUpdates: Boolean!
+    prereleases: Boolean!
+}
+
+type CommandSettings {
+    commands: String!
+    enabled: Boolean!
+    id: String!
+    mtime: Long!
+    title: String!
+}
+
+type ConnectionSettings {
+    firmware: MachineFirmwareSettings!
+    manufacturer: String
+    port: String!
+}
+
+type EventSettings {
+    commands: String!
+    enabled: Boolean!
+    event: String!
+    id: String!
+    mtime: Long!
+    trigger: String!
+}
+
+type FileSystemSettings {
+    mountPoints: [MountPointSettings!]!
+    programDirectory: String!
+}
+
+type MachineAxisSettings {
+    accuracy: Decimal!
+    id: String
+    max: Decimal!
+    min: Decimal!
+    name: AxisName!
+    precision: Decimal!
+}
+
+type MachineCommandSettings {
+    id: String!
+    name: String!
+    value: String!
+}
+
+type MachineFeatureSettings {
+    description: String
+    disabled: Boolean!
+    icon: String
+    id: String
+    key: String!
+    title: String
+}
+
+type MachineFirmwareSettings {
+    baudRate: BaudRate!
+    controllerType: MachineControllerType!
+    downloadUrl: String
+    edition: String
+    helpUrl: String
+    id: String
+    name: String
+    requiredVersion: Decimal!
+    rtscts: Boolean!
+    suggestedVersion: Decimal!
+}
+
+type MachinePartSettings {
+    dataBlob: String
+    description: String
+    id: String
+    isDefault: Boolean!
+    optional: Boolean!
+    partType: MachinePartType!
+    settings: [MachineSettingSettings!]!
+    specs: [MachineSpecSettings!]!
+    title: String!
+}
+
+type MachineSettingSettings {
+    id: String!
+    key: String!
+    settingType: MachineSettingType!
+    title: String!
+    value: String!
+}
+
+type MachineSpecSettings {
+    id: String!
+    specType: MachineSpecType!
+    value: Decimal!
+}
+
+type MacroSettings {
+    content: String!
+    id: String!
+    mtime: Long!
+    name: String!
+}
+
+type MakerverseSettings {
+    appUpdates: AppUpdates!
+    commands: [CommandSettings!]!
+    events: [EventSettings!]!
+    fileSystem: FileSystemSettings!
+    macros: [MacroSettings!]!
+    users: [MakerverseUser!]!
+    workspaces: [WorkspaceSettings!]!
+}
+
+type MakerverseUser {
+    authenticationType: String!
+    enabled: Boolean!
+    id: String
+    tokens: [String!]!
+    username: String!
+}
+
+type MountPointSettings {
+    route: String!
+    target: String!
+}
+
+type Query {
+    authenticate(token: String!): MakerverseUser!
+    settings: MakerverseSettings
+}
+
+type WorkspaceSettings {
+    autoReconnect: Boolean!
+    axes: [MachineAxisSettings!]!
+    color: String
+    commands: [MachineCommandSettings!]!
+    connection: ConnectionSettings!
+    features: [MachineFeatureSettings!]!
+    icon: String
+    id: String!
+    machineProfileId: String
+    name: String!
+    onboarded: Boolean!
+    parts: [MachinePartSettings!]!
+    path: String!
+    preferImperial: Boolean!
+}
+
+enum AxisName {
+    X
+    Y
+    Z
+}
+
+enum BaudRate {
+    BR115200
+    BR19200
+    BR2400
+    BR250000
+    BR38400
+    BR57600
+    BR9600
+}
+
+enum MachineControllerType {
+    GRBL
+    MARLIN
+    MASLOW
+    SMOOTHIE
+    TINY_G
+}
+
+enum MachinePartType {
+    AXIS_MOTOR
+    BOARD
+    EMERGENCY_STOP
+    HEATBED
+    HOTEND
+    LIMIT_SWITCHES
+    MMU
+    NOZZLE
+    PSU
+    SHIELD
+    SLED
+    SPINDLE
+    UNKNOWN
+}
+
+enum MachineSettingType {
+    GRBL
+    KV
+}
+
+enum MachineSpecType {
+    MAX_AMPS
+    MAX_LAYER_HEIGHT
+    MAX_RPM
+    MAX_TEMP
+    MAX_TRAVEL_SPEED
+    MAX_VOLTS
+    MAX_WATTS
+    MIN_LAYER_HEIGHT
+    NUMBER_OF_MATERIALS
+    TIP_SIZE
+    WATTS
+    WAVE_LENGTH
+}
+
+
+"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long
+
+"The built-in `Decimal` scalar type."
+scalar Decimal

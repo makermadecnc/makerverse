@@ -15,13 +15,13 @@ namespace Makerverse.Api.Machines.Models {
 
     [JsonProperty("controllerType")]
     [JsonConverter(typeof(StringEnumConverter))]
-    public MachineControllerType ControllerType { get; set; } = default!;
+    public MachineControllerType ControllerType { get; set; }
 
     [JsonProperty("name")]
-    public string Name { get; set; } = default!;
+    public string? Name { get; set; }
 
     [JsonProperty("edition")]
-    public string Edition { get; set; } = default!;
+    public string? Edition { get; set; }
 
     [JsonProperty("rtscts")]
     public bool Rtscts { get; set; }
@@ -33,10 +33,10 @@ namespace Makerverse.Api.Machines.Models {
     public decimal SuggestedVersion { get; set; }
 
     [JsonProperty("downloadUrl")]
-    public string DownloadUrl { get; set; } = default!;
+    public string? DownloadUrl { get; set; }
 
     [JsonProperty("helpUrl")]
-    public string HelpUrl { get; set; } = default!;
+    public string? HelpUrl { get; set; }
 
     public void LoadSettings(JObject obj) {
       JsonConvert.PopulateObject(JsonConvert.SerializeObject(obj), this);

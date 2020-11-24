@@ -1,0 +1,8 @@
+fragment Command on CommandSettings {
+    id
+    mtime
+    enabled
+    title
+    commands
+}
+

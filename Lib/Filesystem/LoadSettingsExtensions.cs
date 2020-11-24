@@ -4,6 +4,7 @@ using System.Linq;
 using Makerverse.Api.Settings.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OpenWorkEngine.OpenController.Lib;
 using Serilog;
 
 namespace Makerverse.Lib.Filesystem {
@@ -12,27 +13,40 @@ namespace Makerverse.Lib.Filesystem {
       where TSetting : ILoadSettingsObject, new()
     {
       if (!(obj[key] is JArray arr)) return new List<TSetting>();
-      return arr.Select(jt => jt as JObject).Where(jo => jo != null).Select(jo => {
-        TSetting s = new ();
-        s.LoadSettings(jo!);
-        return s;
-      }).ToList();
-    }
 
-    public static Dictionary<string, TSetting> LoadDictionary<TSetting>(
-      JObject obj, string key, Func<string, JToken?, TSetting>? builder = null
-    ) where TSetting : ILoadSettingsObject, new() {
-      Dictionary<string, TSetting> ret = new();
-      if (!(obj[key] is JObject o)) return ret;
-      if (builder == null) builder = (k, v) => Build<TSetting>(v);
-      foreach (KeyValuePair<string, JToken?> kvp in o) {
+      List<TSetting> ret = new();
+      foreach (JToken t in arr) {
         try {
-          ret.Add(kvp.Key, builder(kvp.Key, kvp.Value));
+          ret.Add(Build<TSetting>(t));
         } catch (Exception e) {
-          Log.Error(e, "Failed to load dictionary {key} from {object}", kvp.Key,
-            JsonConvert.SerializeObject(kvp.Value, Formatting.Indented));
+          Log.Error(e, "Failed to load array item {object}",
+            JsonConvert.SerializeObject(t, Formatting.Indented));
         }
       }
+      return ret;
+    }
+
+    public static List<TSetting> LoadDictionary<TSetting>(
+      JObject obj, string key, Func<string?, JToken?, TSetting>? builder = null
+    ) where TSetting : ILoadSettingsObject, new() {
+      List<TSetting> ret = new();
+      if (builder == null) builder = (k, v) => Build<TSetting>(v);
+
+      if (obj[key] is JObject o) {
+        // legacy story as a dictionary
+        foreach (KeyValuePair<string, JToken?> kvp in o) {
+          try {
+            ret.Add(builder(kvp.Key, kvp.Value));
+          } catch (Exception e) {
+            Log.Error(e, "Failed to load dictionary {key} from {object}", kvp.Key,
+              JsonConvert.SerializeObject(kvp.Value, Formatting.Indented));
+          }
+        }
+      }
+      if (obj[key] is JArray arr) {
+        ret = LoadArray<TSetting>(obj, key);
+      }
+
       return ret;
     }
 

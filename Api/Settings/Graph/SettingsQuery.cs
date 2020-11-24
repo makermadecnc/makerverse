@@ -7,6 +7,6 @@ using Makerverse.Lib;
 namespace Makerverse.Api.Settings.Graph {
   [ExtendObjectType(Name = "Query")]
   public class SettingsQuery {
-    public MakerverseSettings? Settings([Service] ConfigFile file) => file.Data;
+    public MakerverseSettings? Settings([Service] MakerverseContext context) => context.Settings;
   }
 }

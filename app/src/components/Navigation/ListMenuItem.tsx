@@ -30,7 +30,7 @@ const ListMenuItem: FunctionComponent<Props> = (props) => {
 
   const CustomLink = React.useMemo(() =>
     React.forwardRef<HTMLAnchorElement, Omit<LinkProps, 'to'>>(
-      (props, ref) => <Link ref={ref} to="login" {...props} />
+      (props, ref) => <Link ref={ref} to={to} {...props} />
     ), [to]
   );
 

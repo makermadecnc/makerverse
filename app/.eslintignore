@@ -2,3 +2,4 @@
 dist/
 *.js
 *.jsx
+graphql.tsx

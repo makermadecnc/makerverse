@@ -1,22 +1,36 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { cardFooter } from '@openworkshop/ui/components/Cards/CardStyles';
+// import { cardFooter } from '@openworkshop/ui/components/Cards/CardStyles';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  cardHeader: {},
-  cardFooter: cardFooter(theme),
+  cardHeader: {
+    padding: 0,
+  },
+  // cardFooter: cardFooter(theme),
   root: {
     margin: theme.spacing(4),
     minWidth: 300,
   },
+  content: {
+    padding: theme.spacing(4),
+  },
   form: {},
+  actionButton: {
+    padding: theme.spacing(4),
+  },
   centered: {
-    height: '100%',
     textAlign: 'center',
-    justifyContent: 'center',
     verticalAlign: 'center',
   },
   socialButtons: {
     justifyContent: 'center',
+  },
+  logo1: {
+    maxWidth: '64px',
+    marginRight: '30px',
+  },
+  logo2: {
+    maxWidth: '64px',
+    marginLeft: '30px',
   },
   submit: {
     paddingLeft: theme.spacing(3),

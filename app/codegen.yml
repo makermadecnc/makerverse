@@ -1,0 +1,16 @@
+overwrite: true
+schema: './src/makerverse-schema.graphql'
+documents: './src/**/*.graphql'
+generates:
+  ./src/api/graphql.tsx:
+    plugins:
+      - 'typescript'
+      - 'typescript-resolvers'
+      - 'typescript-operations'
+      - 'typescript-react-apollo'
+    config:
+      avoidOptionals: true
+  ./graphql.schema.json:
+    plugins:
+      - 'introspection'
+

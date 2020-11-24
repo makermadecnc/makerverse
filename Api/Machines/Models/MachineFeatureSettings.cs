@@ -6,7 +6,7 @@ using OpenWorkEngine.OpenController.MachineProfiles.Interfaces;
 namespace Makerverse.Api.Machines.Models {
   public class MachineFeatureSettings : IMachineFeature, ILoadSettingsObject {
     [JsonProperty("id")]
-    public string Id { get; set; } = default!;
+    public string? Id { get; set; }
 
     [JsonProperty("disabled")]
     public bool Disabled { get; set; } = false;

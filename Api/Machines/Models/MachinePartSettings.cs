@@ -1,15 +1,19 @@
+using System.Collections.Generic;
 using Makerverse.Api.Settings.Models;
+using Makerverse.Lib.Filesystem;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using OpenWorkEngine.OpenController.MachineProfiles.Enums;
 using OpenWorkEngine.OpenController.MachineProfiles.Interfaces;
 
 namespace Makerverse.Api.Machines.Models {
-  public class MachinePartSettings : IMachinePart, ILoadSettingsObject {
-    [JsonProperty("checkForUpdates")]
-    public string Id { get; set; } = default!;
+  public class MachinePartSettings : IMachinePart<MachineSettingSettings, MachineSpecSettings>, ILoadSettingsObject {
+    [JsonProperty("id")]
+    public string? Id { get; set; } = default!;
 
     [JsonProperty("partType")]
+    [JsonConverter(typeof(StringEnumConverter))]
     public MachinePartType PartType { get; set; } = default!;
 
     [JsonProperty("title")]
@@ -27,7 +31,17 @@ namespace Makerverse.Api.Machines.Models {
     [JsonProperty("dataBlob")]
     public string? DataBlob { get; set; }
 
+    [JsonProperty("settings")] public List<MachineSettingSettings> Settings { get; set; } = new();
+
+    [JsonProperty("specs")] public List<MachineSpecSettings> Specs { get; set; } = new();
+
     public void LoadSettings(JObject obj) {
+      Settings = LoadSettingsExtensions.LoadArray<MachineSettingSettings>(obj, "settings");
+      obj.Remove("settings");
+
+      Specs = LoadSettingsExtensions.LoadArray<MachineSpecSettings>(obj, "specs");
+      obj.Remove("specs");
+
       JsonConvert.PopulateObject(JsonConvert.SerializeObject(obj), this);
     }
   }

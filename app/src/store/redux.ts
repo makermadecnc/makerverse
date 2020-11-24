@@ -1,12 +1,11 @@
 import * as owsStore from '@openworkshop/lib/store';
-import { History } from 'history';
 import { Store } from 'redux';
 
 // The top-level state object
 export type AppState = owsStore.IOwsState;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function configureStore(history: History, initialState?: AppState): Store<AppState> {
+export default function configureStore(initialState?: AppState): Store<AppState> {
   const enhancers = [];
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-explicit-any
   const windowIfDefined = typeof window === 'undefined' ? null : (window as any);

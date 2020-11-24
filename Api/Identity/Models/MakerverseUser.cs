@@ -4,6 +4,8 @@ using Newtonsoft.Json.Linq;
 
 namespace Makerverse.Api.Settings.Models {
   public class MakerverseUser : ILoadSettingsObject {
+    public string? Id { get; set; }
+
     public string Username { get; set; } = default!;
 
     public string AuthenticationType { get; set; } = default!;

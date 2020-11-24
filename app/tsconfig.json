@@ -3,6 +3,7 @@
     "target": "es6",
     "module": "esnext",
     "allowJs": true,
+    "declaration": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -11,11 +12,20 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react",
-    "lib": ["es2015", "dom"],
+    "jsx": "react-jsx",
+    "lib": [
+      "es2015",
+      "dom"
+    ],
     "skipLibCheck": true,
+    "rootDir": "src",
     "baseUrl": "./src",
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

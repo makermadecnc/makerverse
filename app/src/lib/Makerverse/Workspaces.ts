@@ -17,6 +17,7 @@ export default class Workspaces {
 
   constructor(ows?: IOpenWorkShop) {
     this._ows = ows;
+    if (ows) this.log.info('Created workspaces');
   }
 
   get ows(): IOpenWorkShop {

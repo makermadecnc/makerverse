@@ -30,7 +30,10 @@ const HeaderBar: FunctionComponent<Props> = (props) => {
           onClick={() => props.toggleDrawerOpen()}
           className={classes.menuButton}
         >
-          <img src="/images/logo.png" className={classes.sidebarIcon} style={{ maxWidth: 50, maxHeight: 50 }} />
+          <img
+            src="/images/logos/makerverse.png"
+            className={classes.sidebarIcon}
+          />
         </IconButton>
         <Typography variant='h1' noWrap className={classes.headerTitle}>
           {settings.productName}

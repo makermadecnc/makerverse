@@ -1,0 +1,11 @@
+fragment MakerverseUserMin on MakerverseUser {
+    username
+}
+
+fragment MakerverseUserFull on MakerverseUser {
+    ...MakerverseUserMin
+    id
+    authenticationType
+    enabled
+    tokens
+}

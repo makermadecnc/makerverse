@@ -41,6 +41,7 @@ export default function App() {
         <Route exact path="/home" component={Home} />
         <Route exact path="/workspaces" component={WorkspaceCreator} />
         <Route exact path="/docs" component={Docs} />
+        <Route exact path="/" component={Home} />
         <Route path="/" component={NotFound} />
       </Switch>
     </Navigation>
