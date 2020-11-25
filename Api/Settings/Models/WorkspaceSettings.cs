@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
 using Makerverse.Api.Machines.Models;
 using Makerverse.Lib.Filesystem;
@@ -14,6 +15,7 @@ namespace Makerverse.Api.Settings.Models {
 
   }
 
+  [Authorize]
   public class WorkspaceSettings : ILoadSettingsObject {
     [JsonProperty("id")]
     public string Id { get; set; } = default!;
@@ -32,6 +34,9 @@ namespace Makerverse.Api.Settings.Models {
 
     [JsonProperty("color")]
     public string? Color { get; set; }
+
+    [JsonProperty("bkColor")]
+    public string? BkColor { get; set; }
 
     [JsonProperty("icon")]
     public string? Icon { get; set; }

@@ -1,0 +1,9 @@
+
+query Startup($token: String!) {
+    session: authenticate(token: $token) {
+        ...MakerverseSession
+    }
+    settings {
+        ...MakerverseEssentialSettings
+    }
+}

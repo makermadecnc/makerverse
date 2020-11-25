@@ -17,6 +17,10 @@ type CommandSettings {
     title: String!
 }
 
+type ConnectionPort {
+    name: String!
+}
+
 type ConnectionSettings {
     firmware: MachineFirmwareSettings!
     manufacturer: String
@@ -62,7 +66,7 @@ type MachineFeatureSettings {
 }
 
 type MachineFirmwareSettings {
-    baudRate: BaudRate!
+    baudRate: Decimal!
     controllerType: MachineControllerType!
     downloadUrl: String
     edition: String
@@ -107,11 +111,22 @@ type MacroSettings {
     name: String!
 }
 
+type MakerHubSettings {
+    enabled: Boolean!
+}
+
+type MakerverseSession {
+    roles: [String!]!
+    token: String!
+    user: MakerverseUser!
+}
+
 type MakerverseSettings {
     appUpdates: AppUpdates!
     commands: [CommandSettings!]!
     events: [EventSettings!]!
     fileSystem: FileSystemSettings!
+    hub: MakerHubSettings!
     macros: [MacroSettings!]!
     users: [MakerverseUser!]!
     workspaces: [WorkspaceSettings!]!
@@ -131,13 +146,16 @@ type MountPointSettings {
 }
 
 type Query {
-    authenticate(token: String!): MakerverseUser!
-    settings: MakerverseSettings
+    authenticate(token: String!): MakerverseSession!
+    listPorts: [ConnectionPort!]!
+    settings: MakerverseSettings!
+    workspace(idOrPath: String!): WorkspaceSettings!
 }
 
 type WorkspaceSettings {
     autoReconnect: Boolean!
     axes: [MachineAxisSettings!]!
+    bkColor: String
     color: String
     commands: [MachineCommandSettings!]!
     connection: ConnectionSettings!
@@ -152,20 +170,15 @@ type WorkspaceSettings {
     preferImperial: Boolean!
 }
 
+enum ApplyPolicy {
+    AFTER_RESOLVER
+    BEFORE_RESOLVER
+}
+
 enum AxisName {
     X
     Y
     Z
-}
-
-enum BaudRate {
-    BR115200
-    BR19200
-    BR2400
-    BR250000
-    BR38400
-    BR57600
-    BR9600
 }
 
 enum MachineControllerType {
@@ -213,8 +226,8 @@ enum MachineSpecType {
 }
 
 
-"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
-scalar Long
-
 "The built-in `Decimal` scalar type."
 scalar Decimal
+
+"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long

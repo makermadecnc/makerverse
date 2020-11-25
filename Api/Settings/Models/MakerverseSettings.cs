@@ -1,12 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
-using Makerverse.Api.Workspaces.Models;
+using HotChocolate.AspNetCore.Authorization;
+using Makerverse.Api.Identity.Services;
 using Makerverse.Lib.Filesystem;
+using Makerverse.Lib.Graphql;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 
 namespace Makerverse.Api.Settings.Models {
+  [AuthorizeMakerverseUser]
   public class MakerverseSettings : ILoadSettingsObject {
     [JsonProperty("fileSystem")]
     public FileSystemSettings FileSystem { get; set; } = new ();
@@ -29,6 +32,8 @@ namespace Makerverse.Api.Settings.Models {
     [JsonProperty("users")]
     public List<MakerverseUser> Users { get; set; } = new ();
 
+    [JsonProperty("hub")] public MakerHubSettings Hub { get; set; } = new();
+
     public void LoadSettings(JObject obj) {
       if (obj["watchDirectory"] is JValue wd) FileSystem.ProgramDirectory = wd.Value<string>(); // Legacy.
       FileSystem.MountPoints = LoadSettingsExtensions.LoadArray<MountPointSettings>(obj, "mountPoints"); // Legacy.
@@ -43,7 +48,7 @@ namespace Makerverse.Api.Settings.Models {
       Macros = LoadSettingsExtensions.LoadArray<MacroSettings>(obj, "macros");
       Users = LoadSettingsExtensions.LoadArray<MakerverseUser>(obj, "users");
 
-      Log.Debug("Loaded Settings {@workspace}", JsonConvert.SerializeObject(this, Formatting.Indented));
+      Log.Verbose("Loaded Settings {@workspace}", JsonConvert.SerializeObject(this, Formatting.Indented));
     }
   }
 }

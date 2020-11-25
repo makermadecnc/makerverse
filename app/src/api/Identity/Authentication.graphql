@@ -1,5 +1,5 @@
 query Authenticate($token: String!) {
-    makerverseUser: authenticate(token: $token) {
-        ...MakerverseUserFull
+    session: authenticate(token: $token) {
+        ...MakerverseSession
     }
 }

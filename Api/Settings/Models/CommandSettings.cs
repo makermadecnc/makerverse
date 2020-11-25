@@ -1,9 +1,11 @@
-using HotChocolate.Types;
-using Makerverse.Api.Settings.Models;
+using HotChocolate.AspNetCore.Authorization;
+using Makerverse.Api.Identity.Services;
+using Makerverse.Lib.Graphql;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Makerverse.Api.Workspaces.Models {
+namespace Makerverse.Api.Settings.Models {
+  [AuthorizeMakerverseUser]
   public class CommandSettings : ILoadSettingsObject {
     [JsonProperty("id")]
     public string Id { get; set; } = default!;

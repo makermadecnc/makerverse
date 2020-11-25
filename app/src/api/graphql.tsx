@@ -11,10 +11,10 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  /** The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1. */
-  Long: any;
   /** The built-in `Decimal` scalar type. */
   Decimal: any;
+  /** The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1. */
+  Long: any;
 };
 
 export type AppUpdates = {
@@ -30,6 +30,11 @@ export type CommandSettings = {
   id: Scalars['String'];
   mtime: Scalars['Long'];
   title: Scalars['String'];
+};
+
+export type ConnectionPort = {
+  __typename?: 'ConnectionPort';
+  name: Scalars['String'];
 };
 
 export type ConnectionSettings = {
@@ -84,7 +89,7 @@ export type MachineFeatureSettings = {
 
 export type MachineFirmwareSettings = {
   __typename?: 'MachineFirmwareSettings';
-  baudRate: BaudRate;
+  baudRate: Scalars['Decimal'];
   controllerType: MachineControllerType;
   downloadUrl: Maybe<Scalars['String']>;
   edition: Maybe<Scalars['String']>;
@@ -133,12 +138,25 @@ export type MacroSettings = {
   name: Scalars['String'];
 };
 
+export type MakerHubSettings = {
+  __typename?: 'MakerHubSettings';
+  enabled: Scalars['Boolean'];
+};
+
+export type MakerverseSession = {
+  __typename?: 'MakerverseSession';
+  roles: Array<Scalars['String']>;
+  token: Scalars['String'];
+  user: MakerverseUser;
+};
+
 export type MakerverseSettings = {
   __typename?: 'MakerverseSettings';
   appUpdates: AppUpdates;
   commands: Array<CommandSettings>;
   events: Array<EventSettings>;
   fileSystem: FileSystemSettings;
+  hub: MakerHubSettings;
   macros: Array<MacroSettings>;
   users: Array<MakerverseUser>;
   workspaces: Array<WorkspaceSettings>;
@@ -161,8 +179,10 @@ export type MountPointSettings = {
 
 export type Query = {
   __typename?: 'Query';
-  authenticate: MakerverseUser;
-  settings: Maybe<MakerverseSettings>;
+  authenticate: MakerverseSession;
+  listPorts: Array<ConnectionPort>;
+  settings: MakerverseSettings;
+  workspace: WorkspaceSettings;
 };
 
 
@@ -170,10 +190,16 @@ export type QueryAuthenticateArgs = {
   token: Scalars['String'];
 };
 
+
+export type QueryWorkspaceArgs = {
+  idOrPath: Scalars['String'];
+};
+
 export type WorkspaceSettings = {
   __typename?: 'WorkspaceSettings';
   autoReconnect: Scalars['Boolean'];
   axes: Array<MachineAxisSettings>;
+  bkColor: Maybe<Scalars['String']>;
   color: Maybe<Scalars['String']>;
   commands: Array<MachineCommandSettings>;
   connection: ConnectionSettings;
@@ -188,20 +214,15 @@ export type WorkspaceSettings = {
   preferImperial: Scalars['Boolean'];
 };
 
+export enum ApplyPolicy {
+  AfterResolver = 'AFTER_RESOLVER',
+  BeforeResolver = 'BEFORE_RESOLVER'
+}
+
 export enum AxisName {
   X = 'X',
   Y = 'Y',
   Z = 'Z'
-}
-
-export enum BaudRate {
-  Br115200 = 'BR115200',
-  Br19200 = 'BR19200',
-  Br2400 = 'BR2400',
-  Br250000 = 'BR250000',
-  Br38400 = 'BR38400',
-  Br57600 = 'BR57600',
-  Br9600 = 'BR9600'
 }
 
 export enum MachineControllerType {
@@ -332,6 +353,7 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   CommandSettings: ResolverTypeWrapper<CommandSettings>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  ConnectionPort: ResolverTypeWrapper<ConnectionPort>;
   ConnectionSettings: ResolverTypeWrapper<ConnectionSettings>;
   EventSettings: ResolverTypeWrapper<EventSettings>;
   FileSystemSettings: ResolverTypeWrapper<FileSystemSettings>;
@@ -343,19 +365,21 @@ export type ResolversTypes = {
   MachineSettingSettings: ResolverTypeWrapper<MachineSettingSettings>;
   MachineSpecSettings: ResolverTypeWrapper<MachineSpecSettings>;
   MacroSettings: ResolverTypeWrapper<MacroSettings>;
+  MakerHubSettings: ResolverTypeWrapper<MakerHubSettings>;
+  MakerverseSession: ResolverTypeWrapper<MakerverseSession>;
   MakerverseSettings: ResolverTypeWrapper<MakerverseSettings>;
   MakerverseUser: ResolverTypeWrapper<MakerverseUser>;
   MountPointSettings: ResolverTypeWrapper<MountPointSettings>;
   Query: ResolverTypeWrapper<{}>;
   WorkspaceSettings: ResolverTypeWrapper<WorkspaceSettings>;
+  ApplyPolicy: ApplyPolicy;
   AxisName: AxisName;
-  BaudRate: BaudRate;
   MachineControllerType: MachineControllerType;
   MachinePartType: MachinePartType;
   MachineSettingType: MachineSettingType;
   MachineSpecType: MachineSpecType;
-  Long: ResolverTypeWrapper<Scalars['Long']>;
   Decimal: ResolverTypeWrapper<Scalars['Decimal']>;
+  Long: ResolverTypeWrapper<Scalars['Long']>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -364,6 +388,7 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
   CommandSettings: CommandSettings;
   String: Scalars['String'];
+  ConnectionPort: ConnectionPort;
   ConnectionSettings: ConnectionSettings;
   EventSettings: EventSettings;
   FileSystemSettings: FileSystemSettings;
@@ -375,13 +400,15 @@ export type ResolversParentTypes = {
   MachineSettingSettings: MachineSettingSettings;
   MachineSpecSettings: MachineSpecSettings;
   MacroSettings: MacroSettings;
+  MakerHubSettings: MakerHubSettings;
+  MakerverseSession: MakerverseSession;
   MakerverseSettings: MakerverseSettings;
   MakerverseUser: MakerverseUser;
   MountPointSettings: MountPointSettings;
   Query: {};
   WorkspaceSettings: WorkspaceSettings;
-  Long: Scalars['Long'];
   Decimal: Scalars['Decimal'];
+  Long: Scalars['Long'];
 };
 
 export type AppUpdatesResolvers<ContextType = any, ParentType extends ResolversParentTypes['AppUpdates'] = ResolversParentTypes['AppUpdates']> = {
@@ -396,6 +423,11 @@ export type CommandSettingsResolvers<ContextType = any, ParentType extends Resol
   id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   mtime: Resolver<ResolversTypes['Long'], ParentType, ContextType>;
   title: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ConnectionPortResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConnectionPort'] = ResolversParentTypes['ConnectionPort']> = {
+  name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -450,7 +482,7 @@ export type MachineFeatureSettingsResolvers<ContextType = any, ParentType extend
 };
 
 export type MachineFirmwareSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachineFirmwareSettings'] = ResolversParentTypes['MachineFirmwareSettings']> = {
-  baudRate: Resolver<ResolversTypes['BaudRate'], ParentType, ContextType>;
+  baudRate: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   controllerType: Resolver<ResolversTypes['MachineControllerType'], ParentType, ContextType>;
   downloadUrl: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   edition: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -500,11 +532,24 @@ export type MacroSettingsResolvers<ContextType = any, ParentType extends Resolve
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type MakerHubSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MakerHubSettings'] = ResolversParentTypes['MakerHubSettings']> = {
+  enabled: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MakerverseSessionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MakerverseSession'] = ResolversParentTypes['MakerverseSession']> = {
+  roles: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  token: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  user: Resolver<ResolversTypes['MakerverseUser'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MakerverseSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MakerverseSettings'] = ResolversParentTypes['MakerverseSettings']> = {
   appUpdates: Resolver<ResolversTypes['AppUpdates'], ParentType, ContextType>;
   commands: Resolver<Array<ResolversTypes['CommandSettings']>, ParentType, ContextType>;
   events: Resolver<Array<ResolversTypes['EventSettings']>, ParentType, ContextType>;
   fileSystem: Resolver<ResolversTypes['FileSystemSettings'], ParentType, ContextType>;
+  hub: Resolver<ResolversTypes['MakerHubSettings'], ParentType, ContextType>;
   macros: Resolver<Array<ResolversTypes['MacroSettings']>, ParentType, ContextType>;
   users: Resolver<Array<ResolversTypes['MakerverseUser']>, ParentType, ContextType>;
   workspaces: Resolver<Array<ResolversTypes['WorkspaceSettings']>, ParentType, ContextType>;
@@ -527,13 +572,16 @@ export type MountPointSettingsResolvers<ContextType = any, ParentType extends Re
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  authenticate: Resolver<ResolversTypes['MakerverseUser'], ParentType, ContextType, RequireFields<QueryAuthenticateArgs, 'token'>>;
-  settings: Resolver<Maybe<ResolversTypes['MakerverseSettings']>, ParentType, ContextType>;
+  authenticate: Resolver<ResolversTypes['MakerverseSession'], ParentType, ContextType, RequireFields<QueryAuthenticateArgs, 'token'>>;
+  listPorts: Resolver<Array<ResolversTypes['ConnectionPort']>, ParentType, ContextType>;
+  settings: Resolver<ResolversTypes['MakerverseSettings'], ParentType, ContextType>;
+  workspace: Resolver<ResolversTypes['WorkspaceSettings'], ParentType, ContextType, RequireFields<QueryWorkspaceArgs, 'idOrPath'>>;
 };
 
 export type WorkspaceSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['WorkspaceSettings'] = ResolversParentTypes['WorkspaceSettings']> = {
   autoReconnect: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   axes: Resolver<Array<ResolversTypes['MachineAxisSettings']>, ParentType, ContextType>;
+  bkColor: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   color: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   commands: Resolver<Array<ResolversTypes['MachineCommandSettings']>, ParentType, ContextType>;
   connection: Resolver<ResolversTypes['ConnectionSettings'], ParentType, ContextType>;
@@ -549,17 +597,18 @@ export type WorkspaceSettingsResolvers<ContextType = any, ParentType extends Res
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export interface LongScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Long'], any> {
-  name: 'Long';
-}
-
 export interface DecimalScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Decimal'], any> {
   name: 'Decimal';
+}
+
+export interface LongScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Long'], any> {
+  name: 'Long';
 }
 
 export type Resolvers<ContextType = any> = {
   AppUpdates: AppUpdatesResolvers<ContextType>;
   CommandSettings: CommandSettingsResolvers<ContextType>;
+  ConnectionPort: ConnectionPortResolvers<ContextType>;
   ConnectionSettings: ConnectionSettingsResolvers<ContextType>;
   EventSettings: EventSettingsResolvers<ContextType>;
   FileSystemSettings: FileSystemSettingsResolvers<ContextType>;
@@ -571,13 +620,15 @@ export type Resolvers<ContextType = any> = {
   MachineSettingSettings: MachineSettingSettingsResolvers<ContextType>;
   MachineSpecSettings: MachineSpecSettingsResolvers<ContextType>;
   MacroSettings: MacroSettingsResolvers<ContextType>;
+  MakerHubSettings: MakerHubSettingsResolvers<ContextType>;
+  MakerverseSession: MakerverseSessionResolvers<ContextType>;
   MakerverseSettings: MakerverseSettingsResolvers<ContextType>;
   MakerverseUser: MakerverseUserResolvers<ContextType>;
   MountPointSettings: MountPointSettingsResolvers<ContextType>;
   Query: QueryResolvers<ContextType>;
   WorkspaceSettings: WorkspaceSettingsResolvers<ContextType>;
-  Long: GraphQLScalarType;
   Decimal: GraphQLScalarType;
+  Long: GraphQLScalarType;
 };
 
 
@@ -594,7 +645,16 @@ export type AuthenticateQueryVariables = Exact<{
 
 export type AuthenticateQuery = (
   { __typename?: 'Query' }
-  & { makerverseUser: (
+  & { session: (
+    { __typename?: 'MakerverseSession' }
+    & MakerverseSessionFragment
+  ) }
+);
+
+export type MakerverseSessionFragment = (
+  { __typename?: 'MakerverseSession' }
+  & Pick<MakerverseSession, 'token'>
+  & { user: (
     { __typename?: 'MakerverseUser' }
     & MakerverseUserFullFragment
   ) }
@@ -607,13 +667,8 @@ export type MakerverseUserMinFragment = (
 
 export type MakerverseUserFullFragment = (
   { __typename?: 'MakerverseUser' }
-  & Pick<MakerverseUser, 'id' | 'authenticationType' | 'enabled' | 'tokens'>
+  & Pick<MakerverseUser, 'id' | 'authenticationType' | 'enabled'>
   & MakerverseUserMinFragment
-);
-
-export type CommandFragment = (
-  { __typename?: 'CommandSettings' }
-  & Pick<CommandSettings, 'id' | 'mtime' | 'enabled' | 'title' | 'commands'>
 );
 
 export type EventFragment = (
@@ -630,29 +685,179 @@ export type FileSystemFragment = (
   )> }
 );
 
-export type MakerverseSettingsStartupFragment = (
+export type CommandFragment = (
+  { __typename?: 'CommandSettings' }
+  & Pick<CommandSettings, 'id' | 'mtime' | 'commands' | 'title' | 'enabled'>
+);
+
+export type AppUpdatesFragment = (
+  { __typename?: 'AppUpdates' }
+  & Pick<AppUpdates, 'checkForUpdates' | 'prereleases'>
+);
+
+export type MakerHubFragment = (
+  { __typename?: 'MakerHubSettings' }
+  & Pick<MakerHubSettings, 'enabled'>
+);
+
+export type MakerverseEssentialSettingsFragment = (
   { __typename?: 'MakerverseSettings' }
   & { fileSystem: (
     { __typename?: 'FileSystemSettings' }
     & FileSystemFragment
   ), appUpdates: (
     { __typename?: 'AppUpdates' }
-    & Pick<AppUpdates, 'checkForUpdates' | 'prereleases'>
+    & AppUpdatesFragment
   ), commands: Array<(
     { __typename?: 'CommandSettings' }
     & CommandFragment
   )>, events: Array<(
     { __typename?: 'EventSettings' }
     & EventFragment
-  )>, macros: Array<(
-    { __typename?: 'MacroSettings' }
-    & Pick<MacroSettings, 'id' | 'mtime' | 'name' | 'content'>
-  )>, users: Array<(
+  )>, hub: (
+    { __typename?: 'MakerHubSettings' }
+    & MakerHubFragment
+  ), users: Array<(
     { __typename?: 'MakerverseUser' }
     & MakerverseUserFullFragment
+  )>, workspaces: Array<(
+    { __typename?: 'WorkspaceSettings' }
+    & WorkspaceEssentialSettingsFragment
   )> }
 );
 
+export type StartupQueryVariables = Exact<{
+  token: Scalars['String'];
+}>;
+
+
+export type StartupQuery = (
+  { __typename?: 'Query' }
+  & { session: (
+    { __typename?: 'MakerverseSession' }
+    & MakerverseSessionFragment
+  ), settings: (
+    { __typename?: 'MakerverseSettings' }
+    & MakerverseEssentialSettingsFragment
+  ) }
+);
+
+export type WorkspacePropsFragment = (
+  { __typename?: 'WorkspaceSettings' }
+  & Pick<WorkspaceSettings, 'id' | 'machineProfileId' | 'name' | 'onboarded' | 'path' | 'color' | 'bkColor' | 'icon' | 'autoReconnect' | 'preferImperial'>
+);
+
+export type MachineSettingsFragment = (
+  { __typename?: 'MachineSettingSettings' }
+  & Pick<MachineSettingSettings, 'id' | 'title' | 'settingType' | 'key' | 'value'>
+);
+
+export type MachineSpecFragment = (
+  { __typename?: 'MachineSpecSettings' }
+  & Pick<MachineSpecSettings, 'id' | 'specType' | 'value'>
+);
+
+export type MachinePartFragment = (
+  { __typename?: 'MachinePartSettings' }
+  & Pick<MachinePartSettings, 'id' | 'partType' | 'title' | 'description' | 'optional' | 'isDefault' | 'dataBlob'>
+  & { settings: Array<(
+    { __typename?: 'MachineSettingSettings' }
+    & MachineSettingsFragment
+  )>, specs: Array<(
+    { __typename?: 'MachineSpecSettings' }
+    & MachineSpecFragment
+  )> }
+);
+
+export type MachineFirmwareFragment = (
+  { __typename?: 'MachineFirmwareSettings' }
+  & Pick<MachineFirmwareSettings, 'id' | 'controllerType' | 'baudRate' | 'name' | 'edition' | 'rtscts' | 'requiredVersion' | 'suggestedVersion' | 'downloadUrl' | 'helpUrl'>
+);
+
+export type MachineConnectionFragment = (
+  { __typename?: 'ConnectionSettings' }
+  & Pick<ConnectionSettings, 'port' | 'manufacturer'>
+  & { firmware: (
+    { __typename?: 'MachineFirmwareSettings' }
+    & MachineFirmwareFragment
+  ) }
+);
+
+export type MachineAxisFragment = (
+  { __typename?: 'MachineAxisSettings' }
+  & Pick<MachineAxisSettings, 'id' | 'name' | 'min' | 'max' | 'precision' | 'accuracy'>
+);
+
+export type MachineFeatureFragment = (
+  { __typename?: 'MachineFeatureSettings' }
+  & Pick<MachineFeatureSettings, 'id' | 'disabled' | 'key' | 'title' | 'description' | 'icon'>
+);
+
+export type MachineCommandFragment = (
+  { __typename?: 'MachineCommandSettings' }
+  & Pick<MachineCommandSettings, 'id' | 'name' | 'value'>
+);
+
+export type WorkspaceFullFragment = (
+  { __typename?: 'WorkspaceSettings' }
+  & { connection: (
+    { __typename?: 'ConnectionSettings' }
+    & MachineConnectionFragment
+  ), axes: Array<(
+    { __typename?: 'MachineAxisSettings' }
+    & MachineAxisFragment
+  )>, features: Array<(
+    { __typename?: 'MachineFeatureSettings' }
+    & MachineFeatureFragment
+  )>, commands: Array<(
+    { __typename?: 'MachineCommandSettings' }
+    & MachineCommandFragment
+  )>, parts: Array<(
+    { __typename?: 'MachinePartSettings' }
+    & MachinePartFragment
+  )> }
+  & WorkspacePropsFragment
+);
+
+export type WorkspaceEssentialSettingsFragment = (
+  { __typename?: 'WorkspaceSettings' }
+  & WorkspaceFullFragment
+);
+
+export type WorkspaceQueryVariables = Exact<{
+  idOrPath: Scalars['String'];
+}>;
+
+
+export type WorkspaceQuery = (
+  { __typename?: 'Query' }
+  & { workspace: (
+    { __typename?: 'WorkspaceSettings' }
+    & WorkspaceFullFragment
+  ) }
+);
+
+export const MakerverseUserMinFragmentDoc = gql`
+    fragment MakerverseUserMin on MakerverseUser {
+  username
+}
+    `;
+export const MakerverseUserFullFragmentDoc = gql`
+    fragment MakerverseUserFull on MakerverseUser {
+  ...MakerverseUserMin
+  id
+  authenticationType
+  enabled
+}
+    ${MakerverseUserMinFragmentDoc}`;
+export const MakerverseSessionFragmentDoc = gql`
+    fragment MakerverseSession on MakerverseSession {
+  token
+  user {
+    ...MakerverseUserFull
+  }
+}
+    ${MakerverseUserFullFragmentDoc}`;
 export const FileSystemFragmentDoc = gql`
     fragment FileSystem on FileSystemSettings {
   programDirectory
@@ -662,13 +867,19 @@ export const FileSystemFragmentDoc = gql`
   }
 }
     `;
+export const AppUpdatesFragmentDoc = gql`
+    fragment AppUpdates on AppUpdates {
+  checkForUpdates
+  prereleases
+}
+    `;
 export const CommandFragmentDoc = gql`
     fragment Command on CommandSettings {
   id
   mtime
-  enabled
-  title
   commands
+  title
+  enabled
 }
     `;
 export const EventFragmentDoc = gql`
@@ -681,28 +892,146 @@ export const EventFragmentDoc = gql`
   commands
 }
     `;
-export const MakerverseUserMinFragmentDoc = gql`
-    fragment MakerverseUserMin on MakerverseUser {
-  username
+export const MakerHubFragmentDoc = gql`
+    fragment MakerHub on MakerHubSettings {
+  enabled
 }
     `;
-export const MakerverseUserFullFragmentDoc = gql`
-    fragment MakerverseUserFull on MakerverseUser {
-  ...MakerverseUserMin
+export const WorkspacePropsFragmentDoc = gql`
+    fragment WorkspaceProps on WorkspaceSettings {
   id
-  authenticationType
-  enabled
-  tokens
+  machineProfileId
+  name
+  onboarded
+  path
+  color
+  bkColor
+  icon
+  autoReconnect
+  preferImperial
 }
-    ${MakerverseUserMinFragmentDoc}`;
-export const MakerverseSettingsStartupFragmentDoc = gql`
-    fragment MakerverseSettingsStartup on MakerverseSettings {
+    `;
+export const MachineFirmwareFragmentDoc = gql`
+    fragment MachineFirmware on MachineFirmwareSettings {
+  id
+  controllerType
+  baudRate
+  name
+  edition
+  rtscts
+  requiredVersion
+  suggestedVersion
+  downloadUrl
+  helpUrl
+}
+    `;
+export const MachineConnectionFragmentDoc = gql`
+    fragment MachineConnection on ConnectionSettings {
+  port
+  manufacturer
+  firmware {
+    ...MachineFirmware
+  }
+}
+    ${MachineFirmwareFragmentDoc}`;
+export const MachineAxisFragmentDoc = gql`
+    fragment MachineAxis on MachineAxisSettings {
+  id
+  name
+  min
+  max
+  precision
+  accuracy
+}
+    `;
+export const MachineFeatureFragmentDoc = gql`
+    fragment MachineFeature on MachineFeatureSettings {
+  id
+  disabled
+  key
+  title
+  description
+  icon
+}
+    `;
+export const MachineCommandFragmentDoc = gql`
+    fragment MachineCommand on MachineCommandSettings {
+  id
+  name
+  value
+}
+    `;
+export const MachineSettingsFragmentDoc = gql`
+    fragment MachineSettings on MachineSettingSettings {
+  id
+  title
+  settingType
+  key
+  value
+}
+    `;
+export const MachineSpecFragmentDoc = gql`
+    fragment MachineSpec on MachineSpecSettings {
+  id
+  specType
+  value
+}
+    `;
+export const MachinePartFragmentDoc = gql`
+    fragment MachinePart on MachinePartSettings {
+  id
+  partType
+  title
+  description
+  optional
+  isDefault
+  dataBlob
+  settings {
+    ...MachineSettings
+  }
+  specs {
+    ...MachineSpec
+  }
+}
+    ${MachineSettingsFragmentDoc}
+${MachineSpecFragmentDoc}`;
+export const WorkspaceFullFragmentDoc = gql`
+    fragment WorkspaceFull on WorkspaceSettings {
+  ...WorkspaceProps
+  connection {
+    ...MachineConnection
+  }
+  axes {
+    ...MachineAxis
+  }
+  features {
+    ...MachineFeature
+  }
+  commands {
+    ...MachineCommand
+  }
+  parts {
+    ...MachinePart
+  }
+}
+    ${WorkspacePropsFragmentDoc}
+${MachineConnectionFragmentDoc}
+${MachineAxisFragmentDoc}
+${MachineFeatureFragmentDoc}
+${MachineCommandFragmentDoc}
+${MachinePartFragmentDoc}`;
+export const WorkspaceEssentialSettingsFragmentDoc = gql`
+    fragment WorkspaceEssentialSettings on WorkspaceSettings {
+  ...WorkspaceFull
+}
+    ${WorkspaceFullFragmentDoc}`;
+export const MakerverseEssentialSettingsFragmentDoc = gql`
+    fragment MakerverseEssentialSettings on MakerverseSettings {
   fileSystem {
     ...FileSystem
   }
   appUpdates {
-    checkForUpdates
-    prereleases
+    ...AppUpdates
   }
   commands {
     ...Command
@@ -710,27 +1039,30 @@ export const MakerverseSettingsStartupFragmentDoc = gql`
   events {
     ...Event
   }
-  macros {
-    id
-    mtime
-    name
-    content
+  hub {
+    ...MakerHub
   }
   users {
     ...MakerverseUserFull
   }
-}
-    ${FileSystemFragmentDoc}
-${CommandFragmentDoc}
-${EventFragmentDoc}
-${MakerverseUserFullFragmentDoc}`;
-export const AuthenticateDocument = gql`
-    query Authenticate($token: String!) {
-  makerverseUser: authenticate(token: $token) {
-    ...MakerverseUserFull
+  workspaces {
+    ...WorkspaceEssentialSettings
   }
 }
-    ${MakerverseUserFullFragmentDoc}`;
+    ${FileSystemFragmentDoc}
+${AppUpdatesFragmentDoc}
+${CommandFragmentDoc}
+${EventFragmentDoc}
+${MakerHubFragmentDoc}
+${MakerverseUserFullFragmentDoc}
+${WorkspaceEssentialSettingsFragmentDoc}`;
+export const AuthenticateDocument = gql`
+    query Authenticate($token: String!) {
+  session: authenticate(token: $token) {
+    ...MakerverseSession
+  }
+}
+    ${MakerverseSessionFragmentDoc}`;
 
 /**
  * __useAuthenticateQuery__
@@ -757,3 +1089,73 @@ export function useAuthenticateLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type AuthenticateQueryHookResult = ReturnType<typeof useAuthenticateQuery>;
 export type AuthenticateLazyQueryHookResult = ReturnType<typeof useAuthenticateLazyQuery>;
 export type AuthenticateQueryResult = Apollo.QueryResult<AuthenticateQuery, AuthenticateQueryVariables>;
+export const StartupDocument = gql`
+    query Startup($token: String!) {
+  session: authenticate(token: $token) {
+    ...MakerverseSession
+  }
+  settings {
+    ...MakerverseEssentialSettings
+  }
+}
+    ${MakerverseSessionFragmentDoc}
+${MakerverseEssentialSettingsFragmentDoc}`;
+
+/**
+ * __useStartupQuery__
+ *
+ * To run a query within a React component, call `useStartupQuery` and pass it any options that fit your needs.
+ * When your component renders, `useStartupQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useStartupQuery({
+ *   variables: {
+ *      token: // value for 'token'
+ *   },
+ * });
+ */
+export function useStartupQuery(baseOptions: Apollo.QueryHookOptions<StartupQuery, StartupQueryVariables>) {
+        return Apollo.useQuery<StartupQuery, StartupQueryVariables>(StartupDocument, baseOptions);
+      }
+export function useStartupLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<StartupQuery, StartupQueryVariables>) {
+          return Apollo.useLazyQuery<StartupQuery, StartupQueryVariables>(StartupDocument, baseOptions);
+        }
+export type StartupQueryHookResult = ReturnType<typeof useStartupQuery>;
+export type StartupLazyQueryHookResult = ReturnType<typeof useStartupLazyQuery>;
+export type StartupQueryResult = Apollo.QueryResult<StartupQuery, StartupQueryVariables>;
+export const WorkspaceDocument = gql`
+    query Workspace($idOrPath: String!) {
+  workspace(idOrPath: $idOrPath) {
+    ...WorkspaceFull
+  }
+}
+    ${WorkspaceFullFragmentDoc}`;
+
+/**
+ * __useWorkspaceQuery__
+ *
+ * To run a query within a React component, call `useWorkspaceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWorkspaceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWorkspaceQuery({
+ *   variables: {
+ *      idOrPath: // value for 'idOrPath'
+ *   },
+ * });
+ */
+export function useWorkspaceQuery(baseOptions: Apollo.QueryHookOptions<WorkspaceQuery, WorkspaceQueryVariables>) {
+        return Apollo.useQuery<WorkspaceQuery, WorkspaceQueryVariables>(WorkspaceDocument, baseOptions);
+      }
+export function useWorkspaceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WorkspaceQuery, WorkspaceQueryVariables>) {
+          return Apollo.useLazyQuery<WorkspaceQuery, WorkspaceQueryVariables>(WorkspaceDocument, baseOptions);
+        }
+export type WorkspaceQueryHookResult = ReturnType<typeof useWorkspaceQuery>;
+export type WorkspaceLazyQueryHookResult = ReturnType<typeof useWorkspaceLazyQuery>;
+export type WorkspaceQueryResult = Apollo.QueryResult<WorkspaceQuery, WorkspaceQueryVariables>;

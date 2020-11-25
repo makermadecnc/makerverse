@@ -7,5 +7,4 @@ fragment MakerverseUserFull on MakerverseUser {
     id
     authenticationType
     enabled
-    tokens
 }

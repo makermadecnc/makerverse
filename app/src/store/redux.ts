@@ -1,11 +1,13 @@
 import * as owsStore from '@openworkshop/lib/store';
 import { Store } from 'redux';
+import {makerverseReducer} from '../lib/Makerverse/reducers';
+import {IMakerverseState} from '../lib/Makerverse/types';
 
 // The top-level state object
-export type AppState = owsStore.IOwsState;
+export type AppState = owsStore.IOwsState & IMakerverseState;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function configureStore(initialState?: AppState): Store<AppState> {
+export default function configureStore(): Store<AppState> {
   const enhancers = [];
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-explicit-any
   const windowIfDefined = typeof window === 'undefined' ? null : (window as any);
@@ -15,10 +17,11 @@ export default function configureStore(initialState?: AppState): Store<AppState>
     enhancers.push(windowIfDefined.__REDUX_DEVTOOLS_EXTENSION__());
   }
 
-  return owsStore.configureStore(
-    { },
+  return owsStore.configureStore<AppState>(
+    {
+      makerverse: makerverseReducer,
+    },
     [ ],
     enhancers,
-    initialState,
   );
 }

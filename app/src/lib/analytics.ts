@@ -2,7 +2,6 @@ import { IOpenWorkShop } from '@openworkshop/lib';
 import _ from 'lodash';
 import ReactGA from 'react-ga';
 import settings from 'config/settings';
-import { Workspace } from './workspaces';
 import { ISemver } from './semvers';
 import { Logger } from '@openworkshop/lib/utils/logging/Logger';
 
@@ -31,7 +30,7 @@ function wrapDev<TFunc extends IFunc>(func: TFunc) {
   const version: ISemver = settings.version;
   if (version.branch === 'dev') {
     return (...args: unknown[]) => {
-      log?.debug(func.name, args);
+      log?.trace(func.name, args);
     };
   }
   return func;
@@ -40,7 +39,7 @@ function wrapDev<TFunc extends IFunc>(func: TFunc) {
 const pageview = wrapDev(ReactGA.pageview);
 const set = wrapDev(ReactGA.set);
 
-const setDimensions = (opts: { [key: string]: string }) => {
+const setDimensions = (opts: { [key: string]: string }): void => {
   Object.keys(DIMENSION_MAP).forEach((d) => {
     if (_.has(opts, d)) {
       const dNum = DIMENSION_MAP[d];
@@ -51,21 +50,16 @@ const setDimensions = (opts: { [key: string]: string }) => {
   set(opts);
 };
 
-interface ILocation {
-  pathname: string;
-}
-
-const trackPage = (location: ILocation, workspace?: Workspace) => {
+const trackPage = (path: string): void => {
   setDimensions({
     version: settings.version.public,
     build: settings.version.build.toString(),
   });
-  const path: string = workspace ? workspace.hardware.path : location.pathname;
   pageview(path);
 };
 
 const analytics = {
-  initialize: (ows: IOpenWorkShop) => {
+  initialize: (ows: IOpenWorkShop): void => {
     log = ows.logManager.getLogger('analytics');
     // https://github.com/ReactTraining/react-router/issues/4278#issuecomment-299692502
     ReactGA.initialize(settings.analytics.trackingId, {

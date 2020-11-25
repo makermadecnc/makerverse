@@ -1,8 +1,12 @@
+using HotChocolate.AspNetCore.Authorization;
+using Makerverse.Api.Identity.Services;
 using Makerverse.Api.Machines.Models;
+using Makerverse.Lib.Graphql;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Makerverse.Api.Settings.Models {
+  [AuthorizeMakerverseUser]
   public class ConnectionSettings : ILoadSettingsObject {
     [JsonProperty("port")]
     public string Port { get; set; } = default!;

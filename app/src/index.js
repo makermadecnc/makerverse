@@ -3,15 +3,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { SubscriptionClient } from 'subscriptions-transport-ws';
-import { WebSocketLink } from '@apollo/client/link/ws';
 import log from 'js-logger';
 import { OpenWorkShopProvider } from '@openworkshop/ui/components';
 import configureStore from 'store/redux';
 import { initReactI18next } from 'react-i18next';
 import { ThemeProvider } from '@material-ui/core';
+import {IOpenWorkShop} from '@openworkshop/lib';
+import usePromise from 'react-promise-suspense';
 import theme from '@openworkshop/ui/themes/Makerverse';
-import MakerverseProvider from './views/MakerverseProvider';
+import {MakerverseSubscription} from "./lib/Makerverse/apollo";
+import MakerverseProvider, { IMakerverseConfig } from './views/MakerverseProvider';
 import auth from './lib/auth';
 import './styles/vendor.styl';
 import './styles/app.styl';
@@ -87,9 +88,31 @@ document.body.appendChild(container);
 
 log.debug('startup', window.location);
 
-const apolloLink = new WebSocketLink(new SubscriptionClient('ws://localhost:8000/api/graphql', {
-  reconnect: true
-}));
+const config = {
+  connection: undefined,
+};
+
+function apolloLinkCreator(ows) {
+  config.connection = new MakerverseSubscription(ows);
+  return config.connection.webSocketLink;
+}
+
+const MakerverseMain = () => {
+  usePromise(async () => {
+    while(!config.connection) {
+      await new Promise((r) => setTimeout(r, 100));
+    }
+  }, [config]);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <Router >
+        <CssBaseline />
+        <MakerverseProvider connection={config.connection} />
+      </Router>
+    </ThemeProvider>
+  );
+};
 
 ReactDOM.render(
   <Provider store={store}>
@@ -98,14 +121,9 @@ ReactDOM.render(
       client={auth.client}
       hostnameMap={auth.hosts}
       i18nMiddleware={[initReactI18next]}
-      clientApolloLink={apolloLink}
+      clientApolloLinkCreator={apolloLinkCreator}
     >
-        <ThemeProvider theme={theme}>
-          <Router >
-            <CssBaseline />
-            <MakerverseProvider />
-          </Router>
-        </ThemeProvider>
+        <MakerverseMain />
     </OpenWorkShopProvider>
   </Provider>,
   container,

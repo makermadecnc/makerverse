@@ -13,7 +13,7 @@ namespace Makerverse.Lib {
       base.OnChanged(data);
       // Log.Information("Users: {users}", Data.Users);
       // Log.Information("Commands: {@commands}", Data.Commands);
-      Log.Information("Workspaces: {@workspaces}", Data.Workspaces);
+      // Log.Information("Workspaces: {@workspaces}", Data.Workspaces);
     }
 
     protected override MakerverseSettings Load(JObject obj) {

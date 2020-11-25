@@ -1,10 +1,9 @@
 using System.Reflection;
 using HotChocolate.Types;
 using HotChocolate.Types.Descriptors;
-using Makerverse.Api.Settings;
 using Makerverse.Api.Settings.Models;
 
-namespace Makerverse.Lib {
+namespace Makerverse.Lib.Graphql {
   public class UseMakerverseSettingsAttribute : ObjectFieldDescriptorAttribute {
     public override void OnConfigure(
       IDescriptorContext context,

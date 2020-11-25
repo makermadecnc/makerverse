@@ -5,9 +5,10 @@ import { OpenWorkShop } from '@openworkshop/lib';
 import {useNetworkStatus} from '@openworkshop/lib/utils/device';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import React, { FunctionComponent } from 'react';
-import { useTranslation } from 'react-i18next';
+import {Trans, useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import {MakerverseContext} from '../../lib/Makerverse';
+// import {reconnectToBackend} from '../../lib/Makerverse/apollo';
 
 const UserMenu: FunctionComponent = () => {
   const log = useLogger(UserMenu);
@@ -18,7 +19,8 @@ const UserMenu: FunctionComponent = () => {
   const makerverse = React.useContext(MakerverseContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const isAuthenticated = !!makerverse.user;
+  const session = makerverse.session;
+  const isAuthenticated = !!session;
   const showUserMenu = isOnline && isAuthenticated;
   const icon = showUserMenu ? faUser : faUserSlash;
 
@@ -31,13 +33,13 @@ const UserMenu: FunctionComponent = () => {
     if (!isOnline) {
       return <Alert severity="warning">{t('You are offline.')}</Alert>;
     }
-    if (!isAuthenticated) {
+    if (!session) {
       return <Alert severity="warning">{t('You are not logged in. Community features will be unavailable.')}</Alert>;
     }
-    return <Alert severity="info">{t('Welcome, {{ username }}', makerverse.user)}</Alert>;
+    return <Alert severity="info">{t('Welcome, {{ username }}', session.user)}</Alert>;
   }
 
-  log.debug(isOnline, isAuthenticated);
+  log.trace('online', isOnline, 'authenticated', isAuthenticated);
 
   return (
     <div>
@@ -67,6 +69,13 @@ const UserMenu: FunctionComponent = () => {
       >
         {renderHeader()}
         {isAuthenticated && <MenuItem onClick={() => handleAccountLink('/account/manage')}>My account</MenuItem>}
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            setTimeout(() => void makerverse.connection.reconnect(), 10);
+          }}>
+          <Trans>Reconnect</Trans>
+        </MenuItem>
         {isAuthenticated && <MenuItem
           onClick={() => {
             setAnchorEl(null);

@@ -1,0 +1,116 @@
+fragment WorkspaceProps on WorkspaceSettings {
+    id
+    machineProfileId
+    name
+    onboarded
+    path
+    color
+    bkColor
+    icon
+    autoReconnect
+    preferImperial
+}
+
+fragment MachineSettings on MachineSettingSettings {
+    id
+    title
+    settingType
+    key
+    value
+}
+
+fragment MachineSpec on MachineSpecSettings {
+    id
+    specType
+    value
+}
+
+fragment MachinePart on MachinePartSettings {
+    id
+    partType
+    title
+    description
+    optional
+    isDefault
+    dataBlob
+    settings {
+        ...MachineSettings
+    }
+    specs {
+        ...MachineSpec
+    }
+}
+
+fragment MachineFirmware on MachineFirmwareSettings {
+    id
+    controllerType
+    baudRate
+    name
+    edition
+    rtscts
+    requiredVersion
+    suggestedVersion
+    downloadUrl
+    helpUrl
+}
+
+fragment MachineConnection on ConnectionSettings {
+    port
+    manufacturer
+    firmware {
+        ...MachineFirmware
+    }
+}
+
+fragment MachineAxis on MachineAxisSettings {
+    id
+    name
+    min
+    max
+    precision
+    accuracy
+}
+
+fragment MachineFeature on MachineFeatureSettings {
+    id
+    disabled
+    key
+    title
+    description
+    icon
+}
+
+fragment MachineCommand on MachineCommandSettings {
+    id
+    name
+    value
+}
+
+fragment WorkspaceFull on WorkspaceSettings {
+    ...WorkspaceProps
+    connection {
+        ...MachineConnection
+    }
+    axes {
+        ...MachineAxis
+    }
+    features {
+        ...MachineFeature
+    }
+    commands {
+        ...MachineCommand
+    }
+    parts {
+        ...MachinePart
+    }
+}
+
+fragment WorkspaceEssentialSettings on WorkspaceSettings {
+    ...WorkspaceFull
+}
+
+query Workspace($idOrPath: String!) {
+    workspace(idOrPath: $idOrPath) {
+        ...WorkspaceFull
+    }
+}

@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from 'react';
-import {useWorkspaces, Workspaces} from '../../lib/Makerverse';
 
 interface OwnProps {
   id: string;
@@ -8,12 +7,12 @@ interface OwnProps {
 type Props = OwnProps;
 
 const index: FunctionComponent<Props> = (props) => {
-  const workspaces: Workspaces = useWorkspaces();
-  const workspace = workspaces.all[props.id];
+  //const workspaces: Workspaces = useWorkspaces();
+  //const workspace = workspaces.all[props.id];
 
   return (
     <div>
-      {workspace.name}
+      {props.id}
     </div>
   );
 };

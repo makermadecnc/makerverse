@@ -1,6 +1,6 @@
-import { AxisName, MachineAxis } from '@openworkshop/lib/api/graphql';
-import { normalizeAxisName } from '@openworkshop/lib/api/Machines/AxisName';
+import { AxisName } from '@openworkshop/lib/api/graphql';
 import _ from 'lodash';
+import {MachineAxisFragment} from '../../api/graphql';
 import Workspace from './workspace';
 
 const INCH = 25.4;
@@ -21,11 +21,11 @@ class WorkspaceAxis {
 
   _workspace: Workspace;
   _axis: AxisName;
-  _record: MachineAxis;
+  _record: MachineAxisFragment;
 
-  constructor(workspace: Workspace, axis: string, record: MachineAxis) {
+  constructor(workspace: Workspace, record: MachineAxisFragment) {
     this._workspace = workspace;
-    this._axis = normalizeAxisName(axis) || AxisName.X;
+    this._axis = record.name;
     this._record = { ...WorkspaceAxis.empty, ...record };
   }
 

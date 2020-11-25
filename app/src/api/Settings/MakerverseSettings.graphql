@@ -1,10 +1,26 @@
-fragment MakerverseSettingsStartup on MakerverseSettings {
+fragment Command on CommandSettings {
+    id
+    mtime
+    commands
+    title
+    enabled
+}
+
+fragment AppUpdates on AppUpdates {
+    checkForUpdates
+    prereleases
+}
+
+fragment MakerHub on MakerHubSettings {
+    enabled
+}
+
+fragment MakerverseEssentialSettings on MakerverseSettings {
     fileSystem {
         ...FileSystem
     }
     appUpdates {
-        checkForUpdates
-        prereleases
+        ...AppUpdates
     }
     commands {
         ...Command
@@ -12,13 +28,13 @@ fragment MakerverseSettingsStartup on MakerverseSettings {
     events {
         ...Event
     }
-    macros {
-        id
-        mtime
-        name
-        content
+    hub {
+        ...MakerHub
     }
     users {
         ...MakerverseUserFull
+    }
+    workspaces {
+        ...WorkspaceEssentialSettings
     }
 }

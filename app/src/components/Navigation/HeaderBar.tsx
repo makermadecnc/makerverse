@@ -15,15 +15,15 @@ type Props = OwnProps;
 const HeaderBar: FunctionComponent<Props> = (props) => {
   const log = useLogger(HeaderBar);
   const makerverse = React.useContext(MakerverseContext);
-  const workspace = makerverse.workspaces.current;
+  // const workspace = makerverse.workspaces.current;
   const classes = useStyles();
 
-  const bk = workspace ? { backgroundColor: workspace.hexColor } : {};
-  log.debug('workspace', workspace, bk);
+  // const bk = workspace ? { backgroundColor: workspace.hexColor } : {};
+  // log.debug('workspace', workspace, bk);
 
   return (
     <AppBar position='fixed' className={classes.appBar}>
-      <Toolbar className={classes.toolbar} style={bk} >
+      <Toolbar className={classes.toolbar} >
         <IconButton
           aria-label='open drawer'
           edge='start'

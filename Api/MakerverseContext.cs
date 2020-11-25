@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Makerverse.Api.Identity.Services;
 using Makerverse.Api.Settings.Models;
 using Makerverse.Lib;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace Makerverse.Api {
   public class MakerverseContext {
@@ -14,9 +16,13 @@ namespace Makerverse.Api {
 
     public IWebHostEnvironment WebHostEnvironment { get; }
 
+    public SessionManager Sessions { get; }
+
     public string? Subdomain { get; }
 
     public string OwsHost { get; }
+
+    public ILogger Log { get; }
 
     private List<MakerverseUser>? _enabledUsers;
 
@@ -27,8 +33,10 @@ namespace Makerverse.Api {
 
     public void SaveSettings() => _configFile.Save();
 
-    public MakerverseContext(IWebHostEnvironment env, ConfigFile cf) {
+    public MakerverseContext(IWebHostEnvironment env, ConfigFile cf, SessionManager sm) {
+      Sessions = sm;
       WebHostEnvironment = env;
+      Log = cf.Log.ForContext("WebHost", env.WebRootPath);
       _configFile = cf;
       Settings = _configFile.Data ?? new MakerverseSettings();
       if (env.IsDevelopment()) {

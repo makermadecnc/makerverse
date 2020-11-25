@@ -1,6 +1,7 @@
 using HotChocolate.Execution.Configuration;
 using Makerverse.Api.Settings.Models;
 using Makerverse.Lib;
+using Makerverse.Lib.Graphql;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Makerverse.Api.Settings.Graph {

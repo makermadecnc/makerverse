@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using HotChocolate.AspNetCore.Authorization;
+using Makerverse.Api.Identity.Services;
 using Makerverse.Api.Settings.Models;
 using Makerverse.Lib.Filesystem;
+using Makerverse.Lib.Graphql;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -8,6 +11,7 @@ using OpenWorkEngine.OpenController.MachineProfiles.Enums;
 using OpenWorkEngine.OpenController.MachineProfiles.Interfaces;
 
 namespace Makerverse.Api.Machines.Models {
+  [AuthorizeMakerverseUser]
   public class MachinePartSettings : IMachinePart<MachineSettingSettings, MachineSpecSettings>, ILoadSettingsObject {
     [JsonProperty("id")]
     public string? Id { get; set; } = default!;

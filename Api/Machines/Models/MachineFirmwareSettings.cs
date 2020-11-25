@@ -1,4 +1,8 @@
+using HotChocolate.AspNetCore.Authorization;
+using HotChocolate.Types;
+using Makerverse.Api.Identity.Services;
 using Makerverse.Api.Settings.Models;
+using Makerverse.Lib.Graphql;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -6,6 +10,15 @@ using OpenWorkEngine.OpenController.MachineProfiles.Enums;
 using OpenWorkEngine.OpenController.MachineProfiles.Interfaces;
 
 namespace Makerverse.Api.Machines.Models {
+  public class MachineFirmwareSettingsType : ObjectType<MachineFirmwareSettings> {
+    protected override void Configure(IObjectTypeDescriptor<MachineFirmwareSettings> descriptor) {
+      base.Configure(descriptor);
+
+      descriptor.Field("baudRate").Resolve(r => (decimal)r.Parent<MachineFirmwareSettings>().BaudRate);
+    }
+  }
+
+  [AuthorizeMakerverseUser]
   public class MachineFirmwareSettings : IMachineFirmware, ILoadSettingsObject {
     [JsonProperty("id")]
     public string? Id { get; set; }

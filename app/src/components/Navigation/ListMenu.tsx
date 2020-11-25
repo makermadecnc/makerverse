@@ -13,7 +13,7 @@ import { faCogs, faHome, faQuestionCircle } from '@fortawesome/free-solid-svg-ic
 import { faUsb } from '@fortawesome/free-brands-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import {MakerverseContext, useWorkspaces} from '../../lib/Makerverse';
+import {MakerverseContext} from '../../lib/Makerverse';
 import ListMenuItem from './ListMenuItem';
 
 interface OwnProps {
@@ -31,8 +31,8 @@ const ListMenu: FunctionComponent<Props> = (props) => {
   const log = useLogger(ListMenu);
   const { t } = useTranslation();
   const classes = useStyles();
-  const workspaces = useWorkspaces();
-  const workspaceIds = Object.keys(workspaces.all);
+  const makerverse = React.useContext(MakerverseContext);
+  const showWorkspaces = makerverse.workspaces.length > 0;
   const iconStyle = { width: 24, height: 24, marginLeft: -2 };
 
   function renderRouteItem(route: string, text: string, icon: IconProp, t2?: string) {
@@ -40,22 +40,21 @@ const ListMenu: FunctionComponent<Props> = (props) => {
     return <ListMenuItem to={route} title={text} icon={i} subtitle={t2} />;
   }
 
-  log.debug('list', workspaces);
-
   return (
     <div>
       <div className={classes.toolbar} />
-      <Divider />
-      <List>
-        {workspaceIds.map((workspaceId) => {
-          const workspace = workspaces.all[workspaceId];
-          const route = `/workspaces/${workspace.id}`;
-          const icon = <OpenWorkShopIcon style={iconStyle} name={workspace.icon} />;
+      {showWorkspaces && <React.Fragment>
+        <Divider />
+        <List>
+          {makerverse.workspaces.map((workspace) => {
+            const route = `/workspaces/${workspace.id}`;
+            const icon = <OpenWorkShopIcon style={iconStyle} name={workspace.icon ?? 'xyz'} />;
 
-          return <ListMenuItem key={workspaceId} to={route} title={workspace.name} icon={icon} />;
-        })}
-      </List>
-      <Divider />
+            return <ListMenuItem key={workspace.id} to={route} title={workspace.name} icon={icon} />;
+          })}
+        </List>
+        <Divider />
+      </React.Fragment>}
       <List>
         {renderRouteItem('/home', t('Home'), faHome)}
         {renderRouteItem('/workspaces', t('Connect'), faUsb)}

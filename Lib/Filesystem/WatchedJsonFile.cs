@@ -42,6 +42,7 @@ namespace Makerverse.Lib {
 
     public void Save() {
       try {
+        Log.Debug("Saving JSON file at {path}", _path);
         File.WriteAllText(_path, JsonConvert.SerializeObject(Data, Formatting.Indented));
       } catch (Exception e) {
         Log.Error(e, $"Failed to write config file: {_path}");
@@ -51,7 +52,7 @@ namespace Makerverse.Lib {
 
     protected virtual void OnChanged(TJson data) {
       Data = data;
-      Log.Information("Loaded new {filename} data: {@data}", _path, Data);
+      Log.Verbose("Loaded new {filename} data: {@data}", _path, Data);
     }
 
     protected abstract TJson Load(JObject obj);

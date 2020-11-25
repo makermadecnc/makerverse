@@ -3,29 +3,35 @@ import React from 'react';
 import {Route, Switch, useLocation } from 'react-router-dom';
 import analytics from '../lib/analytics';
 import settings from '../config/settings';
-import {useWorkspaces, Workspaces} from '../lib/Makerverse';
+import {MakerverseContext} from '../lib/Makerverse';
 import { Settings, Home, WorkspaceCreator, Docs, Workspace } from './';
 import Navigation, { NotFound } from 'components/Navigation';
+import {useWorkspace} from './MakerverseProvider';
 
-export default function App() {
+interface IProps {
+  currentWorkspaceId?: string;
+}
+
+const App: React.FunctionComponent<IProps> = (props) => {
   const log = useLogger(App);
+  const makerverse = React.useContext(MakerverseContext);
+  const workspaceIds = makerverse.workspaces.map(ws => ws.id);
+  const workspace = useWorkspace(props.currentWorkspaceId);
   const location = useLocation();
-  const workspaces: Workspaces = useWorkspaces();
-  const workspaceIds = Object.keys(workspaces.all);
 
   React.useEffect(() => {
-    workspaces.current = workspaces.findByPath(location.pathname);
-    analytics.trackPage(location, workspaces.current);
+    log.debug('app workspace', location.pathname, 'workspace', workspace?.id);
 
-    log.debug('app workspace', workspaces.current, 'location', location);
-
-    if (workspaces.current) {
-      document.title = `${workspaces.current.name} | ${settings.productName}`;
+    if (workspace) {
+      document.title = `${workspace.name} | ${settings.productName}`;
+      const parts = [workspace.connection.firmware.controllerType];
+      analytics.trackPage('/' + parts.join('/') + '/');
     } else {
       document.title = settings.productName;
+      analytics.trackPage(location.pathname);
     }
 
-  }, [analytics, log, workspaces]);
+  }, [analytics, log, workspace]);
 
   return (
     <Navigation>
@@ -46,4 +52,6 @@ export default function App() {
       </Switch>
     </Navigation>
   );
-}
+};
+
+export default App;

@@ -1,10 +1,8 @@
 import {Logger} from '@openworkshop/lib/utils/logging/Logger';
 import _ from 'lodash';
 import {
-  MachineControllerType, MachineFeaturePropsFragment,
-  MachinePartCompleteFragment,
+  MachineControllerType,
   MachinePartType,
-  MachineSettingPropsFragment
 } from '@openworkshop/lib/api/graphql';
 import { IOpenWorkShop } from '@openworkshop/lib';
 import MachineController, {IWorkflow, MachineCommandType, MachineEventType} from '@openworkshop/open-controller/MachineController';
@@ -15,9 +13,16 @@ import {WORKFLOW_STATE_IDLE} from '../../constants';
 import MachineSettings from '../MachineSettings';
 import ActiveState, {IPos} from './active-state';
 import Hardware from './hardware';
-import {IWorkspaceRecord, WorkspaceRecord} from './types';
+import {ControllerEventMap, WorkspaceRecord} from './types';
 import WorkspaceAxis from './workspace-axis';
-import {ControllerEventMap, FeatureMap, Firmware, WorkspaceAxisMap, WorkspaceCommands} from './types';
+import { WorkspaceAxisMap} from './types';
+import {
+  MachineConnectionFragment,
+  MachineFeatureFragment,
+  MachineFirmwareFragment,
+  MachineCommandFragment,
+  MachinePartFragment, MachineSettingsFragment,
+} from 'api/graphql';
 
 class Workspace extends events.EventEmitter {
   _record: WorkspaceRecord;
@@ -79,8 +84,12 @@ class Workspace extends events.EventEmitter {
     return this._record.name;
   }
 
-  get firmware(): Firmware {
-    return { ...this._record.firmware };
+  get connection(): MachineConnectionFragment {
+    return this._record.connection;
+  }
+
+  get firmware(): MachineFirmwareFragment {
+    return this.connection.firmware;
   }
 
   get hasOnboarding(): boolean {
@@ -160,7 +169,7 @@ class Workspace extends events.EventEmitter {
     return this._record.bkColor || Workspace.defaultBkColor;
   }
 
-  updateRecord(values: IWorkspaceRecord): void {
+  updateRecord(values: WorkspaceRecord): void {
     this._record = { ...this._record, ...values };
     void api.workspaces.update(this.id, values);
   }
@@ -168,22 +177,22 @@ class Workspace extends events.EventEmitter {
   // PARTS
   // ---------------------------------------------------------------------------------------------
 
-  get parts(): MachinePartCompleteFragment[] {
+  get parts(): MachinePartFragment[] {
     return this._record.parts || [];
   }
 
-  findPart(partType: MachinePartType): MachinePartCompleteFragment | undefined {
+  findPart(partType: MachinePartType): MachinePartFragment | undefined {
     const part = _.find(this.parts, { partType: partType });
     return part ? { ...part } : undefined;
   }
 
   // All settings in parts
-  get partSettings(): MachineSettingPropsFragment[] {
-    let ret: MachineSettingPropsFragment[] = [];
+  get partSettings(): MachineSettingsFragment[] {
+    let ret: MachineSettingsFragment[] = [];
     this.parts.forEach((part) => {
-      const settings = part.settings || [];
-      ret = ret.concat(settings);
+      ret = ret.concat(part.settings || []);
     });
+
     return ret;
   }
 
@@ -203,9 +212,10 @@ class Workspace extends events.EventEmitter {
   // the response, keyed by the same axisKey.
   mapAxes(builder?: (v: WorkspaceAxis) => WorkspaceAxis): WorkspaceAxisMap {
     const ret: WorkspaceAxisMap = {};
-    Object.keys(this._record.axes).forEach((axisKey) => {
-      if (!_.has(this._axes, axisKey)) {
-        this._axes[axisKey] = new WorkspaceAxis(this, axisKey, this._record.axes[axisKey]);
+    this._record.axes.forEach((axisRecord) => {
+      const axisKey = axisRecord.name;
+      if (!_.has(this._axes, axisRecord.name)) {
+        this._axes[axisKey] = new WorkspaceAxis(this, axisRecord);
       }
       if (builder) {
         ret[axisKey] = builder(this._axes[axisKey]);
@@ -277,13 +287,13 @@ class Workspace extends events.EventEmitter {
   // Allow for the API to enable/disable anything in this workspace.
   // ---------------------------------------------------------------------------------------------
 
-  get features(): FeatureMap {
-    return this._record.features || {};
+  get features(): MachineFeatureFragment[] {
+    return this._record.features || [];
   }
 
-  getFeature(key: string, defaults: MachineFeaturePropsFragment): MachineFeaturePropsFragment | undefined {
-    const f = this.features[key];
-    if (f === false) {
+  getFeature(key: string, defaults: MachineFeatureFragment): MachineFeatureFragment | undefined {
+    const f = this.features.find(f => f.key === key);
+    if (!f) {
       // Disabled feature.
       return undefined;
     }
@@ -331,12 +341,12 @@ class Workspace extends events.EventEmitter {
   // WIP: controller is still a global, but it gets (dis/re)connected when switching workspaces.
   // ---------------------------------------------------------------------------------------------
 
-  get commands(): WorkspaceCommands {
+  get commands(): MachineCommandFragment[] {
     return this._record.commands;
   }
 
   getCommand(name: string, def = []): string[] {
-    return [...(this.commands[name] || def)];
+    return [...(this.commands.find(c => c.name === name)?.value || def)];
   }
 
   _controllerEvents: ControllerEventMap = {
@@ -433,12 +443,12 @@ class Workspace extends events.EventEmitter {
     if (this._connected) {
       return true;
     }
-    const firmware = this.firmware;
+    const connection = this.connection;
     this._connecting = true;
     this._connected = false;
-    this.log.debug('Open port with firmware', firmware);
+    this.log.debug('Open port with firmware', connection);
     try {
-      await this.controller.openPort(firmware);
+      await this.controller.openPort(connection);
       return true;
     } catch (e) {
       this._connecting = false;
@@ -455,7 +465,7 @@ class Workspace extends events.EventEmitter {
     this._connecting = false;
     this._connected = false;
     try {
-      await this.controller.closePort(this.firmware.port);
+      await this.controller.closePort(this.connection.port);
     } catch (e) {
       this.log.error(e);
     }

@@ -16,7 +16,8 @@
 
   <ItemGroup>
     <PackageReference Include="ElectronNET.API" Version="9.31.2" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-rc.8" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.0" />
     <PackageReference Include="SemanticVersion" Version="2.1.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.1-dev-00188" />
@@ -26,6 +27,7 @@
     <PackageReference Include="Serilog.Exceptions" Version="6.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.2.0-dev-00257" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0-dev-00839" />
+    <PackageReference Include="System.IO.Ports" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
@@ -44,11 +46,13 @@
     <Content Include="App\.prettierrc.json" />
     <Content Include="App\package.json" />
     <Content Include="App\src\api\Identity\Authentication.graphql" />
+    <Content Include="App\src\api\Identity\MakerverseSession.graphql" />
     <Content Include="App\src\api\Identity\MakerverseUser.graphql" />
-    <Content Include="App\src\api\Settings\Command.graphql" />
     <Content Include="App\src\api\Settings\Event.graphql" />
     <Content Include="App\src\api\Settings\FileSystem.graphql" />
     <Content Include="App\src\api\Settings\MakerverseSettings.graphql" />
+    <Content Include="App\src\api\Settings\Startup.graphql" />
+    <Content Include="App\src\api\Settings\Workspaces.graphql" />
     <Content Include="App\src\config\i18n.js" />
     <Content Include="App\tsconfig.json" />
     <None Remove="$(SpaRoot)**" />
@@ -65,6 +69,7 @@
     <Content Remove="electron-build\**" />
     <None Remove="dist\**" />
     <Content Remove="dist\**" />
+    <None Include="App\src\lib\Makerverse\actions.ts" />
     <None Include="App\src\lib\workspaces\active-state.ts" />
     <None Include="App\src\lib\workspaces\hardware.js" />
     <None Include="App\src\lib\workspaces\workspace-axis.ts" />
@@ -296,13 +301,13 @@
   <ItemGroup>
     <TypeScriptCompile Include="App\src\api\graphql.tsx" />
     <TypeScriptCompile Include="App\src\components\Login\index.ts" />
-    <TypeScriptCompile Include="App\src\components\Login\TokenValidator.tsx" />
     <TypeScriptCompile Include="App\src\components\Navigation\HeaderBar.tsx" />
     <TypeScriptCompile Include="App\src\components\Navigation\ListMenu.tsx" />
     <TypeScriptCompile Include="App\src\components\Navigation\index.tsx" />
     <TypeScriptCompile Include="App\src\components\Navigation\ListMenuItem.tsx" />
     <TypeScriptCompile Include="App\src\components\Navigation\NotFound.tsx" />
     <TypeScriptCompile Include="App\src\components\Navigation\ProtectedRoute.tsx" />
+    <TypeScriptCompile Include="App\src\components\Navigation\ReconnectRedirect.tsx" />
     <TypeScriptCompile Include="App\src\components\Navigation\SideDrawer.tsx" />
     <TypeScriptCompile Include="App\src\components\Login\CallbackPage.tsx" />
     <TypeScriptCompile Include="App\src\components\Login\LoginPage.tsx" />
@@ -311,12 +316,15 @@
     <TypeScriptCompile Include="App\src\components\Navigation\UserMenu.tsx" />
     <TypeScriptCompile Include="App\src\constants\docs.ts" />
     <TypeScriptCompile Include="App\src\languages.ts" />
+    <TypeScriptCompile Include="App\src\lib\Makerverse\apollo.ts" />
     <TypeScriptCompile Include="App\src\lib\Makerverse\Hooks.ts" />
     <TypeScriptCompile Include="App\src\lib\Makerverse\index.ts" />
     <TypeScriptCompile Include="App\src\lib\Makerverse\MakerverseContext.ts" />
+    <TypeScriptCompile Include="App\src\lib\Makerverse\reducers.ts" />
+    <TypeScriptCompile Include="App\src\lib\Makerverse\types.ts" />
     <TypeScriptCompile Include="App\src\lib\Makerverse\Workspaces.ts" />
+    <TypeScriptCompile Include="App\src\lib\suspend.ts" />
     <TypeScriptCompile Include="App\src\lib\workspaces\index.ts" />
-    <TypeScriptCompile Include="App\src\lib\workspaces\reducers.ts" />
     <TypeScriptCompile Include="App\src\lib\workspaces\types.ts" />
     <TypeScriptCompile Include="App\src\lib\workspaces\workspace.ts" />
     <TypeScriptCompile Include="App\src\store\redux.ts" />
@@ -324,6 +332,7 @@
     <TypeScriptCompile Include="App\src\views\Home\index.tsx" />
     <TypeScriptCompile Include="App\src\views\index.ts" />
     <TypeScriptCompile Include="App\src\views\MakerverseProvider.tsx" />
+    <TypeScriptCompile Include="App\src\views\ProtectedApp.tsx" />
     <TypeScriptCompile Include="App\src\views\Settings\index.tsx" />
     <TypeScriptCompile Include="App\src\views\WorkspaceCreator\index.tsx" />
     <TypeScriptCompile Include="App\src\views\WorkspaceCreator\Styles.ts" />

@@ -10,8 +10,8 @@ import { Link, Redirect } from 'react-router-dom';
 import { CallbackComponent } from 'redux-oidc';
 import analytics from '../../lib/analytics';
 import {MakerverseContext} from '../../lib/Makerverse';
+import ReconnectRedirect from '../Navigation/ReconnectRedirect';
 import useStyles from './Styles';
-import TokenValidator from './TokenValidator';
 
 interface OwnProps {
   children: React.ReactNode;
@@ -30,6 +30,7 @@ const CallbackPage: FunctionComponent<Props> = (props) => {
   const isLoading = !error && !token;
 
   function handleSuccess(oidc: User) {
+    log.debug('success', oidc);
     setError(undefined);
     analytics.event({
       category: 'interaction',
@@ -64,9 +65,8 @@ const CallbackPage: FunctionComponent<Props> = (props) => {
     }
     if (token) {
       return (
-        <TokenValidator token={token} onError={handleError} >
-          <Redirect to="/" />
-        </TokenValidator>
+        // After login, the session needs to be recreated to change the user.
+        <ReconnectRedirect to="/" />
       );
     }
     return (
