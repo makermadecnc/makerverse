@@ -19,9 +19,10 @@ const UserMenu: FunctionComponent = () => {
   const makerverse = React.useContext(MakerverseContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const session = makerverse.session;
+  const { connection, session } = makerverse;
   const isAuthenticated = !!session;
-  const showUserMenu = isOnline && isAuthenticated;
+  const isConnected = connection.isConnected;
+  const showUserMenu = isOnline && isAuthenticated && isConnected;
   const icon = showUserMenu ? faUser : faUserSlash;
 
   const handleAccountLink = (page: string) => {
@@ -30,6 +31,9 @@ const UserMenu: FunctionComponent = () => {
   };
 
   function renderHeader() {
+    if (!isConnected) {
+      return <Alert severity="error">{t('Cannot communicate with Makerverse.')}</Alert>;
+    }
     if (!isOnline) {
       return <Alert severity="warning">{t('You are offline.')}</Alert>;
     }
@@ -38,6 +42,7 @@ const UserMenu: FunctionComponent = () => {
     }
     return <Alert severity="info">{t('Welcome, {{ username }}', session.user)}</Alert>;
   }
+
 
   log.trace('online', isOnline, 'authenticated', isAuthenticated);
 

@@ -1,0 +1,16 @@
+fragment ConnectionPort on ConnectionPort {
+    name
+}
+
+query ListPorts {
+    ports: listPorts {
+        ...ConnectionPort
+    }
+}
+
+subscription MonitorPorts {
+    onPortChanged {
+        name
+        isOpen
+    }
+}

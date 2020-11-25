@@ -3,12 +3,14 @@ import { SubscriptionClient } from 'subscriptions-transport-ws';
 import {IOpenWorkShop} from '@openworkshop/lib';
 import { WebSocketLink } from '@apollo/client/link/ws';
 
+export type ConnectionState = 'disconnected' | 'connecting' | 'connected';
+
 export class MakerverseSubscription {
   private _subscriptionClient: SubscriptionClient;
   private _webSocketLink: WebSocketLink;
   private _ows: IOpenWorkShop;
-  private _connected = false;
   private _log: Logger;
+  private _state: ConnectionState = 'disconnected';
 
   constructor(ows: IOpenWorkShop) {
     this._ows = ows;
@@ -23,28 +25,28 @@ export class MakerverseSubscription {
     });
 
     subscriptionClient.onConnected((a) => {
-      this.log.info('[subscription]', 'connected.', a);
-      this.setConnected(true);
+      this.log.debug('[subscription]', 'connected.', a);
+      this.setState('connected');
     });
 
     subscriptionClient.onConnecting((a) => {
-      this.log.info('[subscription]', 'connecting...', a);
-      this.setConnected(false);
+      this.log.debug('[subscription]', 'connecting...', a);
+      this.setState('connecting');
     });
 
     subscriptionClient.onReconnected ((a) => {
-      this.log.info('[subscription]', 're-connected.', a);
-      this.setConnected(true);
+      this.log.debug('[subscription]', 're-connected.', a);
+      this.setState('connected');
     });
 
     subscriptionClient.onReconnecting((a) => {
-      this.log.info('[subscription]', 're-connecting...', a);
-      this.setConnected(false);
+      this.log.debug('[subscription]', 're-connecting...', a);
+      this.setState('connecting');
     });
 
     subscriptionClient.onDisconnected((a) => {
-      this.log.info('[subscription]', 'disconnected.', a);
-      this.setConnected(false);
+      this.log.debug('[subscription]', 'disconnected.', a);
+      this.setState('disconnected');
     });
 
     subscriptionClient.onError((a) => {
@@ -69,13 +71,13 @@ export class MakerverseSubscription {
     }
   }
 
-  private setConnected(connected: boolean): void {
-    if (this._connected === connected) return;
-    this._connected = connected;
-    this.log.info(connected ? 'connected' : 'dis-connected');
+  private setState(state: ConnectionState) {
+    if (this._state === state) return;
+    this._state = state;
+    this.log.info(state);
   }
 
-  public get isConnected() { return this._connected; }
+  public get isConnected() { return this._state === 'connected'; }
 
   public get log(): Logger { return this._log; }
 

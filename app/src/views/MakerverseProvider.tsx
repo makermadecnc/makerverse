@@ -73,7 +73,6 @@ const MakerverseProvider: FunctionComponent<IProps> = (props) => {
   const currentWorkspaceId = path.startsWith(wsPrefix) ? path.substring(wsPrefix.length) : undefined;
 
   // Set up the IMakerverse interface for the .Provider...
-  log.debug('makerveres', connection);
   const makerverse: IMakerverse = { ows, connection, session, workspaces };
 
   usePromise(async () => {

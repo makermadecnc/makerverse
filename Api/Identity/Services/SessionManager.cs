@@ -12,18 +12,17 @@ namespace Makerverse.Api.Identity.Services {
     public ConcurrentDictionary<string, MakerverseSession> Sessions { get; } = new ();
 
     public MakerverseSession LoadSession(string token, MakerverseUser user, params string[] roles) {
-      MakerverseSession newSession = new() {Token = token, User = user, Roles = roles};
-      Sessions.AddOrUpdate(token, newSession, (s, session) => {
-        if (!session.User.Username.Equals(user.Username)) {
-          Log.Error("Token {token} is for {username}, not {requested}", token, session.User.Username, user.Username);
-          throw new ArgumentException("Token mismatch: invalid user.");
-        }
-        Log.Debug("Found existing session for {username}", user.Username);
-        // New roles always take priority.
-        session.Roles = roles;
-        return session;
+      MakerverseSession session = Sessions.GetOrAdd(token, (t) => {
+        Log.Debug("Creating new session for {username}", user.Username);
+        return new MakerverseSession() {Token = t, User = user, Roles = roles};
       });
-      return newSession;
+      if (!session.User.Username.Equals(user.Username)) {
+        Log.Error("Token {token} is for {username}, not {requested}", token, session.User.Username, user.Username);
+        throw new ArgumentException("Token mismatch: invalid user.");
+      }
+      // New roles always take priority.
+      session.Roles = roles;
+      return session;
     }
 
     public SessionManager(ILogger logger) {

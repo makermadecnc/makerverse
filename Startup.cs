@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
+using OpenWorkEngine.OpenController.Controller;
+using OpenWorkEngine.OpenController.Controller.Services;
 using OpenWorkEngine.OpenController.Lib.Api;
 using OpenWorkEngine.OpenController.Lib.Graphql;
 using Serilog;
@@ -28,6 +30,7 @@ namespace Makerverse {
       services.AddSingleton(Log.Logger);
       services.AddSingleton<ConfigFile>();
       services.AddSingleton<SessionManager>();
+      services.AddSingleton<PortManager>();
       services.AddTransient<MakerverseContext>();
       services.AddScoped<IdentityService>();
       services.AddHttpContextAccessor();

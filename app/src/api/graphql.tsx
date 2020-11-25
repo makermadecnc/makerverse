@@ -34,6 +34,7 @@ export type CommandSettings = {
 
 export type ConnectionPort = {
   __typename?: 'ConnectionPort';
+  isOpen: Scalars['Boolean'];
   name: Scalars['String'];
 };
 
@@ -177,6 +178,22 @@ export type MountPointSettings = {
   target: Scalars['String'];
 };
 
+export type Mutation = {
+  __typename?: 'Mutation';
+  openPort: ConnectionPort;
+};
+
+
+export type MutationOpenPortArgs = {
+  name: Scalars['String'];
+};
+
+export type PortStateMessage = {
+  __typename?: 'PortStateMessage';
+  isOpen: Scalars['Boolean'];
+  name: Scalars['ID'];
+};
+
 export type Query = {
   __typename?: 'Query';
   authenticate: MakerverseSession;
@@ -193,6 +210,17 @@ export type QueryAuthenticateArgs = {
 
 export type QueryWorkspaceArgs = {
   idOrPath: Scalars['String'];
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  onPortChanged: PortStateMessage;
+  onPortUpdated: PortStateMessage;
+};
+
+
+export type SubscriptionOnPortUpdatedArgs = {
+  name: Scalars['ID'];
 };
 
 export type WorkspaceSettings = {
@@ -370,7 +398,11 @@ export type ResolversTypes = {
   MakerverseSettings: ResolverTypeWrapper<MakerverseSettings>;
   MakerverseUser: ResolverTypeWrapper<MakerverseUser>;
   MountPointSettings: ResolverTypeWrapper<MountPointSettings>;
+  Mutation: ResolverTypeWrapper<{}>;
+  PortStateMessage: ResolverTypeWrapper<PortStateMessage>;
+  ID: ResolverTypeWrapper<Scalars['ID']>;
   Query: ResolverTypeWrapper<{}>;
+  Subscription: ResolverTypeWrapper<{}>;
   WorkspaceSettings: ResolverTypeWrapper<WorkspaceSettings>;
   ApplyPolicy: ApplyPolicy;
   AxisName: AxisName;
@@ -405,7 +437,11 @@ export type ResolversParentTypes = {
   MakerverseSettings: MakerverseSettings;
   MakerverseUser: MakerverseUser;
   MountPointSettings: MountPointSettings;
+  Mutation: {};
+  PortStateMessage: PortStateMessage;
+  ID: Scalars['ID'];
   Query: {};
+  Subscription: {};
   WorkspaceSettings: WorkspaceSettings;
   Decimal: Scalars['Decimal'];
   Long: Scalars['Long'];
@@ -427,6 +463,7 @@ export type CommandSettingsResolvers<ContextType = any, ParentType extends Resol
 };
 
 export type ConnectionPortResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConnectionPort'] = ResolversParentTypes['ConnectionPort']> = {
+  isOpen: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -571,11 +608,26 @@ export type MountPointSettingsResolvers<ContextType = any, ParentType extends Re
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  openPort: Resolver<ResolversTypes['ConnectionPort'], ParentType, ContextType, RequireFields<MutationOpenPortArgs, 'name'>>;
+};
+
+export type PortStateMessageResolvers<ContextType = any, ParentType extends ResolversParentTypes['PortStateMessage'] = ResolversParentTypes['PortStateMessage']> = {
+  isOpen: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  name: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   authenticate: Resolver<ResolversTypes['MakerverseSession'], ParentType, ContextType, RequireFields<QueryAuthenticateArgs, 'token'>>;
   listPorts: Resolver<Array<ResolversTypes['ConnectionPort']>, ParentType, ContextType>;
   settings: Resolver<ResolversTypes['MakerverseSettings'], ParentType, ContextType>;
   workspace: Resolver<ResolversTypes['WorkspaceSettings'], ParentType, ContextType, RequireFields<QueryWorkspaceArgs, 'idOrPath'>>;
+};
+
+export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
+  onPortChanged: SubscriptionResolver<ResolversTypes['PortStateMessage'], "onPortChanged", ParentType, ContextType>;
+  onPortUpdated: SubscriptionResolver<ResolversTypes['PortStateMessage'], "onPortUpdated", ParentType, ContextType, RequireFields<SubscriptionOnPortUpdatedArgs, 'name'>>;
 };
 
 export type WorkspaceSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['WorkspaceSettings'] = ResolversParentTypes['WorkspaceSettings']> = {
@@ -625,7 +677,10 @@ export type Resolvers<ContextType = any> = {
   MakerverseSettings: MakerverseSettingsResolvers<ContextType>;
   MakerverseUser: MakerverseUserResolvers<ContextType>;
   MountPointSettings: MountPointSettingsResolvers<ContextType>;
+  Mutation: MutationResolvers<ContextType>;
+  PortStateMessage: PortStateMessageResolvers<ContextType>;
   Query: QueryResolvers<ContextType>;
+  Subscription: SubscriptionResolvers<ContextType>;
   WorkspaceSettings: WorkspaceSettingsResolvers<ContextType>;
   Decimal: GraphQLScalarType;
   Long: GraphQLScalarType;
@@ -637,6 +692,33 @@ export type Resolvers<ContextType = any> = {
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
  */
 export type IResolvers<ContextType = any> = Resolvers<ContextType>;
+
+export type ConnectionPortFragment = (
+  { __typename?: 'ConnectionPort' }
+  & Pick<ConnectionPort, 'name'>
+);
+
+export type ListPortsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ListPortsQuery = (
+  { __typename?: 'Query' }
+  & { ports: Array<(
+    { __typename?: 'ConnectionPort' }
+    & ConnectionPortFragment
+  )> }
+);
+
+export type MonitorPortsSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MonitorPortsSubscription = (
+  { __typename?: 'Subscription' }
+  & { onPortChanged: (
+    { __typename?: 'PortStateMessage' }
+    & Pick<PortStateMessage, 'name' | 'isOpen'>
+  ) }
+);
 
 export type AuthenticateQueryVariables = Exact<{
   token: Scalars['String'];
@@ -837,6 +919,11 @@ export type WorkspaceQuery = (
   ) }
 );
 
+export const ConnectionPortFragmentDoc = gql`
+    fragment ConnectionPort on ConnectionPort {
+  name
+}
+    `;
 export const MakerverseUserMinFragmentDoc = gql`
     fragment MakerverseUserMin on MakerverseUser {
   username
@@ -1056,6 +1143,67 @@ ${EventFragmentDoc}
 ${MakerHubFragmentDoc}
 ${MakerverseUserFullFragmentDoc}
 ${WorkspaceEssentialSettingsFragmentDoc}`;
+export const ListPortsDocument = gql`
+    query ListPorts {
+  ports: listPorts {
+    ...ConnectionPort
+  }
+}
+    ${ConnectionPortFragmentDoc}`;
+
+/**
+ * __useListPortsQuery__
+ *
+ * To run a query within a React component, call `useListPortsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useListPortsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useListPortsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useListPortsQuery(baseOptions?: Apollo.QueryHookOptions<ListPortsQuery, ListPortsQueryVariables>) {
+        return Apollo.useQuery<ListPortsQuery, ListPortsQueryVariables>(ListPortsDocument, baseOptions);
+      }
+export function useListPortsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ListPortsQuery, ListPortsQueryVariables>) {
+          return Apollo.useLazyQuery<ListPortsQuery, ListPortsQueryVariables>(ListPortsDocument, baseOptions);
+        }
+export type ListPortsQueryHookResult = ReturnType<typeof useListPortsQuery>;
+export type ListPortsLazyQueryHookResult = ReturnType<typeof useListPortsLazyQuery>;
+export type ListPortsQueryResult = Apollo.QueryResult<ListPortsQuery, ListPortsQueryVariables>;
+export const MonitorPortsDocument = gql`
+    subscription MonitorPorts {
+  onPortChanged {
+    name
+    isOpen
+  }
+}
+    `;
+
+/**
+ * __useMonitorPortsSubscription__
+ *
+ * To run a query within a React component, call `useMonitorPortsSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useMonitorPortsSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMonitorPortsSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMonitorPortsSubscription(baseOptions?: Apollo.SubscriptionHookOptions<MonitorPortsSubscription, MonitorPortsSubscriptionVariables>) {
+        return Apollo.useSubscription<MonitorPortsSubscription, MonitorPortsSubscriptionVariables>(MonitorPortsDocument, baseOptions);
+      }
+export type MonitorPortsSubscriptionHookResult = ReturnType<typeof useMonitorPortsSubscription>;
+export type MonitorPortsSubscriptionResult = Apollo.SubscriptionResult<MonitorPortsSubscription>;
 export const AuthenticateDocument = gql`
     query Authenticate($token: String!) {
   session: authenticate(token: $token) {

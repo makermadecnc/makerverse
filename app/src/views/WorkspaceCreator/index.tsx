@@ -4,14 +4,20 @@ import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import CustomizeMachine from '@openworkshop/ui/components/MachineProfiles/CustomizeMachine';
 import React, { FunctionComponent } from 'react';
 import { Trans } from 'react-i18next';
+import {useMonitorPortsSubscription} from '../../api/graphql';
 import useStyles from './Styles';
 
 const WorkspaceCreator: FunctionComponent = () => {
   const log = useLogger(WorkspaceCreator);
   const classes = useStyles();
+  const [machine, setMachine] = React.useState<ICustomizedMachine | undefined>(undefined);
+
+  const sub = useMonitorPortsSubscription();
+  log.debug('subscription', sub);
 
   function onCustomized (cust?: ICustomizedMachine) {
-    log.debug('cust', cust);
+    log.trace(cust);
+    setMachine(cust);
   }
 
   return (

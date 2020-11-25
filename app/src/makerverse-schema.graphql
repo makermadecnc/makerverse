@@ -2,6 +2,8 @@
 
 schema {
     query: Query
+    mutation: Mutation
+    subscription: Subscription
 }
 
 type AppUpdates {
@@ -18,6 +20,7 @@ type CommandSettings {
 }
 
 type ConnectionPort {
+    isOpen: Boolean!
     name: String!
 }
 
@@ -145,11 +148,25 @@ type MountPointSettings {
     target: String!
 }
 
+type Mutation {
+    openPort(name: String!): ConnectionPort!
+}
+
+type PortStateMessage {
+    isOpen: Boolean!
+    name: ID!
+}
+
 type Query {
     authenticate(token: String!): MakerverseSession!
     listPorts: [ConnectionPort!]!
     settings: MakerverseSettings!
     workspace(idOrPath: String!): WorkspaceSettings!
+}
+
+type Subscription {
+    onPortChanged: PortStateMessage!
+    onPortUpdated(name: ID!): PortStateMessage!
 }
 
 type WorkspaceSettings {

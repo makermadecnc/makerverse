@@ -4,6 +4,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   root: {},
   header: {
     marginBottom: theme.spacing(2),
+  },
+  formControl: {
+    minWidth: 120,
+    margin: theme.spacing(1),
   }
 }));
 

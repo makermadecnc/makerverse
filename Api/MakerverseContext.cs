@@ -8,6 +8,8 @@ using Makerverse.Api.Settings.Models;
 using Makerverse.Lib;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using OpenWorkEngine.OpenController.Controller;
+using OpenWorkEngine.OpenController.Controller.Services;
 using Serilog;
 
 namespace Makerverse.Api {
@@ -17,6 +19,8 @@ namespace Makerverse.Api {
     public IWebHostEnvironment WebHostEnvironment { get; }
 
     public SessionManager Sessions { get; }
+
+    public PortManager Ports { get; }
 
     public string? Subdomain { get; }
 
@@ -33,8 +37,9 @@ namespace Makerverse.Api {
 
     public void SaveSettings() => _configFile.Save();
 
-    public MakerverseContext(IWebHostEnvironment env, ConfigFile cf, SessionManager sm) {
+    public MakerverseContext(IWebHostEnvironment env, ConfigFile cf, SessionManager sm, PortManager p) {
       Sessions = sm;
+      Ports = p;
       WebHostEnvironment = env;
       Log = cf.Log.ForContext("WebHost", env.WebRootPath);
       _configFile = cf;
