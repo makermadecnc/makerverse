@@ -1,5 +1,3 @@
-using HotChocolate.AspNetCore.Authorization;
-using Makerverse.Api.Identity.Services;
 using Makerverse.Api.Settings.Models;
 using Makerverse.Lib.Graphql;
 using Newtonsoft.Json;
@@ -8,18 +6,27 @@ using Newtonsoft.Json.Linq;
 using OpenWorkEngine.OpenController.MachineProfiles.Enums;
 using OpenWorkEngine.OpenController.MachineProfiles.Interfaces;
 
-namespace Makerverse.Api.Machines.Models {
+namespace Makerverse.Api.Workspaces.Models {
   [AuthorizeMakerverseUser]
-  public class MachineSpecSettings : IMachineSpec, ILoadSettingsObject {
+  public class MachineAxisSettings : IMachineAxis, ILoadSettingsObject {
     [JsonProperty("id")]
-    public string Id { get; set; } = default!;
+    public string? Id { get; set; }
 
-    [JsonProperty("specType")]
+    [JsonProperty("name")]
     [JsonConverter(typeof(StringEnumConverter))]
-    public MachineSpecType SpecType { get; set; }
+    public AxisName Name { get; set; }
 
-    [JsonProperty("value")]
-    public decimal Value { get; set; }
+    [JsonProperty("min")]
+    public decimal Min { get; set; }
+
+    [JsonProperty("max")]
+    public decimal Max { get; set; }
+
+    [JsonProperty("precision")]
+    public decimal Precision { get; set; }
+
+    [JsonProperty("accuracy")]
+    public decimal Accuracy { get; set; }
 
     public void LoadSettings(JObject obj) {
       JsonConvert.PopulateObject(JsonConvert.SerializeObject(obj), this);

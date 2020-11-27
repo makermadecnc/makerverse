@@ -1,6 +1,6 @@
 import React from 'react';
 import AlertList from '@openworkshop/ui/components/Alerts/AlertList';
-import { Alert } from '@material-ui/lab';
+import { Alert } from '@material-ui/core';
 import { Space } from 'components-old/';
 import i18n from 'lib/i18n';
 import analytics from 'lib/analytics';

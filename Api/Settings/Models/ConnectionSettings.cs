@@ -1,6 +1,6 @@
 using HotChocolate.AspNetCore.Authorization;
 using Makerverse.Api.Identity.Services;
-using Makerverse.Api.Machines.Models;
+using Makerverse.Api.Workspaces.Models;
 using Makerverse.Lib.Graphql;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

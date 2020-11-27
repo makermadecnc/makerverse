@@ -1,0 +1,9 @@
+fragment ConnectedPort on ConnectedPort {
+    controllerType
+    machine {
+        ...Machine
+    }
+    status {
+        ...PortIOStatus
+    }
+}

@@ -6,27 +6,15 @@ interface OwnProps {
   icon: React.ReactNode;
   title: string;
   to: string;
-  subtitle?: string;
+  subcomponent?: React.ReactNode;
 }
 
 type Props = OwnProps;
 
 const ListMenuItem: FunctionComponent<Props> = (props) => {
-  const { icon, title, to, subtitle } = props;
+  const { icon, title, to, subcomponent } = props;
   const location = useLocation();
   const selected = location.pathname === to;
-
-  const s = subtitle ? <Typography variant='subtitle2'>{subtitle}</Typography> : null;
-  //
-  // const CustomLink = React.useMemo(
-  //   () =>
-  //     React.forwardRef<HTMLAnchorElement, Props>((linkProps, ref) => (
-  //       <Link ref={ref} to={ to } />
-  //     )),
-  //   [to],
-  // );
-
-  // const CustomLink = (p: unknown) => <Link to={to} {...p} />;
 
   const CustomLink = React.useMemo(() =>
     React.forwardRef<HTMLAnchorElement, Omit<LinkProps, 'to'>>(
@@ -37,7 +25,7 @@ const ListMenuItem: FunctionComponent<Props> = (props) => {
   return (
     <ListItem selected={selected} button component={CustomLink}>
       <ListItemIcon>{icon}</ListItemIcon>
-      <ListItemText primary={<Typography variant='h6'>{title}</Typography>} secondary={s} />
+      <ListItemText primary={<Typography variant='h6'>{title}</Typography>} secondary={subcomponent} />
     </ListItem>
   );
 };

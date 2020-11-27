@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
-import { Alert } from '@material-ui/lab';
+import { Alert } from '@material-ui/core';
 import i18n from 'lib/i18n';
 import analytics from 'lib/analytics';
 

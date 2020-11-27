@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Makerverse.Api.Settings.Models;
+using Makerverse.Api.Workspaces.Models;
 using Makerverse.Lib;
 using Microsoft.AspNetCore.Mvc;
 

@@ -8,6 +8,7 @@ generates:
       - 'typescript-resolvers'
       - 'typescript-operations'
       - 'typescript-react-apollo'
+      - 'typescript-graphql-request'
     config:
       avoidOptionals: true
   ./graphql.schema.json:

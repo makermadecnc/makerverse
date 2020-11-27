@@ -1,4 +1,8 @@
-import { MachineControllerType } from '@openworkshop/lib/api/graphql';
+
+import {
+  MachineControllerType,
+} from 'api/graphql';
+
 import {
   ACTIVE_STATE_ALARM,
   ACTIVE_STATE_CHECK,

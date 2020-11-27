@@ -1,9 +1,5 @@
 import {Logger} from '@openworkshop/lib/utils/logging/Logger';
 import _ from 'lodash';
-import {
-  MachineControllerType,
-  MachinePartType,
-} from '@openworkshop/lib/api/graphql';
 import { IOpenWorkShop } from '@openworkshop/lib';
 import MachineController, {IWorkflow, MachineCommandType, MachineEventType} from '@openworkshop/open-controller/MachineController';
 import api from 'api';
@@ -17,11 +13,14 @@ import {ControllerEventMap, WorkspaceRecord} from './types';
 import WorkspaceAxis from './workspace-axis';
 import { WorkspaceAxisMap} from './types';
 import {
+  MachineControllerType,
+  MachinePartType,
   MachineConnectionFragment,
   MachineFeatureFragment,
   MachineFirmwareFragment,
   MachineCommandFragment,
-  MachinePartFragment, MachineSettingsFragment,
+  MachinePartFragment,
+  MachineSettingsFragment,
 } from 'api/graphql';
 
 class Workspace extends events.EventEmitter {
@@ -84,7 +83,7 @@ class Workspace extends events.EventEmitter {
     return this._record.name;
   }
 
-  get connection(): MachineConnectionFragment {
+  get connection(): MachineConnectionFragment  {
     return this._record.connection;
   }
 
@@ -448,7 +447,7 @@ class Workspace extends events.EventEmitter {
     this._connected = false;
     this.log.debug('Open port with firmware', connection);
     try {
-      await this.controller.openPort(connection);
+      await new Promise((r) => setTimeout(r, 1000));
       return true;
     } catch (e) {
       this._connecting = false;

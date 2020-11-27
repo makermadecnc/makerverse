@@ -1,0 +1,3 @@
+fragment Machine on Machine {
+    machineProfileId
+}

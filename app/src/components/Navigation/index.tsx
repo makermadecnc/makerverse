@@ -18,7 +18,7 @@ const Menus: FunctionComponent<Props> = (props) => {
   return (
     <div className={classes.root}>
       <HeaderBar toggleDrawerOpen={() => setDrawerOpen(!drawerOpen)} />
-      <SideDrawer open={drawerOpen} setOpen={setDrawerOpen} />
+      <SideDrawer isOpen={drawerOpen} setOpen={setDrawerOpen} />
       <main className={classes.content}>
         <div className={classes.toolbar} />
         {props.children}

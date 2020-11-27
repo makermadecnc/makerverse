@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HotChocolate.AspNetCore.Authorization;
 using Makerverse.Api.Identity.Services;
+using Makerverse.Api.Workspaces.Models;
 using Makerverse.Lib.Filesystem;
 using Makerverse.Lib.Graphql;
 using Newtonsoft.Json;

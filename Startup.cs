@@ -14,10 +14,10 @@ using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
-using OpenWorkEngine.OpenController.Controller;
-using OpenWorkEngine.OpenController.Controller.Services;
+using OpenWorkEngine.OpenController.Controllers;
 using OpenWorkEngine.OpenController.Lib.Api;
 using OpenWorkEngine.OpenController.Lib.Graphql;
+using OpenWorkEngine.OpenController.Ports.Services;
 using Serilog;
 
 namespace Makerverse {

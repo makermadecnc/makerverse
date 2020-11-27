@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
-using Makerverse.Api.Machines.Models;
+using Makerverse.Api.Settings.Models;
 using Makerverse.Lib.Filesystem;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenWorkEngine.OpenController.MachineProfiles.Enums;
-using Serilog;
 
-namespace Makerverse.Api.Settings.Models {
+namespace Makerverse.Api.Workspaces.Models {
   public class WorkspaceConfigType : ObjectType<WorkspaceSettings> {
 
   }

@@ -45,7 +45,11 @@
     <Content Remove="$(SpaRoot)**" />
     <Content Include="App\.prettierrc.json" />
     <Content Include="App\package.json" />
-    <Content Include="App\src\api\Controllers\ConnectionPorts.graphql" />
+    <Content Include="App\src\api\Machines\Machine.graphql" />
+    <Content Include="App\src\api\Ports\ConnectedPort.graphql" />
+    <Content Include="App\src\api\Ports\PortConnectionStatus.graphql" />
+    <Content Include="App\src\api\Ports\PortOptions.graphql" />
+    <Content Include="App\src\api\Ports\SystemPorts.graphql" />
     <Content Include="App\src\api\Identity\Authentication.graphql" />
     <Content Include="App\src\api\Identity\MakerverseSession.graphql" />
     <Content Include="App\src\api\Identity\MakerverseUser.graphql" />
@@ -315,6 +319,10 @@
     <TypeScriptCompile Include="App\src\components\Login\Styles.ts" />
     <TypeScriptCompile Include="App\src\components\Navigation\Styles.ts" />
     <TypeScriptCompile Include="App\src\components\Navigation\UserMenu.tsx" />
+    <TypeScriptCompile Include="App\src\components\Ports\OpenMachinePort.tsx" />
+    <TypeScriptCompile Include="App\src\components\Ports\PortSelect.tsx" />
+    <TypeScriptCompile Include="App\src\components\Ports\PortStatus.tsx" />
+    <TypeScriptCompile Include="App\src\components\Ports\Styles.ts" />
     <TypeScriptCompile Include="App\src\constants\docs.ts" />
     <TypeScriptCompile Include="App\src\languages.ts" />
     <TypeScriptCompile Include="App\src\lib\Makerverse\apollo.ts" />
@@ -336,7 +344,6 @@
     <TypeScriptCompile Include="App\src\views\ProtectedApp.tsx" />
     <TypeScriptCompile Include="App\src\views\Settings\index.tsx" />
     <TypeScriptCompile Include="App\src\views\WorkspaceCreator\index.tsx" />
-    <TypeScriptCompile Include="App\src\views\WorkspaceCreator\MachineConnectionCreator.tsx" />
     <TypeScriptCompile Include="App\src\views\WorkspaceCreator\Styles.ts" />
     <TypeScriptCompile Include="App\src\views\Workspace\index.tsx" />
   </ItemGroup>

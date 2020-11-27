@@ -8,8 +8,8 @@ using Makerverse.Api.Settings.Models;
 using Makerverse.Lib;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using OpenWorkEngine.OpenController.Controller;
-using OpenWorkEngine.OpenController.Controller.Services;
+using OpenWorkEngine.OpenController.Controllers;
+using OpenWorkEngine.OpenController.Ports.Services;
 using Serilog;
 
 namespace Makerverse.Api {

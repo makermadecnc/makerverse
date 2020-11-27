@@ -1,6 +1,7 @@
 import { useLogger } from '@openworkshop/lib/utils/logging/UseLogger';
 import React from 'react';
 import {Route, Switch, useLocation } from 'react-router-dom';
+import {usePortStatusSubscription} from '../api/graphql';
 import analytics from '../lib/analytics';
 import settings from '../config/settings';
 import {MakerverseContext} from '../lib/Makerverse';

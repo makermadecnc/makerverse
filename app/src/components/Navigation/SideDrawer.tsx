@@ -5,7 +5,7 @@ import { Drawer } from '@material-ui/core';
 import useStyles from './Styles';
 
 interface OwnProps {
-  open: boolean;
+  isOpen: boolean;
   setOpen: (open: boolean) => void;
 }
 
@@ -13,7 +13,7 @@ type Props = OwnProps;
 
 const SideDrawer: React.FunctionComponent<Props> = (props) => {
   const classes = useStyles();
-  const open = props.open;
+  const isOpen = props.isOpen;
 
   //
   // const toggleDrawer = (open: boolean) => (
@@ -36,17 +36,17 @@ const SideDrawer: React.FunctionComponent<Props> = (props) => {
       <Drawer
         variant='permanent'
         className={clsx(classes.drawer, {
-          [classes.drawerOpen]: open,
-          [classes.drawerClose]: !open,
+          [classes.drawerOpen]: isOpen,
+          [classes.drawerClose]: !isOpen,
         })}
         classes={{
           paper: clsx({
-            [classes.drawerOpen]: open,
-            [classes.drawerClose]: !open,
+            [classes.drawerOpen]: isOpen,
+            [classes.drawerClose]: !isOpen,
           }),
         }}
       >
-        <ListMenu isPermanent={false} />
+        <ListMenu isOpen={isOpen} />
       </Drawer>
     </nav>
   );

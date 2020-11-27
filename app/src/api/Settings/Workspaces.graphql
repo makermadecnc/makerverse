@@ -110,7 +110,7 @@ fragment WorkspaceEssentialSettings on WorkspaceSettings {
 }
 
 query Workspace($idOrPath: String!) {
-    workspace(idOrPath: $idOrPath) {
+    workspace: getWorkspace(idOrPath: $idOrPath) {
         ...WorkspaceFull
     }
 }

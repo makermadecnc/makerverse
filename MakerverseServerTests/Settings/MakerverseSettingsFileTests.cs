@@ -1,7 +1,7 @@
 using System.Linq;
 using FluentAssertions;
-using Makerverse.Api.Machines.Models;
 using Makerverse.Api.Settings.Models;
+using Makerverse.Api.Workspaces.Models;
 using Newtonsoft.Json.Linq;
 using OpenWorkEngine.OpenController.MachineProfiles.Enums;
 using Serilog;

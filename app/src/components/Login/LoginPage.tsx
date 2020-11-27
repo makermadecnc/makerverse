@@ -13,7 +13,6 @@ import {
 import { OpenWorkShop } from '@openworkshop/lib';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import AlertList from '@openworkshop/ui/components/Alerts/AlertList';
-import CardFooter from '@openworkshop/ui/components/Cards/CardFooter';
 import ToolbarCard from '@openworkshop/ui/components/Cards/ToolbarCard';
 import ThreeColumns from '@openworkshop/ui/components/Layout/ThreeColumns';
 import React, { FunctionComponent } from 'react';

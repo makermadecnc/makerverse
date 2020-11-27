@@ -19,9 +19,11 @@ type CommandSettings {
     title: String!
 }
 
-type ConnectionPort {
-    isOpen: Boolean!
-    name: String!
+type ConnectedPort {
+    controllerType: MachineControllerType!
+    machine: Machine!
+    port: SystemPort!
+    status: PortStatus!
 }
 
 type ConnectionSettings {
@@ -44,6 +46,19 @@ type FileSystemSettings {
     programDirectory: String!
 }
 
+type Machine {
+    configuration: MachineConfiguration!
+    machineProfileId: String
+    settings: [MachineSetting!]!
+    state: MachineState!
+}
+
+type MachineAlert {
+    code: String!
+    message: String!
+    name: String!
+}
+
 type MachineAxisSettings {
     accuracy: Decimal!
     id: String
@@ -57,6 +72,12 @@ type MachineCommandSettings {
     id: String!
     name: String!
     value: String!
+}
+
+type MachineConfiguration {
+    boardVersion: MachineVersion!
+    firmwareVersion: MachineVersion!
+    workOffset: MachinePosition!
 }
 
 type MachineFeatureSettings {
@@ -82,7 +103,7 @@ type MachineFirmwareSettings {
 }
 
 type MachinePartSettings {
-    dataBlob: String
+    dataBlob: String!
     description: String
     id: String
     isDefault: Boolean!
@@ -91,6 +112,20 @@ type MachinePartSettings {
     settings: [MachineSettingSettings!]!
     specs: [MachineSpecSettings!]!
     title: String!
+}
+
+type MachinePosition {
+    e: Decimal
+    x: Decimal!
+    y: Decimal
+    z: Decimal
+}
+
+type MachineSetting {
+    key: String!
+    settingType: MachineSettingType!
+    title: String!
+    value: String!
 }
 
 type MachineSettingSettings {
@@ -105,6 +140,20 @@ type MachineSpecSettings {
     id: String!
     specType: MachineSpecType!
     value: Decimal!
+}
+
+type MachineState {
+    alarm: MachineAlert
+    error: MachineAlert
+    machinePosition: MachinePosition!
+    state: ActiveState!
+    workPosition: MachinePosition
+}
+
+type MachineVersion {
+    isValid: Boolean!
+    name: String
+    value: Decimal
 }
 
 type MacroSettings {
@@ -149,24 +198,47 @@ type MountPointSettings {
 }
 
 type Mutation {
-    openPort(name: String!): ConnectionPort!
+    closePort(controllerType: MachineControllerType!, options: SerialPortOptionsInput!, portName: String!): SystemPort!
+    openPort(controllerType: MachineControllerType!, options: SerialPortOptionsInput!, portName: String!): SystemPort!
 }
 
-type PortStateMessage {
+type PortOptions {
+    baudRate: Int!
+    dataBits: Int
+    handshake: Handshake
+    parity: Parity
+    readBufferSize: Int
+    readTimeout: Int
+    rtsEnable: Boolean
+    stopBits: StopBits
+    writeBufferSize: Int
+    writeTimeout: Int
+}
+
+type PortStatus {
+    bytesToRead: Int!
+    bytesToWrite: Int!
     isOpen: Boolean!
-    name: ID!
 }
 
 type Query {
     authenticate(token: String!): MakerverseSession!
-    listPorts: [ConnectionPort!]!
-    settings: MakerverseSettings!
-    workspace(idOrPath: String!): WorkspaceSettings!
+    getPort(portName: String!): SystemPort!
+    getSettings: MakerverseSettings!
+    getWorkspace(idOrPath: String!): WorkspaceSettings!
+    listPorts: [SystemPort!]!
 }
 
 type Subscription {
-    onPortChanged: PortStateMessage!
-    onPortUpdated(name: ID!): PortStateMessage!
+    onMachineConfiguration(portName: String!): ConnectedPort!
+    onMachineState(portName: String!): ConnectedPort!
+    onPortStatus: SystemPort!
+}
+
+type SystemPort {
+    connection: ConnectedPort
+    options: PortOptions!
+    portName: String!
 }
 
 type WorkspaceSettings {
@@ -187,6 +259,18 @@ type WorkspaceSettings {
     preferImperial: Boolean!
 }
 
+enum ActiveState {
+    ALARM
+    CHECK
+    DOOR
+    HOLD
+    HOME
+    IDLE_READY
+    INITIALIZING
+    RUN
+    SLEEP
+}
+
 enum ApplyPolicy {
     AFTER_RESOLVER
     BEFORE_RESOLVER
@@ -198,12 +282,20 @@ enum AxisName {
     Z
 }
 
+enum Handshake {
+    NONE
+    REQUEST_TO_SEND
+    REQUEST_TO_SEND_X_ON_X_OFF
+    X_ON_X_OFF
+}
+
 enum MachineControllerType {
     GRBL
     MARLIN
     MASLOW
     SMOOTHIE
     TINY_G
+    UNKNOWN
 }
 
 enum MachinePartType {
@@ -240,6 +332,34 @@ enum MachineSpecType {
     TIP_SIZE
     WATTS
     WAVE_LENGTH
+}
+
+enum Parity {
+    EVEN
+    MARK
+    NONE
+    ODD
+    SPACE
+}
+
+enum StopBits {
+    NONE
+    ONE
+    ONE_POINT_FIVE
+    TWO
+}
+
+input SerialPortOptionsInput {
+    baudRate: Int!
+    dataBits: Int
+    handshake: Handshake
+    parity: Parity
+    readBufferSize: Int
+    readTimeout: Int
+    rtsEnable: Boolean
+    stopBits: StopBits
+    writeBufferSize: Int
+    writeTimeout: Int
 }
 
 

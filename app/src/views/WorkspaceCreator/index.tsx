@@ -3,19 +3,17 @@ import {ICustomizedMachine} from '@openworkshop/lib/api/Machines/CustomizedMachi
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import CustomizeMachine from '@openworkshop/ui/components/MachineProfiles/CustomizeMachine';
 import React, { FunctionComponent } from 'react';
-import { Trans } from 'react-i18next';
-import {useMonitorPortsSubscription} from '../../api/graphql';
+import { Trans, useTranslation } from 'react-i18next';
+import OpenMachinePort from '../../components/Ports/OpenMachinePort';
 import useStyles from './Styles';
 
 const WorkspaceCreator: FunctionComponent = () => {
   const log = useLogger(WorkspaceCreator);
   const classes = useStyles();
+  const { t } = useTranslation();
   const [machine, setMachine] = React.useState<ICustomizedMachine | undefined>(undefined);
 
-  const sub = useMonitorPortsSubscription();
-  log.debug('subscription', sub);
-
-  function onCustomized (cust?: ICustomizedMachine) {
+  function onCustomized(cust?: ICustomizedMachine) {
     log.trace(cust);
     setMachine(cust);
   }
@@ -25,7 +23,11 @@ const WorkspaceCreator: FunctionComponent = () => {
       <Typography variant="h5" className={classes.header}>
         <Trans>Create Workspace</Trans>
       </Typography>
-      <CustomizeMachine onCustomized={onCustomized} />
+      <CustomizeMachine
+        tip={t('Select a machine, above, so that you may connect to it.')}
+        onCustomized={onCustomized}
+      />
+      {machine && <OpenMachinePort machine={machine} />}
     </React.Fragment>
   );
 };
