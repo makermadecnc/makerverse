@@ -8,7 +8,10 @@ namespace Makerverse.Api.Identity.Graphql {
   [ExtendObjectType(Name = "Query")]
   public class IdentityQuery {
 
-    public Task<MakerverseSession> Authenticate([Service] IdentityService identityService, string token) =>
-      identityService.Authenticate(token);
+    public async Task<MakerverseSession> Authenticate([Service] IdentityService identityService, string token) {
+      MakerverseSession session = await identityService.Authenticate(token);
+      identityService.Log.Debug("[AUTH] session: {session}", session.ToString());
+      return session;
+    }
   }
 }

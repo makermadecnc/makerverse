@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using OpenWorkEngine.OpenController.Controllers;
+using OpenWorkEngine.OpenController.Controllers.Services;
 using OpenWorkEngine.OpenController.Lib.Api;
 using OpenWorkEngine.OpenController.Lib.Graphql;
 using OpenWorkEngine.OpenController.Ports.Services;
@@ -24,12 +25,15 @@ namespace Makerverse {
   public class Startup {
     private const string GraphqlPath = "/api/graphql";
 
+    private static ILogger Log = Serilog.Log.ForContext(typeof(Startup));
+
     // This method gets called by the runtime. Use this method to add services to the container.
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services) {
-      services.AddSingleton(Log.Logger);
+      services.AddSingleton(Serilog.Log.Logger);
       services.AddSingleton<ConfigFile>();
       services.AddSingleton<SessionManager>();
+      services.AddSingleton<ControllerManager>();
       services.AddSingleton<PortManager>();
       services.AddTransient<MakerverseContext>();
       services.AddScoped<IdentityService>();
@@ -54,6 +58,7 @@ namespace Makerverse {
       services.AddHttpResultSerializer<GraphqlHttpResultSerializer>()
               .AddInMemorySubscriptions()
               .AddGraphQLServer()
+              .AddDiagnosticEventListener<GraphqlDiagnosticEventListener>()
               .AddSocketSessionInterceptor<MakerverseSocketSessionInterceptor>()
               .AddHttpRequestInterceptor<MakerverseHttpRequestInterceptor>()
               .AddAuthorization()
@@ -65,7 +70,7 @@ namespace Makerverse {
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
       ConfigFile? sf = app.ApplicationServices.GetService<ConfigFile>();
-      Log.Information("Config File: {sf}", sf);
+      Log.Information("[CONFIG] load filename: {sf}", sf);
 
       if (env.IsDevelopment()) {
         app.UseDeveloperExceptionPage();

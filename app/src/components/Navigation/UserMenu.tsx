@@ -1,5 +1,6 @@
-import {faUser, faUserSlash } from '@fortawesome/free-solid-svg-icons';
+import {faShieldAlt, faUserSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Typography } from '@material-ui/core';
 import {Alert, IconButton, Menu, MenuItem } from '@material-ui/core';
 import { OpenWorkShop } from '@openworkshop/lib';
 import {useNetworkStatus} from '@openworkshop/lib/utils/device';
@@ -23,12 +24,25 @@ const UserMenu: FunctionComponent = () => {
   const isAuthenticated = !!session;
   const isConnected = connection.isConnected;
   const showUserMenu = isOnline && isAuthenticated && isConnected;
-  const icon = showUserMenu ? faUser : faUserSlash;
+  //
+  // const handleAccountLink = (page: string) => {
+  //   history.push(page);
+  //   setAnchorEl(null);
+  // };
 
-  const handleAccountLink = (page: string) => {
-    history.push(page);
-    setAnchorEl(null);
-  };
+  function getIcon() {
+    if (!isConnected) {
+
+    }
+    if (!isOnline) {
+
+    }
+    if (!session) {
+      return faUserSlash;
+    }
+    return faShieldAlt;
+  }
+  const icon = getIcon();
 
   function renderHeader() {
     if (!isConnected) {
@@ -43,6 +57,9 @@ const UserMenu: FunctionComponent = () => {
     return <Alert severity="info">{t('Welcome, {{ username }}', session.user)}</Alert>;
   }
 
+  function renderVersion() {
+    return 'Makerverse v?.?.?';
+  }
 
   log.trace('online', isOnline, 'authenticated', isAuthenticated);
 
@@ -72,8 +89,12 @@ const UserMenu: FunctionComponent = () => {
         open={open}
         onClose={() => setAnchorEl(null)}
       >
-        {renderHeader()}
-        {isAuthenticated && <MenuItem onClick={() => handleAccountLink('/account/manage')}>My account</MenuItem>}
+        <Typography variant="h6">
+          {renderHeader()}
+        </Typography>
+        <Typography variant="subtitle1">
+          {renderVersion()}
+        </Typography>
         <MenuItem
           onClick={() => {
             setAnchorEl(null);

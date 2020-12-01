@@ -74,15 +74,10 @@
     <Content Remove="electron-build\**" />
     <None Remove="dist\**" />
     <Content Remove="dist\**" />
-    <None Include="App\src\lib\Makerverse\actions.ts" />
-    <None Include="App\src\lib\workspaces\active-state.ts" />
-    <None Include="App\src\lib\workspaces\hardware.js" />
-    <None Include="App\src\lib\workspaces\workspace-axis.ts" />
-    <None Include="App\src\lib\workspaces\workspaces.ts" />
-    <None Include="App\src\views\App.tsx" />
-    <None Include="App\src\views\AppCorrupted.jsx" />
     <None Remove="MakerverseServerTests\**" />
     <Content Remove="MakerverseServerTests\**" />
+    <None Remove="logs\**" />
+    <Content Remove="logs\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -92,6 +87,7 @@
     <Compile Remove="electron-build\**" />
     <Compile Remove="dist\**" />
     <Compile Remove="MakerverseServerTests\**" />
+    <Compile Remove="logs\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -101,6 +97,7 @@
     <EmbeddedResource Remove="electron-build\**" />
     <EmbeddedResource Remove="dist\**" />
     <EmbeddedResource Remove="MakerverseServerTests\**" />
+    <EmbeddedResource Remove="logs\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -301,10 +298,11 @@
     <_ContentIncludedByDefault Remove="MakerverseServerTests\obj\project.assets.json" />
     <_ContentIncludedByDefault Remove="MakerverseServerTests\obj\project.packagespec.json" />
     <_ContentIncludedByDefault Remove="App\App\graphql.schema.json" />
+    <_ContentIncludedByDefault Remove="logs\makerverse20201130.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="App\src\api\graphql.tsx" />
+    <TypeScriptCompile Include="App\src\api\graphql.ts" />
     <TypeScriptCompile Include="App\src\components\Login\index.ts" />
     <TypeScriptCompile Include="App\src\components\Navigation\HeaderBar.tsx" />
     <TypeScriptCompile Include="App\src\components\Navigation\ListMenu.tsx" />
@@ -320,6 +318,7 @@
     <TypeScriptCompile Include="App\src\components\Navigation\Styles.ts" />
     <TypeScriptCompile Include="App\src\components\Navigation\UserMenu.tsx" />
     <TypeScriptCompile Include="App\src\components\Ports\OpenMachinePort.tsx" />
+    <TypeScriptCompile Include="App\src\components\Ports\PortConnectionSteps.tsx" />
     <TypeScriptCompile Include="App\src\components\Ports\PortSelect.tsx" />
     <TypeScriptCompile Include="App\src\components\Ports\PortStatus.tsx" />
     <TypeScriptCompile Include="App\src\components\Ports\Styles.ts" />
@@ -336,11 +335,16 @@
     <TypeScriptCompile Include="App\src\lib\workspaces\index.ts" />
     <TypeScriptCompile Include="App\src\lib\workspaces\types.ts" />
     <TypeScriptCompile Include="App\src\lib\workspaces\workspace.ts" />
+    <TypeScriptCompile Include="App\src\providers\index.ts" />
+    <TypeScriptCompile Include="App\src\providers\MakerverseHooks.ts" />
+    <TypeScriptCompile Include="App\src\providers\MakerverseProvider.tsx" />
+    <TypeScriptCompile Include="App\src\providers\SystemPortContext.ts" />
+    <TypeScriptCompile Include="App\src\providers\SystemPortHooks.ts" />
+    <TypeScriptCompile Include="App\src\providers\SystemPortProvider.tsx" />
     <TypeScriptCompile Include="App\src\store\redux.ts" />
     <TypeScriptCompile Include="App\src\views\Docs\index.tsx" />
     <TypeScriptCompile Include="App\src\views\Home\index.tsx" />
     <TypeScriptCompile Include="App\src\views\index.ts" />
-    <TypeScriptCompile Include="App\src\views\MakerverseProvider.tsx" />
     <TypeScriptCompile Include="App\src\views\ProtectedApp.tsx" />
     <TypeScriptCompile Include="App\src\views\Settings\index.tsx" />
     <TypeScriptCompile Include="App\src\views\WorkspaceCreator\index.tsx" />

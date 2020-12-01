@@ -19,7 +19,7 @@ namespace Makerverse.Api.Settings.Models {
     [JsonProperty("tokens")]
     public List<string> Tokens { get; set; } = new List<string>();
 
-    public override string ToString() => Username;
+    public override string ToString() => $"<u:{Username}>";
 
     public void LoadSettings(JObject obj) {
       JsonConvert.PopulateObject(JsonConvert.SerializeObject(obj), this);

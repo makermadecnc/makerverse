@@ -1,7 +1,6 @@
 import {Logger} from '@openworkshop/lib/utils/logging/Logger';
 import _ from 'lodash';
 import { IOpenWorkShop } from '@openworkshop/lib';
-import MachineController, {IWorkflow, MachineCommandType, MachineEventType} from '@openworkshop/open-controller/MachineController';
 import api from 'api';
 import events from 'events';
 import store from 'store';
@@ -23,6 +22,8 @@ import {
   MachineSettingsFragment,
 } from 'api/graphql';
 
+export type MachineCommandType = 'homing';
+
 class Workspace extends events.EventEmitter {
   _record: WorkspaceRecord;
 
@@ -34,7 +35,7 @@ class Workspace extends events.EventEmitter {
 
   activeState: ActiveState;
 
-  _controller = new MachineController();
+  //   _controller = new MachineController();
 
   _metricJogSteps?: number[] = undefined;
 
@@ -312,25 +313,25 @@ class Workspace extends events.EventEmitter {
     this._blockingText = text;
     this.emit('block', text);
   }
-
-  get workflow(): IWorkflow {
-    return this.controller.workflow;
-  }
+  //
+  //   get workflow(): IWorkflow {
+  //     return this.controller.workflow;
+  //   }
 
   get isReady(): boolean {
-    return this.activeState.isReady && this.workflow.state === WORKFLOW_STATE_IDLE;
+    return this.activeState.isReady; // && this.workflow.state === WORKFLOW_STATE_IDLE;
   }
 
   async writeCommands(lines: MachineCommandType[], d = 2000): Promise<void> {
     for (let i = 0; i < lines.length; i++) {
-      await this.controller.command(lines[i]);
+      //       await this.controller.command(lines[i]);
       await new Promise((r) => setTimeout(r, d));
     }
   }
 
   async writeLines(lines: string[], delay = 2000) {
     for (let i = 0; i < lines.length; i++) {
-      await this.controller.writeln(lines[i]);
+      //       await this.controller.writeln(lines[i]);
       await new Promise((r) => setTimeout(r, delay));
     }
   }
@@ -413,9 +414,9 @@ class Workspace extends events.EventEmitter {
     // }
   };
 
-  get controller(): MachineController {
-    return this._controller;
-  }
+  //   get controller(): MachineController {
+  //     return this._controller;
+  //   }
 
   get controllerState(): unknown {
     return this._controllerState;
@@ -464,24 +465,24 @@ class Workspace extends events.EventEmitter {
     this._connecting = false;
     this._connected = false;
     try {
-      await this.controller.closePort(this.connection.port);
+      await new Promise((r) => setTimeout(r, 1000));//this.controller.closePort(this.connection.port);
     } catch (e) {
       this.log.error(e);
     }
   }
 
   addControllerEvents(controllerEvents: ControllerEventMap): void {
-    Object.keys(controllerEvents).forEach((eventName) => {
-      const callback = controllerEvents[eventName];
-      this.controller.addListener(eventName as MachineEventType, callback);
-    });
+    //     Object.keys(controllerEvents).forEach((eventName) => {
+    //       const callback = controllerEvents[eventName];
+    //       this.controller.addListener(eventName as MachineEventType, callback);
+    //     });
   }
 
   removeControllerEvents(controllerEvents: ControllerEventMap): void {
-    Object.keys(controllerEvents).forEach((eventName) => {
-      const callback = controllerEvents[eventName];
-      this.controller.removeListener(eventName as MachineEventType, callback);
-    });
+    //     Object.keys(controllerEvents).forEach((eventName) => {
+    //       const callback = controllerEvents[eventName];
+    //       this.controller.removeListener(eventName as MachineEventType, callback);
+    //     });
   }
 
   // ---------------------------------------------------------------------------------------------

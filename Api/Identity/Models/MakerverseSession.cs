@@ -5,5 +5,7 @@ namespace Makerverse.Api.Settings.Models {
     public MakerverseUser User { get; set; } = default!;
 
     public string[] Roles { get; set; } = default!;
+
+    public override string ToString() => $"{User} <r:{string.Join(',', Roles)}>";
   }
 }

@@ -9,7 +9,7 @@ namespace Makerverse.Api.Settings.Models {
   [AuthorizeMakerverseUser]
   public class ConnectionSettings : ILoadSettingsObject {
     [JsonProperty("port")]
-    public string Port { get; set; } = default!;
+    public string PortName { get; set; } = default!;
 
     [JsonProperty("manufacturer")]
     public string? Manufacturer { get; set; }

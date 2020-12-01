@@ -44,7 +44,7 @@ const ProtectedApp: React.FunctionComponent<IProps> = (props) => {
   }, [loading, data, error]);
 
   if (loading) {
-    log.debug('validating token...');
+    log.debug('[TOKEN]', 'validating', data, error);
     return <Preloader />;
   }
 
@@ -60,6 +60,7 @@ const ProtectedApp: React.FunctionComponent<IProps> = (props) => {
     );
   }
 
+  log.debug('[TOKEN]', 'validated', data);
   return <App currentWorkspaceId={currentWorkspaceId} />;
 };
 

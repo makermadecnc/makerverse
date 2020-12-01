@@ -22,7 +22,7 @@ namespace Makerverse {
     public static ILogger LoadSerilog(string filename) => Log.Logger =
       new LoggerConfiguration()
        .ReadFrom.Configuration(new ConfigurationBuilder().AddJsonFile(filename).Build())
-       .CreateLogger();
+       .CreateLogger().ForContext("App", "MV");
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
       Host.CreateDefaultBuilder(args)

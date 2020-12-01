@@ -2,4 +2,4 @@
 dist/
 *.js
 *.jsx
-graphql.tsx
+graphql.ts

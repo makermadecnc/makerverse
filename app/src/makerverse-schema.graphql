@@ -20,7 +20,9 @@ type CommandSettings {
 }
 
 type ConnectedPort {
-    controllerType: MachineControllerType!
+    createdAt: DateTime!
+    firmwareRequirement: FirmwareRequirement!
+    friendlyName: String!
     machine: Machine!
     port: SystemPort!
     status: PortStatus!
@@ -29,7 +31,7 @@ type ConnectedPort {
 type ConnectionSettings {
     firmware: MachineFirmwareSettings!
     manufacturer: String
-    port: String!
+    portName: String!
 }
 
 type EventSettings {
@@ -44,6 +46,13 @@ type EventSettings {
 type FileSystemSettings {
     mountPoints: [MountPointSettings!]!
     programDirectory: String!
+}
+
+type FirmwareRequirement {
+    controllerType: MachineControllerType!
+    edition: String
+    name: String
+    value: Decimal
 }
 
 type Machine {
@@ -75,9 +84,18 @@ type MachineCommandSettings {
 }
 
 type MachineConfiguration {
-    boardVersion: MachineVersion!
-    firmwareVersion: MachineVersion!
+    firmware: MachineDetectedFirmware!
     workOffset: MachinePosition!
+}
+
+type MachineDetectedFirmware {
+    edition: String
+    friendlyName: String
+    isValid: Boolean!
+    name: String!
+    protocol: String
+    value: Decimal
+    welcomeMessage: String
 }
 
 type MachineFeatureSettings {
@@ -150,12 +168,6 @@ type MachineState {
     workPosition: MachinePosition
 }
 
-type MachineVersion {
-    isValid: Boolean!
-    name: String
-    value: Decimal
-}
-
 type MacroSettings {
     content: String!
     id: String!
@@ -198,8 +210,13 @@ type MountPointSettings {
 }
 
 type Mutation {
-    closePort(controllerType: MachineControllerType!, options: SerialPortOptionsInput!, portName: String!): SystemPort!
-    openPort(controllerType: MachineControllerType!, options: SerialPortOptionsInput!, portName: String!): SystemPort!
+    closePort(portName: String!): SystemPort!
+    openPort(firmware: FirmwareRequirementInput!, friendlyName: String!, options: SerialPortOptionsInput!, portName: String!): SystemPort!
+}
+
+type PortError {
+    message: String!
+    name: String!
 }
 
 type PortOptions {
@@ -218,6 +235,8 @@ type PortOptions {
 type PortStatus {
     bytesToRead: Int!
     bytesToWrite: Int!
+    charactersRead: Int!
+    charactersWritten: Int!
     isOpen: Boolean!
 }
 
@@ -230,15 +249,19 @@ type Query {
 }
 
 type Subscription {
-    onMachineConfiguration(portName: String!): ConnectedPort!
-    onMachineState(portName: String!): ConnectedPort!
+    onMachineConfiguration(portName: String!): MachineConfiguration!
+    onMachineSetting(portName: String!): MachineSetting!
+    onMachineState(portName: String!): MachineState!
+    onPortList: [SystemPort!]!
     onPortStatus: SystemPort!
 }
 
 type SystemPort {
     connection: ConnectedPort
+    error: PortError
     options: PortOptions!
     portName: String!
+    state: PortState!
 }
 
 type WorkspaceSettings {
@@ -342,11 +365,29 @@ enum Parity {
     SPACE
 }
 
+enum PortState {
+    ACTIVE
+    ERROR
+    HAS_DATA
+    HAS_FIRMWARE
+    OPENING
+    READY
+    STARTUP
+    UNKNOWN
+}
+
 enum StopBits {
     NONE
     ONE
     ONE_POINT_FIVE
     TWO
+}
+
+input FirmwareRequirementInput {
+    controllerType: MachineControllerType!
+    edition: String
+    name: String
+    value: Decimal
 }
 
 input SerialPortOptionsInput {
@@ -365,6 +406,9 @@ input SerialPortOptionsInput {
 
 "The built-in `Decimal` scalar type."
 scalar Decimal
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime
 
 "The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
 scalar Long

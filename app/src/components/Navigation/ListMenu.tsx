@@ -57,7 +57,7 @@ const ListMenu: FunctionComponent<Props> = (props) => {
             const route = `/workspaces/${workspace.id}`;
             const icon = <OpenWorkShopIcon style={iconStyle} name={workspace.icon ?? 'xyz'} />;
             const port = data && data.ports ?
-              _.find(data.ports, p => p.portName === workspace.connection.port) : undefined;
+              _.find(data.ports, p => p.portName === workspace.connection.portName) : undefined;
 
             return <ListMenuItem
               key={workspace.id}

@@ -103,8 +103,8 @@ const LoginPage: FunctionComponent<Props> = (props) => {
         title={t('Login to {{ productName }}', settings)}
         footer={footer}
       >
-        <AlertList error={error} />
         <div className={classes.centered}>
+          <AlertList error={error} />
           <Button
             className={classes.actionButton}
             variant='outlined'

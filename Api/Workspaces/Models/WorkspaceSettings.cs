@@ -7,6 +7,7 @@ using Makerverse.Api.Settings.Models;
 using Makerverse.Lib.Filesystem;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OpenWorkEngine.OpenController.Lib.Linq;
 using OpenWorkEngine.OpenController.MachineProfiles.Enums;
 
 namespace Makerverse.Api.Workspaces.Models {
@@ -106,7 +107,9 @@ namespace Makerverse.Api.Workspaces.Models {
           MachineCommandSettings cmd = new();
           cmd.Id = key ?? "";
           cmd.Name = key ?? "";
-          List<string> cmds = arr.Select(t => t as JValue).Where(v => v != null).Select(v => v.Value<string>()).ToList();
+          IEnumerable<string> cmds = arr.Select(t => t as JValue)
+                                         .Select(v => v?.Value<string>())
+                                         .SelectNonNull();
           cmd.Value = string.Join('\n', cmds);
           return cmd;
         }

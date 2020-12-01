@@ -1,8 +1,8 @@
 import {useNetworkStatus} from '@openworkshop/lib/utils/device';
 import React, { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
-import OfflineAlert from '@openworkshop/ui/components/Alerts/OfflineAlert';
 import settings from '../../config/settings';
+import OfflineAlertList from '@openworkshop/ui/components/Alerts/OfflineAlertList';
 
 const Docs: FunctionComponent = () => {
   const isOnline = useNetworkStatus();
@@ -10,7 +10,7 @@ const Docs: FunctionComponent = () => {
   const fs = { width: '100%', height: '100%' };
 
   if (!isOnline) {
-    return <OfflineAlert feature={t('The {{ productName }} documentation', settings)} />;
+    return <OfflineAlertList feature={t('The {{ productName }} documentation', settings)} />;
   }
 
   return (

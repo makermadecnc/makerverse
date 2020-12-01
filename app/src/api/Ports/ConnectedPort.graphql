@@ -1,9 +1,23 @@
-fragment ConnectedPort on ConnectedPort {
+fragment FirmwareRequirement on FirmwareRequirement {
     controllerType
-    machine {
-        ...Machine
+    name
+    edition
+    value
+}
+
+fragment ConnectedPortStatus on ConnectedPort {
+    friendlyName
+    firmwareRequirement {
+        ...FirmwareRequirement
     }
     status {
         ...PortIOStatus
+    }
+}
+
+fragment ConnectedPort on ConnectedPort {
+    ...ConnectedPortStatus
+    machine {
+        ...Machine
     }
 }

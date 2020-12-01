@@ -12,13 +12,8 @@ namespace MakerverseServerTests {
   /// <summary>
   /// CNCjs and early Makerverse file format legacy support.
   /// </summary>
-  public class MakerverseSettingsFileTests {
-    public MakerverseSettingsFileTests(ITestOutputHelper output) {
-      Log.Logger = new LoggerConfiguration()
-                  .MinimumLevel.Debug()
-                  .WriteTo.TestOutput(output)
-                  .CreateLogger();
-    }
+  public class MakerverseSettingsFileTests : TestBase {
+    public MakerverseSettingsFileTests(ITestOutputHelper output) : base(output) { }
 
     private bool ValidateCommand(CommandSettings c) {
       return !string.IsNullOrWhiteSpace(c.Title) && !string.IsNullOrWhiteSpace(c.Id) &&
@@ -35,7 +30,7 @@ namespace MakerverseServerTests {
     }
 
     private bool ValidateConnection(ConnectionSettings c) {
-      return !string.IsNullOrEmpty(c.Port) && ValidateFirmware(c.Firmware);
+      return !string.IsNullOrEmpty(c.PortName) && ValidateFirmware(c.Firmware);
     }
 
     private bool ValidateWorkspace(WorkspaceSettings ws) {

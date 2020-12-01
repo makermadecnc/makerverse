@@ -12,7 +12,7 @@ import {IOpenWorkShop} from '@openworkshop/lib';
 import usePromise from 'react-promise-suspense';
 import theme from '@openworkshop/ui/themes/Makerverse';
 import {MakerverseSubscription} from "./lib/Makerverse/apollo";
-import MakerverseProvider, { IMakerverseConfig } from './views/MakerverseProvider';
+import MakerverseProvider from './providers/MakerverseProvider';
 import auth from './lib/auth';
 import './styles/vendor.styl';
 import './styles/app.styl';

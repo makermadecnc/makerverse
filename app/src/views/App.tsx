@@ -7,7 +7,7 @@ import settings from '../config/settings';
 import {MakerverseContext} from '../lib/Makerverse';
 import { Settings, Home, WorkspaceCreator, Docs, Workspace } from './';
 import Navigation, { NotFound } from 'components/Navigation';
-import {useWorkspace} from './MakerverseProvider';
+import {tryUseWorkspace} from '../providers';
 
 interface IProps {
   currentWorkspaceId?: string;
@@ -17,11 +17,11 @@ const App: React.FunctionComponent<IProps> = (props) => {
   const log = useLogger(App);
   const makerverse = React.useContext(MakerverseContext);
   const workspaceIds = makerverse.workspaces.map(ws => ws.id);
-  const workspace = useWorkspace(props.currentWorkspaceId);
+  const workspace = tryUseWorkspace(props.currentWorkspaceId);
   const location = useLocation();
 
   React.useEffect(() => {
-    log.debug('app workspace', location.pathname, 'workspace', workspace?.id);
+    log.trace('app workspace', location.pathname, 'workspace', workspace?.id);
 
     if (workspace) {
       document.title = `${workspace.name} | ${settings.productName}`;
