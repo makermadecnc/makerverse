@@ -4,7 +4,7 @@ import React, { FunctionComponent } from 'react';
 import {Redirect, Route, Switch, useLocation, Link } from 'react-router-dom';
 import {OpenWorkShop} from '@openworkshop/lib';
 import {
-  MakerverseEssentialSettingsFragment, MakerverseSessionFragment,
+  MakerverseEssentialSettingsFragment, MakerverseSessionFragment, useWorkspaceChangeSubscription,
 } from '../api/graphql';
 import i18nConfig from '../config/i18n';
 import analytics from '../lib/analytics';
@@ -15,7 +15,7 @@ import i18next from 'i18next';
 import XHR from 'i18next-xhr-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { Workspace } from 'lib/workspaces';
-import {MakerverseSubscription} from '../lib/Makerverse/apollo';
+import {BackendConnection} from '../lib/Makerverse/apollo';
 import {AppState} from '../store/redux';
 import ProtectedApp from '../views/ProtectedApp';
 import { useSelector } from 'react-redux';
@@ -25,12 +25,13 @@ import SystemPortProvider from './SystemPortProvider';
 const workspaceObjects: { [key: string]: Workspace } = {};
 
 interface IProps {
-  connection: MakerverseSubscription;
+  connection: BackendConnection;
 }
 
 const MakerverseProvider: FunctionComponent<IProps> = (props) => {
   const log = useLogger(MakerverseProvider);
   const ows = React.useContext(OpenWorkShop);
+  const onWorkspaceChanged = useWorkspaceChangeSubscription();
   const { connection } = props;
   const location = useLocation();
   const [settings, setSettings] = React.useState<MakerverseEssentialSettingsFragment | undefined>(undefined);
@@ -66,6 +67,29 @@ const MakerverseProvider: FunctionComponent<IProps> = (props) => {
   const path = location.pathname;
   const currentWorkspaceId = path.startsWith(wsPrefix) ? path.substring(wsPrefix.length) : undefined;
 
+  // Apply subscription mutations
+  React.useEffect(() => {
+    if (settings && onWorkspaceChanged.data && onWorkspaceChanged.data.change) {
+      const { workspaceId, workspace } = onWorkspaceChanged.data.change;
+      const workspaces = [...workspaceRecords];
+      const ei = workspaces.findIndex(ws => ws.id === workspaceId);
+      if (workspace) {
+        if (ei >= 0) {
+          workspaceObjects[workspace.settings.id].updateRecord(workspace.settings);
+        } else {
+          log.debug('[WORKSPACE]', 'add', workspaceId, workspace);
+          workspaces.push(workspace.settings);
+        }
+      } else if(ei >= 0) {
+        workspaces.splice(ei, 1);
+        log.debug('[WORKSPACE]', 'remove', workspaceId, workspace);
+      } else {
+        log.warn('[WORKSPACE]', 'deleted by server; not present on client', workspaceId);
+      }
+      setSettings({ ...settings, workspaces });
+    }
+  }, [workspaceObjects, onWorkspaceChanged]);
+
   // Set up the IMakerverse interface for the .Provider...
   const makerverse: IMakerverse = { ows, connection, session, workspaces };
 
@@ -88,7 +112,11 @@ const MakerverseProvider: FunctionComponent<IProps> = (props) => {
           <Route path='/login' component={LoginPage} />
           <Route path='/callback' component={CallbackPage} />
           {user && <Route path='/' >
-            <ProtectedApp token={user.access_token} onLoaded={onLoaded} currentWorkspaceId={currentWorkspaceId} />
+            <ProtectedApp
+              token={user.access_token}
+              onLoaded={onLoaded}
+              currentWorkspaceId={currentWorkspaceId}
+            />
           </Route>}
           {!user && <Route path='/'>
             <Redirect to="/login" />

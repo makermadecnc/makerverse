@@ -1,0 +1,23 @@
+query Workspace($idOrPath: String!) {
+    workspace: getWorkspace(idOrPath: $idOrPath) {
+        ...WorkspaceFullSettings
+    }
+}
+
+mutation CreateWorkspace($workspaceSettings: WorkspaceSettingsInput!) {
+    workspace: createWorkspace(workspaceSettings: $workspaceSettings) {
+        ...WorkspaceFullSettings
+    }
+}
+
+subscription WorkspaceChange {
+    change: onWorkspacesChanged {
+        workspaceId
+        workspace {
+            settings {
+                ...WorkspaceFullSettings
+            }
+        }
+    }
+}
+

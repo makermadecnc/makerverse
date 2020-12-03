@@ -7,9 +7,9 @@ import {IAlertMessage} from '@openworkshop/ui/components/Alerts/AlertMessage';
 import {faCircle, faDotCircle, faExclamationCircle} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {StepIconProps} from '@material-ui/core/StepIcon';
+import {IMaybeHavePortStatus} from './types';
 
-type Props = {
- port: PortStatusFragment;
+type Props = IMaybeHavePortStatus & {
  requiredFirmware?: MachineFirmwareFragment;
 };
 
@@ -36,7 +36,7 @@ const PortConnectionSteps: React.FunctionComponent<Props> = (props) => {
   const log = useLogger(PortConnectionSteps);
   const { t } = useTranslation();
   const { port } = props;
-  const portState = port.state;
+  const portState = port?.state ?? PortState.Unknown;
   const [lastPortState, setLastPortState] = React.useState(PortState.Unknown);
   const [activeStep, setActiveStep] = React.useState(ConnectionStep.NotOpen);
   const stepsNumbers = [...Array(ConnectionStep.NumSteps).keys()];
@@ -63,7 +63,7 @@ const PortConnectionSteps: React.FunctionComponent<Props> = (props) => {
   }
 
   function getError(step: ConnectionStep): IAlertMessage | undefined {
-    if (step === ConnectionStep.OpenConnection && port.error) return port.error;
+    if (step === ConnectionStep.OpenConnection && port?.error) return port.error;
     return undefined;
   }
 
@@ -83,7 +83,7 @@ const PortConnectionSteps: React.FunctionComponent<Props> = (props) => {
 
   return (
     <Container>
-      <Stepper activeStep={activeStep} >
+      <Stepper activeStep={activeStep} orientation="vertical" >
         {stepsNumbers.map((num) => {
           const error: IAlertMessage | undefined = num <= activeStep ? getError(num) : undefined;
           const showCaption = error || num === activeStep;

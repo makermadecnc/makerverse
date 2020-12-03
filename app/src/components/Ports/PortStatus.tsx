@@ -4,20 +4,22 @@ import {PortState, PortStatusFragment} from '../../api/graphql';
 import {useTranslation} from 'react-i18next';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUsb} from '@fortawesome/free-brands-svg-icons';
-import {faPlug, faExclamationCircle} from '@fortawesome/free-solid-svg-icons';
-import {useTheme} from '@material-ui/core';
+import {faPlug, faExclamationCircle, faMicrochip} from '@fortawesome/free-solid-svg-icons';
+import {useTheme, Typography} from '@material-ui/core';
+import {IMaybeHavePortStatus} from './types';
 
 interface OwnProps {
-  port?: PortStatusFragment;
+  showType?: boolean;
+  showName?: boolean;
 }
 
-type Props = OwnProps;
+type Props = IMaybeHavePortStatus & OwnProps;
 
 const PortStatus: FunctionComponent<Props> = (props) => {
   const { t } = useTranslation();
   const log = useLogger(PortStatus);
   const theme = useTheme();
-  const { port } = props;
+  const { port, showType, showName } = props;
   const portName = port ? port.portName : undefined;
   const st = port ? port.state : undefined;
 
@@ -57,13 +59,21 @@ const PortStatus: FunctionComponent<Props> = (props) => {
     if (!port) return faUsb;
     if (port.state === PortState.Error) return faExclamationCircle;
     if (!port.connection) return faUsb;
+    if (port.state === PortState.Active) return faMicrochip;
     return faPlug;
   }
 
   const color = getPortColor();
+  log.debug('port', portName, 'status', st);
 
   return (
     <React.Fragment >
+      {showType && port && port.connection && <Typography variant="subtitle1">
+        [{port.connection.firmwareRequirement.controllerType}]
+      </Typography>}
+      {showName && port && port.portName && <Typography variant="subtitle2">
+        {port.portName}
+      </Typography>}
       <FontAwesomeIcon color={color} icon={ getPortIcon() } style={{ marginRight: theme.spacing(1) }} />
       {' '}{getPortStatusText()}
     </React.Fragment>

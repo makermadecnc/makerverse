@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using HotChocolate.Subscriptions;
 using Makerverse.Api.Identity.Services;
 using Makerverse.Api.Settings.Models;
+using Makerverse.Api.Workspaces.Services;
 using Makerverse.Lib;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
@@ -22,7 +24,12 @@ namespace Makerverse.Api {
 
     public PortManager Ports { get; }
 
+    public WorkspaceManager Workspaces => _workspaces ??= new WorkspaceManager(this);
+    private WorkspaceManager? _workspaces = null;
+
     public string? Subdomain { get; }
+
+    internal ITopicEventSender Sender { get; }
 
     public string OwsHost { get; }
 
@@ -37,10 +44,13 @@ namespace Makerverse.Api {
 
     public void SaveSettings() => _configFile.Save();
 
-    public MakerverseContext(IWebHostEnvironment env, ConfigFile cf, SessionManager sm, PortManager p) {
+    public MakerverseContext(
+      IWebHostEnvironment env, ConfigFile cf, SessionManager sm, PortManager p, ITopicEventSender sender
+    ) {
       Sessions = sm;
       Ports = p;
       WebHostEnvironment = env;
+      Sender = sender;
       Log = cf.Log.ForContext("WebHost", env.WebRootPath);
       _configFile = cf;
       Settings = _configFile.Data ?? new MakerverseSettings();

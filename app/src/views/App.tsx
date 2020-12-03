@@ -1,13 +1,13 @@
 import { useLogger } from '@openworkshop/lib/utils/logging/UseLogger';
 import React from 'react';
 import {Route, Switch, useLocation } from 'react-router-dom';
-import {usePortStatusSubscription} from '../api/graphql';
 import analytics from '../lib/analytics';
 import settings from '../config/settings';
 import {MakerverseContext} from '../lib/Makerverse';
 import { Settings, Home, WorkspaceCreator, Docs, Workspace } from './';
 import Navigation, { NotFound } from 'components/Navigation';
-import {tryUseWorkspace} from '../providers';
+import BackendDiconnectedModal from '../components/Modals/BackendDiconnectedModal';
+import _ from 'lodash';
 
 interface IProps {
   currentWorkspaceId?: string;
@@ -17,25 +17,39 @@ const App: React.FunctionComponent<IProps> = (props) => {
   const log = useLogger(App);
   const makerverse = React.useContext(MakerverseContext);
   const workspaceIds = makerverse.workspaces.map(ws => ws.id);
-  const workspace = tryUseWorkspace(props.currentWorkspaceId);
+  const { currentWorkspaceId } = props;
+  const workspace = _.find(makerverse.workspaces, ws => ws.id === currentWorkspaceId);
   const location = useLocation();
 
+  function toggleWorkspaceActiveFlags(activeWorkspaceId?: string) {
+    makerverse.workspaces.forEach((ws) => {
+      ws.isActive = Boolean(activeWorkspaceId && ws.id === activeWorkspaceId);
+    });
+  }
+
+  function setPage(title: string, pathname: string) {
+    document.title = title;
+    analytics.trackPage(pathname);
+    toggleWorkspaceActiveFlags(currentWorkspaceId);
+  }
+
   React.useEffect(() => {
-    log.trace('app workspace', location.pathname, 'workspace', workspace?.id);
+    log.verbose('app workspace', location.pathname, 'workspace', workspace?.id);
 
     if (workspace) {
-      document.title = `${workspace.name} | ${settings.productName}`;
-      const parts = [workspace.connection.firmware.controllerType];
-      analytics.trackPage('/' + parts.join('/') + '/');
+      setPage(
+        `${workspace.name} | ${settings.productName}`,
+        '/' + [workspace.connection.firmware.controllerType].join('/') + '/'
+      );
     } else {
-      document.title = settings.productName;
-      analytics.trackPage(location.pathname);
+      setPage(settings.productName, location.pathname);
     }
 
   }, [analytics, log, workspace]);
 
   return (
     <Navigation>
+      <BackendDiconnectedModal />
       <Switch>
         {workspaceIds.map((workspaceId) => {
           return (

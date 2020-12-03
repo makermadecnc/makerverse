@@ -1,0 +1,9 @@
+
+
+fragment MachineConnection on ConnectionSettings {
+    portName
+    manufacturer
+    firmware {
+        ...MachineFirmware
+    }
+}

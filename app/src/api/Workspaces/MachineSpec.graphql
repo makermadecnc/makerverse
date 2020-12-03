@@ -1,0 +1,5 @@
+fragment MachineSpec on MachineSpecSettings {
+    id
+    specType
+    value
+}

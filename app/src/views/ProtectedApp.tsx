@@ -1,21 +1,17 @@
 import { Typography } from '@material-ui/core';
-import {OpenWorkShop} from '@openworkshop/lib';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import {Preloader} from '@openworkshop/ui/components';
 import AlertList from '@openworkshop/ui/components/Alerts/AlertList';
 import ToolbarCard from '@openworkshop/ui/components/Cards/ToolbarCard';
 import ThreeColumns from '@openworkshop/ui/components/Layout/ThreeColumns';
-import { User } from 'oidc-client';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-import {Link, Redirect } from 'react-router-dom';
+import {Link } from 'react-router-dom';
 import {
   MakerverseEssentialSettingsFragment,
   MakerverseSessionFragment,
   useStartupQuery,
 } from '../api/graphql';
-import {AppState} from '../store/redux';
 import App from './App';
 
 interface IProps {

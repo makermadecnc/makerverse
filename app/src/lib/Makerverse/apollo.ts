@@ -1,18 +1,28 @@
 import {Logger} from '@openworkshop/lib/utils/logging/Logger';
+import { EventEmitter } from 'events';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import {IOpenWorkShop} from '@openworkshop/lib';
 import { WebSocketLink } from '@apollo/client/link/ws';
 
-export type ConnectionState = 'disconnected' | 'connecting' | 'connected';
+export enum ConnectionState {
+  Disconnected = -1,
+  Connecting,
+  Connected,
+}
 
-export class MakerverseSubscription {
+export enum BackendConnectionEvent {
+  ConnectionStateChanged,
+}
+
+export class BackendConnection extends EventEmitter {
   private _subscriptionClient: SubscriptionClient;
   private _webSocketLink: WebSocketLink;
   private _ows: IOpenWorkShop;
   private _log: Logger;
-  private _state: ConnectionState = 'disconnected';
+  private _state: ConnectionState = ConnectionState.Disconnected;
 
   constructor(ows: IOpenWorkShop) {
+    super();
     this._ows = ows;
     const url = 'ws://localhost:8000/api/graphql';
     this._log = ows.logManager.getLogger(url);
@@ -26,27 +36,27 @@ export class MakerverseSubscription {
 
     subscriptionClient.onConnected((a) => {
       this.log.debug('[subscription]', 'connected.', a);
-      this.setState('connected');
+      this.setState(ConnectionState.Connected);
     });
 
     subscriptionClient.onConnecting((a) => {
       this.log.debug('[subscription]', 'connecting...', a);
-      this.setState('connecting');
+      this.setState(ConnectionState.Connecting);
     });
 
     subscriptionClient.onReconnected ((a) => {
       this.log.debug('[subscription]', 're-connected.', a);
-      this.setState('connected');
+      this.setState(ConnectionState.Connected);
     });
 
     subscriptionClient.onReconnecting((a) => {
       this.log.debug('[subscription]', 're-connecting...', a);
-      this.setState('connecting');
+      this.setState(ConnectionState.Connecting);
     });
 
     subscriptionClient.onDisconnected((a) => {
       this.log.debug('[subscription]', 'disconnected.', a);
-      this.setState('disconnected');
+      this.setState(ConnectionState.Disconnected);
     });
 
     subscriptionClient.onError((a) => {
@@ -75,9 +85,12 @@ export class MakerverseSubscription {
     if (this._state === state) return;
     this._state = state;
     this.log.info(state);
+    this.emit(BackendConnectionEvent.ConnectionStateChanged.toString(), state);
   }
 
-  public get isConnected() { return this._state === 'connected'; }
+  public get state(): ConnectionState { return this._state; }
+
+  public get isConnected(): boolean { return this._state === ConnectionState.Connected; }
 
   public get log(): Logger { return this._log; }
 

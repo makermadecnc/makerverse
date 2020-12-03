@@ -1,0 +1,9 @@
+
+fragment MachineAxis on MachineAxisSettings {
+    id
+    name
+    min
+    max
+    precision
+    accuracy
+}

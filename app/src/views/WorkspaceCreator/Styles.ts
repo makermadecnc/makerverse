@@ -8,6 +8,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   formControl: {
     minWidth: 120,
     margin: theme.spacing(1),
+  },
+  leftButtonIconAdornment: {
+    marginRight: theme.spacing(2),
   }
 }));
 

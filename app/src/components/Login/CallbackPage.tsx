@@ -6,20 +6,18 @@ import ThreeColumns from '@openworkshop/ui/components/Layout/ThreeColumns';
 import { User } from 'oidc-client';
 import React, { FunctionComponent } from 'react';
 import {Trans, useTranslation } from 'react-i18next';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { CallbackComponent } from 'redux-oidc';
 import analytics from '../../lib/analytics';
 import {MakerverseContext} from '../../lib/Makerverse';
 import ReconnectRedirect from '../Navigation/ReconnectRedirect';
 import useStyles from './Styles';
 
-interface OwnProps {
-  children: React.ReactNode;
-}
+type Props = {
 
-type Props = OwnProps;
+};
 
-const CallbackPage: FunctionComponent<Props> = (props) => {
+const CallbackPage: FunctionComponent<Props> = () => {
   const { t } = useTranslation();
   const log = useLogger(CallbackPage);
   const classes = useStyles();

@@ -1,0 +1,8 @@
+
+fragment MachineSettings on MachineSettingSettings {
+    id
+    title
+    settingType
+    key
+    value
+}

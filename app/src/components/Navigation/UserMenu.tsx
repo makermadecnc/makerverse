@@ -1,48 +1,30 @@
-import {faShieldAlt, faUserSlash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Typography } from '@material-ui/core';
-import {Alert, IconButton, Menu, MenuItem } from '@material-ui/core';
-import { OpenWorkShop } from '@openworkshop/lib';
+import {faUserShield, faUserSecret} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {Alert, IconButton, Menu, MenuItem, Typography} from '@material-ui/core';
+import {OpenWorkShop} from '@openworkshop/lib';
 import {useNetworkStatus} from '@openworkshop/lib/utils/device';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
-import React, { FunctionComponent } from 'react';
-import {Trans, useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import React, {FunctionComponent} from 'react';
+import {Trans, useTranslation} from 'react-i18next';
 import {MakerverseContext} from '../../lib/Makerverse';
-// import {reconnectToBackend} from '../../lib/Makerverse/apollo';
+import {useBackendConnectionState} from '../../providers';
+import {ConnectionState} from '../../lib/Makerverse/apollo';
 
 const UserMenu: FunctionComponent = () => {
   const log = useLogger(UserMenu);
   const { t } = useTranslation();
   const { isOnline } = useNetworkStatus();
-  const history = useHistory();
+  // const history = useHistory();
   const ows = React.useContext(OpenWorkShop);
   const makerverse = React.useContext(MakerverseContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const { connection, session } = makerverse;
+  const connectionState: ConnectionState = useBackendConnectionState();
+  const isConnected = connectionState === ConnectionState.Connected;
+  const { session } = makerverse;
   const isAuthenticated = !!session;
-  const isConnected = connection.isConnected;
-  const showUserMenu = isOnline && isAuthenticated && isConnected;
-  //
-  // const handleAccountLink = (page: string) => {
-  //   history.push(page);
-  //   setAnchorEl(null);
-  // };
 
-  function getIcon() {
-    if (!isConnected) {
-
-    }
-    if (!isOnline) {
-
-    }
-    if (!session) {
-      return faUserSlash;
-    }
-    return faShieldAlt;
-  }
-  const icon = getIcon();
+  const icon = session ? faUserShield : faUserSecret;
 
   function renderHeader() {
     if (!isConnected) {
@@ -58,10 +40,10 @@ const UserMenu: FunctionComponent = () => {
   }
 
   function renderVersion() {
-    return 'Makerverse v?.?.?';
+    return 'Makerverse v1.2.0';
   }
 
-  log.trace('online', isOnline, 'authenticated', isAuthenticated);
+  log.verbose('online', isOnline, 'authenticated', isAuthenticated);
 
   return (
     <div>

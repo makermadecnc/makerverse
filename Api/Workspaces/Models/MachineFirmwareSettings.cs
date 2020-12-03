@@ -1,3 +1,4 @@
+using System;
 using HotChocolate.Types;
 using Makerverse.Api.Settings.Models;
 using Makerverse.Lib.Graphql;
@@ -8,21 +9,18 @@ using OpenWorkEngine.OpenController.MachineProfiles.Enums;
 using OpenWorkEngine.OpenController.MachineProfiles.Interfaces;
 
 namespace Makerverse.Api.Workspaces.Models {
-  public class MachineFirmwareSettingsType : ObjectType<MachineFirmwareSettings> {
-    protected override void Configure(IObjectTypeDescriptor<MachineFirmwareSettings> descriptor) {
-      base.Configure(descriptor);
-
-      descriptor.Field("baudRate").Resolve(r => (decimal)r.Parent<MachineFirmwareSettings>().BaudRate);
-    }
-  }
-
   [AuthorizeMakerverseUser]
   public class MachineFirmwareSettings : IMachineFirmware, ILoadSettingsObject {
     [JsonProperty("id")]
     public string? Id { get; set; }
 
     [JsonProperty("baudRate")]
-    public BaudRate BaudRate { get; set; }
+    public BaudRate? BaudRate { get; set; }
+
+    public int BaudRateValue {
+      get => BaudRate == null ? 0 : (int) BaudRate;
+      set => BaudRate = (BaudRate) value;
+    }
 
     [JsonProperty("controllerType")]
     [JsonConverter(typeof(StringEnumConverter))]

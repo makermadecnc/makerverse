@@ -26,7 +26,7 @@ namespace MakerverseServerTests {
     }
 
     private bool ValidateFirmware(MachineFirmwareSettings fw) {
-      return fw.BaudRate > BaudRate.BR2400 && fw.ControllerType > MachineControllerType.TinyG;
+      return fw.BaudRateValue > 2400 && fw.ControllerType > MachineControllerType.TinyG;
     }
 
     private bool ValidateConnection(ConnectionSettings c) {

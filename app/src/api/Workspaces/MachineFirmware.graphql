@@ -1,0 +1,13 @@
+
+fragment MachineFirmware on MachineFirmwareSettings {
+    id
+    controllerType
+    baudRateValue
+    name
+    edition
+    rtscts
+    requiredVersion
+    suggestedVersion
+    downloadUrl
+    helpUrl
+}

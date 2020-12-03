@@ -13,7 +13,7 @@ namespace Makerverse.Api.Workspaces.Models {
     public string Id { get; set; } = default!;
 
     [JsonProperty("title")]
-    public string Title { get; set; } = default!;
+    public string? Title { get; set; } = default!;
 
     [JsonProperty("settingType")]
     [JsonConverter(typeof(StringEnumConverter))]

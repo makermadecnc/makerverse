@@ -4,7 +4,6 @@ import { IOpenWorkShop } from '@openworkshop/lib';
 import api from 'api';
 import events from 'events';
 import store from 'store';
-import {WORKFLOW_STATE_IDLE} from '../../constants';
 import MachineSettings from '../MachineSettings';
 import ActiveState, {IPos} from './active-state';
 import Hardware from './hardware';
@@ -54,11 +53,11 @@ class Workspace extends events.EventEmitter {
   _log?: Logger;
 
   // record comes from an API response, loaded from .makerverse
-  constructor(ows:IOpenWorkShop , record: WorkspaceRecord) {
+  constructor(ows:IOpenWorkShop, record: WorkspaceRecord) {
     super();
     this._ows = ows;
     this._record = record;
-    this.addControllerEvents(this._controllerEvents);
+    // this.addControllerEvents(this._controllerEvents);
 
     const controllerType = this.firmware.controllerType;
     this.hardware = new Hardware(this, controllerType);
@@ -71,26 +70,12 @@ class Workspace extends events.EventEmitter {
     return this._log;
   }
 
-  // Convenience method which uses the slug (path without prefix slash)
-  get id(): string {
-    return this._record.id;
-  }
-
-  get path(): string {
-    return this._record.path;
-  }
-
-  get name(): string {
-    return this._record.name;
-  }
-
-  get connection(): MachineConnectionFragment  {
-    return this._record.connection;
-  }
-
-  get firmware(): MachineFirmwareFragment {
-    return this.connection.firmware;
-  }
+  // Convenience: pass-through to record
+  get id(): string { return this._record.id; }
+  get path(): string { return this._record.path; }
+  get name(): string { return this._record.name; }
+  get connection(): MachineConnectionFragment { return this._record.connection; }
+  get firmware(): MachineFirmwareFragment { return this.connection.firmware; }
 
   get hasOnboarding(): boolean {
     return this.partSettings.length > 0 || this.firmware.controllerType === MachineControllerType.Maslow;
@@ -171,7 +156,8 @@ class Workspace extends events.EventEmitter {
 
   updateRecord(values: WorkspaceRecord): void {
     this._record = { ...this._record, ...values };
-    void api.workspaces.update(this.id, values);
+    this.log.debug('[WORKSPACE]', 'update', this.id, this._record);
+    // void api.workspaces.update(this.id, values);
   }
   // ---------------------------------------------------------------------------------------------
   // PARTS
@@ -329,7 +315,7 @@ class Workspace extends events.EventEmitter {
     }
   }
 
-  async writeLines(lines: string[], delay = 2000) {
+  async writeLines(lines: string[], delay = 2000): Promise<void> {
     for (let i = 0; i < lines.length; i++) {
       //       await this.controller.writeln(lines[i]);
       await new Promise((r) => setTimeout(r, delay));
@@ -470,20 +456,20 @@ class Workspace extends events.EventEmitter {
       this.log.error(e);
     }
   }
-
-  addControllerEvents(controllerEvents: ControllerEventMap): void {
-    //     Object.keys(controllerEvents).forEach((eventName) => {
-    //       const callback = controllerEvents[eventName];
-    //       this.controller.addListener(eventName as MachineEventType, callback);
-    //     });
-  }
-
-  removeControllerEvents(controllerEvents: ControllerEventMap): void {
-    //     Object.keys(controllerEvents).forEach((eventName) => {
-    //       const callback = controllerEvents[eventName];
-    //       this.controller.removeListener(eventName as MachineEventType, callback);
-    //     });
-  }
+  //
+  // addControllerEvents(controllerEvents: ControllerEventMap): void {
+  //   //     Object.keys(controllerEvents).forEach((eventName) => {
+  //   //       const callback = controllerEvents[eventName];
+  //   //       this.controller.addListener(eventName as MachineEventType, callback);
+  //   //     });
+  // }
+  //
+  // removeControllerEvents(controllerEvents: ControllerEventMap): void {
+  //   //     Object.keys(controllerEvents).forEach((eventName) => {
+  //   //       const callback = controllerEvents[eventName];
+  //   //       this.controller.removeListener(eventName as MachineEventType, callback);
+  //   //     });
+  // }
 
   // ---------------------------------------------------------------------------------------------
   get centerWidgets(): string[] {
@@ -545,7 +531,7 @@ class Workspace extends events.EventEmitter {
     return store.get(`workspace.${this.id}.${settingKey}`, def) as T;
   }
 
-  set<T>(settingKey: string, value: T) {
+  set<T>(settingKey: string, value: T): unknown {
     // Calling store.set() will merge two different arrays into one.
     // Remove the property first to avoid duplication.
     return store.replace(`workspace.${this.id}.${settingKey}`, value);

@@ -30,7 +30,7 @@ function wrapDev<TFunc extends IFunc>(func: TFunc) {
   const version: ISemver = settings.version;
   if (version.branch === 'dev') {
     return (...args: unknown[]) => {
-      log?.trace(func.name, args);
+      log?.verbose(func.name, args);
     };
   }
   return func;

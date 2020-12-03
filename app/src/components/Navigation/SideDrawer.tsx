@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import ListMenu from './ListMenu';
 import { Drawer } from '@material-ui/core';
 import useStyles from './Styles';
+import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 
 interface OwnProps {
   isOpen: boolean;
@@ -12,8 +13,10 @@ interface OwnProps {
 type Props = OwnProps;
 
 const SideDrawer: React.FunctionComponent<Props> = (props) => {
+  const log = useLogger(SideDrawer);
   const classes = useStyles();
   const isOpen = props.isOpen;
+  log.verbose('menus');
 
   //
   // const toggleDrawer = (open: boolean) => (

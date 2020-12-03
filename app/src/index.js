@@ -11,7 +11,7 @@ import { ThemeProvider } from '@material-ui/core';
 import {IOpenWorkShop} from '@openworkshop/lib';
 import usePromise from 'react-promise-suspense';
 import theme from '@openworkshop/ui/themes/Makerverse';
-import {MakerverseSubscription} from "./lib/Makerverse/apollo";
+import {BackendConnection} from "./lib/Makerverse/apollo";
 import MakerverseProvider from './providers/MakerverseProvider';
 import auth from './lib/auth';
 import './styles/vendor.styl';
@@ -93,7 +93,7 @@ const config = {
 };
 
 function apolloLinkCreator(ows) {
-  config.connection = new MakerverseSubscription(ows);
+  config.connection = new BackendConnection(ows);
   return config.connection.webSocketLink;
 }
 
@@ -105,26 +105,28 @@ const MakerverseMain = () => {
   }, [config]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Router >
-        <CssBaseline />
-        <MakerverseProvider connection={config.connection} />
-      </Router>
-    </ThemeProvider>
+    <Router >
+      <CssBaseline />
+      <MakerverseProvider connection={config.connection} />
+    </Router>
   );
 };
 
 ReactDOM.render(
   <Provider store={store}>
-    <OpenWorkShopProvider
-      store={store}
-      client={auth.client}
-      hostnameMap={auth.hosts}
-      i18nMiddleware={[initReactI18next]}
-      clientApolloLinkCreator={apolloLinkCreator}
-    >
-        <MakerverseMain />
-    </OpenWorkShopProvider>
+    <ThemeProvider theme={theme}>
+      <OpenWorkShopProvider
+        store={store}
+        client={auth.client}
+        hostnameMap={auth.hosts}
+        i18nMiddleware={[initReactI18next]}
+        clientApolloLinkCreator={apolloLinkCreator}
+      >
+        <ThemeProvider theme={theme}>
+          <MakerverseMain />
+        </ThemeProvider>
+      </OpenWorkShopProvider>
+    </ThemeProvider>
   </Provider>,
   container,
 );

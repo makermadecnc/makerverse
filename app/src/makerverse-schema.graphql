@@ -108,7 +108,8 @@ type MachineFeatureSettings {
 }
 
 type MachineFirmwareSettings {
-    baudRate: Decimal!
+    baudRate: BaudRate
+    baudRateValue: Int!
     controllerType: MachineControllerType!
     downloadUrl: String
     edition: String
@@ -129,7 +130,7 @@ type MachinePartSettings {
     partType: MachinePartType!
     settings: [MachineSettingSettings!]!
     specs: [MachineSpecSettings!]!
-    title: String!
+    title: String
 }
 
 type MachinePosition {
@@ -140,9 +141,10 @@ type MachinePosition {
 }
 
 type MachineSetting {
+    id: String!
     key: String!
     settingType: MachineSettingType!
-    title: String!
+    title: String
     value: String!
 }
 
@@ -150,7 +152,7 @@ type MachineSettingSettings {
     id: String!
     key: String!
     settingType: MachineSettingType!
-    title: String!
+    title: String
     value: String!
 }
 
@@ -211,7 +213,10 @@ type MountPointSettings {
 
 type Mutation {
     closePort(portName: String!): SystemPort!
+    createWorkspace(workspaceSettings: WorkspaceSettingsInput!): WorkspaceSettings!
+    deleteWorkspace(workspaceId: String!): String!
     openPort(firmware: FirmwareRequirementInput!, friendlyName: String!, options: SerialPortOptionsInput!, portName: String!): SystemPort!
+    updateWorkspace(workspaceSettings: WorkspaceSettingsInput!): WorkspaceSettings!
 }
 
 type PortError {
@@ -246,6 +251,7 @@ type Query {
     getSettings: MakerverseSettings!
     getWorkspace(idOrPath: String!): WorkspaceSettings!
     listPorts: [SystemPort!]!
+    workspace(workspaceId: String, workspaceName: String): WorkspaceSettings!
 }
 
 type Subscription {
@@ -254,6 +260,8 @@ type Subscription {
     onMachineState(portName: String!): MachineState!
     onPortList: [SystemPort!]!
     onPortStatus: SystemPort!
+    onWorkspacesChanged: WorkspaceChange!
+    openWorkspace(workspaceId: String!): Workspace!
 }
 
 type SystemPort {
@@ -262,6 +270,17 @@ type SystemPort {
     options: PortOptions!
     portName: String!
     state: PortState!
+}
+
+type Workspace {
+    settings: WorkspaceSettings!
+    state: WorkspaceState!
+    workspaceId: String!
+}
+
+type WorkspaceChange {
+    workspace: Workspace
+    workspaceId: String!
 }
 
 type WorkspaceSettings {
@@ -303,6 +322,16 @@ enum AxisName {
     X
     Y
     Z
+}
+
+enum BaudRate {
+    BR115200
+    BR19200
+    BR2400
+    BR250000
+    BR38400
+    BR57600
+    BR9600
 }
 
 enum Handshake {
@@ -383,11 +412,87 @@ enum StopBits {
     TWO
 }
 
+enum WorkspaceState {
+    CLOSED
+    OPENED
+    OPENING
+}
+
+input ConnectionSettingsInput {
+    firmware: MachineFirmwareSettingsInput!
+    manufacturer: String
+    portName: String!
+}
+
 input FirmwareRequirementInput {
     controllerType: MachineControllerType!
     edition: String
     name: String
     value: Decimal
+}
+
+input MachineAxisSettingsInput {
+    accuracy: Decimal!
+    id: String
+    max: Decimal!
+    min: Decimal!
+    name: AxisName!
+    precision: Decimal!
+}
+
+input MachineCommandSettingsInput {
+    id: String!
+    name: String!
+    value: String!
+}
+
+input MachineFeatureSettingsInput {
+    description: String
+    disabled: Boolean!
+    icon: String
+    id: String
+    key: String!
+    title: String
+}
+
+input MachineFirmwareSettingsInput {
+    baudRate: BaudRate
+    baudRateValue: Int!
+    controllerType: MachineControllerType!
+    downloadUrl: String
+    edition: String
+    helpUrl: String
+    id: String
+    name: String
+    requiredVersion: Decimal!
+    rtscts: Boolean!
+    suggestedVersion: Decimal!
+}
+
+input MachinePartSettingsInput {
+    dataBlob: String!
+    description: String
+    id: String
+    isDefault: Boolean!
+    optional: Boolean!
+    partType: MachinePartType!
+    settings: [MachineSettingSettingsInput!]!
+    specs: [MachineSpecSettingsInput!]!
+    title: String
+}
+
+input MachineSettingSettingsInput {
+    id: String!
+    key: String!
+    settingType: MachineSettingType!
+    title: String
+    value: String!
+}
+
+input MachineSpecSettingsInput {
+    id: String!
+    specType: MachineSpecType!
+    value: Decimal!
 }
 
 input SerialPortOptionsInput {
@@ -401,6 +506,24 @@ input SerialPortOptionsInput {
     stopBits: StopBits
     writeBufferSize: Int
     writeTimeout: Int
+}
+
+input WorkspaceSettingsInput {
+    autoReconnect: Boolean!
+    axes: [MachineAxisSettingsInput!]!
+    bkColor: String
+    color: String
+    commands: [MachineCommandSettingsInput!]!
+    connection: ConnectionSettingsInput!
+    features: [MachineFeatureSettingsInput!]!
+    icon: String
+    id: String!
+    machineProfileId: String
+    name: String!
+    onboarded: Boolean!
+    parts: [MachinePartSettingsInput!]!
+    path: String!
+    preferImperial: Boolean!
 }
 
 

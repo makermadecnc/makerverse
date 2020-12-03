@@ -19,7 +19,7 @@ namespace Makerverse.Api.Workspaces.Models {
     public MachinePartType PartType { get; set; } = default!;
 
     [JsonProperty("title")]
-    public string Title { get; set; } = default!;
+    public string? Title { get; set; }
 
     [JsonProperty("description")]
     public string? Description { get; set; }

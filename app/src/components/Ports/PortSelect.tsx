@@ -35,7 +35,7 @@ const PortSelect: FunctionComponent<Props> = (props) => {
   const { selectedPortName, setSelectedPortName } = props;
   const port = portCollection.portMap[selectedPortName];
 
-  log.trace(port, selectedPortName, portCollection);
+  log.verbose(port, selectedPortName, portCollection);
 
   function onSelectedPort(e: React.ChangeEvent<{ value: unknown }>) {
     const portName = e.target.value as string;

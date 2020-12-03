@@ -2,6 +2,7 @@ import React, { FunctionComponent } from 'react';
 import {useSystemPorts} from '../../providers/SystemPortHooks';
 import {useWorkspace} from '../../providers';
 import {PortState} from '../../api/graphql';
+import WorkspaceConnector from './WorkspaceConnector';
 
 interface OwnProps {
   id: string;
@@ -16,12 +17,8 @@ const index: FunctionComponent<Props> = (props) => {
   const workspace = useWorkspace(props.id);
   const port = ports.portMap[workspace.connection.portName];
 
-  if (!port) {
-    return <div>Port missing (unplugged).</div>;
-  }
-
-  if (port.state !== PortState.Active) {
-    return <div>{port.state}</div>;
+  if (port?.state !== PortState.Active) {
+    return <WorkspaceConnector workspaceId={props.id} port={port} />;
   }
 
   return (

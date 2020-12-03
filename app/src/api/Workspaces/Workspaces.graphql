@@ -1,0 +1,36 @@
+fragment WorkspaceProps on WorkspaceSettings {
+    id
+    machineProfileId
+    name
+    onboarded
+    path
+    color
+    bkColor
+    icon
+    autoReconnect
+    preferImperial
+}
+
+
+fragment WorkspaceFullSettings on WorkspaceSettings {
+    ...WorkspaceProps
+    connection {
+        ...MachineConnection
+    }
+    axes {
+        ...MachineAxis
+    }
+    features {
+        ...MachineFeature
+    }
+    commands {
+        ...MachineCommand
+    }
+    parts {
+        ...MachinePart
+    }
+}
+
+fragment WorkspaceEssentialSettings on WorkspaceSettings {
+    ...WorkspaceFullSettings
+}

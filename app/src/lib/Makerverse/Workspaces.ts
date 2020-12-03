@@ -1,24 +1,19 @@
-import { IOpenWorkShop } from '@openworkshop/lib';
-import {Logger} from '@openworkshop/lib/utils/logging/Logger';
-import _ from 'lodash';
 import Workspace from 'lib/workspaces/workspace';
-import {WorkspaceRecord} from '../workspaces/types';
-import {IMakerverse} from './MakerverseContext';
 
-export type WorkspaceMap = { [key: string]: Workspace };
+// export type WorkspaceMap = { [key: string]: Workspace };
 
 export default class Workspaces {
-  _makerverse: IMakerverse;
+  // _makerverse: IMakerverse;
 
-  _currentWorkspace?: Workspace = undefined;
-
-  _all: WorkspaceMap = {};
-
-  _log?: Logger = undefined;
-
-  constructor(makerverse: IMakerverse) {
-    this._makerverse = makerverse;
-  }
+  // _currentWorkspace?: Workspace = undefined;
+  //
+  // _all: WorkspaceMap = {};
+  //
+  // _log?: Logger = undefined;
+  //
+  // constructor(makerverse: IMakerverse) {
+  //   this._makerverse = makerverse;
+  // }
   //
   // get all(): WorkspaceMap {
   //   return this._all;

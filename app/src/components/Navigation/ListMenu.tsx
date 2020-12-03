@@ -15,10 +15,11 @@ import { faCogs, faProjectDiagram, faQuestionCircle } from '@fortawesome/free-so
 import { faUsb } from '@fortawesome/free-brands-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import {useListPortsQuery} from '../../api/graphql';
+import {PortStatusFragment, useListPortsQuery} from '../../api/graphql';
 import {MakerverseContext} from '../../lib/Makerverse';
 import PortStatus from '../Ports/PortStatus';
 import ListMenuItem from './ListMenuItem';
+import {useSystemPorts} from '../../providers/SystemPortHooks';
 
 interface OwnProps {
   isOpen: boolean;
@@ -33,13 +34,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const ListMenu: FunctionComponent<Props> = (props) => {
   const log = useLogger(ListMenu);
+  const ports = useSystemPorts();
+  const portList: PortStatusFragment[] = Object.values(ports.portMap);
   const { t } = useTranslation();
   const classes = useStyles();
   const makerverse = React.useContext(MakerverseContext);
   const showWorkspaces = makerverse.workspaces.length > 0;
   const iconStyle = { width: 24, height: 24, marginLeft: -2 };
-
-  const { data, loading, error } = useListPortsQuery();
 
   function renderRouteItem(route: string, text: string, icon: IconProp, t2?: string) {
     const i = <FontAwesomeIcon size='lg' style={iconStyle} icon={icon} />;
@@ -56,8 +57,8 @@ const ListMenu: FunctionComponent<Props> = (props) => {
           {makerverse.workspaces.map((workspace) => {
             const route = `/workspaces/${workspace.id}`;
             const icon = <OpenWorkShopIcon style={iconStyle} name={workspace.icon ?? 'xyz'} />;
-            const port = data && data.ports ?
-              _.find(data.ports, p => p.portName === workspace.connection.portName) : undefined;
+            const port = portList.length > 0 ?
+              _.find(portList, p => p.portName === workspace.connection.portName) : undefined;
 
             return <ListMenuItem
               key={workspace.id}

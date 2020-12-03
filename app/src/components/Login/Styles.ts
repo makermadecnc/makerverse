@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   inputIcon: {
     color: theme.palette.grey.A700,
-    marginRight: 10,
+    marginRight: theme.spacing(2),
   },
   top: {
     fontStyle: 'italic',

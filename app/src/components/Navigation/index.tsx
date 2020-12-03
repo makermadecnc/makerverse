@@ -2,6 +2,7 @@ import React, { FunctionComponent } from 'react';
 import HeaderBar from './HeaderBar';
 import SideDrawer from './SideDrawer';
 import useStyles from './Styles';
+import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 export { default as ProtectedRoute } from './ProtectedRoute';
 export { default as NotFound } from './NotFound';
 
@@ -12,8 +13,11 @@ interface OwnProps {
 type Props = OwnProps;
 
 const Menus: FunctionComponent<Props> = (props) => {
+  const log = useLogger(Menus);
   const classes = useStyles();
   const [drawerOpen, setDrawerOpen] = React.useState(true);
+
+  log.verbose('menus');
 
   return (
     <div className={classes.root}>

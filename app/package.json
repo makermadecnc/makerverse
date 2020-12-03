@@ -18,7 +18,6 @@
     "@material-ui/lab": "^5.0.0-alpha.17",
     "@material-ui/styles": "^5.0.0-alpha.15",
     "@openworkshop/lib": "^1.0.7",
-    "@openworkshop/open-controller": "^1.0.0",
     "@openworkshop/ui": "^1.0.7",
     "@popperjs/core": "^2.5.4",
     "@reduxjs/toolkit": "^1.4.0",

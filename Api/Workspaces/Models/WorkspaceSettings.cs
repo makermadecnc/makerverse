@@ -118,5 +118,7 @@ namespace Makerverse.Api.Workspaces.Models {
 
       Parts = LoadSettingsExtensions.LoadArray<MachinePartSettings>(obj, "parts");
     }
+
+    public override string ToString() => $"<w:{Name}>";
   }
 }
