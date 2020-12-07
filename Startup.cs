@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ElectronNET.API;
 using Makerverse.Api;
 using Makerverse.Api.Identity.Services;
+using Makerverse.Api.Workspaces.Services;
 using Makerverse.Lib;
 using Makerverse.Lib.Graphql;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -34,7 +35,7 @@ namespace Makerverse {
       services.AddSingleton<ConfigFile>();
       services.AddSingleton<SessionManager>();
       services.AddSingleton<ControllerManager>();
-      services.AddSingleton<PortManager>();
+      services.AddSingleton<WorkspaceManager>();
       services.AddTransient<MakerverseContext>();
       services.AddScoped<IdentityService>();
       services.AddHttpContextAccessor();

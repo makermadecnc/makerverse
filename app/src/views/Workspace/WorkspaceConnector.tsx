@@ -2,9 +2,8 @@ import * as React from 'react';
 import ThreeColumns from '@openworkshop/ui/components/Layout/ThreeColumns';
 import ToolbarCard from '@openworkshop/ui/components/Cards/ToolbarCard';
 import PortConnectionSteps from '../../components/Ports/PortConnectionSteps';
-import {useTranslation} from 'react-i18next';
 import PortStatus from '../../components/Ports/PortStatus';
-import {IHaveWorkspaceId} from '../../components/Workspaces/types';
+import {IHaveWorkspaceId} from '../../components/Workspaces';
 import {useWorkspace} from '../../providers';
 import {useSystemPorts} from '../../providers/SystemPortHooks';
 import { Grid } from '@material-ui/core';
@@ -16,15 +15,12 @@ type Props = IHaveWorkspaceId & IMaybeHavePortStatus;
 
 const WorkspaceConnector: React.FunctionComponent<Props> = (props) => {
   const log = useLogger(WorkspaceConnector);
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
+  const { workspaceId } = props;
   const ports = useSystemPorts();
-  const workspace = useWorkspace(props.workspaceId);
+  const workspace = useWorkspace(workspaceId);
   const portName = workspace.connection.portName;
   const port = ports.portMap[portName];
-
-  function onConnectedToMachine() {
-    log.debug('workspace connected');
-  }
 
   return (
     <ThreeColumns size="md" >

@@ -1,5 +1,6 @@
 using FluentAssertions;
 using OpenWorkEngine.OpenController.Controllers.Grbl;
+using OpenWorkEngine.OpenController.Controllers.Services;
 using OpenWorkEngine.OpenController.Controllers.Utils.Parsers;
 using OpenWorkEngine.OpenController.MachineProfiles.Enums;
 using OpenWorkEngine.OpenController.Machines.Models;
@@ -15,11 +16,11 @@ namespace MakerverseServerTests.Controllers {
     [InlineData("[VER:1.1f.20170801:LASER]")]
     [InlineData("[VER:2.0.0.20170522::CTRL0]")]
     public void CanParseGrblVersions(string versionString) {
-      Machine machine = new Machine(Log.Logger);
+      ControlledMachine machine = new ControlledMachine("", null, Log.Logger);
       ParserSet parsers = new ParserSet();
       parsers.AddGrblParsers();
       Log.Logger.Information("Parsers {parsers}", parsers.ToList());
-      parsers.FirmwareParser.PatchMachine(machine, versionString);
+      parsers.FirmwareParser?.UpdateMachine(null, machine, versionString);
 
       MachineDetectedFirmware fw = machine.Configuration.Firmware;
       fw.Should().NotBeNull();
@@ -32,11 +33,11 @@ namespace MakerverseServerTests.Controllers {
     [Theory]
     [InlineData("[VER:1.1g.20200915.MaslowDue:]")]
     public void CanParseMaslowVersions(string versionString) {
-      Machine machine = new Machine(Log.Logger);
+      ControlledMachine machine = new ControlledMachine("", null, Log.Logger);
       ParserSet parsers = new ParserSet();
       parsers.AddGrblParsers();
       Log.Logger.Information("Parsers {parsers}", parsers.ToList());
-      parsers.FirmwareParser.PatchMachine(machine, versionString);
+      parsers.FirmwareParser?.UpdateMachine(null, machine, versionString);
 
       MachineDetectedFirmware fw = machine.Configuration.Firmware;
       fw.Should().NotBeNull();

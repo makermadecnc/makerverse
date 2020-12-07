@@ -1,14 +1,15 @@
-fragment FirmwareRequirement on FirmwareRequirement {
+fragment FirmwareRequirement on IMachineFirmwareRequirement {
     controllerType
     name
     edition
-    value
+    requiredVersion
 }
 
 fragment ConnectedPortStatus on ConnectedPort {
-    friendlyName
-    firmwareRequirement {
-        ...FirmwareRequirement
+    machine {
+        firmwareRequirement {
+            ...FirmwareRequirement
+        }
     }
     status {
         ...PortIOStatus
@@ -16,8 +17,10 @@ fragment ConnectedPortStatus on ConnectedPort {
 }
 
 fragment ConnectedPort on ConnectedPort {
-    ...ConnectedPortStatus
     machine {
-        ...Machine
+        ...ControlledMachine
+    }
+    status {
+        ...PortIOStatus
     }
 }

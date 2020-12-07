@@ -1,27 +1,27 @@
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
-using Makerverse.Api.Workspaces.Messages;
-using Makerverse.Api.Workspaces.Observables;
+using Makerverse.Api.Workspaces.Enums;
+using Makerverse.Api.Workspaces.Models;
+using Makerverse.Api.Workspaces.Services;
 using Makerverse.Lib.Graphql;
+using OpenWorkEngine.OpenController.Controllers.Services;
 using OpenWorkEngine.OpenController.Lib.Graphql;
 
 namespace Makerverse.Api.Workspaces.Graph {
   [ExtendObjectType(Name = "Subscription")]
   public class WorkspaceSubscription {
     // General change method.
-    // Workspace added, updated, or deleted.
-    // Or, state change.
-    [Subscribe]
-    [Topic]
+    // Workspace added, updated, or deleted... see its state.
+    [Subscribe(With = nameof(SubscribeToAllWorkspaceState))]
     [AuthorizeMakerverseUser]
-    public Task<WorkspaceChange> OnWorkspacesChanged([EventMessage] WorkspaceChange change) =>
-      Task.FromResult(change);
+    public Task<Workspace> OnWorkspaceChange([EventMessage] Workspace workspace) => Task.FromResult(workspace);
 
-    // Main connection method to subscribe to a workspace.
-    // If not open, the workspace becomes open (including, port connection).
-    [AuthorizeMakerverseUser]
-    public Task<Workspace> OpenWorkspace([Service] MakerverseContext mv, string workspaceId) =>
-      mv.Workspaces.Open(workspaceId);
+    public ValueTask<IObservable<Workspace>> SubscribeToAllWorkspaceState(
+      [Service] WorkspaceManager workspaceManager,
+      CancellationToken ct
+    ) => workspaceManager.SubscribeToAll(WorkspaceTopic.State, ct);
   }
 }

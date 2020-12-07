@@ -1,6 +1,6 @@
 import {Typography } from '@material-ui/core';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
-import AlertList from '@openworkshop/ui/components/Alerts/AlertList';
+import {AlertList} from '@openworkshop/ui/components/Alerts';
 import ToolbarCard from '@openworkshop/ui/components/Cards/ToolbarCard';
 import ThreeColumns from '@openworkshop/ui/components/Layout/ThreeColumns';
 import { User } from 'oidc-client';
@@ -25,8 +25,6 @@ const CallbackPage: FunctionComponent<Props> = () => {
   const [token, setToken] = React.useState<string | undefined>(undefined);
   const makerverse = React.useContext(MakerverseContext);
 
-  const isLoading = !error && !token;
-
   function handleSuccess(oidc: User) {
     log.debug('success', oidc);
     setError(undefined);
@@ -45,10 +43,6 @@ const CallbackPage: FunctionComponent<Props> = () => {
       action: 'login-error',
       label: `${err.name}: ${err.message}`,
     });
-  }
-
-  function renderError(err: Error) {
-    return <AlertList error={err} />;
   }
 
   const footer = error ? <Typography className={classes.centered} variant="subtitle1">

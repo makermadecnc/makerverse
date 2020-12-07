@@ -84,6 +84,7 @@ namespace Makerverse.Api.Workspaces.Models {
       if (obj["connection"] is JObject conn) {
         Connection.LoadSettings(conn);
       }
+      Connection.MachineProfileId = MachineProfileId;
 
       Features = LoadSettingsExtensions.LoadDictionary(obj, "features", (key, token) => {
         if (!(token is JObject obj)) {

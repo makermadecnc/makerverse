@@ -21,6 +21,32 @@ export type Scalars = {
   Long: any;
 };
 
+export type IMachineFirmwareRequirement = {
+  controllerType: MachineControllerType;
+  edition: Maybe<Scalars['String']>;
+  name: Maybe<Scalars['String']>;
+  requiredVersion: Scalars['Decimal'];
+};
+
+export type ISerialPortOptions = {
+  baudRate: Scalars['Int'];
+  dataBits: Maybe<Scalars['Int']>;
+  handshake: Maybe<Handshake>;
+  parity: Maybe<Parity>;
+  readBufferSize: Maybe<Scalars['Int']>;
+  readTimeout: Maybe<Scalars['Int']>;
+  rtsEnable: Maybe<Scalars['Boolean']>;
+  stopBits: Maybe<StopBits>;
+  writeBufferSize: Maybe<Scalars['Int']>;
+  writeTimeout: Maybe<Scalars['Int']>;
+};
+
+export type AlertError = {
+  __typename?: 'AlertError';
+  message: Scalars['String'];
+  name: Scalars['String'];
+};
+
 export type AppUpdates = {
   __typename?: 'AppUpdates';
   checkForUpdates: Scalars['Boolean'];
@@ -39,9 +65,7 @@ export type CommandSettings = {
 export type ConnectedPort = {
   __typename?: 'ConnectedPort';
   createdAt: Scalars['DateTime'];
-  firmwareRequirement: FirmwareRequirement;
-  friendlyName: Scalars['String'];
-  machine: Machine;
+  machine: ControlledMachine;
   port: SystemPort;
   status: PortStatus;
 };
@@ -49,8 +73,22 @@ export type ConnectedPort = {
 export type ConnectionSettings = {
   __typename?: 'ConnectionSettings';
   firmware: MachineFirmwareSettings;
+  firmwareRequirement: IMachineFirmwareRequirement;
+  machineProfileId: Maybe<Scalars['String']>;
   manufacturer: Maybe<Scalars['String']>;
   portName: Scalars['String'];
+  toSerialPortOptions: ISerialPortOptions;
+};
+
+export type ControlledMachine = {
+  __typename?: 'ControlledMachine';
+  configuration: MachineConfiguration;
+  firmwareRequirement: IMachineFirmwareRequirement;
+  lastTopic: MachineTopic;
+  machineProfileId: Maybe<Scalars['String']>;
+  settings: Array<MachineSetting>;
+  state: MachineState;
+  topicId: Scalars['String'];
 };
 
 export type EventSettings = {
@@ -69,20 +107,12 @@ export type FileSystemSettings = {
   programDirectory: Scalars['String'];
 };
 
-export type FirmwareRequirement = {
+export type FirmwareRequirement = IMachineFirmwareRequirement & {
   __typename?: 'FirmwareRequirement';
   controllerType: MachineControllerType;
   edition: Maybe<Scalars['String']>;
   name: Maybe<Scalars['String']>;
-  value: Maybe<Scalars['Decimal']>;
-};
-
-export type Machine = {
-  __typename?: 'Machine';
-  configuration: MachineConfiguration;
-  machineProfileId: Maybe<Scalars['String']>;
-  settings: Array<MachineSetting>;
-  state: MachineState;
+  requiredVersion: Scalars['Decimal'];
 };
 
 export type MachineAlert = {
@@ -136,7 +166,7 @@ export type MachineFeatureSettings = {
   title: Maybe<Scalars['String']>;
 };
 
-export type MachineFirmwareSettings = {
+export type MachineFirmwareSettings = IMachineFirmwareRequirement & {
   __typename?: 'MachineFirmwareSettings';
   baudRate: Maybe<BaudRate>;
   baudRateValue: Scalars['Int'];
@@ -149,6 +179,7 @@ export type MachineFirmwareSettings = {
   requiredVersion: Scalars['Decimal'];
   rtscts: Scalars['Boolean'];
   suggestedVersion: Scalars['Decimal'];
+  toRequirement: FirmwareRequirement;
 };
 
 export type MachinePartSettings = {
@@ -161,7 +192,7 @@ export type MachinePartSettings = {
   partType: MachinePartType;
   settings: Array<MachineSettingSettings>;
   specs: Array<MachineSpecSettings>;
-  title: Maybe<Scalars['String']>;
+  title: Scalars['String'];
 };
 
 export type MachinePosition = {
@@ -256,10 +287,11 @@ export type MountPointSettings = {
 export type Mutation = {
   __typename?: 'Mutation';
   closePort: SystemPort;
-  createWorkspace: WorkspaceSettings;
-  deleteWorkspace: Scalars['String'];
+  createWorkspace: Workspace;
+  deleteWorkspace: Workspace;
   openPort: SystemPort;
-  updateWorkspace: WorkspaceSettings;
+  openWorkspace: Workspace;
+  updateWorkspace: Workspace;
 };
 
 
@@ -280,9 +312,13 @@ export type MutationDeleteWorkspaceArgs = {
 
 export type MutationOpenPortArgs = {
   firmware: FirmwareRequirementInput;
-  friendlyName: Scalars['String'];
   options: SerialPortOptionsInput;
   portName: Scalars['String'];
+};
+
+
+export type MutationOpenWorkspaceArgs = {
+  workspaceId: Scalars['String'];
 };
 
 
@@ -290,13 +326,7 @@ export type MutationUpdateWorkspaceArgs = {
   workspaceSettings: WorkspaceSettingsInput;
 };
 
-export type PortError = {
-  __typename?: 'PortError';
-  message: Scalars['String'];
-  name: Scalars['String'];
-};
-
-export type PortOptions = {
+export type PortOptions = ISerialPortOptions & {
   __typename?: 'PortOptions';
   baudRate: Scalars['Int'];
   dataBits: Maybe<Scalars['Int']>;
@@ -324,9 +354,9 @@ export type Query = {
   authenticate: MakerverseSession;
   getPort: SystemPort;
   getSettings: MakerverseSettings;
-  getWorkspace: WorkspaceSettings;
+  getWorkspace: Workspace;
   listPorts: Array<SystemPort>;
-  workspace: WorkspaceSettings;
+  listWorkspaces: Array<Workspace>;
 };
 
 
@@ -341,24 +371,16 @@ export type QueryGetPortArgs = {
 
 
 export type QueryGetWorkspaceArgs = {
-  idOrPath: Scalars['String'];
-};
-
-
-export type QueryWorkspaceArgs = {
-  workspaceId: Maybe<Scalars['String']>;
-  workspaceName: Maybe<Scalars['String']>;
+  workspaceId: Scalars['String'];
 };
 
 export type Subscription = {
   __typename?: 'Subscription';
-  onMachineConfiguration: MachineConfiguration;
-  onMachineSetting: MachineSetting;
-  onMachineState: MachineState;
-  onPortList: Array<SystemPort>;
-  onPortStatus: SystemPort;
-  onWorkspacesChanged: WorkspaceChange;
-  openWorkspace: Workspace;
+  onMachineConfiguration: ControlledMachine;
+  onMachineSetting: ControlledMachine;
+  onMachineState: ControlledMachine;
+  onPortChange: SystemPort;
+  onWorkspaceChange: Workspace;
 };
 
 
@@ -376,31 +398,25 @@ export type SubscriptionOnMachineStateArgs = {
   portName: Scalars['String'];
 };
 
-
-export type SubscriptionOpenWorkspaceArgs = {
-  workspaceId: Scalars['String'];
-};
-
 export type SystemPort = {
   __typename?: 'SystemPort';
   connection: Maybe<ConnectedPort>;
-  error: Maybe<PortError>;
+  error: Maybe<AlertError>;
   options: PortOptions;
   portName: Scalars['String'];
   state: PortState;
+  topicId: Scalars['String'];
 };
 
 export type Workspace = {
   __typename?: 'Workspace';
+  error: Maybe<AlertError>;
+  id: Scalars['String'];
+  port: Maybe<SystemPort>;
+  portName: Scalars['String'];
   settings: WorkspaceSettings;
   state: WorkspaceState;
-  workspaceId: Scalars['String'];
-};
-
-export type WorkspaceChange = {
-  __typename?: 'WorkspaceChange';
-  workspace: Maybe<Workspace>;
-  workspaceId: Scalars['String'];
+  topicId: Scalars['String'];
 };
 
 export type WorkspaceSettings = {
@@ -507,6 +523,12 @@ export enum MachineSpecType {
   WaveLength = 'WAVE_LENGTH'
 }
 
+export enum MachineTopic {
+  Configuration = 'CONFIGURATION',
+  Setting = 'SETTING',
+  State = 'STATE'
+}
+
 export enum Parity {
   Even = 'EVEN',
   Mark = 'MARK',
@@ -523,7 +545,7 @@ export enum PortState {
   Opening = 'OPENING',
   Ready = 'READY',
   Startup = 'STARTUP',
-  Unknown = 'UNKNOWN'
+  Unplugged = 'UNPLUGGED'
 }
 
 export enum StopBits {
@@ -534,13 +556,17 @@ export enum StopBits {
 }
 
 export enum WorkspaceState {
+  Active = 'ACTIVE',
   Closed = 'CLOSED',
-  Opened = 'OPENED',
+  Deleted = 'DELETED',
+  Disconnected = 'DISCONNECTED',
+  Error = 'ERROR',
   Opening = 'OPENING'
 }
 
 export type ConnectionSettingsInput = {
   firmware: MachineFirmwareSettingsInput;
+  machineProfileId: Maybe<Scalars['String']>;
   manufacturer: Maybe<Scalars['String']>;
   portName: Scalars['String'];
 };
@@ -549,7 +575,7 @@ export type FirmwareRequirementInput = {
   controllerType: MachineControllerType;
   edition: Maybe<Scalars['String']>;
   name: Maybe<Scalars['String']>;
-  value: Maybe<Scalars['Decimal']>;
+  requiredVersion: Scalars['Decimal'];
 };
 
 export type MachineAxisSettingsInput = {
@@ -599,7 +625,7 @@ export type MachinePartSettingsInput = {
   partType: MachinePartType;
   settings: Array<MachineSettingSettingsInput>;
   specs: Array<MachineSpecSettingsInput>;
-  title: Maybe<Scalars['String']>;
+  title: Scalars['String'];
 };
 
 export type MachineSettingSettingsInput = {
@@ -728,16 +754,20 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  AppUpdates: ResolverTypeWrapper<AppUpdates>;
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
-  CommandSettings: ResolverTypeWrapper<CommandSettings>;
+  IMachineFirmwareRequirement: ResolversTypes['FirmwareRequirement'] | ResolversTypes['MachineFirmwareSettings'];
   String: ResolverTypeWrapper<Scalars['String']>;
+  ISerialPortOptions: ResolversTypes['PortOptions'];
+  Int: ResolverTypeWrapper<Scalars['Int']>;
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  AlertError: ResolverTypeWrapper<AlertError>;
+  AppUpdates: ResolverTypeWrapper<AppUpdates>;
+  CommandSettings: ResolverTypeWrapper<CommandSettings>;
   ConnectedPort: ResolverTypeWrapper<ConnectedPort>;
   ConnectionSettings: ResolverTypeWrapper<ConnectionSettings>;
+  ControlledMachine: ResolverTypeWrapper<ControlledMachine>;
   EventSettings: ResolverTypeWrapper<EventSettings>;
   FileSystemSettings: ResolverTypeWrapper<FileSystemSettings>;
   FirmwareRequirement: ResolverTypeWrapper<FirmwareRequirement>;
-  Machine: ResolverTypeWrapper<Machine>;
   MachineAlert: ResolverTypeWrapper<MachineAlert>;
   MachineAxisSettings: ResolverTypeWrapper<MachineAxisSettings>;
   MachineCommandSettings: ResolverTypeWrapper<MachineCommandSettings>;
@@ -745,7 +775,6 @@ export type ResolversTypes = {
   MachineDetectedFirmware: ResolverTypeWrapper<MachineDetectedFirmware>;
   MachineFeatureSettings: ResolverTypeWrapper<MachineFeatureSettings>;
   MachineFirmwareSettings: ResolverTypeWrapper<MachineFirmwareSettings>;
-  Int: ResolverTypeWrapper<Scalars['Int']>;
   MachinePartSettings: ResolverTypeWrapper<MachinePartSettings>;
   MachinePosition: ResolverTypeWrapper<MachinePosition>;
   MachineSetting: ResolverTypeWrapper<MachineSetting>;
@@ -759,14 +788,12 @@ export type ResolversTypes = {
   MakerverseUser: ResolverTypeWrapper<MakerverseUser>;
   MountPointSettings: ResolverTypeWrapper<MountPointSettings>;
   Mutation: ResolverTypeWrapper<{}>;
-  PortError: ResolverTypeWrapper<PortError>;
   PortOptions: ResolverTypeWrapper<PortOptions>;
   PortStatus: ResolverTypeWrapper<PortStatus>;
   Query: ResolverTypeWrapper<{}>;
   Subscription: ResolverTypeWrapper<{}>;
   SystemPort: ResolverTypeWrapper<SystemPort>;
   Workspace: ResolverTypeWrapper<Workspace>;
-  WorkspaceChange: ResolverTypeWrapper<WorkspaceChange>;
   WorkspaceSettings: ResolverTypeWrapper<WorkspaceSettings>;
   ActiveState: ActiveState;
   ApplyPolicy: ApplyPolicy;
@@ -777,6 +804,7 @@ export type ResolversTypes = {
   MachinePartType: MachinePartType;
   MachineSettingType: MachineSettingType;
   MachineSpecType: MachineSpecType;
+  MachineTopic: MachineTopic;
   Parity: Parity;
   PortState: PortState;
   StopBits: StopBits;
@@ -799,16 +827,20 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  AppUpdates: AppUpdates;
-  Boolean: Scalars['Boolean'];
-  CommandSettings: CommandSettings;
+  IMachineFirmwareRequirement: ResolversParentTypes['FirmwareRequirement'] | ResolversParentTypes['MachineFirmwareSettings'];
   String: Scalars['String'];
+  ISerialPortOptions: ResolversParentTypes['PortOptions'];
+  Int: Scalars['Int'];
+  Boolean: Scalars['Boolean'];
+  AlertError: AlertError;
+  AppUpdates: AppUpdates;
+  CommandSettings: CommandSettings;
   ConnectedPort: ConnectedPort;
   ConnectionSettings: ConnectionSettings;
+  ControlledMachine: ControlledMachine;
   EventSettings: EventSettings;
   FileSystemSettings: FileSystemSettings;
   FirmwareRequirement: FirmwareRequirement;
-  Machine: Machine;
   MachineAlert: MachineAlert;
   MachineAxisSettings: MachineAxisSettings;
   MachineCommandSettings: MachineCommandSettings;
@@ -816,7 +848,6 @@ export type ResolversParentTypes = {
   MachineDetectedFirmware: MachineDetectedFirmware;
   MachineFeatureSettings: MachineFeatureSettings;
   MachineFirmwareSettings: MachineFirmwareSettings;
-  Int: Scalars['Int'];
   MachinePartSettings: MachinePartSettings;
   MachinePosition: MachinePosition;
   MachineSetting: MachineSetting;
@@ -830,14 +861,12 @@ export type ResolversParentTypes = {
   MakerverseUser: MakerverseUser;
   MountPointSettings: MountPointSettings;
   Mutation: {};
-  PortError: PortError;
   PortOptions: PortOptions;
   PortStatus: PortStatus;
   Query: {};
   Subscription: {};
   SystemPort: SystemPort;
   Workspace: Workspace;
-  WorkspaceChange: WorkspaceChange;
   WorkspaceSettings: WorkspaceSettings;
   ConnectionSettingsInput: ConnectionSettingsInput;
   FirmwareRequirementInput: FirmwareRequirementInput;
@@ -853,6 +882,34 @@ export type ResolversParentTypes = {
   Decimal: Scalars['Decimal'];
   DateTime: Scalars['DateTime'];
   Long: Scalars['Long'];
+};
+
+export type IMachineFirmwareRequirementResolvers<ContextType = any, ParentType extends ResolversParentTypes['IMachineFirmwareRequirement'] = ResolversParentTypes['IMachineFirmwareRequirement']> = {
+  __resolveType: TypeResolveFn<'FirmwareRequirement' | 'MachineFirmwareSettings', ParentType, ContextType>;
+  controllerType: Resolver<ResolversTypes['MachineControllerType'], ParentType, ContextType>;
+  edition: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  requiredVersion: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
+};
+
+export type ISerialPortOptionsResolvers<ContextType = any, ParentType extends ResolversParentTypes['ISerialPortOptions'] = ResolversParentTypes['ISerialPortOptions']> = {
+  __resolveType: TypeResolveFn<'PortOptions', ParentType, ContextType>;
+  baudRate: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  dataBits: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  handshake: Resolver<Maybe<ResolversTypes['Handshake']>, ParentType, ContextType>;
+  parity: Resolver<Maybe<ResolversTypes['Parity']>, ParentType, ContextType>;
+  readBufferSize: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  readTimeout: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  rtsEnable: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  stopBits: Resolver<Maybe<ResolversTypes['StopBits']>, ParentType, ContextType>;
+  writeBufferSize: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  writeTimeout: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+};
+
+export type AlertErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['AlertError'] = ResolversParentTypes['AlertError']> = {
+  message: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type AppUpdatesResolvers<ContextType = any, ParentType extends ResolversParentTypes['AppUpdates'] = ResolversParentTypes['AppUpdates']> = {
@@ -872,9 +929,7 @@ export type CommandSettingsResolvers<ContextType = any, ParentType extends Resol
 
 export type ConnectedPortResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConnectedPort'] = ResolversParentTypes['ConnectedPort']> = {
   createdAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
-  firmwareRequirement: Resolver<ResolversTypes['FirmwareRequirement'], ParentType, ContextType>;
-  friendlyName: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  machine: Resolver<ResolversTypes['Machine'], ParentType, ContextType>;
+  machine: Resolver<ResolversTypes['ControlledMachine'], ParentType, ContextType>;
   port: Resolver<ResolversTypes['SystemPort'], ParentType, ContextType>;
   status: Resolver<ResolversTypes['PortStatus'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -882,8 +937,22 @@ export type ConnectedPortResolvers<ContextType = any, ParentType extends Resolve
 
 export type ConnectionSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConnectionSettings'] = ResolversParentTypes['ConnectionSettings']> = {
   firmware: Resolver<ResolversTypes['MachineFirmwareSettings'], ParentType, ContextType>;
+  firmwareRequirement: Resolver<ResolversTypes['IMachineFirmwareRequirement'], ParentType, ContextType>;
+  machineProfileId: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   manufacturer: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   portName: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  toSerialPortOptions: Resolver<ResolversTypes['ISerialPortOptions'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ControlledMachineResolvers<ContextType = any, ParentType extends ResolversParentTypes['ControlledMachine'] = ResolversParentTypes['ControlledMachine']> = {
+  configuration: Resolver<ResolversTypes['MachineConfiguration'], ParentType, ContextType>;
+  firmwareRequirement: Resolver<ResolversTypes['IMachineFirmwareRequirement'], ParentType, ContextType>;
+  lastTopic: Resolver<ResolversTypes['MachineTopic'], ParentType, ContextType>;
+  machineProfileId: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  settings: Resolver<Array<ResolversTypes['MachineSetting']>, ParentType, ContextType>;
+  state: Resolver<ResolversTypes['MachineState'], ParentType, ContextType>;
+  topicId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -907,15 +976,7 @@ export type FirmwareRequirementResolvers<ContextType = any, ParentType extends R
   controllerType: Resolver<ResolversTypes['MachineControllerType'], ParentType, ContextType>;
   edition: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  value: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type MachineResolvers<ContextType = any, ParentType extends ResolversParentTypes['Machine'] = ResolversParentTypes['Machine']> = {
-  configuration: Resolver<ResolversTypes['MachineConfiguration'], ParentType, ContextType>;
-  machineProfileId: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  settings: Resolver<Array<ResolversTypes['MachineSetting']>, ParentType, ContextType>;
-  state: Resolver<ResolversTypes['MachineState'], ParentType, ContextType>;
+  requiredVersion: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -982,6 +1043,7 @@ export type MachineFirmwareSettingsResolvers<ContextType = any, ParentType exten
   requiredVersion: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   rtscts: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   suggestedVersion: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
+  toRequirement: Resolver<ResolversTypes['FirmwareRequirement'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -994,7 +1056,7 @@ export type MachinePartSettingsResolvers<ContextType = any, ParentType extends R
   partType: Resolver<ResolversTypes['MachinePartType'], ParentType, ContextType>;
   settings: Resolver<Array<ResolversTypes['MachineSettingSettings']>, ParentType, ContextType>;
   specs: Resolver<Array<ResolversTypes['MachineSpecSettings']>, ParentType, ContextType>;
-  title: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  title: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1089,16 +1151,11 @@ export type MountPointSettingsResolvers<ContextType = any, ParentType extends Re
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   closePort: Resolver<ResolversTypes['SystemPort'], ParentType, ContextType, RequireFields<MutationClosePortArgs, 'portName'>>;
-  createWorkspace: Resolver<ResolversTypes['WorkspaceSettings'], ParentType, ContextType, RequireFields<MutationCreateWorkspaceArgs, 'workspaceSettings'>>;
-  deleteWorkspace: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationDeleteWorkspaceArgs, 'workspaceId'>>;
-  openPort: Resolver<ResolversTypes['SystemPort'], ParentType, ContextType, RequireFields<MutationOpenPortArgs, 'firmware' | 'friendlyName' | 'options' | 'portName'>>;
-  updateWorkspace: Resolver<ResolversTypes['WorkspaceSettings'], ParentType, ContextType, RequireFields<MutationUpdateWorkspaceArgs, 'workspaceSettings'>>;
-};
-
-export type PortErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['PortError'] = ResolversParentTypes['PortError']> = {
-  message: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+  createWorkspace: Resolver<ResolversTypes['Workspace'], ParentType, ContextType, RequireFields<MutationCreateWorkspaceArgs, 'workspaceSettings'>>;
+  deleteWorkspace: Resolver<ResolversTypes['Workspace'], ParentType, ContextType, RequireFields<MutationDeleteWorkspaceArgs, 'workspaceId'>>;
+  openPort: Resolver<ResolversTypes['SystemPort'], ParentType, ContextType, RequireFields<MutationOpenPortArgs, 'firmware' | 'options' | 'portName'>>;
+  openWorkspace: Resolver<ResolversTypes['Workspace'], ParentType, ContextType, RequireFields<MutationOpenWorkspaceArgs, 'workspaceId'>>;
+  updateWorkspace: Resolver<ResolversTypes['Workspace'], ParentType, ContextType, RequireFields<MutationUpdateWorkspaceArgs, 'workspaceSettings'>>;
 };
 
 export type PortOptionsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PortOptions'] = ResolversParentTypes['PortOptions']> = {
@@ -1128,40 +1185,37 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   authenticate: Resolver<ResolversTypes['MakerverseSession'], ParentType, ContextType, RequireFields<QueryAuthenticateArgs, 'token'>>;
   getPort: Resolver<ResolversTypes['SystemPort'], ParentType, ContextType, RequireFields<QueryGetPortArgs, 'portName'>>;
   getSettings: Resolver<ResolversTypes['MakerverseSettings'], ParentType, ContextType>;
-  getWorkspace: Resolver<ResolversTypes['WorkspaceSettings'], ParentType, ContextType, RequireFields<QueryGetWorkspaceArgs, 'idOrPath'>>;
+  getWorkspace: Resolver<ResolversTypes['Workspace'], ParentType, ContextType, RequireFields<QueryGetWorkspaceArgs, 'workspaceId'>>;
   listPorts: Resolver<Array<ResolversTypes['SystemPort']>, ParentType, ContextType>;
-  workspace: Resolver<ResolversTypes['WorkspaceSettings'], ParentType, ContextType, RequireFields<QueryWorkspaceArgs, never>>;
+  listWorkspaces: Resolver<Array<ResolversTypes['Workspace']>, ParentType, ContextType>;
 };
 
 export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
-  onMachineConfiguration: SubscriptionResolver<ResolversTypes['MachineConfiguration'], "onMachineConfiguration", ParentType, ContextType, RequireFields<SubscriptionOnMachineConfigurationArgs, 'portName'>>;
-  onMachineSetting: SubscriptionResolver<ResolversTypes['MachineSetting'], "onMachineSetting", ParentType, ContextType, RequireFields<SubscriptionOnMachineSettingArgs, 'portName'>>;
-  onMachineState: SubscriptionResolver<ResolversTypes['MachineState'], "onMachineState", ParentType, ContextType, RequireFields<SubscriptionOnMachineStateArgs, 'portName'>>;
-  onPortList: SubscriptionResolver<Array<ResolversTypes['SystemPort']>, "onPortList", ParentType, ContextType>;
-  onPortStatus: SubscriptionResolver<ResolversTypes['SystemPort'], "onPortStatus", ParentType, ContextType>;
-  onWorkspacesChanged: SubscriptionResolver<ResolversTypes['WorkspaceChange'], "onWorkspacesChanged", ParentType, ContextType>;
-  openWorkspace: SubscriptionResolver<ResolversTypes['Workspace'], "openWorkspace", ParentType, ContextType, RequireFields<SubscriptionOpenWorkspaceArgs, 'workspaceId'>>;
+  onMachineConfiguration: SubscriptionResolver<ResolversTypes['ControlledMachine'], "onMachineConfiguration", ParentType, ContextType, RequireFields<SubscriptionOnMachineConfigurationArgs, 'portName'>>;
+  onMachineSetting: SubscriptionResolver<ResolversTypes['ControlledMachine'], "onMachineSetting", ParentType, ContextType, RequireFields<SubscriptionOnMachineSettingArgs, 'portName'>>;
+  onMachineState: SubscriptionResolver<ResolversTypes['ControlledMachine'], "onMachineState", ParentType, ContextType, RequireFields<SubscriptionOnMachineStateArgs, 'portName'>>;
+  onPortChange: SubscriptionResolver<ResolversTypes['SystemPort'], "onPortChange", ParentType, ContextType>;
+  onWorkspaceChange: SubscriptionResolver<ResolversTypes['Workspace'], "onWorkspaceChange", ParentType, ContextType>;
 };
 
 export type SystemPortResolvers<ContextType = any, ParentType extends ResolversParentTypes['SystemPort'] = ResolversParentTypes['SystemPort']> = {
   connection: Resolver<Maybe<ResolversTypes['ConnectedPort']>, ParentType, ContextType>;
-  error: Resolver<Maybe<ResolversTypes['PortError']>, ParentType, ContextType>;
+  error: Resolver<Maybe<ResolversTypes['AlertError']>, ParentType, ContextType>;
   options: Resolver<ResolversTypes['PortOptions'], ParentType, ContextType>;
   portName: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   state: Resolver<ResolversTypes['PortState'], ParentType, ContextType>;
+  topicId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type WorkspaceResolvers<ContextType = any, ParentType extends ResolversParentTypes['Workspace'] = ResolversParentTypes['Workspace']> = {
+  error: Resolver<Maybe<ResolversTypes['AlertError']>, ParentType, ContextType>;
+  id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  port: Resolver<Maybe<ResolversTypes['SystemPort']>, ParentType, ContextType>;
+  portName: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   settings: Resolver<ResolversTypes['WorkspaceSettings'], ParentType, ContextType>;
   state: Resolver<ResolversTypes['WorkspaceState'], ParentType, ContextType>;
-  workspaceId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type WorkspaceChangeResolvers<ContextType = any, ParentType extends ResolversParentTypes['WorkspaceChange'] = ResolversParentTypes['WorkspaceChange']> = {
-  workspace: Resolver<Maybe<ResolversTypes['Workspace']>, ParentType, ContextType>;
-  workspaceId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  topicId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1197,14 +1251,17 @@ export interface LongScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 }
 
 export type Resolvers<ContextType = any> = {
+  IMachineFirmwareRequirement: IMachineFirmwareRequirementResolvers<ContextType>;
+  ISerialPortOptions: ISerialPortOptionsResolvers<ContextType>;
+  AlertError: AlertErrorResolvers<ContextType>;
   AppUpdates: AppUpdatesResolvers<ContextType>;
   CommandSettings: CommandSettingsResolvers<ContextType>;
   ConnectedPort: ConnectedPortResolvers<ContextType>;
   ConnectionSettings: ConnectionSettingsResolvers<ContextType>;
+  ControlledMachine: ControlledMachineResolvers<ContextType>;
   EventSettings: EventSettingsResolvers<ContextType>;
   FileSystemSettings: FileSystemSettingsResolvers<ContextType>;
   FirmwareRequirement: FirmwareRequirementResolvers<ContextType>;
-  Machine: MachineResolvers<ContextType>;
   MachineAlert: MachineAlertResolvers<ContextType>;
   MachineAxisSettings: MachineAxisSettingsResolvers<ContextType>;
   MachineCommandSettings: MachineCommandSettingsResolvers<ContextType>;
@@ -1225,14 +1282,12 @@ export type Resolvers<ContextType = any> = {
   MakerverseUser: MakerverseUserResolvers<ContextType>;
   MountPointSettings: MountPointSettingsResolvers<ContextType>;
   Mutation: MutationResolvers<ContextType>;
-  PortError: PortErrorResolvers<ContextType>;
   PortOptions: PortOptionsResolvers<ContextType>;
   PortStatus: PortStatusResolvers<ContextType>;
   Query: QueryResolvers<ContextType>;
   Subscription: SubscriptionResolvers<ContextType>;
   SystemPort: SystemPortResolvers<ContextType>;
   Workspace: WorkspaceResolvers<ContextType>;
-  WorkspaceChange: WorkspaceChangeResolvers<ContextType>;
   WorkspaceSettings: WorkspaceSettingsResolvers<ContextType>;
   Decimal: GraphQLScalarType;
   DateTime: GraphQLScalarType;
@@ -1279,9 +1334,16 @@ export type MakerverseUserFullFragment = (
   & MakerverseUserMinFragment
 );
 
-export type MachineFragment = (
-  { __typename?: 'Machine' }
-  & Pick<Machine, 'machineProfileId'>
+export type ControlledMachineFragment = (
+  { __typename?: 'ControlledMachine' }
+  & Pick<ControlledMachine, 'machineProfileId'>
+  & { firmwareRequirement: (
+    { __typename?: 'FirmwareRequirement' }
+    & FirmwareRequirement_FirmwareRequirement_Fragment
+  ) | (
+    { __typename?: 'MachineFirmwareSettings' }
+    & FirmwareRequirement_MachineFirmwareSettings_Fragment
+  ) }
 );
 
 export type DetectedFirmwareFragment = (
@@ -1304,23 +1366,38 @@ export type MachineConfigurationSubscriptionVariables = Exact<{
 
 export type MachineConfigurationSubscription = (
   { __typename?: 'Subscription' }
-  & { config: (
-    { __typename?: 'MachineConfiguration' }
-    & MachineConfigFragment
+  & { machine: (
+    { __typename?: 'ControlledMachine' }
+    & { configuration: (
+      { __typename?: 'MachineConfiguration' }
+      & MachineConfigFragment
+    ) }
   ) }
 );
 
-export type FirmwareRequirementFragment = (
+type FirmwareRequirement_FirmwareRequirement_Fragment = (
   { __typename?: 'FirmwareRequirement' }
-  & Pick<FirmwareRequirement, 'controllerType' | 'name' | 'edition' | 'value'>
+  & Pick<FirmwareRequirement, 'controllerType' | 'name' | 'edition' | 'requiredVersion'>
 );
+
+type FirmwareRequirement_MachineFirmwareSettings_Fragment = (
+  { __typename?: 'MachineFirmwareSettings' }
+  & Pick<MachineFirmwareSettings, 'controllerType' | 'name' | 'edition' | 'requiredVersion'>
+);
+
+export type FirmwareRequirementFragment = FirmwareRequirement_FirmwareRequirement_Fragment | FirmwareRequirement_MachineFirmwareSettings_Fragment;
 
 export type ConnectedPortStatusFragment = (
   { __typename?: 'ConnectedPort' }
-  & Pick<ConnectedPort, 'friendlyName'>
-  & { firmwareRequirement: (
-    { __typename?: 'FirmwareRequirement' }
-    & FirmwareRequirementFragment
+  & { machine: (
+    { __typename?: 'ControlledMachine' }
+    & { firmwareRequirement: (
+      { __typename?: 'FirmwareRequirement' }
+      & FirmwareRequirement_FirmwareRequirement_Fragment
+    ) | (
+      { __typename?: 'MachineFirmwareSettings' }
+      & FirmwareRequirement_MachineFirmwareSettings_Fragment
+    ) }
   ), status: (
     { __typename?: 'PortStatus' }
     & PortIoStatusFragment
@@ -1330,10 +1407,12 @@ export type ConnectedPortStatusFragment = (
 export type ConnectedPortFragment = (
   { __typename?: 'ConnectedPort' }
   & { machine: (
-    { __typename?: 'Machine' }
-    & MachineFragment
+    { __typename?: 'ControlledMachine' }
+    & ControlledMachineFragment
+  ), status: (
+    { __typename?: 'PortStatus' }
+    & PortIoStatusFragment
   ) }
-  & ConnectedPortStatusFragment
 );
 
 export type PortIoStatusFragment = (
@@ -1350,8 +1429,8 @@ export type SystemPortFragment = (
   { __typename?: 'SystemPort' }
   & Pick<SystemPort, 'portName' | 'state'>
   & { error: Maybe<(
-    { __typename?: 'PortError' }
-    & Pick<PortError, 'name' | 'message'>
+    { __typename?: 'AlertError' }
+    & AlertErrorFragment
   )>, options: (
     { __typename?: 'PortOptions' }
     & PortOptionsFragment
@@ -1365,8 +1444,8 @@ export type PortStatusFragment = (
   { __typename?: 'SystemPort' }
   & Pick<SystemPort, 'portName' | 'state'>
   & { error: Maybe<(
-    { __typename?: 'PortError' }
-    & Pick<PortError, 'name' | 'message'>
+    { __typename?: 'AlertError' }
+    & AlertErrorFragment
   )>, connection: Maybe<(
     { __typename?: 'ConnectedPort' }
     & ConnectedPortStatusFragment
@@ -1384,10 +1463,10 @@ export type ListPortsQuery = (
   )> }
 );
 
-export type PortStatusSubscriptionVariables = Exact<{ [key: string]: never; }>;
+export type PortChangeSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PortStatusSubscription = (
+export type PortChangeSubscription = (
   { __typename?: 'Subscription' }
   & { port: (
     { __typename?: 'SystemPort' }
@@ -1395,19 +1474,7 @@ export type PortStatusSubscription = (
   ) }
 );
 
-export type PortListSubscriptionVariables = Exact<{ [key: string]: never; }>;
-
-
-export type PortListSubscription = (
-  { __typename?: 'Subscription' }
-  & { ports: Array<(
-    { __typename?: 'SystemPort' }
-    & PortStatusFragment
-  )> }
-);
-
 export type OpenPortMutationVariables = Exact<{
-  friendlyName: Scalars['String'];
   portName: Scalars['String'];
   firmware: FirmwareRequirementInput;
   options: SerialPortOptionsInput;
@@ -1484,9 +1551,17 @@ export type MakerverseEssentialSettingsFragment = (
   ), users: Array<(
     { __typename?: 'MakerverseUser' }
     & MakerverseUserFullFragment
-  )>, workspaces: Array<(
-    { __typename?: 'WorkspaceSettings' }
-    & WorkspaceEssentialSettingsFragment
+  )> }
+);
+
+export type StartupFragment = (
+  { __typename?: 'Query' }
+  & { settings: (
+    { __typename?: 'MakerverseSettings' }
+    & MakerverseEssentialSettingsFragment
+  ), workspaces: Array<(
+    { __typename?: 'Workspace' }
+    & WorkspaceFullFragment
   )> }
 );
 
@@ -1500,10 +1575,8 @@ export type StartupQuery = (
   & { session: (
     { __typename?: 'MakerverseSession' }
     & MakerverseSessionFragment
-  ), settings: (
-    { __typename?: 'MakerverseSettings' }
-    & MakerverseEssentialSettingsFragment
   ) }
+  & StartupFragment
 );
 
 export type MachineAxisFragment = (
@@ -1557,16 +1630,28 @@ export type MachineSpecFragment = (
   & Pick<MachineSpecSettings, 'id' | 'specType' | 'value'>
 );
 
+export type WorkspaceFullFragment = (
+  { __typename?: 'Workspace' }
+  & Pick<Workspace, 'id' | 'portName' | 'state'>
+  & { error: Maybe<(
+    { __typename?: 'AlertError' }
+    & AlertErrorFragment
+  )>, settings: (
+    { __typename?: 'WorkspaceSettings' }
+    & WorkspaceFullSettingsFragment
+  ) }
+);
+
 export type WorkspaceQueryVariables = Exact<{
-  idOrPath: Scalars['String'];
+  workspaceId: Scalars['String'];
 }>;
 
 
 export type WorkspaceQuery = (
   { __typename?: 'Query' }
   & { workspace: (
-    { __typename?: 'WorkspaceSettings' }
-    & WorkspaceFullSettingsFragment
+    { __typename?: 'Workspace' }
+    & WorkspaceFullFragment
   ) }
 );
 
@@ -1578,8 +1663,8 @@ export type CreateWorkspaceMutationVariables = Exact<{
 export type CreateWorkspaceMutation = (
   { __typename?: 'Mutation' }
   & { workspace: (
-    { __typename?: 'WorkspaceSettings' }
-    & WorkspaceFullSettingsFragment
+    { __typename?: 'Workspace' }
+    & WorkspaceFullFragment
   ) }
 );
 
@@ -1588,16 +1673,22 @@ export type WorkspaceChangeSubscriptionVariables = Exact<{ [key: string]: never;
 
 export type WorkspaceChangeSubscription = (
   { __typename?: 'Subscription' }
-  & { change: (
-    { __typename?: 'WorkspaceChange' }
-    & Pick<WorkspaceChange, 'workspaceId'>
-    & { workspace: Maybe<(
-      { __typename?: 'Workspace' }
-      & { settings: (
-        { __typename?: 'WorkspaceSettings' }
-        & WorkspaceFullSettingsFragment
-      ) }
-    )> }
+  & { workspace: (
+    { __typename?: 'Workspace' }
+    & WorkspaceFullFragment
+  ) }
+);
+
+export type OpenWorkspaceMutationVariables = Exact<{
+  workspaceId: Scalars['String'];
+}>;
+
+
+export type OpenWorkspaceMutation = (
+  { __typename?: 'Mutation' }
+  & { workspace: (
+    { __typename?: 'Workspace' }
+    & WorkspaceFullFragment
   ) }
 );
 
@@ -1630,6 +1721,11 @@ export type WorkspaceFullSettingsFragment = (
 export type WorkspaceEssentialSettingsFragment = (
   { __typename?: 'WorkspaceSettings' }
   & WorkspaceFullSettingsFragment
+);
+
+export type AlertErrorFragment = (
+  { __typename?: 'AlertError' }
+  & Pick<AlertError, 'name' | 'message'>
 );
 
 export const MakerverseUserMinFragmentDoc = gql`
@@ -1669,6 +1765,12 @@ export const MachineConfigFragmentDoc = gql`
   }
 }
     ${DetectedFirmwareFragmentDoc}`;
+export const AlertErrorFragmentDoc = gql`
+    fragment AlertError on AlertError {
+  name
+  message
+}
+    `;
 export const PortOptionsFragmentDoc = gql`
     fragment PortOptions on PortOptions {
   baudRate
@@ -1684,13 +1786,21 @@ export const PortOptionsFragmentDoc = gql`
 }
     `;
 export const FirmwareRequirementFragmentDoc = gql`
-    fragment FirmwareRequirement on FirmwareRequirement {
+    fragment FirmwareRequirement on IMachineFirmwareRequirement {
   controllerType
   name
   edition
-  value
+  requiredVersion
 }
     `;
+export const ControlledMachineFragmentDoc = gql`
+    fragment ControlledMachine on ControlledMachine {
+  machineProfileId
+  firmwareRequirement {
+    ...FirmwareRequirement
+  }
+}
+    ${FirmwareRequirementFragmentDoc}`;
 export const PortIoStatusFragmentDoc = gql`
     fragment PortIOStatus on PortStatus {
   bytesToRead
@@ -1699,39 +1809,23 @@ export const PortIoStatusFragmentDoc = gql`
   charactersWritten
 }
     `;
-export const ConnectedPortStatusFragmentDoc = gql`
-    fragment ConnectedPortStatus on ConnectedPort {
-  friendlyName
-  firmwareRequirement {
-    ...FirmwareRequirement
+export const ConnectedPortFragmentDoc = gql`
+    fragment ConnectedPort on ConnectedPort {
+  machine {
+    ...ControlledMachine
   }
   status {
     ...PortIOStatus
   }
 }
-    ${FirmwareRequirementFragmentDoc}
+    ${ControlledMachineFragmentDoc}
 ${PortIoStatusFragmentDoc}`;
-export const MachineFragmentDoc = gql`
-    fragment Machine on Machine {
-  machineProfileId
-}
-    `;
-export const ConnectedPortFragmentDoc = gql`
-    fragment ConnectedPort on ConnectedPort {
-  ...ConnectedPortStatus
-  machine {
-    ...Machine
-  }
-}
-    ${ConnectedPortStatusFragmentDoc}
-${MachineFragmentDoc}`;
 export const SystemPortFragmentDoc = gql`
     fragment SystemPort on SystemPort {
   portName
   state
   error {
-    name
-    message
+    ...AlertError
   }
   options {
     ...PortOptions
@@ -1740,21 +1834,35 @@ export const SystemPortFragmentDoc = gql`
     ...ConnectedPort
   }
 }
-    ${PortOptionsFragmentDoc}
+    ${AlertErrorFragmentDoc}
+${PortOptionsFragmentDoc}
 ${ConnectedPortFragmentDoc}`;
+export const ConnectedPortStatusFragmentDoc = gql`
+    fragment ConnectedPortStatus on ConnectedPort {
+  machine {
+    firmwareRequirement {
+      ...FirmwareRequirement
+    }
+  }
+  status {
+    ...PortIOStatus
+  }
+}
+    ${FirmwareRequirementFragmentDoc}
+${PortIoStatusFragmentDoc}`;
 export const PortStatusFragmentDoc = gql`
     fragment PortStatus on SystemPort {
   portName
   state
   error {
-    name
-    message
+    ...AlertError
   }
   connection {
     ...ConnectedPortStatus
   }
 }
-    ${ConnectedPortStatusFragmentDoc}`;
+    ${AlertErrorFragmentDoc}
+${ConnectedPortStatusFragmentDoc}`;
 export const FileSystemFragmentDoc = gql`
     fragment FileSystem on FileSystemSettings {
   programDirectory
@@ -1794,6 +1902,33 @@ export const MakerHubFragmentDoc = gql`
   enabled
 }
     `;
+export const MakerverseEssentialSettingsFragmentDoc = gql`
+    fragment MakerverseEssentialSettings on MakerverseSettings {
+  fileSystem {
+    ...FileSystem
+  }
+  appUpdates {
+    ...AppUpdates
+  }
+  commands {
+    ...Command
+  }
+  events {
+    ...Event
+  }
+  hub {
+    ...MakerHub
+  }
+  users {
+    ...MakerverseUserFull
+  }
+}
+    ${FileSystemFragmentDoc}
+${AppUpdatesFragmentDoc}
+${CommandFragmentDoc}
+${EventFragmentDoc}
+${MakerHubFragmentDoc}
+${MakerverseUserFullFragmentDoc}`;
 export const WorkspacePropsFragmentDoc = gql`
     fragment WorkspaceProps on WorkspaceSettings {
   id
@@ -1917,42 +2052,36 @@ ${MachineAxisFragmentDoc}
 ${MachineFeatureFragmentDoc}
 ${MachineCommandFragmentDoc}
 ${MachinePartFragmentDoc}`;
+export const WorkspaceFullFragmentDoc = gql`
+    fragment WorkspaceFull on Workspace {
+  id
+  portName
+  state
+  error {
+    ...AlertError
+  }
+  settings {
+    ...WorkspaceFullSettings
+  }
+}
+    ${AlertErrorFragmentDoc}
+${WorkspaceFullSettingsFragmentDoc}`;
+export const StartupFragmentDoc = gql`
+    fragment Startup on Query {
+  settings: getSettings {
+    ...MakerverseEssentialSettings
+  }
+  workspaces: listWorkspaces {
+    ...WorkspaceFull
+  }
+}
+    ${MakerverseEssentialSettingsFragmentDoc}
+${WorkspaceFullFragmentDoc}`;
 export const WorkspaceEssentialSettingsFragmentDoc = gql`
     fragment WorkspaceEssentialSettings on WorkspaceSettings {
   ...WorkspaceFullSettings
 }
     ${WorkspaceFullSettingsFragmentDoc}`;
-export const MakerverseEssentialSettingsFragmentDoc = gql`
-    fragment MakerverseEssentialSettings on MakerverseSettings {
-  fileSystem {
-    ...FileSystem
-  }
-  appUpdates {
-    ...AppUpdates
-  }
-  commands {
-    ...Command
-  }
-  events {
-    ...Event
-  }
-  hub {
-    ...MakerHub
-  }
-  users {
-    ...MakerverseUserFull
-  }
-  workspaces {
-    ...WorkspaceEssentialSettings
-  }
-}
-    ${FileSystemFragmentDoc}
-${AppUpdatesFragmentDoc}
-${CommandFragmentDoc}
-${EventFragmentDoc}
-${MakerHubFragmentDoc}
-${MakerverseUserFullFragmentDoc}
-${WorkspaceEssentialSettingsFragmentDoc}`;
 export const AuthenticateDocument = gql`
     query Authenticate($token: String!) {
   session: authenticate(token: $token) {
@@ -1988,8 +2117,10 @@ export type AuthenticateLazyQueryHookResult = ReturnType<typeof useAuthenticateL
 export type AuthenticateQueryResult = Apollo.QueryResult<AuthenticateQuery, AuthenticateQueryVariables>;
 export const MachineConfigurationDocument = gql`
     subscription MachineConfiguration($portName: String!) {
-  config: onMachineConfiguration(portName: $portName) {
-    ...MachineConfig
+  machine: onMachineConfiguration(portName: $portName) {
+    configuration {
+      ...MachineConfig
+    }
   }
 }
     ${MachineConfigFragmentDoc}`;
@@ -2047,70 +2178,37 @@ export function useListPortsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<
 export type ListPortsQueryHookResult = ReturnType<typeof useListPortsQuery>;
 export type ListPortsLazyQueryHookResult = ReturnType<typeof useListPortsLazyQuery>;
 export type ListPortsQueryResult = Apollo.QueryResult<ListPortsQuery, ListPortsQueryVariables>;
-export const PortStatusDocument = gql`
-    subscription PortStatus {
-  port: onPortStatus {
+export const PortChangeDocument = gql`
+    subscription PortChange {
+  port: onPortChange {
     ...PortStatus
   }
 }
     ${PortStatusFragmentDoc}`;
 
 /**
- * __usePortStatusSubscription__
+ * __usePortChangeSubscription__
  *
- * To run a query within a React component, call `usePortStatusSubscription` and pass it any options that fit your needs.
- * When your component renders, `usePortStatusSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `usePortChangeSubscription` and pass it any options that fit your needs.
+ * When your component renders, `usePortChangeSubscription` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = usePortStatusSubscription({
+ * const { data, loading, error } = usePortChangeSubscription({
  *   variables: {
  *   },
  * });
  */
-export function usePortStatusSubscription(baseOptions?: Apollo.SubscriptionHookOptions<PortStatusSubscription, PortStatusSubscriptionVariables>) {
-        return Apollo.useSubscription<PortStatusSubscription, PortStatusSubscriptionVariables>(PortStatusDocument, baseOptions);
+export function usePortChangeSubscription(baseOptions?: Apollo.SubscriptionHookOptions<PortChangeSubscription, PortChangeSubscriptionVariables>) {
+        return Apollo.useSubscription<PortChangeSubscription, PortChangeSubscriptionVariables>(PortChangeDocument, baseOptions);
       }
-export type PortStatusSubscriptionHookResult = ReturnType<typeof usePortStatusSubscription>;
-export type PortStatusSubscriptionResult = Apollo.SubscriptionResult<PortStatusSubscription>;
-export const PortListDocument = gql`
-    subscription PortList {
-  ports: onPortList {
-    ...PortStatus
-  }
-}
-    ${PortStatusFragmentDoc}`;
-
-/**
- * __usePortListSubscription__
- *
- * To run a query within a React component, call `usePortListSubscription` and pass it any options that fit your needs.
- * When your component renders, `usePortListSubscription` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePortListSubscription({
- *   variables: {
- *   },
- * });
- */
-export function usePortListSubscription(baseOptions?: Apollo.SubscriptionHookOptions<PortListSubscription, PortListSubscriptionVariables>) {
-        return Apollo.useSubscription<PortListSubscription, PortListSubscriptionVariables>(PortListDocument, baseOptions);
-      }
-export type PortListSubscriptionHookResult = ReturnType<typeof usePortListSubscription>;
-export type PortListSubscriptionResult = Apollo.SubscriptionResult<PortListSubscription>;
+export type PortChangeSubscriptionHookResult = ReturnType<typeof usePortChangeSubscription>;
+export type PortChangeSubscriptionResult = Apollo.SubscriptionResult<PortChangeSubscription>;
 export const OpenPortDocument = gql`
-    mutation OpenPort($friendlyName: String!, $portName: String!, $firmware: FirmwareRequirementInput!, $options: SerialPortOptionsInput!) {
-  port: openPort(
-    friendlyName: $friendlyName
-    portName: $portName
-    firmware: $firmware
-    options: $options
-  ) {
+    mutation OpenPort($portName: String!, $firmware: FirmwareRequirementInput!, $options: SerialPortOptionsInput!) {
+  port: openPort(portName: $portName, firmware: $firmware, options: $options) {
     ...SystemPort
   }
 }
@@ -2130,7 +2228,6 @@ export type OpenPortMutationFn = Apollo.MutationFunction<OpenPortMutation, OpenP
  * @example
  * const [openPortMutation, { data, loading, error }] = useOpenPortMutation({
  *   variables: {
- *      friendlyName: // value for 'friendlyName'
  *      portName: // value for 'portName'
  *      firmware: // value for 'firmware'
  *      options: // value for 'options'
@@ -2180,12 +2277,10 @@ export const StartupDocument = gql`
   session: authenticate(token: $token) {
     ...MakerverseSession
   }
-  settings: getSettings {
-    ...MakerverseEssentialSettings
-  }
+  ...Startup
 }
     ${MakerverseSessionFragmentDoc}
-${MakerverseEssentialSettingsFragmentDoc}`;
+${StartupFragmentDoc}`;
 
 /**
  * __useStartupQuery__
@@ -2213,12 +2308,12 @@ export type StartupQueryHookResult = ReturnType<typeof useStartupQuery>;
 export type StartupLazyQueryHookResult = ReturnType<typeof useStartupLazyQuery>;
 export type StartupQueryResult = Apollo.QueryResult<StartupQuery, StartupQueryVariables>;
 export const WorkspaceDocument = gql`
-    query Workspace($idOrPath: String!) {
-  workspace: getWorkspace(idOrPath: $idOrPath) {
-    ...WorkspaceFullSettings
+    query Workspace($workspaceId: String!) {
+  workspace: getWorkspace(workspaceId: $workspaceId) {
+    ...WorkspaceFull
   }
 }
-    ${WorkspaceFullSettingsFragmentDoc}`;
+    ${WorkspaceFullFragmentDoc}`;
 
 /**
  * __useWorkspaceQuery__
@@ -2232,7 +2327,7 @@ export const WorkspaceDocument = gql`
  * @example
  * const { data, loading, error } = useWorkspaceQuery({
  *   variables: {
- *      idOrPath: // value for 'idOrPath'
+ *      workspaceId: // value for 'workspaceId'
  *   },
  * });
  */
@@ -2248,10 +2343,10 @@ export type WorkspaceQueryResult = Apollo.QueryResult<WorkspaceQuery, WorkspaceQ
 export const CreateWorkspaceDocument = gql`
     mutation CreateWorkspace($workspaceSettings: WorkspaceSettingsInput!) {
   workspace: createWorkspace(workspaceSettings: $workspaceSettings) {
-    ...WorkspaceFullSettings
+    ...WorkspaceFull
   }
 }
-    ${WorkspaceFullSettingsFragmentDoc}`;
+    ${WorkspaceFullFragmentDoc}`;
 export type CreateWorkspaceMutationFn = Apollo.MutationFunction<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>;
 
 /**
@@ -2279,16 +2374,11 @@ export type CreateWorkspaceMutationResult = Apollo.MutationResult<CreateWorkspac
 export type CreateWorkspaceMutationOptions = Apollo.BaseMutationOptions<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>;
 export const WorkspaceChangeDocument = gql`
     subscription WorkspaceChange {
-  change: onWorkspacesChanged {
-    workspaceId
-    workspace {
-      settings {
-        ...WorkspaceFullSettings
-      }
-    }
+  workspace: onWorkspaceChange {
+    ...WorkspaceFull
   }
 }
-    ${WorkspaceFullSettingsFragmentDoc}`;
+    ${WorkspaceFullFragmentDoc}`;
 
 /**
  * __useWorkspaceChangeSubscription__
@@ -2310,3 +2400,35 @@ export function useWorkspaceChangeSubscription(baseOptions?: Apollo.Subscription
       }
 export type WorkspaceChangeSubscriptionHookResult = ReturnType<typeof useWorkspaceChangeSubscription>;
 export type WorkspaceChangeSubscriptionResult = Apollo.SubscriptionResult<WorkspaceChangeSubscription>;
+export const OpenWorkspaceDocument = gql`
+    mutation OpenWorkspace($workspaceId: String!) {
+  workspace: openWorkspace(workspaceId: $workspaceId) {
+    ...WorkspaceFull
+  }
+}
+    ${WorkspaceFullFragmentDoc}`;
+export type OpenWorkspaceMutationFn = Apollo.MutationFunction<OpenWorkspaceMutation, OpenWorkspaceMutationVariables>;
+
+/**
+ * __useOpenWorkspaceMutation__
+ *
+ * To run a mutation, you first call `useOpenWorkspaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useOpenWorkspaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [openWorkspaceMutation, { data, loading, error }] = useOpenWorkspaceMutation({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *   },
+ * });
+ */
+export function useOpenWorkspaceMutation(baseOptions?: Apollo.MutationHookOptions<OpenWorkspaceMutation, OpenWorkspaceMutationVariables>) {
+        return Apollo.useMutation<OpenWorkspaceMutation, OpenWorkspaceMutationVariables>(OpenWorkspaceDocument, baseOptions);
+      }
+export type OpenWorkspaceMutationHookResult = ReturnType<typeof useOpenWorkspaceMutation>;
+export type OpenWorkspaceMutationResult = Apollo.MutationResult<OpenWorkspaceMutation>;
+export type OpenWorkspaceMutationOptions = Apollo.BaseMutationOptions<OpenWorkspaceMutation, OpenWorkspaceMutationVariables>;

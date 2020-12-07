@@ -1,11 +1,11 @@
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faPlug, faPowerOff} from '@fortawesome/free-solid-svg-icons';
-import {Fab, Grid, Paper, Typography, useTheme, Modal, FormControl} from '@material-ui/core';
+import {Fab, Grid, Paper, Typography, Modal, FormControl} from '@material-ui/core';
 import {ICustomizedMachine} from '@openworkshop/lib/api/Machines/CustomizedMachine';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import React, {FunctionComponent} from 'react';
 import {Trans, useTranslation} from 'react-i18next';
-import HoverHelpStep from '@openworkshop/ui/components/Alerts/HoverHelpStep';
+import {HoverHelpStep} from '@openworkshop/ui/components/Alerts';
 import {
   FirmwareRequirementInput,
   MutationOpenPortArgs,
@@ -18,8 +18,7 @@ import PortSelect from '../../components/Ports/PortSelect';
 import {useSystemPorts} from '../../providers/SystemPortHooks';
 import useStyles from './Styles';
 import PortConnectionSteps from './PortConnectionSteps';
-import {IAlertMessage} from '@openworkshop/ui/components/Alerts/AlertMessage';
-import AlertList from '@openworkshop/ui/components/Alerts/AlertList';
+import {AlertList} from '@openworkshop/ui/components/Alerts';
 
 interface OwnProps {
   machine: ICustomizedMachine;
@@ -34,7 +33,6 @@ type Props = OwnProps;
 
 const OpenMachinePort: FunctionComponent<Props> = (props) => {
   const log = useLogger(OpenMachinePort);
-  const theme = useTheme();
   const { t } = useTranslation();
   const classes = useStyles();
   const portCollection = useSystemPorts();
@@ -47,7 +45,7 @@ const OpenMachinePort: FunctionComponent<Props> = (props) => {
   const isConnecting = port && port.state === PortState.Opening;
   const isActive = port && port.state === PortState.Active;
   const canConnect = machine && port && !isConnected && !isConnecting;
-  const [error, setError] = React.useState<IAlertMessage | undefined>(undefined);
+  const errors = [openedPort.error, closedPort.error, port?.error];
 
   async function onPressConnect() {
     // TODO: These may need to be configurable...
@@ -67,34 +65,29 @@ const OpenMachinePort: FunctionComponent<Props> = (props) => {
     const fw: FirmwareRequirementInput = {
       name: machine.firmware.name ?? null,
       edition: machine.firmware.edition ?? null,
-      value: machine.firmware.value ?? null,
+      requiredVersion: machine.firmware.requiredVersion ? machine.firmware.requiredVersion as number : 0,
       controllerType: machine.firmware.controllerType,
     };
 
     const args: MutationOpenPortArgs = {
-      friendlyName: 'CreateWorkspace',
       portName: selectedPortName,
       firmware: fw,
       options: opts,
     };
     log.debug('opening port...', args);
     try {
-      setError(undefined);
       await openPort({variables: args});
-      log.debug('opened?', openedPort.data?.port);
     } catch (e) {
-      setError(e);
+      log.error(e, 'failed to open port');
     }
   }
 
   async function onPressDisconnect() {
+    log.debug('closing port', port.portName);
     try {
-      log.debug('closing port', port.portName);
-      setError(undefined);
       await closePort({ variables: { portName: port.portName }});
-      log.debug('closed?', closedPort.data?.port);
     } catch (e) {
-      setError(e);
+      log.error(e, 'disconnection error');
     }
   }
 
@@ -174,7 +167,7 @@ const OpenMachinePort: FunctionComponent<Props> = (props) => {
           </FormControl>}
         </Grid>
         <Grid item xs={12}>
-          <AlertList error={error} />
+          <AlertList errors={errors} />
         </Grid>
       </Grid>
       <Modal

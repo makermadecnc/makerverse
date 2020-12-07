@@ -11,6 +11,7 @@ using Makerverse.Lib;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using OpenWorkEngine.OpenController.Controllers;
+using OpenWorkEngine.OpenController.Controllers.Services;
 using OpenWorkEngine.OpenController.Ports.Services;
 using Serilog;
 
@@ -24,8 +25,9 @@ namespace Makerverse.Api {
 
     public PortManager Ports { get; }
 
-    public WorkspaceManager Workspaces => _workspaces ??= new WorkspaceManager(this);
-    private WorkspaceManager? _workspaces = null;
+    public ControllerManager Controllers { get; }
+
+    public WorkspaceManager Workspaces { get; }
 
     public string? Subdomain { get; }
 
@@ -37,7 +39,7 @@ namespace Makerverse.Api {
 
     private List<MakerverseUser>? _enabledUsers;
 
-    public List<MakerverseUser> enabledUsers => _enabledUsers ??=
+    public List<MakerverseUser> EnabledUsers => _enabledUsers ??=
       (Settings?.Users.Where(u => u.Enabled).ToList() ?? new List<MakerverseUser>());
 
     private readonly ConfigFile _configFile;
@@ -45,10 +47,13 @@ namespace Makerverse.Api {
     public void SaveSettings() => _configFile.Save();
 
     public MakerverseContext(
-      IWebHostEnvironment env, ConfigFile cf, SessionManager sm, PortManager p, ITopicEventSender sender
+      IWebHostEnvironment env, ITopicEventSender sender, WorkspaceManager work,
+      ConfigFile cf, SessionManager sm, ControllerManager cm
     ) {
       Sessions = sm;
-      Ports = p;
+      Ports = cm.Ports;
+      Controllers = cm;
+      Workspaces = work;
       WebHostEnvironment = env;
       Sender = sender;
       Log = cf.Log.ForContext("WebHost", env.WebRootPath);

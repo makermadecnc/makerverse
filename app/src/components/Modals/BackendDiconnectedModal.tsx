@@ -6,11 +6,7 @@ import CardDialog from '@openworkshop/ui/components/Cards/CardDialog';
 import { CircularProgress, Typography } from '@material-ui/core';
 import { Trans, useTranslation } from 'react-i18next';
 
-type Props = {
-
-};
-
-const BackendDiconnectedModal: React.FunctionComponent<Props> = (props) => {
+const BackendDiconnectedModal: React.FunctionComponent = () => {
   const log = useLogger(BackendDiconnectedModal);
   const { t } = useTranslation();
   const connectionState: ConnectionState = useBackendConnectionState();

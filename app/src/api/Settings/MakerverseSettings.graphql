@@ -34,7 +34,4 @@ fragment MakerverseEssentialSettings on MakerverseSettings {
     users {
         ...MakerverseUserFull
     }
-    workspaces {
-        ...WorkspaceEssentialSettings
-    }
 }

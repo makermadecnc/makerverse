@@ -1,18 +1,13 @@
 import {
   Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
   Checkbox,
   CircularProgress,
   FormControlLabel,
-  Toolbar,
   Typography,
 } from '@material-ui/core';
 import { OpenWorkShop } from '@openworkshop/lib';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
-import AlertList from '@openworkshop/ui/components/Alerts/AlertList';
+import {AlertList} from '@openworkshop/ui/components/Alerts';
 import ToolbarCard from '@openworkshop/ui/components/Cards/ToolbarCard';
 import ThreeColumns from '@openworkshop/ui/components/Layout/ThreeColumns';
 import React, { FunctionComponent } from 'react';
@@ -22,15 +17,8 @@ import analytics from 'lib/analytics';
 import settings from 'config/settings';
 import docs from 'constants/docs';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
 
-interface OwnProps {
-  children: React.ReactNode;
-}
-
-type Props = OwnProps;
-
-const LoginPage: FunctionComponent<Props> = (props) => {
+const LoginPage: FunctionComponent = () => {
   const log = useLogger(LoginPage);
   const ows = React.useContext(OpenWorkShop);
   const classes = useStyles();

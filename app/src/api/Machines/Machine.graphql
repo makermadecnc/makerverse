@@ -1,5 +1,8 @@
-fragment Machine on Machine {
+fragment ControlledMachine on ControlledMachine {
     machineProfileId
+    firmwareRequirement {
+        ...FirmwareRequirement
+    }
 }
 
 fragment DetectedFirmware on MachineDetectedFirmware {
@@ -17,7 +20,9 @@ fragment MachineConfig on MachineConfiguration {
 }
 
 subscription MachineConfiguration($portName: String!) {
-    config: onMachineConfiguration(portName: $portName) {
-        ...MachineConfig
+    machine: onMachineConfiguration(portName: $portName) {
+        configuration {
+            ...MachineConfig
+        }
     }
 }

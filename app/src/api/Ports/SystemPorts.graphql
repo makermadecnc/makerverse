@@ -2,8 +2,7 @@ fragment SystemPort on SystemPort {
     portName
     state
     error {
-        name
-        message
+        ...AlertError
     }
     options {
         ...PortOptions
@@ -18,8 +17,7 @@ fragment PortStatus on SystemPort {
     portName
     state
     error {
-        name
-        message
+        ...AlertError
     }
     connection {
         ...ConnectedPortStatus
@@ -32,20 +30,14 @@ query ListPorts {
     }
 }
 
-subscription PortStatus {
-    port: onPortStatus {
+subscription PortChange {
+    port: onPortChange {
         ...PortStatus
     }
 }
 
-subscription PortList {
-    ports: onPortList {
-        ...PortStatus
-    }
-}
-
-mutation OpenPort($friendlyName: String!, $portName: String!, $firmware: FirmwareRequirementInput!, $options: SerialPortOptionsInput!) {
-    port: openPort(friendlyName: $friendlyName, portName: $portName, firmware: $firmware, options: $options) {
+mutation OpenPort($portName: String!, $firmware: FirmwareRequirementInput!, $options: SerialPortOptionsInput!) {
+    port: openPort(portName: $portName, firmware: $firmware, options: $options) {
         ...SystemPort
     }
 }

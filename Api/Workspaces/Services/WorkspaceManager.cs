@@ -3,87 +3,118 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
-using HotChocolate.Subscriptions;
-using Makerverse.Api.Workspaces.Graph;
-using Makerverse.Api.Workspaces.Messages;
+using Makerverse.Api.Settings.Models;
+using Makerverse.Api.Workspaces.Enums;
 using Makerverse.Api.Workspaces.Models;
-using Makerverse.Api.Workspaces.Observables;
-using Newtonsoft.Json;
-using OpenWorkEngine.OpenController.Ports.Models;
+using Makerverse.Lib;
+using OpenWorkEngine.OpenController.Controllers.Services;
+using OpenWorkEngine.OpenController.Lib.Observables;
+using OpenWorkEngine.OpenController.Ports.Services;
 using Serilog;
 
 namespace Makerverse.Api.Workspaces.Services {
-  public class WorkspaceManager {
-    internal ILogger Log { get; }
+  public class WorkspaceManager : SubscriptionStateManager<WorkspaceTopic, Workspace, WorkspaceState> {
+    public override ILogger Log { get; }
 
-    internal MakerverseContext Context { get; }
+    public PortManager Ports { get; }
 
-    internal ITopicEventSender Sender => Context.Sender;
-    //
-    // public WorkspaceSettings this[string workspaceId] =>
-    //   Settings.TryGetValue(workspaceId, out WorkspaceSettings? val) ? val :
-    //     throw new ArgumentException($"Workspace missing: {workspaceId}");
+    public ControllerManager Controllers { get; }
+
+    public Workspace this[string workspaceId] =>
+      _workspaces.TryGetValue(workspaceId, out Workspace? val) ? val :
+        throw new ArgumentException($"Workspace missing: {workspaceId}");
+
+    public List<Workspace> ToList() => _workspaces.Values.ToList();
+
+    private readonly MakerverseSettings _makerverseSettings;
+
+    private readonly ConfigFile _configFile;
 
     private Dictionary<string, WorkspaceSettings> Settings =>
-      Context.Settings.Workspaces.ToDictionary(ws => ws.Id, ws => ws);
+      _makerverseSettings.Workspaces.ToDictionary(ws => ws.Id, ws => ws);
 
-    private ConcurrentDictionary<string, Workspace> _openWorkspaces =
-      new ConcurrentDictionary<string, Workspace>();
+    private readonly ConcurrentDictionary<string, Workspace> _workspaces;
 
-    // Opening a workspace -> open port, ready for work.
-    internal Task<Workspace> Open(string workspaceId) {
-      WorkspaceSettings settings = Settings[workspaceId];
-      Workspace state = _openWorkspaces.AddOrUpdate(
-        workspaceId,
-        (wsId) => new Workspace(settings),
-        (wsId, existingState) => existingState
-      );
-      return Task.FromResult(state);
-    }
-
-    internal async Task<WorkspaceSettings> Create(WorkspaceSettings ws) {
-      if (Settings.ContainsKey(ws.Id)) {
-        throw new DuplicateNameException($"{ws.Id} already exists");
-      }
-      Log.Debug("[WORKSPACE] created: {workspace}", JsonConvert.SerializeObject(ws));
-      Log.Information("[WORKSPACE] created: {workspaceName}", ws.Name);
-      Context.Settings.Workspaces.Add(ws);
-      Context.SaveSettings();
-      await Sender.SendAsync(nameof(WorkspaceSubscription.OnWorkspacesChanged), new WorkspaceChange(ws));
+    // This is not a "create" per se; it is an internal model tracker, not a creation of a new workspace.
+    private Workspace InitWorkspace(WorkspaceSettings wss) {
+      Workspace ws = new Workspace(this, wss);
+      Log.Debug("[WORKSPACE] init {workspace}", ws.ToString());
       return ws;
     }
 
-    internal async Task<WorkspaceSettings> Update(WorkspaceSettings ws) {
+    // Inform the in-memory Workspace object it has a settings change.
+    private Workspace UpdateWorkspaceSettings(Workspace ws, WorkspaceSettings wss) {
+      ws.Settings = wss;
+      Log.Debug("[WORKSPACE] updated {workspace}", ws.ToString());
+      return ws;
+    }
+
+    // Update the settings file with the new workspace settings and get the in-memory Workspace object.
+    private Workspace UpsertWorkspaceSettings(WorkspaceSettings wss) {
       Dictionary<string, WorkspaceSettings> map = Settings;
-      if (!map.ContainsKey(ws.Id)) {
-        throw new KeyNotFoundException($"{ws.Id} does not exist");
+      if (map.ContainsKey(wss.Id)) {
+        map[wss.Id] = wss;
+      } else {
+        map.Add(wss.Id, wss);
       }
-      Log.Debug("[WORKSPACE] updated: {workspace}", JsonConvert.SerializeObject(ws));
-      Log.Information("[WORKSPACE] updated: {workspaceName}", ws.Name);
-      map[ws.Id] = ws;
-      Context.Settings.Workspaces = map.Values.ToList();
-      Context.SaveSettings();
-      await Sender.SendAsync(nameof(WorkspaceSubscription.OnWorkspacesChanged), new WorkspaceChange(ws));
-      return ws;
+      _makerverseSettings.Workspaces = map.Values.ToList();
+      _configFile.Save();
+
+      // Create or update the workspace and immediately broadcast its state.
+      return EmitState(_workspaces.AddOrUpdate(
+        wss.Id,
+        (wsId) => InitWorkspace(wss),
+        (wsId, existingState) => UpdateWorkspaceSettings(existingState, wss)
+      ));
     }
 
-    internal async Task<string> Delete(string workspaceId) {
+    // General CRUD
+    internal Workspace Create(WorkspaceSettings wss) {
+      if (Settings.ContainsKey(wss.Id)) throw new DuplicateNameException($"{wss.Id} already exists");
+      return UpsertWorkspaceSettings(wss);
+    }
+
+    // General CRUD
+    internal Workspace Update(WorkspaceSettings wss) {
+      if (!Settings.ContainsKey(wss.Id)) throw new KeyNotFoundException($"{wss.Id} does not exist");
+      return UpsertWorkspaceSettings(wss);
+    }
+
+    // General CRUD
+    internal Workspace Delete(string workspaceId) {
+      if (!_workspaces.TryRemove(workspaceId, out Workspace? ws)) {
+        throw new KeyNotFoundException($"{workspaceId}'s workspace did not exist");
+      }
+
       Dictionary<string, WorkspaceSettings> map = Settings;
       if (!map.ContainsKey(workspaceId)) {
-        throw new KeyNotFoundException($"{workspaceId} does not exist");
+        throw new KeyNotFoundException($"{workspaceId}'s settings did not exist");
       }
       map.Remove(workspaceId);
 
-      Context.Settings.Workspaces = map.Values.ToList();
-      Context.SaveSettings();
-      await Sender.SendAsync(nameof(WorkspaceSubscription.OnWorkspacesChanged), new WorkspaceChange (workspaceId));
-      return workspaceId;
+      _makerverseSettings.Workspaces = map.Values.ToList();
+      _configFile.Save();
+      EmitState(ws, WorkspaceState.Deleted);
+      ws.Dispose();
+      return ws;
     }
 
-    public WorkspaceManager(MakerverseContext context) {
-      Context = context;
-      Log = context.Log.ForContext(typeof(WorkspaceManager));
+    public WorkspaceManager(
+      ControllerManager controllerManager, ConfigFile settingsFile, ILogger log
+    ) {
+      Controllers = controllerManager;
+      Ports = controllerManager.Ports;
+      Log = log.ForContext(typeof(WorkspaceManager));
+
+      _configFile = settingsFile;
+      _makerverseSettings = settingsFile.Data ?? throw new ArgumentNullException(nameof(settingsFile));
+      _workspaces = new ConcurrentDictionary<string, Workspace>(
+        settingsFile.Data?
+                    .Workspaces.Select(InitWorkspace)
+                    .ToDictionary(ws => ws.Id, ws => ws) ?? new Dictionary<string, Workspace>());
     }
+
+    public override WorkspaceTopic StateTopic => WorkspaceTopic.State;
+    protected override WorkspaceState ErrorState => WorkspaceState.Error;
   }
 }

@@ -2,7 +2,7 @@ import {useNetworkStatus} from '@openworkshop/lib/utils/device';
 import React, { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 import settings from '../../config/settings';
-import OfflineAlertList from '@openworkshop/ui/components/Alerts/OfflineAlertList';
+import {OfflineAlertList} from '@openworkshop/ui/components/Alerts';
 
 const Docs: FunctionComponent = () => {
   const isOnline = useNetworkStatus();

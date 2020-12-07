@@ -2,8 +2,8 @@ import {CircularProgress, Container, Step, StepLabel, Stepper, Typography, useTh
 import * as React from 'react';
 import {useTranslation} from 'react-i18next';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
-import {MachineFirmwareFragment, PortState, PortStatusFragment,} from '../../api/graphql';
-import {IAlertMessage} from '@openworkshop/ui/components/Alerts/AlertMessage';
+import {MachineFirmwareFragment, PortState} from '../../api/graphql';
+import {IAlertMessage} from '@openworkshop/ui/components/Alerts';
 import {faCircle, faDotCircle, faExclamationCircle} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {StepIconProps} from '@material-ui/core/StepIcon';
@@ -36,13 +36,10 @@ const PortConnectionSteps: React.FunctionComponent<Props> = (props) => {
   const log = useLogger(PortConnectionSteps);
   const { t } = useTranslation();
   const { port } = props;
-  const portState = port?.state ?? PortState.Unknown;
-  const [lastPortState, setLastPortState] = React.useState(PortState.Unknown);
+  const portState = port?.state ?? PortState.Unplugged;
+  const [lastPortState, setLastPortState] = React.useState(PortState.Unplugged);
   const [activeStep, setActiveStep] = React.useState(ConnectionStep.NotOpen);
   const stepsNumbers = [...Array(ConnectionStep.NumSteps).keys()];
-
-  // const onConfiguration = useMachineConfigurationSubscription({ variables: { portName: port.portName } });
-  // const hasDetectedFirmware = onConfiguration.data && onConfiguration.data.config.firmware.isValid;
 
   function getName(step: ConnectionStep) {
     if (step === ConnectionStep.NotOpen) return t('Not Open');
@@ -71,7 +68,7 @@ const PortConnectionSteps: React.FunctionComponent<Props> = (props) => {
   React.useEffect(() => {
     if (portState === lastPortState) return;
     if (portState === PortState.Error) setActiveStep(ConnectionStep.OpenConnection);
-    if (portState === PortState.Ready || portState === PortState.Unknown) setActiveStep(ConnectionStep.NotOpen);
+    if (portState === PortState.Ready || portState === PortState.Unplugged) setActiveStep(ConnectionStep.NotOpen);
     if (portState === PortState.Opening) setActiveStep(ConnectionStep.OpenConnection);
     if (portState === PortState.Startup) setActiveStep(ConnectionStep.ReceiveData);
     if (portState === PortState.HasData) setActiveStep(ConnectionStep.CheckProtocol);

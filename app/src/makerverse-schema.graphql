@@ -6,6 +6,31 @@ schema {
     subscription: Subscription
 }
 
+interface IMachineFirmwareRequirement {
+    controllerType: MachineControllerType!
+    edition: String
+    name: String
+    requiredVersion: Decimal!
+}
+
+interface ISerialPortOptions {
+    baudRate: Int!
+    dataBits: Int
+    handshake: Handshake
+    parity: Parity
+    readBufferSize: Int
+    readTimeout: Int
+    rtsEnable: Boolean
+    stopBits: StopBits
+    writeBufferSize: Int
+    writeTimeout: Int
+}
+
+type AlertError {
+    message: String!
+    name: String!
+}
+
 type AppUpdates {
     checkForUpdates: Boolean!
     prereleases: Boolean!
@@ -21,17 +46,28 @@ type CommandSettings {
 
 type ConnectedPort {
     createdAt: DateTime!
-    firmwareRequirement: FirmwareRequirement!
-    friendlyName: String!
-    machine: Machine!
+    machine: ControlledMachine!
     port: SystemPort!
     status: PortStatus!
 }
 
 type ConnectionSettings {
     firmware: MachineFirmwareSettings!
+    firmwareRequirement: IMachineFirmwareRequirement!
+    machineProfileId: String
     manufacturer: String
     portName: String!
+    toSerialPortOptions: ISerialPortOptions!
+}
+
+type ControlledMachine {
+    configuration: MachineConfiguration!
+    firmwareRequirement: IMachineFirmwareRequirement!
+    lastTopic: MachineTopic!
+    machineProfileId: String
+    settings: [MachineSetting!]!
+    state: MachineState!
+    topicId: String!
 }
 
 type EventSettings {
@@ -48,18 +84,11 @@ type FileSystemSettings {
     programDirectory: String!
 }
 
-type FirmwareRequirement {
+type FirmwareRequirement implements IMachineFirmwareRequirement {
     controllerType: MachineControllerType!
     edition: String
     name: String
-    value: Decimal
-}
-
-type Machine {
-    configuration: MachineConfiguration!
-    machineProfileId: String
-    settings: [MachineSetting!]!
-    state: MachineState!
+    requiredVersion: Decimal!
 }
 
 type MachineAlert {
@@ -107,7 +136,7 @@ type MachineFeatureSettings {
     title: String
 }
 
-type MachineFirmwareSettings {
+type MachineFirmwareSettings implements IMachineFirmwareRequirement {
     baudRate: BaudRate
     baudRateValue: Int!
     controllerType: MachineControllerType!
@@ -119,6 +148,7 @@ type MachineFirmwareSettings {
     requiredVersion: Decimal!
     rtscts: Boolean!
     suggestedVersion: Decimal!
+    toRequirement: FirmwareRequirement!
 }
 
 type MachinePartSettings {
@@ -130,7 +160,7 @@ type MachinePartSettings {
     partType: MachinePartType!
     settings: [MachineSettingSettings!]!
     specs: [MachineSpecSettings!]!
-    title: String
+    title: String!
 }
 
 type MachinePosition {
@@ -213,18 +243,14 @@ type MountPointSettings {
 
 type Mutation {
     closePort(portName: String!): SystemPort!
-    createWorkspace(workspaceSettings: WorkspaceSettingsInput!): WorkspaceSettings!
-    deleteWorkspace(workspaceId: String!): String!
-    openPort(firmware: FirmwareRequirementInput!, friendlyName: String!, options: SerialPortOptionsInput!, portName: String!): SystemPort!
-    updateWorkspace(workspaceSettings: WorkspaceSettingsInput!): WorkspaceSettings!
+    createWorkspace(workspaceSettings: WorkspaceSettingsInput!): Workspace!
+    deleteWorkspace(workspaceId: String!): Workspace!
+    openPort(firmware: FirmwareRequirementInput!, options: SerialPortOptionsInput!, portName: String!): SystemPort!
+    openWorkspace(workspaceId: String!): Workspace!
+    updateWorkspace(workspaceSettings: WorkspaceSettingsInput!): Workspace!
 }
 
-type PortError {
-    message: String!
-    name: String!
-}
-
-type PortOptions {
+type PortOptions implements ISerialPortOptions {
     baudRate: Int!
     dataBits: Int
     handshake: Handshake
@@ -249,38 +275,36 @@ type Query {
     authenticate(token: String!): MakerverseSession!
     getPort(portName: String!): SystemPort!
     getSettings: MakerverseSettings!
-    getWorkspace(idOrPath: String!): WorkspaceSettings!
+    getWorkspace(workspaceId: String!): Workspace!
     listPorts: [SystemPort!]!
-    workspace(workspaceId: String, workspaceName: String): WorkspaceSettings!
+    listWorkspaces: [Workspace!]!
 }
 
 type Subscription {
-    onMachineConfiguration(portName: String!): MachineConfiguration!
-    onMachineSetting(portName: String!): MachineSetting!
-    onMachineState(portName: String!): MachineState!
-    onPortList: [SystemPort!]!
-    onPortStatus: SystemPort!
-    onWorkspacesChanged: WorkspaceChange!
-    openWorkspace(workspaceId: String!): Workspace!
+    onMachineConfiguration(portName: String!): ControlledMachine!
+    onMachineSetting(portName: String!): ControlledMachine!
+    onMachineState(portName: String!): ControlledMachine!
+    onPortChange: SystemPort!
+    onWorkspaceChange: Workspace!
 }
 
 type SystemPort {
     connection: ConnectedPort
-    error: PortError
+    error: AlertError
     options: PortOptions!
     portName: String!
     state: PortState!
+    topicId: String!
 }
 
 type Workspace {
+    error: AlertError
+    id: String!
+    port: SystemPort
+    portName: String!
     settings: WorkspaceSettings!
     state: WorkspaceState!
-    workspaceId: String!
-}
-
-type WorkspaceChange {
-    workspace: Workspace
-    workspaceId: String!
+    topicId: String!
 }
 
 type WorkspaceSettings {
@@ -386,6 +410,12 @@ enum MachineSpecType {
     WAVE_LENGTH
 }
 
+enum MachineTopic {
+    CONFIGURATION
+    SETTING
+    STATE
+}
+
 enum Parity {
     EVEN
     MARK
@@ -402,7 +432,7 @@ enum PortState {
     OPENING
     READY
     STARTUP
-    UNKNOWN
+    UNPLUGGED
 }
 
 enum StopBits {
@@ -413,13 +443,17 @@ enum StopBits {
 }
 
 enum WorkspaceState {
+    ACTIVE
     CLOSED
-    OPENED
+    DELETED
+    DISCONNECTED
+    ERROR
     OPENING
 }
 
 input ConnectionSettingsInput {
     firmware: MachineFirmwareSettingsInput!
+    machineProfileId: String
     manufacturer: String
     portName: String!
 }
@@ -428,7 +462,7 @@ input FirmwareRequirementInput {
     controllerType: MachineControllerType!
     edition: String
     name: String
-    value: Decimal
+    requiredVersion: Decimal!
 }
 
 input MachineAxisSettingsInput {
@@ -478,7 +512,7 @@ input MachinePartSettingsInput {
     partType: MachinePartType!
     settings: [MachineSettingSettingsInput!]!
     specs: [MachineSpecSettingsInput!]!
-    title: String
+    title: String!
 }
 
 input MachineSettingSettingsInput {

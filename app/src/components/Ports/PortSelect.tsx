@@ -1,4 +1,4 @@
-import AlertList from '@openworkshop/ui/components/Alerts/AlertList';
+import {AlertList} from '@openworkshop/ui/components/Alerts';
 import {
   Container,
   FormControl,

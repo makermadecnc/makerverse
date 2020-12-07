@@ -43,7 +43,7 @@ namespace Makerverse.Api.Identity.Services {
       Log.Information("[TOKEN] handoff token to {host}", Context.OwsHost);
 
       HttpClient client = Context.LoadOwsClient(token);
-      MakerverseUser? previouslyAuthenticatedUser = Context.enabledUsers.FirstOrDefault(u => u.Tokens.Contains(token));
+      MakerverseUser? previouslyAuthenticatedUser = Context.EnabledUsers.FirstOrDefault(u => u.Tokens.Contains(token));
       HttpResponseMessage? res = null;
 
       try {
@@ -88,26 +88,26 @@ namespace Makerverse.Api.Identity.Services {
     // Given any user object, make sure they can access the current install with the given token.
     private MakerverseSession ValidateAccess(MakerverseUser user, string token) {
       bool changed = false;
-      if (Context.enabledUsers.Count < 1) {
+      if (Context.EnabledUsers.Count < 1) {
         // First user. Automatically add as a user.
-        Context.enabledUsers.Push(user);
+        Context.EnabledUsers.Push(user);
         changed = true;
       } else {
         // Already have users. Check that this user is one of them.
-        MakerverseUser? existingUser = Context.enabledUsers.FirstOrDefault(
+        MakerverseUser? existingUser = Context.EnabledUsers.FirstOrDefault(
           u => u.Username.EqualsInvariantIgnoreCase(user.Username));
         if (existingUser == null) {
           Log.Warning("[ID] User {user} is not in valid users: {users}",
-            user.ToString(), Context.enabledUsers.Select(u => u.ToString()));
+            user.ToString(), Context.EnabledUsers.Select(u => u.ToString()));
           throw new UnauthorizedAccessException(
             $"{user.Username} does not have access to this installation. " +
-            $"{Context.enabledUsers.First().Username} must grant them access.");
+            $"{Context.EnabledUsers.First().Username} must grant them access.");
         }
         user = existingUser;
       }
 
       Log.Debug("[ID] User {username} found in users: {usernames}",
-        user.Username, Context.enabledUsers.Select(u => u.Username));
+        user.Username, Context.EnabledUsers.Select(u => u.Username));
       if (!user.Tokens.Contains(token)) {
         user.Tokens.Push(token);
         changed = true;

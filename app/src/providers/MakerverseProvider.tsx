@@ -4,7 +4,12 @@ import React, { FunctionComponent } from 'react';
 import {Redirect, Route, Switch, useLocation, Link } from 'react-router-dom';
 import {OpenWorkShop} from '@openworkshop/lib';
 import {
-  MakerverseEssentialSettingsFragment, MakerverseSessionFragment, useWorkspaceChangeSubscription,
+  StartupFragment,
+  MakerverseEssentialSettingsFragment,
+  MakerverseSessionFragment,
+  useWorkspaceChangeSubscription,
+  WorkspaceFullFragment,
+  WorkspaceState,
 } from '../api/graphql';
 import i18nConfig from '../config/i18n';
 import analytics from '../lib/analytics';
@@ -34,15 +39,14 @@ const MakerverseProvider: FunctionComponent<IProps> = (props) => {
   const onWorkspaceChanged = useWorkspaceChangeSubscription();
   const { connection } = props;
   const location = useLocation();
+  const [workspaceFragments, setWorkspaceFragments] = React.useState<WorkspaceFullFragment[]>([]);
   const [settings, setSettings] = React.useState<MakerverseEssentialSettingsFragment | undefined>(undefined);
   const [session, setSession] = React.useState<MakerverseSessionFragment | undefined>(undefined);
 
   const user = useSelector<AppState, User | undefined>((state) => state.oidc.user);
-  const token = user ? user.access_token : undefined;
 
   // Load/unload workspaces
-  const workspaceRecords = settings?.workspaces ?? [];
-  const currentWorkspaceIds = workspaceRecords.map(ws => ws.id);
+  const currentWorkspaceIds = workspaceFragments.map(ws => ws.id);
   const previousWorkspaceIds = Object.keys(workspaceObjects);
   const newWorkspaceIds = _.difference(currentWorkspaceIds, previousWorkspaceIds);
   const removedWorkspaceIds = _.difference(previousWorkspaceIds, currentWorkspaceIds);
@@ -53,10 +57,10 @@ const MakerverseProvider: FunctionComponent<IProps> = (props) => {
   });
 
   newWorkspaceIds.forEach(id => {
-    const record = _.find(workspaceRecords, r => r.id === id);
-    if (record) {
+    const frag = _.find(workspaceFragments, r => r.id === id);
+    if (frag) {
       log.debug('load workspace', id);
-      workspaceObjects[id] = new Workspace(ows, record);
+      workspaceObjects[id] = new Workspace(ows, frag);
     } else {
       log.error('missing workspace', id);
     }
@@ -69,24 +73,26 @@ const MakerverseProvider: FunctionComponent<IProps> = (props) => {
 
   // Apply subscription mutations
   React.useEffect(() => {
-    if (settings && onWorkspaceChanged.data && onWorkspaceChanged.data.change) {
-      const { workspaceId, workspace } = onWorkspaceChanged.data.change;
-      const workspaces = [...workspaceRecords];
-      const ei = workspaces.findIndex(ws => ws.id === workspaceId);
-      if (workspace) {
+    if (settings && onWorkspaceChanged.data && onWorkspaceChanged.data.workspace) {
+      const workspaceFragment: WorkspaceFullFragment = onWorkspaceChanged.data.workspace;
+
+      const changedWorkspaceId = workspaceFragment.id;
+      const newFragments = [...workspaceFragments];
+
+      if (workspaceFragment.state === WorkspaceState.Deleted) {
+        log.debug('[WORKSPACE]', 'delete', changedWorkspaceId, workspaceFragment);
+        const ei = _.findIndex(newFragments, ws => ws.id === changedWorkspaceId);
         if (ei >= 0) {
-          workspaceObjects[workspace.settings.id].updateRecord(workspace.settings);
-        } else {
-          log.debug('[WORKSPACE]', 'add', workspaceId, workspace);
-          workspaces.push(workspace.settings);
+          newFragments.splice(ei, 1);
         }
-      } else if(ei >= 0) {
-        workspaces.splice(ei, 1);
-        log.debug('[WORKSPACE]', 'remove', workspaceId, workspace);
+      } else if (_.has(workspaceObjects, changedWorkspaceId)) {
+        log.debug('[WORKSPACE]', 'update', changedWorkspaceId, workspaceFragment);
+        workspaceObjects[changedWorkspaceId].updateRecord(workspaceFragment);
       } else {
-        log.warn('[WORKSPACE]', 'deleted by server; not present on client', workspaceId);
+        log.debug('[WORKSPACE]', 'add', changedWorkspaceId, workspaceFragment);
+        newFragments.push(workspaceFragment);
+        setWorkspaceFragments(newFragments);
       }
-      setSettings({ ...settings, workspaces });
     }
   }, [workspaceObjects, onWorkspaceChanged]);
 
@@ -99,10 +105,11 @@ const MakerverseProvider: FunctionComponent<IProps> = (props) => {
     analytics.initialize(ows);
   }, []);
 
-  function onLoaded(u: MakerverseSessionFragment, s: MakerverseEssentialSettingsFragment) {
-    log.debug('loaded', 'session', !!u, 'settings', !!s);
-    setSession(u);
-    setSettings(s);
+  function onLoaded(session: MakerverseSessionFragment, startup: StartupFragment) {
+    log.debug('loaded', 'session', !!session, 'settings', !!startup);
+    setSession(session);
+    setSettings(startup.settings);
+    setWorkspaceFragments(startup.workspaces);
   }
 
   return (

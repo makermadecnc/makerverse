@@ -23,8 +23,7 @@ import {
   MachinePartCompleteFragment,
   MachinePresetSettingPropsFragment
 } from '@openworkshop/lib/api/graphql';
-import AlertList from '@openworkshop/ui/components/Alerts/AlertList';
-import {IAlertMessage} from '@openworkshop/ui/components/Alerts/AlertMessage';
+import {IAlertMessage, AlertList} from '@openworkshop/ui/components/Alerts';
 import { Redirect } from 'react-router-dom';
 
 type Props = {
@@ -75,7 +74,7 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
       isDefault: part.isDefault,
       optional: part.optional,
       partType: part.partType,
-      title: part.title,
+      title: part.title ?? '',
       specs: part.specs.map((setting) => {
         return _.omit(setting, ['__typename']);
       }),
@@ -92,6 +91,7 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
       log.error('no portName before create');
       return;
     }
+
     // Smush the OWS types into a Workspace.
     const workspaceSettings: WorkspaceSettingsInput = {
       id: workspaceId,
@@ -112,6 +112,7 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
       }),
       connection: {
         portName,
+        machineProfileId: machine.profile.machineProfileId ?? null,
         manufacturer: null,
         firmware: {
           ..._.omit(machine.firmware, ['__typename']),

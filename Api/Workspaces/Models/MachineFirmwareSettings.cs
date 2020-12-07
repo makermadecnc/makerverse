@@ -7,6 +7,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using OpenWorkEngine.OpenController.MachineProfiles.Enums;
 using OpenWorkEngine.OpenController.MachineProfiles.Interfaces;
+using OpenWorkEngine.OpenController.Ports.Messages;
 
 namespace Makerverse.Api.Workspaces.Models {
   [AuthorizeMakerverseUser]
@@ -49,5 +50,8 @@ namespace Makerverse.Api.Workspaces.Models {
     public void LoadSettings(JObject obj) {
       JsonConvert.PopulateObject(JsonConvert.SerializeObject(obj), this);
     }
+
+    public FirmwareRequirement ToRequirement() =>
+      new FirmwareRequirement() { ControllerType = ControllerType, Name = Name };
   }
 }

@@ -1,23 +1,21 @@
 import { Typography } from '@material-ui/core';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import {Preloader} from '@openworkshop/ui/components';
-import AlertList from '@openworkshop/ui/components/Alerts/AlertList';
-import ToolbarCard from '@openworkshop/ui/components/Cards/ToolbarCard';
-import ThreeColumns from '@openworkshop/ui/components/Layout/ThreeColumns';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {Link } from 'react-router-dom';
 import {
-  MakerverseEssentialSettingsFragment,
+  StartupFragment,
   MakerverseSessionFragment,
   useStartupQuery,
 } from '../api/graphql';
 import App from './App';
+import {AlertDialog} from '@openworkshop/ui/components/Alerts';
 
 interface IProps {
   token: string;
   currentWorkspaceId?: string;
-  onLoaded: (u: MakerverseSessionFragment, s: MakerverseEssentialSettingsFragment) => void;
+  onLoaded: (u: MakerverseSessionFragment, s: StartupFragment) => void;
 }
 
 const ProtectedApp: React.FunctionComponent<IProps> = (props) => {
@@ -34,7 +32,7 @@ const ProtectedApp: React.FunctionComponent<IProps> = (props) => {
         setDataError(new Error('No data in response.'));
       } else {
         log.debug('valid token response');
-        onLoaded(data.session, data.settings);
+        onLoaded(data.session, data);
       }
     }
   }, [loading, data, error]);
@@ -46,17 +44,14 @@ const ProtectedApp: React.FunctionComponent<IProps> = (props) => {
 
   if (error || dataError) {
     log.warn('failed to start', loading, error, data);
-    const footer = <Typography variant="subtitle1"><Link to="/login">{t('Return to Login')}</Link></Typography>;
     return (
-      <ThreeColumns >
-        <ToolbarCard title={t('Startup Error')} footer={footer}>
-          <AlertList errors={[error, dataError]} />
-        </ToolbarCard>
-      </ThreeColumns>
+      <AlertDialog title={t('Startup Error')} permanent={true} errors={[error, dataError]}>
+        <Typography variant="subtitle1"><Link to="/login">{t('Return to Login')}</Link></Typography>
+      </AlertDialog>
     );
   }
 
-  log.debug('[TOKEN]', 'validated', data);
+  log.verbose('[TOKEN]', 'validated', data);
   return <App currentWorkspaceId={currentWorkspaceId} />;
 };
 

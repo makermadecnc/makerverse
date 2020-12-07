@@ -1,13 +1,12 @@
 import {Logger} from '@openworkshop/lib/utils/logging/Logger';
 import _ from 'lodash';
 import { IOpenWorkShop } from '@openworkshop/lib';
-import api from 'api';
 import events from 'events';
 import store from 'store';
 import MachineSettings from '../MachineSettings';
 import ActiveState, {IPos} from './active-state';
 import Hardware from './hardware';
-import {ControllerEventMap, WorkspaceRecord} from './types';
+import {ControllerEventMap, WorkspaceEvent} from './types';
 import WorkspaceAxis from './workspace-axis';
 import { WorkspaceAxisMap} from './types';
 import {
@@ -18,13 +17,15 @@ import {
   MachineFirmwareFragment,
   MachineCommandFragment,
   MachinePartFragment,
-  MachineSettingsFragment,
+  MachineSettingsFragment, WorkspaceFullSettingsFragment, WorkspaceFullFragment, WorkspaceState,
 } from 'api/graphql';
 
 export type MachineCommandType = 'homing';
 
 class Workspace extends events.EventEmitter {
-  _record: WorkspaceRecord;
+  _record: WorkspaceFullFragment;
+
+  _settings: WorkspaceFullSettingsFragment;
 
   _isActive = false;
 
@@ -53,10 +54,11 @@ class Workspace extends events.EventEmitter {
   _log?: Logger;
 
   // record comes from an API response, loaded from .makerverse
-  constructor(ows:IOpenWorkShop, record: WorkspaceRecord) {
+  constructor(ows:IOpenWorkShop, record: WorkspaceFullFragment) {
     super();
     this._ows = ows;
     this._record = record;
+    this._settings = record.settings;
     // this.addControllerEvents(this._controllerEvents);
 
     const controllerType = this.firmware.controllerType;
@@ -71,25 +73,26 @@ class Workspace extends events.EventEmitter {
   }
 
   // Convenience: pass-through to record
-  get id(): string { return this._record.id; }
-  get path(): string { return this._record.path; }
-  get name(): string { return this._record.name; }
-  get connection(): MachineConnectionFragment { return this._record.connection; }
+  get id(): string { return this._settings.id; }
+  get path(): string { return this._settings.path; }
+  get name(): string { return this._settings.name; }
+  get connection(): MachineConnectionFragment { return this._settings.connection; }
   get firmware(): MachineFirmwareFragment { return this.connection.firmware; }
+  get state(): WorkspaceState { return this._record.state; }
 
   get hasOnboarding(): boolean {
     return this.partSettings.length > 0 || this.firmware.controllerType === MachineControllerType.Maslow;
   }
 
   get hasOnboarded(): boolean {
-    return this._record.onboarded;
+    return this._settings.onboarded;
   }
 
   set hasOnboarded(val: boolean) {
     if (this.hasOnboarded === val) {
       return;
     }
-    this.updateRecord({ ...this._record, onboarded: val });
+    this.updateSettings({ ...this._settings, onboarded: val });
   }
 
   // Flag set by main App.jsx to indicate if this is the active workspace.
@@ -114,7 +117,7 @@ class Workspace extends events.EventEmitter {
   }
 
   onActivated(): void {
-    if (this._record.autoReconnect) {
+    if (this._settings.autoReconnect) {
       void this.openPort();
     }
     this.hardware.onActivated();
@@ -143,28 +146,36 @@ class Workspace extends events.EventEmitter {
 
   // Sidebar icon.
   get icon(): string {
-    return this._record.icon || Workspace.getControllerTypeIconName(this.firmware.controllerType);
+    return this._settings.icon || Workspace.getControllerTypeIconName(this.firmware.controllerType);
   }
 
   get hexColor(): string {
-    return this._record.color || Workspace.defaultColor;
+    return this._settings.color || Workspace.defaultColor;
   }
 
   get bkColor(): string {
-    return this._record.bkColor || Workspace.defaultBkColor;
+    return this._settings.bkColor || Workspace.defaultBkColor;
   }
 
-  updateRecord(values: WorkspaceRecord): void {
-    this._record = { ...this._record, ...values };
-    this.log.debug('[WORKSPACE]', 'update', this.id, this._record);
+  updateSettings(values: WorkspaceFullSettingsFragment): void {
+    this._settings = { ...this._settings, ...values };
+    this.log.debug('[WORKSPACE]', 'update', this.id, this._settings);
     // void api.workspaces.update(this.id, values);
   }
+
+  updateRecord(value: WorkspaceFullFragment): void {
+    const stateChanged = this._record.state != value.state;
+    this.updateSettings(value.settings);
+    this._record = { ...this._record, ...value };
+    if (stateChanged) this.emit(WorkspaceEvent.State.toString(), this);
+  }
+
   // ---------------------------------------------------------------------------------------------
   // PARTS
   // ---------------------------------------------------------------------------------------------
 
   get parts(): MachinePartFragment[] {
-    return this._record.parts || [];
+    return this._settings.parts || [];
   }
 
   findPart(partType: MachinePartType): MachinePartFragment | undefined {
@@ -198,7 +209,7 @@ class Workspace extends events.EventEmitter {
   // the response, keyed by the same axisKey.
   mapAxes(builder?: (v: WorkspaceAxis) => WorkspaceAxis): WorkspaceAxisMap {
     const ret: WorkspaceAxisMap = {};
-    this._record.axes.forEach((axisRecord) => {
+    this._settings.axes.forEach((axisRecord) => {
       const axisKey = axisRecord.name;
       if (!_.has(this._axes, axisRecord.name)) {
         this._axes[axisKey] = new WorkspaceAxis(this, axisRecord);
@@ -274,7 +285,7 @@ class Workspace extends events.EventEmitter {
   // ---------------------------------------------------------------------------------------------
 
   get features(): MachineFeatureFragment[] {
-    return this._record.features || [];
+    return this._settings.features || [];
   }
 
   getFeature(key: string, defaults: MachineFeatureFragment): MachineFeatureFragment | undefined {
@@ -328,7 +339,7 @@ class Workspace extends events.EventEmitter {
   // ---------------------------------------------------------------------------------------------
 
   get commands(): MachineCommandFragment[] {
-    return this._record.commands;
+    return this._settings.commands;
   }
 
   getCommand(name: string, def = []): string[] {
