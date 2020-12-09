@@ -12,18 +12,18 @@ import analytics from '../../lib/analytics';
 import {MakerverseContext} from '../../lib/Makerverse';
 import ReconnectRedirect from '../Navigation/ReconnectRedirect';
 import useStyles from './Styles';
+import {useMakerverse} from '../../providers';
 
 type Props = {
 
 };
 
 const CallbackPage: FunctionComponent<Props> = () => {
-  const { t } = useTranslation();
+  const makerverse = useMakerverse();
   const log = useLogger(CallbackPage);
   const classes = useStyles();
   const [error, setError] = React.useState<Error | undefined>(undefined);
   const [token, setToken] = React.useState<string | undefined>(undefined);
-  const makerverse = React.useContext(MakerverseContext);
 
   function handleSuccess(oidc: User) {
     log.debug('success', oidc);
@@ -77,7 +77,7 @@ const CallbackPage: FunctionComponent<Props> = () => {
   return (
     <ThreeColumns>
       <ToolbarCard
-        title={t('Authentication')}
+        title={makerverse.t('Authentication')}
         footer={footer}
       >
         {renderBody()}

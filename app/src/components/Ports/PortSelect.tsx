@@ -18,6 +18,7 @@ import PortStatus from './PortStatus';
 import useStyles from './Styles';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import {PortState} from '../../api/graphql';
+import {useMakerverse} from '../../providers';
 
 interface OwnProps {
   selectedPortName: string;
@@ -28,7 +29,7 @@ type Props = OwnProps;
 
 const PortSelect: FunctionComponent<Props> = (props) => {
   const classes = useStyles();
-  const { t } = useTranslation();
+  const makerverse = useMakerverse();
   const theme = useTheme();
   const log = useLogger(PortSelect);
   const portCollection: IPortCollection = useSystemPorts();
@@ -56,9 +57,9 @@ const PortSelect: FunctionComponent<Props> = (props) => {
   }
 
   function getHelperText(): string | undefined {
-    if (!port) return t('Required');
-    if (port.state === PortState.Error) return port.error?.name ?? t('Cannot connect to machine.');
-    if (port.state === PortState.Ready) return t('The port must not be in-use by any other programs.');
+    if (!port) return makerverse.t('Required');
+    if (port.state === PortState.Error) return port.error?.name ?? makerverse.t('Cannot connect to machine.');
+    if (port.state === PortState.Ready) return makerverse.t('The port must not be in-use by any other programs.');
     return '';
   }
 

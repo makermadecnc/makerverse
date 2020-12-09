@@ -44,11 +44,10 @@ const App: React.FunctionComponent<IProps> = (props) => {
     } else {
       setPage(settings.productName, location.pathname);
     }
-
   }, [analytics, log, workspace]);
 
   return (
-    <Navigation>
+    <Navigation workspace={workspace}>
       <BackendDiconnectedModal />
       <Switch>
         {workspaceIds.map((workspaceId) => {

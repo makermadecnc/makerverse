@@ -48,7 +48,7 @@ const PortConnectionSteps: React.FunctionComponent<Props> = (props) => {
     if (step === ConnectionStep.CheckProtocol) return t('Check Protocol');
     if (step === ConnectionStep.InspectFirmware) return t('Inspect Firmware');
     return t('Unknown');
-  };
+  }
 
   function getTip(step: ConnectionStep) {
     if (step === ConnectionStep.NotOpen) return t('This port is not open.');
@@ -82,7 +82,7 @@ const PortConnectionSteps: React.FunctionComponent<Props> = (props) => {
     <Container>
       <Stepper activeStep={activeStep} orientation="vertical" >
         {stepsNumbers.map((num) => {
-          const error: IAlertMessage | undefined = num <= activeStep ? getError(num) : undefined;
+          const error = num <= activeStep ? getError(num) : undefined;
           const showCaption = error || num === activeStep;
           return (
             <Step key={num} >

@@ -9,7 +9,7 @@ import {useSystemPorts} from '../../providers/SystemPortHooks';
 import { Grid } from '@material-ui/core';
 import {IMaybeHavePortStatus} from '../../components/Ports/types';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
-import OpenWorkspaceButton from '../../components/Workspaces/OpenWorkspaceButton';
+import OpenWorkspaceButton from './OpenWorkspaceButton';
 
 type Props = IHaveWorkspaceId & IMaybeHavePortStatus;
 

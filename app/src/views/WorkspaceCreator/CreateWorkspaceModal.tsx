@@ -25,6 +25,7 @@ import {
 } from '@openworkshop/lib/api/graphql';
 import {IAlertMessage, AlertList} from '@openworkshop/ui/components/Alerts';
 import { Redirect } from 'react-router-dom';
+import {useMakerverse} from '../../providers';
 
 type Props = {
   machine?: ICustomizedMachine;
@@ -35,7 +36,7 @@ type Props = {
 
 const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
   const log = useLogger(CreateWorkspaceModal);
-  const { t } = useTranslation();
+  const makerverse = useMakerverse();
   const { open, onClose, machine, portName } = props;
   const ports = useSystemPorts();
   const port = portName ? ports.portMap[portName] : undefined;
@@ -142,7 +143,7 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
     <CardDialog
       open={open}
       onClose={onClose}
-      title={t('Create Workspace')}
+      title={makerverse.t('Create Workspace')}
       subHeader={<PortStatus port={port} showType={true} />}
     >
       <Grid container spacing={2}>
@@ -154,7 +155,7 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
             required={true}
             variant='outlined'
           >
-            <InputLabel htmlFor='workspace-name'>{t('Workspace Name')}</InputLabel>
+            <InputLabel htmlFor='workspace-name'>{makerverse.t('Workspace Name')}</InputLabel>
             <Input
               id='workspace-name'
               name='workspace-name'
@@ -175,13 +176,13 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
           <FormControl className={classes.formControl}>
             <FormControlLabel
               control={<Checkbox checked={preferImperial} onChange={() => setPreferImperial(!preferImperial)} />}
-              label={t('I prefer imperial (inches) to metric (mm)')}
+              label={makerverse.t('I prefer imperial (inches) to metric (mm)')}
             />
           </FormControl>
           <FormControl className={classes.formControl}>
             <FormControlLabel
               control={<Checkbox checked={autoReconnect} onChange={() => setAutoReconnect(!autoReconnect)} />}
-              label={t('Automatically (re)connect to the machine when the workspace is opened.')}
+              label={makerverse.t('Automatically (re)connect to the machine when the workspace is opened.')}
             />
           </FormControl>
         </Grid>
@@ -196,7 +197,7 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
                 eventLabel='learn more'
                 to={docs.urlAbout}
                 target='_blank'>
-                {t('Learn More')}
+                {makerverse.t('Learn More')}
               </analytics.OutboundLink>
             </Trans>
           </Typography>
@@ -214,7 +215,7 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
               disabled={!canCreate}
             >
               <OpenWorkShopIcon name={icon} className={classes.leftButtonIconAdornment} />
-              <Typography variant="h6">{t('Start Making Something')}</Typography>
+              <Typography variant="h6">{makerverse.t('Start Making Something')}</Typography>
             </Fab>
           </FormControl>
         </Grid>

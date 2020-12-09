@@ -60,29 +60,32 @@ namespace Makerverse.Api.Workspaces.Models {
 
     private void UpdatePortState(SystemPort port) {
       PortState st = port.State;
-      if (st == PortState.Active) Manager.EmitState(this, WorkspaceState.Active);
-      if (st == PortState.Error) {
-        Error = port.Error ?? new AlertError(new PortException("Could not open port", port.PortName));
-        Manager.EmitState(this, WorkspaceState.Error);
+      if (st == PortState.Unplugged) Manager.EmitState(this, WorkspaceState.Disconnected);
+      if (st == PortState.Ready) Manager.EmitState(this, WorkspaceState.Closed);
+
+      if (State == WorkspaceState.Opening) {
+        if (st == PortState.Active) Manager.EmitState(this, WorkspaceState.Active);
+        if (st == PortState.Error) {
+          Error = port.Error ?? new AlertError(new PortException("Could not open port", port.PortName));
+          Manager.EmitState(this, WorkspaceState.Error);
+        }
       }
     }
 
     // Respond to ports appearing and disappearing by keeping the SystemPort up to date.
     private void UpdatePort(SystemPort? port) {
+      Log.Debug("Update port {port} on {workspace}", port?.ToString(), ToString());
       if (port != null && !port.PortName.Equals(PortName)) return;
       bool hadPort = Port != null;
       bool hasPort = port != null;
       if (hadPort == hasPort && Port == port) {
         if (port != null) UpdatePortState(port);
+        else Manager.EmitState(this, WorkspaceState.Disconnected);
         return;
       }
       Port = port;
       Log.Debug("[WORKSPACE] port updated: {workspace}", ToString());
-      if (hasPort) {
-        Manager.EmitState(this, WorkspaceState.Closed);
-      } else {
-        Manager.EmitState(this, WorkspaceState.Disconnected);
-      }
+      Manager.EmitState(this, hasPort ? WorkspaceState.Closed : WorkspaceState.Disconnected);
     }
 
     public Workspace(WorkspaceManager mgr, WorkspaceSettings settings) {

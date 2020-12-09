@@ -3,7 +3,7 @@ import _ from 'lodash';
 import ReactGA from 'react-ga';
 import settings from 'config/settings';
 import { ISemver } from './semvers';
-import { Logger } from '@openworkshop/lib/utils/logging/Logger';
+import { Logger } from '@openworkshop/lib/utils/logging';
 
 let log: Logger | undefined = undefined;
 

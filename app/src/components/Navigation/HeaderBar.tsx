@@ -1,22 +1,24 @@
 import { AppBar, IconButton, Toolbar, Typography } from '@material-ui/core';
-import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
+// import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import React, { FunctionComponent } from 'react';
 import settings from '../../config/settings';
-import { MakerverseContext } from '../../lib/Makerverse';
 import useStyles from './Styles';
 import UserMenu from './UserMenu';
+import {IMaybeHaveWorkspace} from '../Workspaces';
 
 interface OwnProps {
   toggleDrawerOpen: () => void;
 }
 
-type Props = OwnProps;
+type Props = OwnProps & IMaybeHaveWorkspace;
 
 const HeaderBar: FunctionComponent<Props> = (props) => {
-  const log = useLogger(HeaderBar);
-  const makerverse = React.useContext(MakerverseContext);
+  // const log = useLogger(HeaderBar);
+  // const makerverse = React.useContext(MakerverseContext);
   // const workspace = makerverse.workspaces.current;
   const classes = useStyles();
+  const { toggleDrawerOpen, workspace } = props;
+  const title = workspace ? workspace.name : settings.productName;
 
   // const bk = workspace ? { backgroundColor: workspace.hexColor } : {};
   // log.debug('workspace', workspace, bk);
@@ -27,7 +29,7 @@ const HeaderBar: FunctionComponent<Props> = (props) => {
         <IconButton
           aria-label='open drawer'
           edge='start'
-          onClick={() => props.toggleDrawerOpen()}
+          onClick={toggleDrawerOpen}
           className={classes.menuButton}
         >
           <img
@@ -36,7 +38,7 @@ const HeaderBar: FunctionComponent<Props> = (props) => {
           />
         </IconButton>
         <Typography variant='h1' noWrap className={classes.headerTitle}>
-          {settings.productName}
+          {title}
         </Typography>
         <UserMenu />
       </Toolbar>

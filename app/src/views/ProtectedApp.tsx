@@ -11,6 +11,7 @@ import {
 } from '../api/graphql';
 import App from './App';
 import {AlertDialog} from '@openworkshop/ui/components/Alerts';
+import {useMakerverse} from '../providers';
 
 interface IProps {
   token: string;
@@ -20,7 +21,7 @@ interface IProps {
 
 const ProtectedApp: React.FunctionComponent<IProps> = (props) => {
   const log = useLogger(ProtectedApp);
-  const { t } = useTranslation();
+  const makerverse = useMakerverse();
   const { onLoaded, currentWorkspaceId, token } = props;
   const [ dataError, setDataError ] = React.useState<Error | undefined>(undefined);
   const { loading, data, error } = useStartupQuery({ variables: { token: token ?? '' }});
@@ -45,8 +46,8 @@ const ProtectedApp: React.FunctionComponent<IProps> = (props) => {
   if (error || dataError) {
     log.warn('failed to start', loading, error, data);
     return (
-      <AlertDialog title={t('Startup Error')} permanent={true} errors={[error, dataError]}>
-        <Typography variant="subtitle1"><Link to="/login">{t('Return to Login')}</Link></Typography>
+      <AlertDialog title={makerverse.t('Startup Error')} permanent={true} errors={[error, dataError]}>
+        <Typography variant="subtitle1"><Link to="/login">{makerverse.t('Return to Login')}</Link></Typography>
       </AlertDialog>
     );
   }

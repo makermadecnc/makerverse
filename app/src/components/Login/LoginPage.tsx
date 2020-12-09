@@ -16,13 +16,13 @@ import useStyles from './Styles';
 import analytics from 'lib/analytics';
 import settings from 'config/settings';
 import docs from 'constants/docs';
-import { useTranslation } from 'react-i18next';
+import {useMakerverse} from '../../providers';
 
 const LoginPage: FunctionComponent = () => {
   const log = useLogger(LoginPage);
   const ows = React.useContext(OpenWorkShop);
   const classes = useStyles();
-  const { t } = useTranslation();
+  const makerverse = useMakerverse();
   const [guest, setGuest] = React.useState<MakerverseUser | undefined>(undefined);
   const [useCookies, setUseCookies] = React.useState<boolean>(false);
   const [dangerous, setDangerous] = React.useState<boolean>(false);
@@ -64,22 +64,22 @@ const LoginPage: FunctionComponent = () => {
   const footer = <Typography variant="subtitle2">
     {!guest && (
       <analytics.OutboundLink eventLabel='why_login' to={docs.urlSecurity} target='_blank'>
-        {t('Why is it necessary to log in?')}
+        {makerverse.t('Why is it necessary to log in?')}
       </analytics.OutboundLink>
     )}
     {guest && (
       <div>
         <FormControlLabel
           control={<Checkbox checked={useCookies} onChange={() => setUseCookies(!useCookies)} />}
-          label={t('Remember me (I consent to cookies)')}
+          label={makerverse.t('Remember me (I consent to cookies)')}
         />
         <FormControlLabel
           control={<Checkbox checked={dangerous} onChange={() => setDangerous(!dangerous)} />}
-          label={t('I understand "guest mode" is hazardous. ')}
+          label={makerverse.t('I understand "guest mode" is hazardous. ')}
         />
         <br />
         <Button onClick={() => handleGuest()} disabled={authenticating || !dangerous}>
-          {t('Continue as Guest')}
+          {makerverse.t('Continue as Guest')}
         </Button>
       </div>
     )}
@@ -88,7 +88,7 @@ const LoginPage: FunctionComponent = () => {
   return (
     <ThreeColumns>
       <ToolbarCard
-        title={t('Login to {{ productName }}', settings)}
+        title={makerverse.t('Login to {{ productName }}', settings)}
         footer={footer}
       >
         <div className={classes.centered}>
@@ -103,9 +103,9 @@ const LoginPage: FunctionComponent = () => {
             <img src='/images/logos/makerverse.png' alt='Logo' className={classes.logo1} />
             {!authenticating && (
               <span>
-                {t('Login')}
+                {makerverse.t('Login')}
                 <br />
-                {t('(or Create Account)')}
+                {makerverse.t('(or Create Account)')}
               </span>
             )}
             {authenticating && <CircularProgress />}

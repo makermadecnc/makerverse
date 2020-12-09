@@ -1,3 +1,4 @@
+
 import _ from 'lodash';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import React, { FunctionComponent } from 'react';
@@ -16,7 +17,7 @@ import analytics from '../lib/analytics';
 import {IMakerverse, MakerverseContext} from '../lib/Makerverse';
 import { LoginPage, CallbackPage } from 'components/Login';
 import usePromise from 'react-promise-suspense';
-import i18next from 'i18next';
+import i18next, { StringMap } from 'i18next';
 import XHR from 'i18next-xhr-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { Workspace } from 'lib/workspaces';
@@ -96,11 +97,15 @@ const MakerverseProvider: FunctionComponent<IProps> = (props) => {
     }
   }, [workspaceObjects, onWorkspaceChanged]);
 
+  function t(key: string, opts?: StringMap): string {
+    return ows.t(key, opts);
+  }
+
   // Set up the IMakerverse interface for the .Provider...
-  const makerverse: IMakerverse = { ows, connection, session, workspaces };
+  const makerverse: IMakerverse = { ows, connection, session, workspaces, t };
 
   usePromise(async () => {
-    log.debug('loading...');
+    log.debug('loading...', ows);
     await i18next.use(XHR).use(LanguageDetector).init(i18nConfig);
     analytics.initialize(ows);
   }, []);

@@ -1,4 +1,4 @@
-import {Logger} from '@openworkshop/lib/utils/logging/Logger';
+import {Logger} from '@openworkshop/lib/utils/logging';
 import _ from 'lodash';
 import { IOpenWorkShop } from '@openworkshop/lib';
 import events from 'events';
@@ -6,7 +6,7 @@ import store from 'store';
 import MachineSettings from '../MachineSettings';
 import ActiveState, {IPos} from './active-state';
 import Hardware from './hardware';
-import {ControllerEventMap, WorkspaceEvent} from './types';
+import {ControllerEventMap, IWorkspaceEvent, WorkspaceEventType} from './types';
 import WorkspaceAxis from './workspace-axis';
 import { WorkspaceAxisMap} from './types';
 import {
@@ -167,7 +167,14 @@ class Workspace extends events.EventEmitter {
     const stateChanged = this._record.state != value.state;
     this.updateSettings(value.settings);
     this._record = { ...this._record, ...value };
-    if (stateChanged) this.emit(WorkspaceEvent.State.toString(), this);
+    if (stateChanged) this.emitEvent(WorkspaceEventType.State);
+  }
+
+  emitEvent(eventType: WorkspaceEventType): void {
+    const event: IWorkspaceEvent = {
+      type: eventType,
+    };
+    this.emit(eventType.toString(), event);
   }
 
   // ---------------------------------------------------------------------------------------------

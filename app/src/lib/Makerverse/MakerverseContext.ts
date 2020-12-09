@@ -3,6 +3,8 @@ import React from 'react';
 import {MakerverseSessionFragment} from '../../api/graphql';
 import {Workspace} from '../workspaces';
 import {BackendConnection} from './apollo';
+import {TTranslateFunc} from '@openworkshop/lib/OpenWorkShop';
+import { StringMap } from 'i18next';
 
 export interface IMakerverse {
   ows: IOpenWorkShop;
@@ -12,6 +14,8 @@ export interface IMakerverse {
   session: MakerverseSessionFragment | undefined;
 
   workspaces: Workspace[];
+
+  t: TTranslateFunc;
 }
 
 // Contexts require a default value...
@@ -24,6 +28,8 @@ export class EmptyMakerverse implements IMakerverse {
   get session(): MakerverseSessionFragment | undefined { throw new Error(msg); }
 
   get workspaces(): Workspace[] { throw new Error(msg); }
+
+  public t(key: string, opts?: StringMap) { return ''; }
 }
 
 export const MakerverseContext: React.Context<IMakerverse> = React.createContext<IMakerverse>(new EmptyMakerverse());

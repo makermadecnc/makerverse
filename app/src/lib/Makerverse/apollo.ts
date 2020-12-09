@@ -1,4 +1,4 @@
-import {Logger} from '@openworkshop/lib/utils/logging/Logger';
+import {Logger} from '@openworkshop/lib/utils/logging';
 import { EventEmitter } from 'events';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import {IOpenWorkShop} from '@openworkshop/lib';
@@ -62,7 +62,6 @@ export class BackendConnection extends EventEmitter {
     subscriptionClient.onError((a) => {
       this.log.error('[subscription]', 'error', a);
     });
-
 
     const ws =  new WebSocketLink(subscriptionClient);
     ws.setOnError(req => {

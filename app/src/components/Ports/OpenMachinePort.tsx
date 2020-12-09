@@ -19,6 +19,7 @@ import {useSystemPorts} from '../../providers/SystemPortHooks';
 import useStyles from './Styles';
 import PortConnectionSteps from './PortConnectionSteps';
 import {AlertList} from '@openworkshop/ui/components/Alerts';
+import { useMakerverse } from 'providers';
 
 interface OwnProps {
   machine: ICustomizedMachine;
@@ -33,7 +34,7 @@ type Props = OwnProps;
 
 const OpenMachinePort: FunctionComponent<Props> = (props) => {
   const log = useLogger(OpenMachinePort);
-  const { t } = useTranslation();
+  const makerverse = useMakerverse();
   const classes = useStyles();
   const portCollection = useSystemPorts();
   const [openPort, openedPort] = useOpenPortMutation();
@@ -115,7 +116,7 @@ const OpenMachinePort: FunctionComponent<Props> = (props) => {
             <Trans>Connect to your Machine's Port</Trans>
 
             <HoverHelpStep
-              tip={t('Makerverse will attempt to communicate with the device via the port, testing to see if it' +
+              tip={makerverse.t('Makerverse will attempt to communicate with the device via the port, testing to see if it' +
                 ' understands the output.')}
               isComplete={false}
             />
@@ -147,7 +148,7 @@ const OpenMachinePort: FunctionComponent<Props> = (props) => {
               disabled={selectedPortName === ''}
             >
               <FontAwesomeIcon className={classes.connectIcon} icon={faPlug} />
-              <Typography variant="h6">{isConnecting ? t('Cancel') : t('Connect')}</Typography>
+              <Typography variant="h6">{isConnecting ? makerverse.t('Cancel') : makerverse.t('Connect')}</Typography>
             </Fab>
           </FormControl>}
           {isConnected && <FormControl

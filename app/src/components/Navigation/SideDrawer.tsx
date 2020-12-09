@@ -35,7 +35,7 @@ const SideDrawer: React.FunctionComponent<Props> = (props) => {
   // };
 
   return (
-    <nav className={classes.drawer} aria-label='workspaces'>
+    <nav className={classes.drawer} aria-label='main menu'>
       <Drawer
         variant='permanent'
         className={clsx(classes.drawer, {

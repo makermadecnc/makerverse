@@ -1,4 +1,4 @@
-import {Typography } from '@material-ui/core';
+import {Typography, Container } from '@material-ui/core';
 import {ICustomizedMachine} from '@openworkshop/lib/api/Machines/CustomizedMachine';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import CustomizeMachine from '@openworkshop/ui/components/MachineProfiles/CustomizeMachine';
@@ -6,10 +6,12 @@ import React, { FunctionComponent } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import OpenMachinePort from '../../components/Ports/OpenMachinePort';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
+import useStyles from './Styles';
 
 const WorkspaceCreator: FunctionComponent = () => {
   const log = useLogger(WorkspaceCreator);
   const { t } = useTranslation();
+  const classes = useStyles();
   const [machine, setMachine] = React.useState<ICustomizedMachine | undefined>(undefined);
   const [selectedPortName, setSelectedPortName] = React.useState<string>('');
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -24,7 +26,7 @@ const WorkspaceCreator: FunctionComponent = () => {
   }
 
   return (
-    <React.Fragment>
+    <Container className={classes.root}>
       <Typography variant='h5'>
         <Trans>Create Workspace</Trans>
       </Typography>
@@ -47,7 +49,7 @@ const WorkspaceCreator: FunctionComponent = () => {
         machine={machine}
         portName={selectedPortName}
       />
-    </React.Fragment>
+    </Container>
   );
 };
 

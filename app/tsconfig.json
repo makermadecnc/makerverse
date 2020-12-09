@@ -19,7 +19,7 @@
     ],
     "skipLibCheck": true,
     "rootDir": "src",
-    "baseUrl": "./src",
+    "baseUrl": "src",
     "noFallthroughCasesInSwitch": true
   },
   "include": [

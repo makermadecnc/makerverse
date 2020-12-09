@@ -8,18 +8,17 @@ import {
   createStyles,
   Divider,
   List,
-  Typography,
 } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCogs, faProjectDiagram, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { faUsb } from '@fortawesome/free-brands-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import {PortStatusFragment, useListPortsQuery} from '../../api/graphql';
+import {PortStatusFragment} from '../../api/graphql';
 import {MakerverseContext} from '../../lib/Makerverse';
-import PortStatus from '../Ports/PortStatus';
 import ListMenuItem from './ListMenuItem';
 import {useSystemPorts} from '../../providers/SystemPortHooks';
+import WorkspaceStatus from '../Workspaces/WorkspaceStatus';
 
 interface OwnProps {
   isOpen: boolean;
@@ -39,6 +38,7 @@ const ListMenu: FunctionComponent<Props> = (props) => {
   const { t } = useTranslation();
   const classes = useStyles();
   const makerverse = React.useContext(MakerverseContext);
+  const workspaces = _.sortBy(makerverse.workspaces, ws => ws.name.toLowerCase());
   const showWorkspaces = makerverse.workspaces.length > 0;
   const iconStyle = { width: 24, height: 24, marginLeft: -2 };
 
@@ -54,7 +54,7 @@ const ListMenu: FunctionComponent<Props> = (props) => {
       {showWorkspaces && <React.Fragment>
         <Divider />
         <List>
-          {makerverse.workspaces.map((workspace) => {
+          {workspaces.map((workspace) => {
             const route = `/workspaces/${workspace.id}`;
             const icon = <OpenWorkShopIcon style={iconStyle} name={workspace.icon ?? 'xyz'} />;
             const port = portList.length > 0 ?
@@ -65,17 +65,17 @@ const ListMenu: FunctionComponent<Props> = (props) => {
               to={route}
               title={workspace.name}
               icon={icon}
-              subcomponent={<PortStatus port={port} />}
+              subcomponent={<WorkspaceStatus workspace={workspace} port={port} />}
             />;
           })}
         </List>
         <Divider />
       </React.Fragment>}
       <List>
-        {renderRouteItem('/home', t('Projects'), faProjectDiagram, t('MakerHub'))}
-        {renderRouteItem('/workspaces', t('Connect'), faUsb, t('Create a Workspace'))}
-        {renderRouteItem('/settings', t('Settings'), faCogs, t('& Useful Information'))}
-        {renderRouteItem('/docs', t('Documentation'), faQuestionCircle, t('& Support Requests'))}
+        {renderRouteItem('/home', makerverse.t('Projects'), faProjectDiagram, makerverse.t('MakerHub'))}
+        {renderRouteItem('/workspaces', makerverse.t('Connect'), faUsb, makerverse.t('Create a Workspace'))}
+        {renderRouteItem('/settings', makerverse.t('Settings'), faCogs, makerverse.t('& Useful Information'))}
+        {renderRouteItem('/docs', makerverse.t('Documentation'), faQuestionCircle, makerverse.t('& Support Requests'))}
       </List>
     </div>
   );
