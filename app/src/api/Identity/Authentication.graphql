@@ -1,0 +1,5 @@
+query Authenticate($token: String!) {
+    session: authenticate(token: $token) {
+        ...MakerverseSession
+    }
+}

@@ -1,0 +1,288 @@
+{
+  "watchDirectory": "/home/node/gcode",
+  "mountPoints": [
+    {
+      "route": "/tablet",
+      "target": "/home/node/makerverse/widgets/cncjs-shopfloor-tablet/src/"
+    }
+  ],
+  "accessTokenLifetime": "30d",
+  "workspaces": [
+    {
+      "id": "m2",
+      "path": "/m2",
+      "name": "M2",
+      "onboarded": true,
+      "controller": {
+        "controllerType": "Maslow",
+        "port": "/dev/ttyACM0",
+        "baudRate": 38400,
+        "rtscts": false,
+        "reconnect": false
+      },
+      "limits": {
+        "xmin": 0,
+        "xmax": 0,
+        "ymin": 0,
+        "ymax": 0,
+        "zmin": 0,
+        "zmax": 0
+      }
+    },
+    {
+      "id": "mk3smmu2s",
+      "path": "/mk3smmu2s",
+      "customMachine": {
+        "brand": "Prusa",
+        "model": "MK3s",
+        "submit": false
+      },
+      "color": "#4078c0",
+      "bkColor": "#f6f7f8",
+      "icon": "3dp",
+      "name": "MK3sMMU2s",
+      "onboarded": false,
+      "autoReconnect": false,
+      "preferImperial": false,
+      "firmware": {
+        "baudRate": 115200,
+        "controllerType": "Marlin",
+        "rtscts": false,
+        "port": "/dev/tty.usbmodem146301",
+        "manufacturer": "Prusa Research (prusa3d.com)"
+      },
+      "axes": {
+        "x": {
+          "min": 0,
+          "max": 250,
+          "precision": 3,
+          "accuracy": 0.001
+        },
+        "y": {
+          "min": 0,
+          "max": 210,
+          "precision": 3,
+          "accuracy": 0.001
+        },
+        "z": {
+          "min": 0,
+          "max": 210,
+          "precision": 3,
+          "accuracy": 0.001
+        }
+      },
+      "features": {},
+      "commands": {
+        "homing": [
+          "$H"
+        ]
+      },
+      "parts": []
+    },
+    {
+      "id": "genmitsu",
+      "path": "/genmitsu",
+      "color": "#4078c0",
+      "bkColor": "#f6f7f8",
+      "icon": "cnc",
+      "name": "Genmitsu",
+      "onboarded": false,
+      "autoReconnect": false,
+      "preferImperial": false,
+      "firmware": {
+        "__typename": "MachineFirmware",
+        "id": "grbl-1.1e",
+        "requiredVersion": 20161208,
+        "suggestedVersion": 20161208,
+        "name": "Grbl",
+        "edition": "1.1e",
+        "downloadUrl": "https://github.com/gnea/grbl",
+        "helpUrl": "http://www.makerverse.com/machines/cnc/grbl/",
+        "controllerType": "Grbl",
+        "baudRate": 115200,
+        "rtscts": false,
+        "port": "/dev/tty.usbmodem12201"
+      },
+      "axes": {
+        "x": {
+          "accuracy": 0.1,
+          "precision": 2,
+          "min": -300,
+          "max": 300
+        },
+        "y": {
+          "accuracy": 0.1,
+          "precision": 2,
+          "min": -300,
+          "max": 300
+        },
+        "z": {
+          "accuracy": 0.1,
+          "precision": 2,
+          "min": -30,
+          "max": 30
+        }
+      },
+      "features": {},
+      "commands": {
+        "homing": [
+          "$H"
+        ]
+      },
+      "parts": [
+        {
+          "__typename": "MachinePart",
+          "settings": [],
+          "specs": [
+            {
+              "__typename": "MachineSpec",
+              "id": "maxamps-4.75",
+              "specType": "MAX_AMPS",
+              "value": 4.75
+            },
+            {
+              "__typename": "MachineSpec",
+              "id": "maxvolts-24",
+              "specType": "MAX_VOLTS",
+              "value": 24
+            }
+          ],
+          "id": "sainsmart-24v/4.75a-psu",
+          "partType": "PSU",
+          "optional": false,
+          "isDefault": false,
+          "sortOrder": 9,
+          "title": "24V/4.75A PSU",
+          "description": null,
+          "dataBlob": ""
+        },
+        {
+          "__typename": "MachinePart",
+          "settings": [],
+          "specs": [
+            {
+              "__typename": "MachineSpec",
+              "id": "maxrpm-9000",
+              "specType": "MAX_RPM",
+              "value": 9000
+            },
+            {
+              "__typename": "MachineSpec",
+              "id": "maxvolts-36",
+              "specType": "MAX_VOLTS",
+              "value": 36
+            }
+          ],
+          "id": "sainsmart-775-motor",
+          "partType": "SPINDLE",
+          "optional": false,
+          "isDefault": true,
+          "sortOrder": 5,
+          "title": "775 Motor",
+          "description": null,
+          "dataBlob": ""
+        }
+      ]
+    },
+    {
+      "id": "test",
+      "path": "/test",
+      "color": "#4078c0",
+      "bkColor": "#f6f7f8",
+      "icon": "xyz",
+      "name": "Test",
+      "onboarded": true,
+      "autoReconnect": false,
+      "preferImperial": false,
+      "firmware": {
+        "controllerType": "Maslow",
+        "baudRate": 38400,
+        "rtscts": false,
+        "port": "/dev/tty.usbmodem12101"
+      },
+      "axes": {
+        "x": {
+          "accuracy": 1,
+          "precision": 0,
+          "min": -1219.2,
+          "max": 1219.2
+        },
+        "y": {
+          "accuracy": 1,
+          "precision": 0,
+          "min": -609.6,
+          "max": 609.6
+        },
+        "z": {
+          "accuracy": 0.1,
+          "precision": 1,
+          "min": -25.4,
+          "max": 12
+        }
+      },
+      "features": {
+        "homing": {
+          "title": "Reset Chains",
+          "description": "Inform the Maslow that the chains (not the sled) are in the exact same position as they were when you used \"Set Chains\".",
+          "icon": "fa-link"
+        },
+        "mpos_set_home_x": false,
+        "mpos_set_home_y": false,
+        "mpos_go_home_x": false,
+        "mpos_go_home_y": false,
+        "mpos_go_home_z": false
+      },
+      "commands": {
+        "homing": [
+          "G21",
+          "G90",
+          "G0 Z5",
+          "G0 X0 Y0"
+        ]
+      },
+      "parts": []
+    }
+  ],
+  "state": {
+    "checkForUpdates": false,
+    "prereleases": true,
+    "controller": {
+      "exception": {
+        "ignoreErrors": false
+      }
+    },
+    "allowRemoteAccess": true
+  },
+  "secret": "$2a$10$94OMBTOmTj979YrR/yzIs.",
+  "commands": [
+    {
+      "id": "ec8b2a02-05ae-47e5-932d-cb0f63a944f0",
+      "mtime": 1600690323840,
+      "enabled": true,
+      "title": "gpio",
+      "commands": "bash $HOME/makerverse/commands/gpio.sh 19 1"
+    }
+  ],
+  "events": [
+    {
+      "id": "19a4bf2f-71b7-4577-8f7b-0ef884907151",
+      "mtime": 1606058500449,
+      "enabled": true,
+      "event": "controller:ready",
+      "trigger": "gcode",
+      "commands": "uoaeuoaeu"
+    }
+  ],
+  "users": [
+    {
+      "__type": "UserProfile",
+      "username": "zane",
+      "authenticationType": "OWS",
+      "enabled": true,
+      "tokens": [
+        "aoeuaoeuaoeu",
+        "ueoaaoeuoaueoa"
+      ]
+    }
+  ]
+}

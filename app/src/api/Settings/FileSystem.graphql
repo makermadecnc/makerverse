@@ -1,0 +1,7 @@
+fragment FileSystem on FileSystemSettings {
+    programDirectory
+    mountPoints {
+        route
+        target
+    }
+}

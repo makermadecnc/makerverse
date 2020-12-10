@@ -1,7 +1,13 @@
+obj
+bin/Debug
+bin/Release
+yarn-error.log
+.idea
 .DS_Store
 node_modules
 npm-debug.log
 package-lock.json
+logs/makerverse*
 /.eslintcache
 /.nyc_output
 /coverage
@@ -15,5 +21,7 @@ filesystem.img
 bootstrap.log
 raspberry-pi.img
 .makerverse
+MakerverseServerTests/bin/**
 /commands
 /events
+.makerverse-status

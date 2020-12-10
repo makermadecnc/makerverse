@@ -1,0 +1,8 @@
+fragment Event on EventSettings {
+    id
+    mtime
+    enabled
+    event
+    trigger
+    commands
+}

@@ -45,8 +45,7 @@ if [ ! -z "$CI_VERSION" ]; then
   fi
 fi
 echo "Installing packages..."
-npm install --production
-npm dedupe
+yarn install --production
 popd
 
 echo "Rebuild native modules using electron ${electron_version}"

@@ -1,0 +1,15 @@
+fragment MachinePart on MachinePartSettings {
+    id
+    partType
+    title
+    description
+    optional
+    isDefault
+    dataBlob
+    settings {
+        ...MachineSettings
+    }
+    specs {
+        ...MachineSpec
+    }
+}

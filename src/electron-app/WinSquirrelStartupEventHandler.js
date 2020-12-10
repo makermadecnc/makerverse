@@ -2,7 +2,7 @@
 import path from 'path';
 import { spawn } from 'child_process';
 import { app } from 'electron';
-import log from './log';
+import log from 'js-logger';
 
 const run = (args, done) => {
     const appPath = path.resolve(process.execPath, '..');

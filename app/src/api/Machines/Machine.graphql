@@ -1,0 +1,28 @@
+fragment ControlledMachine on ControlledMachine {
+    machineProfileId
+    firmwareRequirement {
+        ...FirmwareRequirement
+    }
+}
+
+fragment DetectedFirmware on MachineDetectedFirmware {
+    friendlyName
+    isValid
+    name
+    value
+    edition
+}
+
+fragment MachineConfig on MachineConfiguration {
+    firmware {
+        ...DetectedFirmware
+    }
+}
+
+subscription MachineConfiguration($portName: String!) {
+    machine: onMachineConfiguration(portName: $portName) {
+        configuration {
+            ...MachineConfig
+        }
+    }
+}

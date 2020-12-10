@@ -1,0 +1,26 @@
+fragment FirmwareRequirement on IMachineFirmwareRequirement {
+    controllerType
+    name
+    edition
+    requiredVersion
+}
+
+fragment ConnectedPortStatus on ConnectedPort {
+    machine {
+        firmwareRequirement {
+            ...FirmwareRequirement
+        }
+    }
+    status {
+        ...PortIOStatus
+    }
+}
+
+fragment ConnectedPort on ConnectedPort {
+    machine {
+        ...ControlledMachine
+    }
+    status {
+        ...PortIOStatus
+    }
+}

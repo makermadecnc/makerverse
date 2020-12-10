@@ -1,0 +1,12 @@
+fragment PortOptions on PortOptions {
+    baudRate
+    parity
+    dataBits
+    stopBits
+    handshake
+    readBufferSize
+    writeBufferSize
+    rtsEnable
+    readTimeout
+    writeTimeout
+}

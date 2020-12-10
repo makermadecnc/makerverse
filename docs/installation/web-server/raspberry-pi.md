@@ -97,10 +97,13 @@ echo "@bash /home/pi/makerverse/bin/kiosk" > /home/pi/.config/lxsession/LXDE-pi/
 
 ... and then reboot the Raspberry Pi. Once it has rebooted, you should notice that the normal desktop does not open. Instead, the screen stays black while Makerverse starts. Makerverse is still running as a Web Server in the background, so other clients can also simultaneously connect. In this mode, Chromium takes over the desktop, hiding all menus in order to maximize screen-space.
 
+_**Note**: if your screen is smaller than 7" or so, you will likely want your Kiosk to use the Tablet UI specified above. To do so, use `sudo nano /etc/environment` to add the new line: `MAKERVERSE_PATH=/tablet`._
+
+In case you need to interact with the Raspberry Pi for some other purpose...
+
 - If your keyboard/mouse are attached directly to the Pi, use the `Alt + F4` hotkey to close the full-screen web browser, and/or `Ctrl + Alt + T` to open a terminal.
 - If you don't have an extra keyboard/mouse, just SSH and use `sudo raspi-config` to turn on the VNC in `Interfacing Options`. Then use an app like VNC Viewer to connect from your computer.
 
-_**Note**: if your screen is smaller than 7" or so, you will likely want your Kiosk to use the Tablet UI specified above. To do so, use `sudo nano /etc/environment` to add the new line: `MAKERVERSE_PATH=/tablet`._
 
 ## Shared Directories
 

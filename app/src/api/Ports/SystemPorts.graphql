@@ -1,0 +1,49 @@
+fragment SystemPort on SystemPort {
+    portName
+    state
+    error {
+        ...AlertError
+    }
+    options {
+        ...PortOptions
+    }
+    connection {
+        ...ConnectedPort
+    }
+}
+
+# streaming incoming port messages
+fragment PortStatus on SystemPort {
+    portName
+    state
+    error {
+        ...AlertError
+    }
+    connection {
+        ...ConnectedPortStatus
+    }
+}
+
+query ListPorts {
+    ports: listPorts {
+        ...PortStatus
+    }
+}
+
+subscription PortChange {
+    port: onPortChange {
+        ...PortStatus
+    }
+}
+
+mutation OpenPort($portName: String!, $firmware: FirmwareRequirementInput!, $options: SerialPortOptionsInput!) {
+    port: openPort(portName: $portName, firmware: $firmware, options: $options) {
+        ...SystemPort
+    }
+}
+
+mutation ClosePort($portName: String!) {
+    port: closePort(portName: $portName) {
+        ...PortStatus
+    }
+}

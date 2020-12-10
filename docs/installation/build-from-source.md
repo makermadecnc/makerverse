@@ -19,10 +19,10 @@ git clone https://github.com/makermadecnc/makerverse.git
 
 ## Node.js
 
-You will need `node` (**Node.js**) version `12.xx.y`. Downloads for Windows, Mac, and Linux can be [found here](https://nodejs.org/en/download/) (including [via package managers](https://nodejs.org/en/download/package-manager/)). On a Raspberry Pi or Debian Linux system, use the following:
+You will need `node` (**Node.js**) version `14.xx.y`. Downloads for Windows, Mac, and Linux can be [found here](https://nodejs.org/en/download/) (including [via package managers](https://nodejs.org/en/download/package-manager/)). On a Raspberry Pi or Debian Linux system, use the following:
 
 ```
-curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
+curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
 sudo apt-get install -y nodejs
 ```
 
@@ -33,7 +33,8 @@ sudo apt-get install -y nodejs
 Enter the source code directory from the command line and run:
 
 ```
-npm install
+npm install -g yarn
+yarn install
 ```
 
 This will download and install all required software. It generally only needs to be done once (unless a major update happens).
@@ -57,7 +58,7 @@ npm run dev
 
 ## Troubleshooting Node.js
 
-Node.js 12 is recommended. You can install [Node Version Manager](https://github.com/creationix/nvm) to manage multiple Node.js versions. If you have `git` installed, just clone the `nvm` repo, and check out the latest version:
+Node.js 14 is recommended. You can install [Node Version Manager](https://github.com/creationix/nvm) to manage multiple Node.js versions. If you have `git` installed, just clone the `nvm` repo, and check out the latest version:
 ```
 git clone https://github.com/creationix/nvm.git ~/.nvm
 cd ~/.nvm
