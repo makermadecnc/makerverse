@@ -5,14 +5,12 @@ import ToolbarCard from '@openworkshop/ui/components/Cards/ToolbarCard';
 import ThreeColumns from '@openworkshop/ui/components/Layout/ThreeColumns';
 import { User } from 'oidc-client';
 import React, { FunctionComponent } from 'react';
-import {Trans, useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { CallbackComponent } from 'redux-oidc';
 import analytics from '../../lib/analytics';
-import {MakerverseContext} from '../../lib/Makerverse';
 import ReconnectRedirect from '../Navigation/ReconnectRedirect';
 import useStyles from './Styles';
-import {useMakerverse} from '../../providers';
+import {useMakerverse, useMakerverseTrans} from '../../providers';
 
 type Props = {
 
@@ -20,6 +18,7 @@ type Props = {
 
 const CallbackPage: FunctionComponent<Props> = () => {
   const makerverse = useMakerverse();
+  const t = useMakerverseTrans();
   const log = useLogger(CallbackPage);
   const classes = useStyles();
   const [error, setError] = React.useState<Error | undefined>(undefined);
@@ -47,7 +46,7 @@ const CallbackPage: FunctionComponent<Props> = () => {
 
   const footer = error ? <Typography className={classes.centered} variant="subtitle1">
     <Link to="/login">
-      <Trans>Return to Login</Trans>
+      {t('Return to Login')}
     </Link>
   </Typography> : undefined;
 
@@ -68,7 +67,7 @@ const CallbackPage: FunctionComponent<Props> = () => {
         errorCallback={handleError}
       >
         <Typography variant="subtitle1" className={classes.centered}>
-          <Trans>Exchanging keys with gatekeeper...</Trans>
+          {t('Exchanging keys with gatekeeper...')}
         </Typography>
       </CallbackComponent>
     );
@@ -77,7 +76,7 @@ const CallbackPage: FunctionComponent<Props> = () => {
   return (
     <ThreeColumns>
       <ToolbarCard
-        title={makerverse.t('Authentication')}
+        title={t('Authentication')}
         footer={footer}
       >
         {renderBody()}

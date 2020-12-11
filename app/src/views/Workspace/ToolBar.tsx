@@ -1,12 +1,12 @@
-import { ButtonGroup, Button, Paper, Grid, Tab, Tabs } from '@material-ui/core';
+import { ButtonGroup, Button, Paper, Grid } from '@material-ui/core';
 import * as React from 'react';
 import {IHaveWorkspace} from 'components/Workspaces';
 import useStyles from './Styles';
 import clsx from 'clsx';
-import { Typography, Popover } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import {ToolType, Console, WorkspaceSettings, Plans, Controls, Machine} from '../../components/Tools';
-import {GearIcon, MicrochipIcon,TerminalIcon, ControlPadIcon, BlueprintIcon, EndMillIcon} from '@openworkshop/ui/components/OpenWorkShopIcon';
-import {useMakerverse, useWindowSize} from '../../providers';
+import {MicrochipIcon,TerminalIcon, ControlPadIcon, BlueprintIcon} from '@openworkshop/ui/components/OpenWorkShopIcon';
+import {useMakerverseTrans, useWindowSize} from '../../providers';
 import {OpenWorkShopIcon} from '@openworkshop/ui/components';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 
@@ -15,7 +15,7 @@ type Props = IHaveWorkspace;
 const ToolBar: React.FunctionComponent<Props> = (props) => {
   const log = useLogger(ToolBar);
   const classes = useStyles();
-  const makerverse = useMakerverse();
+  const t = useMakerverseTrans();
   const { workspace } = props;
   const [selectedToolType, setSelectedToolType] = React.useState<ToolType>(ToolType.None);
   const toolNumbers = [...Array(ToolType.NumTools).keys()];
@@ -23,11 +23,11 @@ const ToolBar: React.FunctionComponent<Props> = (props) => {
   const isOnBottom = windowSize.width < windowSize.height;
 
   function getToolTypeTitle(tt: ToolType): string {
-    if (tt === ToolType.Machine) return makerverse.t('Machine');
-    if (tt === ToolType.Controls) return makerverse.t('Controls');
-    if (tt === ToolType.Plans) return makerverse.t('Plans');
-    if (tt === ToolType.Console) return makerverse.t('Console');
-    if (tt === ToolType.Workspace) return makerverse.t('Workspace');
+    if (tt === ToolType.Machine) return t('Machine');
+    if (tt === ToolType.Controls) return t('Controls');
+    if (tt === ToolType.Plans) return t('Plans');
+    if (tt === ToolType.Console) return t('Console');
+    if (tt === ToolType.Workspace) return t('Workspace');
     return '?';
   }
 
@@ -53,10 +53,12 @@ const ToolBar: React.FunctionComponent<Props> = (props) => {
     if (tt === ToolType.None || tt === ToolType.NumTools) return null;
     return (
       <Paper className={classes.toolPaper}>
-        <Typography variant="h6" color="primary">
-          {getToolTypeTitle(tt)}
-        </Typography>
         <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="h6" color="primary">
+              {getToolTypeTitle(tt)}
+            </Typography>
+          </Grid>
           {getToolComponent(tt)}
         </Grid>
       </Paper>
@@ -86,7 +88,7 @@ const ToolBar: React.FunctionComponent<Props> = (props) => {
         <Paper className={classes.toolBarPaper} >
           <ButtonGroup
             orientation={isOnBottom ? 'horizontal' : 'vertical'}
-            aria-label={makerverse.t('Toolbar Tabs')}
+            aria-label={t('Toolbar Tabs')}
           >
             {toolNumbers.map(tt => {
               return (

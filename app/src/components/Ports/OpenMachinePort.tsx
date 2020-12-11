@@ -4,7 +4,6 @@ import {Fab, Grid, Paper, Typography, Modal, FormControl} from '@material-ui/cor
 import {ICustomizedMachine} from '@openworkshop/lib/api/Machines/CustomizedMachine';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import React, {FunctionComponent} from 'react';
-import {Trans, useTranslation} from 'react-i18next';
 import {HoverHelpStep} from '@openworkshop/ui/components/Alerts';
 import {
   FirmwareRequirementInput,
@@ -19,7 +18,7 @@ import {useSystemPorts} from '../../providers/SystemPortHooks';
 import useStyles from './Styles';
 import PortConnectionSteps from './PortConnectionSteps';
 import {AlertList} from '@openworkshop/ui/components/Alerts';
-import { useMakerverse } from 'providers';
+import {useMakerverse, useMakerverseTrans} from 'providers';
 
 interface OwnProps {
   machine: ICustomizedMachine;
@@ -35,6 +34,7 @@ type Props = OwnProps;
 const OpenMachinePort: FunctionComponent<Props> = (props) => {
   const log = useLogger(OpenMachinePort);
   const makerverse = useMakerverse();
+  const t = useMakerverseTrans();
   const classes = useStyles();
   const portCollection = useSystemPorts();
   const [openPort, openedPort] = useOpenPortMutation();
@@ -113,16 +113,16 @@ const OpenMachinePort: FunctionComponent<Props> = (props) => {
       <Grid container spacing={2} >
         <Grid item xs={12}>
           <Typography variant='h5'>
-            <Trans>Connect to your Machine's Port</Trans>
+            {t('Connect to your Machine\'s Port')}
 
             <HoverHelpStep
-              tip={makerverse.t('Makerverse will attempt to communicate with the device via the port, testing to see if it' +
+              tip={t('Makerverse will attempt to communicate with the device via the port, testing to see if it' +
                 ' understands the output.')}
               isComplete={false}
             />
           </Typography>
           <Typography variant='body2'>
-            <Trans>The port is the physical connection on the Makerverse host (e.g., USB).</Trans>
+            {t('The port is the physical connection on the Makerverse host (e.g., USB).')}
           </Typography>
         </Grid>
         <Grid item xs={12} md={6} style={{ minHeight: 60, paddingTop: 0, marginTop: 0 }} >
@@ -148,7 +148,7 @@ const OpenMachinePort: FunctionComponent<Props> = (props) => {
               disabled={selectedPortName === ''}
             >
               <FontAwesomeIcon className={classes.connectIcon} icon={faPlug} />
-              <Typography variant="h6">{isConnecting ? makerverse.t('Cancel') : makerverse.t('Connect')}</Typography>
+              <Typography variant="h6">{isConnecting ? t('Cancel') : t('Connect')}</Typography>
             </Fab>
           </FormControl>}
           {isConnected && <FormControl
@@ -163,7 +163,7 @@ const OpenMachinePort: FunctionComponent<Props> = (props) => {
               className={classes.connectionButton}
             >
               <FontAwesomeIcon className={classes.connectIcon} icon={faPowerOff} />
-              <Typography variant="h6"><Trans>Disconnect</Trans></Typography>
+              <Typography variant="h6">{t('Disconnect')}</Typography>
             </Fab>
           </FormControl>}
         </Grid>

@@ -1,20 +1,20 @@
 import {faUserShield, faUserSecret} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {Alert, IconButton, Menu, MenuItem, Typography} from '@material-ui/core';
-import {OpenWorkShop} from '@openworkshop/lib';
+import {useOpenWorkShop} from '@openworkshop/lib';
 import {useNetworkStatus} from '@openworkshop/lib/utils/device';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import React, {FunctionComponent} from 'react';
-import {Trans, useTranslation} from 'react-i18next';
-import {useBackendConnectionState, useMakerverse} from '../../providers';
+import {useBackendConnectionState, useMakerverse, useMakerverseTrans} from '../../providers';
 import {ConnectionState} from '../../lib/Makerverse/apollo';
 
 const UserMenu: FunctionComponent = () => {
   const log = useLogger(UserMenu);
   const makerverse = useMakerverse();
+  const t = useMakerverseTrans();
   const { isOnline } = useNetworkStatus();
   // const history = useHistory();
-  const ows = React.useContext(OpenWorkShop);
+  const ows = useOpenWorkShop();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const connectionState: ConnectionState = useBackendConnectionState();
@@ -26,15 +26,15 @@ const UserMenu: FunctionComponent = () => {
 
   function renderHeader() {
     if (!isConnected) {
-      return <Alert severity="error">{makerverse.t('Cannot communicate with Makerverse.')}</Alert>;
+      return <Alert severity="error">{t('Cannot communicate with Makerverse.')}</Alert>;
     }
     if (!isOnline) {
-      return <Alert severity="warning">{makerverse.t('You are offline.')}</Alert>;
+      return <Alert severity="warning">{t('You are offline.')}</Alert>;
     }
     if (!session) {
-      return <Alert severity="warning">{makerverse.t('You are not logged in. Community features will be unavailable.')}</Alert>;
+      return <Alert severity="warning">{t('You are not logged in. Community features will be unavailable.')}</Alert>;
     }
-    return <Alert severity="info">{makerverse.t('Welcome, {{ username }}', session.user)}</Alert>;
+    return <Alert severity="info">{t('Welcome, {{ username }}', session.user)}</Alert>;
   }
 
   function renderVersion() {
@@ -80,7 +80,7 @@ const UserMenu: FunctionComponent = () => {
             setAnchorEl(null);
             setTimeout(() => void makerverse.connection.reconnect(), 10);
           }}>
-          <Trans>Reconnect</Trans>
+          {t('Reconnect')}
         </MenuItem>
         {isAuthenticated && <MenuItem
           onClick={() => {

@@ -1,12 +1,12 @@
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import React, {FunctionComponent} from 'react';
-import {FirmwareRequirementFragment, PortState} from '../../api/graphql';
-import {useTranslation} from 'react-i18next';
+import {PortState} from '../../api/graphql';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUsb} from '@fortawesome/free-brands-svg-icons';
 import {faExclamationCircle, faMicrochip, faPlug} from '@fortawesome/free-solid-svg-icons';
 import {Typography, useTheme} from '@material-ui/core';
 import {IMaybeHavePortStatus} from './types';
+import {useMakerverseTrans} from '../../providers';
 
 interface OwnProps {
   showType?: boolean;
@@ -16,7 +16,7 @@ interface OwnProps {
 type Props = IMaybeHavePortStatus & OwnProps;
 
 const PortStatus: FunctionComponent<Props> = (props) => {
-  const { t } = useTranslation();
+  const t = useMakerverseTrans();
   const log = useLogger(PortStatus);
   const theme = useTheme();
   const { port, showType, showName } = props;

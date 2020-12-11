@@ -15,7 +15,6 @@ type Props = IHaveWorkspaceId & IMaybeHavePortStatus;
 
 const WorkspaceConnector: React.FunctionComponent<Props> = (props) => {
   const log = useLogger(WorkspaceConnector);
-  // const { t } = useTranslation();
   const { workspaceId } = props;
   const ports = useSystemPorts();
   const workspace = useWorkspace(workspaceId);

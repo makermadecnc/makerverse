@@ -1,9 +1,8 @@
-
 import _ from 'lodash';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import React, { FunctionComponent } from 'react';
 import {Redirect, Route, Switch, useLocation, Link } from 'react-router-dom';
-import {OpenWorkShop} from '@openworkshop/lib';
+import {useOpenWorkShop} from '@openworkshop/lib';
 import {
   StartupFragment,
   MakerverseEssentialSettingsFragment,
@@ -36,7 +35,7 @@ interface IProps {
 
 const MakerverseProvider: FunctionComponent<IProps> = (props) => {
   const log = useLogger(MakerverseProvider);
-  const ows = React.useContext(OpenWorkShop);
+  const ows = useOpenWorkShop();
   const onWorkspaceChanged = useWorkspaceChangeSubscription();
   const { connection } = props;
   const location = useLocation();

@@ -3,14 +3,14 @@ import {ICustomizedMachine} from '@openworkshop/lib/api/Machines/CustomizedMachi
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import CustomizeMachine from '@openworkshop/ui/components/MachineProfiles/CustomizeMachine';
 import React, { FunctionComponent } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
 import OpenMachinePort from '../../components/Ports/OpenMachinePort';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
 import useStyles from './Styles';
+import {useMakerverseTrans} from '../../providers';
 
 const WorkspaceCreator: FunctionComponent = () => {
   const log = useLogger(WorkspaceCreator);
-  const { t } = useTranslation();
+  const t = useMakerverseTrans();
   const classes = useStyles();
   const [machine, setMachine] = React.useState<ICustomizedMachine | undefined>(undefined);
   const [selectedPortName, setSelectedPortName] = React.useState<string>('');
@@ -28,10 +28,10 @@ const WorkspaceCreator: FunctionComponent = () => {
   return (
     <Container className={classes.root}>
       <Typography variant='h5'>
-        <Trans>Create Workspace</Trans>
+        {t('Create Workspace')}
       </Typography>
       <Typography variant="subtitle2">
-        <Trans>By connecting to a CNC or 3D Printer machine attached to the Makeverse computer.</Trans>
+        {t('By connecting to a CNC or 3D Printer machine attached to the Makeverse computer.')}
       </Typography>
       <CustomizeMachine
         tip={t('Select a machine, above, so that you may connect to it.')}

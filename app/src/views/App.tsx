@@ -3,11 +3,11 @@ import React from 'react';
 import {Route, Switch, useLocation } from 'react-router-dom';
 import analytics from '../lib/analytics';
 import settings from '../config/settings';
-import {MakerverseContext} from '../lib/Makerverse';
 import { Settings, Home, WorkspaceCreator, Docs, Workspace } from './';
 import Navigation, { NotFound } from 'components/Navigation';
 import BackendDiconnectedModal from '../components/Modals/BackendDiconnectedModal';
 import _ from 'lodash';
+import {useMakerverse} from '../providers';
 
 interface IProps {
   currentWorkspaceId?: string;
@@ -15,7 +15,7 @@ interface IProps {
 
 const App: React.FunctionComponent<IProps> = (props) => {
   const log = useLogger(App);
-  const makerverse = React.useContext(MakerverseContext);
+  const makerverse = useMakerverse();
   const workspaceIds = makerverse.workspaces.map(ws => ws.id);
   const { currentWorkspaceId } = props;
   const workspace = _.find(makerverse.workspaces, ws => ws.id === currentWorkspaceId);

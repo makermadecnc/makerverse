@@ -27,5 +27,9 @@
   ],
   "exclude": [
     "node_modules"
+  ],
+  "references": [
+    {"path": "../../npm-packages/lib"},
+    {"path": "../../npm-packages/ui"}
   ]
 }

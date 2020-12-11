@@ -1,6 +1,5 @@
 import {CircularProgress, Container, Step, StepLabel, Stepper, Typography, useTheme} from '@material-ui/core';
 import * as React from 'react';
-import {useTranslation} from 'react-i18next';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import {MachineFirmwareFragment, PortState} from '../../api/graphql';
 import {IAlertMessage} from '@openworkshop/ui/components/Alerts';
@@ -8,6 +7,7 @@ import {faCircle, faDotCircle, faExclamationCircle} from '@fortawesome/free-soli
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {StepIconProps} from '@material-ui/core/StepIcon';
 import {IMaybeHavePortStatus} from './types';
+import {useMakerverseTrans} from '../../providers';
 
 type Props = IMaybeHavePortStatus & {
  requiredFirmware?: MachineFirmwareFragment;
@@ -34,7 +34,7 @@ const StepIcon: React.FunctionComponent<StepIconProps> = (props) => {
 
 const PortConnectionSteps: React.FunctionComponent<Props> = (props) => {
   const log = useLogger(PortConnectionSteps);
-  const { t } = useTranslation();
+  const t = useMakerverseTrans();
   const { port } = props;
   const portState = port?.state ?? PortState.Unplugged;
   const [lastPortState, setLastPortState] = React.useState(PortState.Unplugged);

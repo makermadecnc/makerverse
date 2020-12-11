@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from 'react';
-import {MakerverseContext} from '../../lib/Makerverse';
+import {useMakerverse} from '../../providers';
 
 const Home: FunctionComponent = () => {
-  const makerverse = React.useContext(MakerverseContext);
+  const makerverse = useMakerverse();
   const hasWorkspaces = makerverse.workspaces.length > 0;
 
   return (

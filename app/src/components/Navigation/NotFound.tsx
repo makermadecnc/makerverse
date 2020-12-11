@@ -1,11 +1,13 @@
 import { Typography } from '@material-ui/core';
 import React, { FunctionComponent } from 'react';
-import { Trans } from 'react-i18next';
+import {useMakerverseTrans} from '../../providers';
 
 const NotFound: FunctionComponent = () => {
+  const t = useMakerverseTrans();
+
   return (<div>
-    <Typography variant="h4" ><Trans>Not Found</Trans></Typography>
-    <Trans>Whoops! Looks like you've stumbled on an invalid page.</Trans>
+    <Typography variant="h4" >{t('Not Found')}</Typography>
+    {t('Whoops! Looks like you\'ve stumbled on an invalid page.')}
   </div>);
 };
 

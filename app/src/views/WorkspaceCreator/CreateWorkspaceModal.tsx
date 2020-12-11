@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import { Typography, FormControl, InputLabel, Input, Grid, FormHelperText, FormControlLabel, Checkbox, Fab, useTheme } from '@material-ui/core';
 import * as React from 'react';
-import { Trans, useTranslation } from 'react-i18next';
 import CardDialog from '@openworkshop/ui/components/Cards/CardDialog';
 import useStyles from './Styles';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
@@ -25,7 +24,7 @@ import {
 } from '@openworkshop/lib/api/graphql';
 import {IAlertMessage, AlertList} from '@openworkshop/ui/components/Alerts';
 import { Redirect } from 'react-router-dom';
-import {useMakerverse} from '../../providers';
+import {useMakerverseTrans} from '../../providers';
 
 type Props = {
   machine?: ICustomizedMachine;
@@ -36,7 +35,7 @@ type Props = {
 
 const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
   const log = useLogger(CreateWorkspaceModal);
-  const makerverse = useMakerverse();
+  const t = useMakerverseTrans();
   const { open, onClose, machine, portName } = props;
   const ports = useSystemPorts();
   const port = portName ? ports.portMap[portName] : undefined;
@@ -143,7 +142,7 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
     <CardDialog
       open={open}
       onClose={onClose}
-      title={makerverse.t('Create Workspace')}
+      title={t('Create Workspace')}
       subHeader={<PortStatus port={port} showType={true} />}
     >
       <Grid container spacing={2}>
@@ -155,7 +154,7 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
             required={true}
             variant='outlined'
           >
-            <InputLabel htmlFor='workspace-name'>{makerverse.t('Workspace Name')}</InputLabel>
+            <InputLabel htmlFor='workspace-name'>{t('Workspace Name')}</InputLabel>
             <Input
               id='workspace-name'
               name='workspace-name'
@@ -170,36 +169,34 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
           </FormControl>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h6"><Trans>Personal Preferences</Trans></Typography>
+          <Typography variant="h6">{t('Personal Preferences')}</Typography>
         </Grid>
         <Grid item xs={12}>
           <FormControl className={classes.formControl}>
             <FormControlLabel
               control={<Checkbox checked={preferImperial} onChange={() => setPreferImperial(!preferImperial)} />}
-              label={makerverse.t('I prefer imperial (inches) to metric (mm)')}
+              label={t('I prefer imperial (inches) to metric (mm)')}
             />
           </FormControl>
           <FormControl className={classes.formControl}>
             <FormControlLabel
               control={<Checkbox checked={autoReconnect} onChange={() => setAutoReconnect(!autoReconnect)} />}
-              label={makerverse.t('Automatically (re)connect to the machine when the workspace is opened.')}
+              label={t('Automatically (re)connect to the machine when the workspace is opened.')}
             />
           </FormControl>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h6"><Trans>One Last Thing...</Trans></Typography>
+          <Typography variant="h6">{t('One Last Thing...')}</Typography>
         </Grid>
         <Grid item xs={12}>
           <Typography variant="body1">
-            <Trans>
-              Makerverse is an open-source project with a rich history and ambitious goals.
-              <analytics.OutboundLink
-                eventLabel='learn more'
-                to={docs.urlAbout}
-                target='_blank'>
-                {makerverse.t('Learn More')}
-              </analytics.OutboundLink>
-            </Trans>
+            {t('Makerverse is an open-source project with a rich history and ambitious goals.')}
+            <analytics.OutboundLink
+              eventLabel='learn more'
+              to={docs.urlAbout}
+              target='_blank'>
+              {t('Learn More')}
+            </analytics.OutboundLink>
           </Typography>
         </Grid>
         <Grid item xs={12} style={{ textAlign: 'center' }} >
@@ -215,7 +212,7 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
               disabled={!canCreate}
             >
               <OpenWorkShopIcon name={icon} className={classes.leftButtonIconAdornment} />
-              <Typography variant="h6">{makerverse.t('Start Making Something')}</Typography>
+              <Typography variant="h6">{t('Start Making Something')}</Typography>
             </Fab>
           </FormControl>
         </Grid>

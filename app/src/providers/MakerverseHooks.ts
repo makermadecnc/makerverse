@@ -4,10 +4,14 @@ import {IMakerverse, MakerverseContext} from '../lib/Makerverse';
 import {Workspace} from '../lib/workspaces';
 import {BackendConnection, BackendConnectionEvent, ConnectionState} from '../lib/Makerverse/apollo';
 import {IWorkspaceEvent, WorkspaceEventType} from '../lib/workspaces/types';
-import OpenWorkShop from '@openworkshop/lib/OpenWorkShop';
+import {TTranslateFunc} from '@openworkshop/lib';
 
 export function useMakerverse(): IMakerverse {
   return React.useContext(MakerverseContext);
+}
+
+export function useMakerverseTrans(): TTranslateFunc {
+  return useMakerverse().t;
 }
 
 export function useWorkspace(workspaceId: string): Workspace {

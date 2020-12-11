@@ -5,7 +5,7 @@ import {
   FormControlLabel,
   Typography,
 } from '@material-ui/core';
-import { OpenWorkShop } from '@openworkshop/lib';
+import { useOpenWorkShop } from '@openworkshop/lib';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import {AlertList} from '@openworkshop/ui/components/Alerts';
 import ToolbarCard from '@openworkshop/ui/components/Cards/ToolbarCard';
@@ -16,13 +16,13 @@ import useStyles from './Styles';
 import analytics from 'lib/analytics';
 import settings from 'config/settings';
 import docs from 'constants/docs';
-import {useMakerverse} from '../../providers';
+import {useMakerverseTrans} from '../../providers';
 
 const LoginPage: FunctionComponent = () => {
   const log = useLogger(LoginPage);
-  const ows = React.useContext(OpenWorkShop);
+  const ows = useOpenWorkShop();
   const classes = useStyles();
-  const makerverse = useMakerverse();
+  const t = useMakerverseTrans();
   const [guest, setGuest] = React.useState<MakerverseUser | undefined>(undefined);
   const [useCookies, setUseCookies] = React.useState<boolean>(false);
   const [dangerous, setDangerous] = React.useState<boolean>(false);
@@ -64,22 +64,22 @@ const LoginPage: FunctionComponent = () => {
   const footer = <Typography variant="subtitle2">
     {!guest && (
       <analytics.OutboundLink eventLabel='why_login' to={docs.urlSecurity} target='_blank'>
-        {makerverse.t('Why is it necessary to log in?')}
+        {t('Why is it necessary to log in?')}
       </analytics.OutboundLink>
     )}
     {guest && (
       <div>
         <FormControlLabel
           control={<Checkbox checked={useCookies} onChange={() => setUseCookies(!useCookies)} />}
-          label={makerverse.t('Remember me (I consent to cookies)')}
+          label={t('Remember me (I consent to cookies)')}
         />
         <FormControlLabel
           control={<Checkbox checked={dangerous} onChange={() => setDangerous(!dangerous)} />}
-          label={makerverse.t('I understand "guest mode" is hazardous. ')}
+          label={t('I understand "guest mode" is hazardous. ')}
         />
         <br />
         <Button onClick={() => handleGuest()} disabled={authenticating || !dangerous}>
-          {makerverse.t('Continue as Guest')}
+          {t('Continue as Guest')}
         </Button>
       </div>
     )}
@@ -88,7 +88,7 @@ const LoginPage: FunctionComponent = () => {
   return (
     <ThreeColumns>
       <ToolbarCard
-        title={makerverse.t('Login to {{ productName }}', settings)}
+        title={t('Login to {{ productName }}', settings)}
         footer={footer}
       >
         <div className={classes.centered}>
@@ -103,9 +103,9 @@ const LoginPage: FunctionComponent = () => {
             <img src='/images/logos/makerverse.png' alt='Logo' className={classes.logo1} />
             {!authenticating && (
               <span>
-                {makerverse.t('Login')}
+                {t('Login')}
                 <br />
-                {makerverse.t('(or Create Account)')}
+                {t('(or Create Account)')}
               </span>
             )}
             {authenticating && <CircularProgress />}

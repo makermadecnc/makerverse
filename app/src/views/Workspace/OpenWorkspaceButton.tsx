@@ -4,14 +4,14 @@ import * as React from 'react';
 import useStyles from './Styles';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {useTranslation} from 'react-i18next';
 import {IHaveWorkspace} from 'components/Workspaces/types';
 import {useOpenWorkspaceMutation, WorkspaceState} from '../../api/graphql';
 import {AlertList, AlertMessageList, sanitizeAlertMessages} from '@openworkshop/ui/components/Alerts';
+import {useMakerverseTrans} from '../../providers';
 
 const OpenWorkspaceButton: React.FunctionComponent<IHaveWorkspace> = (props) => {
   const log = useLogger(OpenWorkspaceButton);
-  const { t } = useTranslation();
+  const t = useMakerverseTrans();
   const { workspace } = props;
   const variables = { workspaceId: workspace.id };
   const [openWorkspace, openWorkspaceResult] = useOpenWorkspaceMutation({ variables });

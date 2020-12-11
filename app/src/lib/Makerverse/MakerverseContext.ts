@@ -1,9 +1,8 @@
-import { IOpenWorkShop } from '@openworkshop/lib';
+import { IOpenWorkShop, TTranslateFunc } from '@openworkshop/lib';
 import React from 'react';
 import {MakerverseSessionFragment} from '../../api/graphql';
 import {Workspace} from '../workspaces';
 import {BackendConnection} from './apollo';
-import {TTranslateFunc} from '@openworkshop/lib/OpenWorkShop';
 import { StringMap } from 'i18next';
 
 export interface IMakerverse {

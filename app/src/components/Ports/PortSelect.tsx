@@ -11,14 +11,13 @@ import {
 } from '@material-ui/core';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import React, {FunctionComponent} from 'react';
-import {Trans, useTranslation} from 'react-i18next';
 import {IPortCollection} from '../../providers/SystemPortContext';
 import {useSystemPorts} from '../../providers/SystemPortHooks';
 import PortStatus from './PortStatus';
 import useStyles from './Styles';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import {PortState} from '../../api/graphql';
-import {useMakerverse} from '../../providers';
+import {useMakerverse, useMakerverseTrans} from '../../providers';
 
 interface OwnProps {
   selectedPortName: string;
@@ -30,6 +29,7 @@ type Props = OwnProps;
 const PortSelect: FunctionComponent<Props> = (props) => {
   const classes = useStyles();
   const makerverse = useMakerverse();
+  const t = useMakerverseTrans();
   const theme = useTheme();
   const log = useLogger(PortSelect);
   const portCollection: IPortCollection = useSystemPorts();
@@ -57,9 +57,9 @@ const PortSelect: FunctionComponent<Props> = (props) => {
   }
 
   function getHelperText(): string | undefined {
-    if (!port) return makerverse.t('Required');
-    if (port.state === PortState.Error) return port.error?.name ?? makerverse.t('Cannot connect to machine.');
-    if (port.state === PortState.Ready) return makerverse.t('The port must not be in-use by any other programs.');
+    if (!port) return t('Required');
+    if (port.state === PortState.Error) return port.error?.name ?? t('Cannot connect to machine.');
+    if (port.state === PortState.Ready) return t('The port must not be in-use by any other programs.');
     return '';
   }
 
@@ -68,14 +68,14 @@ const PortSelect: FunctionComponent<Props> = (props) => {
   return (
     <Container>
       <FormControl required variant="outlined" className={classes.formControl}>
-        <InputLabel ><Trans>Port Name</Trans></InputLabel>
+        <InputLabel >{t('Port Name')}</InputLabel>
         <Select
           value={selectedPortName}
           onChange={onSelectedPort}
           label="Port Name"
         >
           <MenuItem value="">
-            <em><Trans>Please select a port</Trans></em>
+            <em>{t('Please select a port')}</em>
           </MenuItem>
           {portCollection.sortedPortNames.map(renderPort)}
         </Select>

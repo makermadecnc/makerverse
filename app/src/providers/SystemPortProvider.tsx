@@ -8,8 +8,7 @@ import {
   usePortChangeSubscription
 } from '../api/graphql';
 import {AlertDialog} from '@openworkshop/ui/components/Alerts';
-import { useTranslation } from 'react-i18next';
-import { useMakerverse } from 'providers';
+import {useMakerverseTrans} from 'providers';
 
 interface OwnProps {
   children: React.ReactNode;
@@ -19,8 +18,7 @@ type Props = OwnProps;
 
 const SystemPortProvider: FunctionComponent<Props> = (props) => {
   const log = useLogger(SystemPortProvider);
-  const { t } = useTranslation();
-  const makerverse = useMakerverse();
+  const t = useMakerverseTrans();
 
   // The initial state of all ports, a simple query.
   const queryPorts = useListPortsQuery();
@@ -67,7 +65,7 @@ const SystemPortProvider: FunctionComponent<Props> = (props) => {
 
   return (
     <SystemPortContext.Provider value={portCollection} >
-      <AlertDialog title={makerverse.ows.t('Port Connection Error')} errors={errors} />
+      <AlertDialog title={t('Port Connection Error')} errors={errors} />
       {props.children}
     </SystemPortContext.Provider>
   );

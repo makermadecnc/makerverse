@@ -8,14 +8,13 @@ import {faUsb} from '@fortawesome/free-brands-svg-icons';
 import {faDraftingCompass, faExclamationCircle} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {useTheme} from '@material-ui/core';
-import {useTranslation} from 'react-i18next';
-import {useWorkspaceEvent} from '../../providers';
+import {useMakerverseTrans, useWorkspaceEvent} from '../../providers';
 import {WorkspaceEventType} from '../../lib/workspaces/types';
 
 type Props = IHaveWorkspace & IMaybeHavePortStatus;
 
 const WorkspaceStatus: React.FunctionComponent<Props> = (props) => {
-  const { t } = useTranslation();
+  const t = useMakerverseTrans();
   const log = useLogger(WorkspaceStatus);
   const { workspace, port } = props;
   const st = workspace.state;
