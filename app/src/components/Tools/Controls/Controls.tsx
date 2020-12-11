@@ -1,11 +1,9 @@
 import * as React from 'react';
 import { Grid } from '@material-ui/core';
-import {IHaveWorkspace} from '../../Workspaces';
 import JogControls from './JogControls';
+import {ToolBase} from '../types';
 
-type Props = IHaveWorkspace;
-
-const Controls: React.FunctionComponent<Props> = (props) => {
+const Controls: ToolBase = (props) => {
   return (
     <Grid item xs={12}>
       <JogControls />

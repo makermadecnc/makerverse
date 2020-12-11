@@ -39,6 +39,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     // margin: theme.spacing(2),
     position: 'fixed',
     maxWidth: 320,
+    [theme.breakpoints.up('md')]: {
+      maxWidth: 500,
+    },
     // bottom: 0,
     right: theme.spacing(1),
   },

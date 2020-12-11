@@ -1,4 +1,4 @@
-import { TypedDocumentNode, useQuery } from "@apollo/client";
+import { TypedDocumentNode, useQuery } from '@apollo/client';
 
 export type State = 'pending' | 'success' | 'error';
 

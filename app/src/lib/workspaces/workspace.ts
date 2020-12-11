@@ -19,6 +19,8 @@ import {
   MachinePartFragment,
   MachineSettingsFragment, WorkspaceFullSettingsFragment, WorkspaceFullFragment, WorkspaceState,
 } from 'api/graphql';
+import {IToolGroup} from '../../components/Tools';
+import ToolGroup from '../../components/Tools/ToolGroup';
 
 export type MachineCommandType = 'homing';
 
@@ -143,6 +145,15 @@ class Workspace extends events.EventEmitter {
   static defaultIcon = 'xyz';
 
   static defaultBkColor = '#f6f7f8';
+
+  get tools(): IToolGroup[] {
+    return [
+      new ToolGroup('Plans', 'blueprint', 'Plans'),
+      new ToolGroup('Controls', 'control-pad', 'Controls'),
+      new ToolGroup('Machine', 'machine', 'Machine'),
+      new ToolGroup('Workspace', this.icon, 'WorkspaceSettings'),
+    ];
+  }
 
   // Sidebar icon.
   get icon(): string {

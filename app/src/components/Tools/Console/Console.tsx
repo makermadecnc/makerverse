@@ -1,11 +1,9 @@
 import * as React from 'react';
 import { Grid } from '@material-ui/core';
-import {IHaveWorkspace} from '../../Workspaces';
 import useStyles from './Styles';
+import {ToolBase} from '../types';
 
-type Props = IHaveWorkspace;
-
-const Console: React.FunctionComponent<Props> = (props) => {
+const Console: ToolBase = (props) => {
   const classes = useStyles();
 
   return (
