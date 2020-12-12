@@ -7,7 +7,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   formControl: {
     minWidth: 120,
     width: '100%',
-    margin: theme.spacing(1),
   },
   portSelectItem: {
     width: '100%',

@@ -43,6 +43,7 @@ const ToolBar: React.FunctionComponent<Props> = (props) => {
       <Grid item xs={isOnBottom ? 12 : 2}>
         <Paper className={classes.toolBarPaper} >
           <ButtonGroup
+            className={classes.tabs}
             orientation={isOnBottom ? 'horizontal' : 'vertical'}
             aria-label={t('Toolbar Tabs')}
           >

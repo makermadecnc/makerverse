@@ -5,10 +5,9 @@ import * as React from 'react';
 export function useTool(tool: ITool): React.LazyExoticComponent<ToolBase> | undefined {
   const p = tool.componentPath;
   if (p === 'Console') return React.lazy(() => import('./Console'));
-  if (p === 'Controls') return React.lazy(() => import('./Controls'));
+  if (p === 'AxisJoggerPad') return React.lazy(() => import('./AxisJoggerPad'));
   if (p === 'Plans') return React.lazy(() => import('./Plans'));
   if (p === 'Machine') return React.lazy(() => import('./Machine'));
-  if (p === 'WorkspaceSettings') return React.lazy(() => import('./WorkspaceSettings'));
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return React.lazy(() => require(`./${p}`));
 }

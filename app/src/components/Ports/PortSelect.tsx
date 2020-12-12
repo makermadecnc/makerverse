@@ -1,6 +1,5 @@
 import {AlertList} from '@openworkshop/ui/components/Alerts';
 import {
-  Container,
   FormControl,
   InputLabel,
   ListItemIcon,
@@ -17,7 +16,7 @@ import PortStatus from './PortStatus';
 import useStyles from './Styles';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import {PortState} from '../../api/graphql';
-import {useMakerverse, useMakerverseTrans} from '../../providers';
+import {useMakerverseTrans} from '../../providers';
 
 interface OwnProps {
   selectedPortName: string;
@@ -28,7 +27,6 @@ type Props = OwnProps;
 
 const PortSelect: FunctionComponent<Props> = (props) => {
   const classes = useStyles();
-  const makerverse = useMakerverse();
   const t = useMakerverseTrans();
   const theme = useTheme();
   const log = useLogger(PortSelect);
@@ -66,23 +64,21 @@ const PortSelect: FunctionComponent<Props> = (props) => {
   const helperColor = !port || port.error ? theme.palette.error.main : theme.palette.grey.A700;
 
   return (
-    <Container>
-      <FormControl required variant="outlined" className={classes.formControl}>
-        <InputLabel >{t('Port Name')}</InputLabel>
-        <Select
-          value={selectedPortName}
-          onChange={onSelectedPort}
-          label="Port Name"
-        >
-          <MenuItem value="">
-            <em>{t('Please select a port')}</em>
-          </MenuItem>
-          {portCollection.sortedPortNames.map(renderPort)}
-        </Select>
-        <FormHelperText style={{ color: helperColor.toString() }}>{getHelperText()}</FormHelperText>
-        <AlertList errors={portCollection.errors} />
-      </FormControl>
-    </Container>
+    <FormControl required variant="outlined" className={classes.formControl}>
+      <InputLabel >{t('Port Name')}</InputLabel>
+      <Select
+        value={selectedPortName}
+        onChange={onSelectedPort}
+        label="Port Name"
+      >
+        <MenuItem value="">
+          <em>{t('Please select a port')}</em>
+        </MenuItem>
+        {portCollection.sortedPortNames.map(renderPort)}
+      </Select>
+      <FormHelperText style={{ color: helperColor.toString() }}>{getHelperText()}</FormHelperText>
+      <AlertList errors={portCollection.errors} />
+    </FormControl>
   );
 };
 

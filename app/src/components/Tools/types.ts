@@ -3,6 +3,8 @@ import {IHaveWorkspace} from '../Workspaces';
 export interface ITool {
   // Each tool is a single instantiation within a group.
   id: string;
+  // Name to display (after localization)
+  titleKey: string;
   // The tool can be loaded from a local path (eventually HTTP?)
   componentPath: string;
 }

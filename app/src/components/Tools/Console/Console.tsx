@@ -7,7 +7,7 @@ const Console: ToolBase = (props) => {
   const classes = useStyles();
 
   return (
-    <Grid item xs={12} className={classes.root} >
+    <Grid container className={classes.root} >
       Console component
     </Grid>
   );

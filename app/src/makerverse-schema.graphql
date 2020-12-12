@@ -121,7 +121,7 @@ type MachineDetectedFirmware {
     edition: String
     friendlyName: String
     isValid: Boolean!
-    name: String!
+    name: String
     protocol: String
     value: Decimal
     welcomeMessage: String
@@ -165,7 +165,8 @@ type MachinePartSettings {
 
 type MachinePosition {
     e: Decimal
-    x: Decimal!
+    isValid: Boolean!
+    x: Decimal
     y: Decimal
     z: Decimal
 }

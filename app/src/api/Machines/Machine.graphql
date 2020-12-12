@@ -3,6 +3,15 @@ fragment ControlledMachine on ControlledMachine {
     firmwareRequirement {
         ...FirmwareRequirement
     }
+    configuration {
+        ...MachineConfig
+    }
+    state {
+        ...MachineState
+    }
+    settings {
+        ...MachineSetting
+    }
 }
 
 fragment DetectedFirmware on MachineDetectedFirmware {
@@ -19,10 +28,64 @@ fragment MachineConfig on MachineConfiguration {
     }
 }
 
+fragment MachineAlert on MachineAlert {
+    code
+    name
+    message
+}
+
+fragment MachinePosition on MachinePosition {
+    x
+    y
+    z
+    e
+    isValid
+}
+
+fragment MachineState on MachineState {
+    state
+    machinePosition {
+        ...MachinePosition
+    }
+    workPosition {
+        ...MachinePosition
+    }
+    error {
+        ...MachineAlert
+    }
+    alarm {
+        ...MachineAlert
+    }
+}
+
+fragment MachineSetting on MachineSetting {
+    id
+    title
+    settingType
+    key
+    value
+}
+
 subscription MachineConfiguration($portName: String!) {
     machine: onMachineConfiguration(portName: $portName) {
         configuration {
             ...MachineConfig
+        }
+    }
+}
+
+subscription MachineState($portName: String!) {
+    machine: onMachineConfiguration(portName: $portName) {
+        state {
+            ...MachineState
+        }
+    }
+}
+
+subscription MachineSettings($portName: String!) {
+    machine: onMachineSetting(portName: $portName) {
+        settings {
+            ...MachineSetting
         }
     }
 }

@@ -4,7 +4,7 @@ import {ToolBase} from '../types';
 
 const Plans: ToolBase = (props) => {
   return (
-    <Grid item xs={12}>
+    <Grid container>
 
     </Grid>
   );

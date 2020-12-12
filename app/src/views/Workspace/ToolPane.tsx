@@ -12,21 +12,26 @@ const ToolPane: React.FunctionComponent<Props> = (props) => {
   const classes = useStyles();
   const t = useMakerverseTrans();
   const { toolGroup, workspace } = props;
-  const { titleKey, tools } = toolGroup;
+  const { tools } = toolGroup;
+  const showTitle = false;
 
   return (
     <Paper className={classes.toolPaper}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Typography variant="h6" color="primary">
-            {t(titleKey)}
-          </Typography>
-          <React.Suspense fallback={<CircularProgress />}>
-            {tools.map((t) => {
-              return <ToolLoader key={t.id} tool={t} workspace={workspace} />;
-            })}
-          </React.Suspense>
-        </Grid>
+      <Grid container spacing={0}>
+        <React.Suspense fallback={<CircularProgress />}>
+          {tools.map((tool) => {
+            return (
+              <React.Fragment key={tool.id}>
+                {showTitle && <Grid item xs={12}>
+                  <Typography variant="h6">{t(tool.titleKey)}</Typography>
+                </Grid>}
+                <Grid item xs={12}>
+                  <ToolLoader tool={tool} workspace={workspace} />
+                </Grid>
+              </React.Fragment>
+            );
+          })}
+        </React.Suspense>
       </Grid>
     </Paper>
   );

@@ -1,14 +1,15 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 
-const barSize = 74;
+export const barSize = 44;
 const tabSize = 44;
-const tabWidth = 320 / 6;
+
+const maxWidth = 320;
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     padding: theme.spacing(2),
     paddingTop: theme.spacing(2),
-    marginTop: barSize,
+    marginTop: 80,
   },
   paper: {
     padding: theme.spacing(2),
@@ -32,39 +33,51 @@ const useStyles = makeStyles((theme: Theme) => ({
     alignItems: 'center',
     width: '100%',
   },
+  actionButton: {
+    position: 'fixed',
+    bottom: 60,
+    right: theme.spacing(2),
+    padding: 0,
+    backgroundColor: theme.palette.background.paper,
+  },
   toolBar: {
     // height: controlBarHeight,
     // position: 'fixed',
     padding: theme.spacing(0),
     // margin: theme.spacing(2),
     position: 'fixed',
-    maxWidth: 320,
-    [theme.breakpoints.up('md')]: {
-      maxWidth: 500,
-    },
     // bottom: 0,
     right: theme.spacing(1),
   },
   toolBarSide: {
-    top: 80,
+    top: 116,
+    maxWidth: maxWidth, // Make space for right column, but keep ToolPane the same size.
   },
   toolBarBottom: {
     bottom: theme.spacing(1),
+    maxWidth: maxWidth,
   },
   toolPaper: {
-    padding: theme.spacing(1),
+    padding: theme.spacing(0),
+    // maxWidth: maxWidth * 10 / 12,
     // display: 'flex',
   },
+  tabs: {
+    width: '100%',
+  },
   tabSide: {
-    maxWidth: barSize,
-    minWidth: barSize,
+    padding: 0,
+    width: '100%',
+    height: barSize,
   },
   tabBottom: {
     maxHeight: tabSize,
     minHeight: tabSize,
-    maxWidth: tabWidth,
-    minWidth: tabWidth,
+    width: '100%',
   },
+  visualizer: {
+    height: `calc(100vh - ${barSize + 60}px)`,
+  }
 }));
 
 export default useStyles;

@@ -8,6 +8,13 @@ fragment WorkspaceFull on Workspace {
     settings {
         ...WorkspaceFullSettings
     }
+    port {
+        connection {
+            machine {
+                ...ControlledMachine
+            }
+        }
+    }
 }
 
 query Workspace($workspaceId: String!) {

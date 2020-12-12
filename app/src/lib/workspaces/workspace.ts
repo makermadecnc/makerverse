@@ -17,7 +17,11 @@ import {
   MachineFirmwareFragment,
   MachineCommandFragment,
   MachinePartFragment,
-  MachineSettingsFragment, WorkspaceFullSettingsFragment, WorkspaceFullFragment, WorkspaceState,
+  MachineSettingsFragment,
+  WorkspaceFullSettingsFragment,
+  WorkspaceFullFragment,
+  WorkspaceState,
+  ControlledMachineFragment,
 } from 'api/graphql';
 import {IToolGroup} from '../../components/Tools';
 import ToolGroup from '../../components/Tools/ToolGroup';
@@ -81,6 +85,7 @@ class Workspace extends events.EventEmitter {
   get connection(): MachineConnectionFragment { return this._settings.connection; }
   get firmware(): MachineFirmwareFragment { return this.connection.firmware; }
   get state(): WorkspaceState { return this._record.state; }
+  get machine(): ControlledMachineFragment | undefined { return this._record.port?.connection?.machine; }
 
   get hasOnboarding(): boolean {
     return this.partSettings.length > 0 || this.firmware.controllerType === MachineControllerType.Maslow;
@@ -149,9 +154,9 @@ class Workspace extends events.EventEmitter {
   get tools(): IToolGroup[] {
     return [
       new ToolGroup('Plans', 'blueprint', 'Plans'),
-      new ToolGroup('Controls', 'control-pad', 'Controls'),
+      new ToolGroup('Controls', 'control-pad', 'AxisJoggerPad'),
       new ToolGroup('Machine', 'machine', 'Machine'),
-      new ToolGroup('Workspace', this.icon, 'WorkspaceSettings'),
+      new ToolGroup('Console', 'console', 'Console'),
     ];
   }
 
@@ -248,8 +253,9 @@ class Workspace extends events.EventEmitter {
     const div = imperialUnits ? 25.4 : 1;
     const precision = imperialUnits ? 1 : 2;
     const pow = Math.pow(10, precision);
-    Object.keys(this.axes).forEach((ak) => {
-      const a = this._axes[ak];
+    const axes = this.axes;
+    Object.keys(axes).forEach((ak) => {
+      const a = axes[ak];
       axis = !axis || a.precision > axis.precision ? a : axis;
       opts.max = Math.max(opts.max, Math.round((a.range / 2 / div) * pow) / pow);
       opts.min = Math.min(opts.min, Math.round((a.accuracy / div) * pow) / pow);
@@ -259,6 +265,16 @@ class Workspace extends events.EventEmitter {
     }
     const a: WorkspaceAxis = axis;
     return a.getJogSteps(opts);
+  }
+
+  getAxisSteps(a: WorkspaceAxis, imperialUnits?: boolean): number[] {
+    const div = imperialUnits ? 25.4 : 1;
+    const precision = imperialUnits ? 1 : 2;
+    const pow = Math.pow(10, precision);
+    return a.getJogSteps({
+      max: Math.round((a.range / 2 / div) * pow) / pow,
+      min: Math.round((a.accuracy / div) * pow) / pow,
+    });
   }
 
   get imperialJogSteps(): number[] | undefined {

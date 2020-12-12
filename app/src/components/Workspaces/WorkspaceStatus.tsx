@@ -11,12 +11,14 @@ import {useTheme} from '@material-ui/core';
 import {useMakerverseTrans, useWorkspaceEvent} from '../../providers';
 import {WorkspaceEventType} from '../../lib/workspaces/types';
 
-type Props = IHaveWorkspace & IMaybeHavePortStatus;
+type Props = IHaveWorkspace & IMaybeHavePortStatus & {
+  hideText?: boolean,
+}
 
 const WorkspaceStatus: React.FunctionComponent<Props> = (props) => {
   const t = useMakerverseTrans();
   const log = useLogger(WorkspaceStatus);
-  const { workspace, port } = props;
+  const { workspace, port, hideText } = props;
   const st = workspace.state;
   const theme = useTheme();
 
@@ -44,16 +46,16 @@ const WorkspaceStatus: React.FunctionComponent<Props> = (props) => {
     if (!workspace || st === WorkspaceState.Disconnected) return theme.palette.grey.A400;
     if (st === WorkspaceState.Closed) return theme.palette.grey.A700;
     if (st === WorkspaceState.Error || st === WorkspaceState.Deleted) return theme.palette.error.main;
-    if (st === WorkspaceState.Active) return theme.palette.primary.main;
-    return theme.palette.secondary.main;
+    if (st === WorkspaceState.Active) return theme.palette.secondary.dark;
+    return theme.palette.secondary.dark;
   }
 
   const color = getColor();
 
   return (
     <React.Fragment >
-      <FontAwesomeIcon color={color} icon={getIcon()} style={{ marginRight: theme.spacing(1) }} />
-      {' '}{getStatusText()}
+      <FontAwesomeIcon color={color} icon={getIcon()} style={{ marginRight: theme.spacing(0.5) }} />
+      {!hideText && <span>{' '}{getStatusText()}</span>}
     </React.Fragment>
   );
 };

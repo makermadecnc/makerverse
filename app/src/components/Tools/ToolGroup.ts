@@ -16,7 +16,7 @@ class ToolGroup implements IToolGroup {
     this._icon = icon;
     this._title = title;
     this._tools = args.map((path) => {
-      return { id: `${this.id}-${path}`, componentPath: path };
+      return { id: `${this.id}-${path}`, componentPath: path, titleKey: path };
     });
   }
 }

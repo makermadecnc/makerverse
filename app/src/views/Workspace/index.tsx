@@ -1,11 +1,15 @@
-import React, {FunctionComponent} from 'react';
+import React, {FunctionComponent, ReactNode} from 'react';
 import {useSystemPorts} from '../../providers/SystemPortHooks';
 import {useWorkspace, useWorkspaceEvent} from '../../providers';
-import {WorkspaceState} from '../../api/graphql';
+import {
+  WorkspaceState
+} from '../../api/graphql';
 import WorkspaceConnector from './WorkspaceConnector';
 import {WorkspaceEventType} from '../../lib/workspaces/types';
-import useStyles from './Styles';
-import ToolBar from './ToolBar';
+import ControllerProvider from '../../providers/ControllerProvider';
+import Workspace from './Workspace';
+import { Grid } from '@material-ui/core';
+import WorkBar from 'components/WorkBar';
 
 interface OwnProps {
   id: string;
@@ -14,27 +18,22 @@ interface OwnProps {
 type Props = OwnProps;
 
 const index: FunctionComponent<Props> = (props) => {
-  //const workspaces: Workspaces = useWorkspaces();
-  //const workspace = workspaces.all[props.id];
   const ports = useSystemPorts();
   const workspace = useWorkspace(props.id);
-  const classes = useStyles();
   const port = ports.portMap[workspace.connection.portName];
 
   useWorkspaceEvent(workspace, WorkspaceEventType.State);
 
-  if (workspace.state !== WorkspaceState.Active) {
-    return <WorkspaceConnector workspaceId={props.id} port={port} />;
-  }
   // Controls [Axes, Homing, Spindle/Laser, Hotend, Console(?)]
   // Project [Visualizer, Webcam, Gcode]
   // Settings [Machine Settings, Calibration, Probe, Test Laser, Edit Workspace]
 
-  return (
-    <React.Fragment>
-      <ToolBar workspace={workspace} />
-    </React.Fragment>
-  );
+  if (workspace.state !== WorkspaceState.Active || !workspace.machine)
+    return <WorkspaceConnector workspaceId={props.id} port={port} />;
+
+  return <ControllerProvider portName={port.portName} machine={workspace.machine} >
+    {<Workspace port={port} workspace={workspace} />}
+  </ControllerProvider>;
 };
 
 export default index;

@@ -100,7 +100,6 @@
   <ItemGroup>
     <Folder Include="App\src\components\Tools\Machine" />
     <Folder Include="App\src\components\Tools\Plans" />
-    <Folder Include="App\src\components\Tools\WorkspaceSettings" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

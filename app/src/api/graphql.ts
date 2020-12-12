@@ -150,7 +150,7 @@ export type MachineDetectedFirmware = {
   edition: Maybe<Scalars['String']>;
   friendlyName: Maybe<Scalars['String']>;
   isValid: Scalars['Boolean'];
-  name: Scalars['String'];
+  name: Maybe<Scalars['String']>;
   protocol: Maybe<Scalars['String']>;
   value: Maybe<Scalars['Decimal']>;
   welcomeMessage: Maybe<Scalars['String']>;
@@ -198,7 +198,8 @@ export type MachinePartSettings = {
 export type MachinePosition = {
   __typename?: 'MachinePosition';
   e: Maybe<Scalars['Decimal']>;
-  x: Scalars['Decimal'];
+  isValid: Scalars['Boolean'];
+  x: Maybe<Scalars['Decimal']>;
   y: Maybe<Scalars['Decimal']>;
   z: Maybe<Scalars['Decimal']>;
 };
@@ -1014,7 +1015,7 @@ export type MachineDetectedFirmwareResolvers<ContextType = any, ParentType exten
   edition: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   friendlyName: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   isValid: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   protocol: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   value: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
   welcomeMessage: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -1062,7 +1063,8 @@ export type MachinePartSettingsResolvers<ContextType = any, ParentType extends R
 
 export type MachinePositionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachinePosition'] = ResolversParentTypes['MachinePosition']> = {
   e: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
-  x: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
+  isValid: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  x: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
   y: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
   z: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -1343,7 +1345,16 @@ export type ControlledMachineFragment = (
   ) | (
     { __typename?: 'MachineFirmwareSettings' }
     & FirmwareRequirement_MachineFirmwareSettings_Fragment
-  ) }
+  ), configuration: (
+    { __typename?: 'MachineConfiguration' }
+    & MachineConfigFragment
+  ), state: (
+    { __typename?: 'MachineState' }
+    & MachineStateFragment
+  ), settings: Array<(
+    { __typename?: 'MachineSetting' }
+    & MachineSettingFragment
+  )> }
 );
 
 export type DetectedFirmwareFragment = (
@@ -1359,6 +1370,39 @@ export type MachineConfigFragment = (
   ) }
 );
 
+export type MachineAlertFragment = (
+  { __typename?: 'MachineAlert' }
+  & Pick<MachineAlert, 'code' | 'name' | 'message'>
+);
+
+export type MachinePositionFragment = (
+  { __typename?: 'MachinePosition' }
+  & Pick<MachinePosition, 'x' | 'y' | 'z' | 'e' | 'isValid'>
+);
+
+export type MachineStateFragment = (
+  { __typename?: 'MachineState' }
+  & Pick<MachineState, 'state'>
+  & { machinePosition: (
+    { __typename?: 'MachinePosition' }
+    & MachinePositionFragment
+  ), workPosition: Maybe<(
+    { __typename?: 'MachinePosition' }
+    & MachinePositionFragment
+  )>, error: Maybe<(
+    { __typename?: 'MachineAlert' }
+    & MachineAlertFragment
+  )>, alarm: Maybe<(
+    { __typename?: 'MachineAlert' }
+    & MachineAlertFragment
+  )> }
+);
+
+export type MachineSettingFragment = (
+  { __typename?: 'MachineSetting' }
+  & Pick<MachineSetting, 'id' | 'title' | 'settingType' | 'key' | 'value'>
+);
+
 export type MachineConfigurationSubscriptionVariables = Exact<{
   portName: Scalars['String'];
 }>;
@@ -1372,6 +1416,38 @@ export type MachineConfigurationSubscription = (
       { __typename?: 'MachineConfiguration' }
       & MachineConfigFragment
     ) }
+  ) }
+);
+
+export type MachineStateSubscriptionVariables = Exact<{
+  portName: Scalars['String'];
+}>;
+
+
+export type MachineStateSubscription = (
+  { __typename?: 'Subscription' }
+  & { machine: (
+    { __typename?: 'ControlledMachine' }
+    & { state: (
+      { __typename?: 'MachineState' }
+      & MachineStateFragment
+    ) }
+  ) }
+);
+
+export type MachineSettingsSubscriptionVariables = Exact<{
+  portName: Scalars['String'];
+}>;
+
+
+export type MachineSettingsSubscription = (
+  { __typename?: 'Subscription' }
+  & { machine: (
+    { __typename?: 'ControlledMachine' }
+    & { settings: Array<(
+      { __typename?: 'MachineSetting' }
+      & MachineSettingFragment
+    )> }
   ) }
 );
 
@@ -1639,7 +1715,16 @@ export type WorkspaceFullFragment = (
   )>, settings: (
     { __typename?: 'WorkspaceSettings' }
     & WorkspaceFullSettingsFragment
-  ) }
+  ), port: Maybe<(
+    { __typename?: 'SystemPort' }
+    & { connection: Maybe<(
+      { __typename?: 'ConnectedPort' }
+      & { machine: (
+        { __typename?: 'ControlledMachine' }
+        & ControlledMachineFragment
+      ) }
+    )> }
+  )> }
 );
 
 export type WorkspaceQueryVariables = Exact<{
@@ -1749,22 +1834,6 @@ export const MakerverseSessionFragmentDoc = gql`
   }
 }
     ${MakerverseUserFullFragmentDoc}`;
-export const DetectedFirmwareFragmentDoc = gql`
-    fragment DetectedFirmware on MachineDetectedFirmware {
-  friendlyName
-  isValid
-  name
-  value
-  edition
-}
-    `;
-export const MachineConfigFragmentDoc = gql`
-    fragment MachineConfig on MachineConfiguration {
-  firmware {
-    ...DetectedFirmware
-  }
-}
-    ${DetectedFirmwareFragmentDoc}`;
 export const AlertErrorFragmentDoc = gql`
     fragment AlertError on AlertError {
   name
@@ -1793,14 +1862,85 @@ export const FirmwareRequirementFragmentDoc = gql`
   requiredVersion
 }
     `;
+export const DetectedFirmwareFragmentDoc = gql`
+    fragment DetectedFirmware on MachineDetectedFirmware {
+  friendlyName
+  isValid
+  name
+  value
+  edition
+}
+    `;
+export const MachineConfigFragmentDoc = gql`
+    fragment MachineConfig on MachineConfiguration {
+  firmware {
+    ...DetectedFirmware
+  }
+}
+    ${DetectedFirmwareFragmentDoc}`;
+export const MachinePositionFragmentDoc = gql`
+    fragment MachinePosition on MachinePosition {
+  x
+  y
+  z
+  e
+  isValid
+}
+    `;
+export const MachineAlertFragmentDoc = gql`
+    fragment MachineAlert on MachineAlert {
+  code
+  name
+  message
+}
+    `;
+export const MachineStateFragmentDoc = gql`
+    fragment MachineState on MachineState {
+  state
+  machinePosition {
+    ...MachinePosition
+  }
+  workPosition {
+    ...MachinePosition
+  }
+  error {
+    ...MachineAlert
+  }
+  alarm {
+    ...MachineAlert
+  }
+}
+    ${MachinePositionFragmentDoc}
+${MachineAlertFragmentDoc}`;
+export const MachineSettingFragmentDoc = gql`
+    fragment MachineSetting on MachineSetting {
+  id
+  title
+  settingType
+  key
+  value
+}
+    `;
 export const ControlledMachineFragmentDoc = gql`
     fragment ControlledMachine on ControlledMachine {
   machineProfileId
   firmwareRequirement {
     ...FirmwareRequirement
   }
+  configuration {
+    ...MachineConfig
+  }
+  state {
+    ...MachineState
+  }
+  settings {
+    ...MachineSetting
+  }
 }
-    ${FirmwareRequirementFragmentDoc}`;
+    ${FirmwareRequirementFragmentDoc}
+${MachineConfigFragmentDoc}
+${MachineStateFragmentDoc}
+${MachineSettingFragmentDoc}`;
 export const PortIoStatusFragmentDoc = gql`
     fragment PortIOStatus on PortStatus {
   bytesToRead
@@ -2063,9 +2203,17 @@ export const WorkspaceFullFragmentDoc = gql`
   settings {
     ...WorkspaceFullSettings
   }
+  port {
+    connection {
+      machine {
+        ...ControlledMachine
+      }
+    }
+  }
 }
     ${AlertErrorFragmentDoc}
-${WorkspaceFullSettingsFragmentDoc}`;
+${WorkspaceFullSettingsFragmentDoc}
+${ControlledMachineFragmentDoc}`;
 export const StartupFragmentDoc = gql`
     fragment Startup on Query {
   settings: getSettings {
@@ -2146,6 +2294,68 @@ export function useMachineConfigurationSubscription(baseOptions: Apollo.Subscrip
       }
 export type MachineConfigurationSubscriptionHookResult = ReturnType<typeof useMachineConfigurationSubscription>;
 export type MachineConfigurationSubscriptionResult = Apollo.SubscriptionResult<MachineConfigurationSubscription>;
+export const MachineStateDocument = gql`
+    subscription MachineState($portName: String!) {
+  machine: onMachineConfiguration(portName: $portName) {
+    state {
+      ...MachineState
+    }
+  }
+}
+    ${MachineStateFragmentDoc}`;
+
+/**
+ * __useMachineStateSubscription__
+ *
+ * To run a query within a React component, call `useMachineStateSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useMachineStateSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMachineStateSubscription({
+ *   variables: {
+ *      portName: // value for 'portName'
+ *   },
+ * });
+ */
+export function useMachineStateSubscription(baseOptions: Apollo.SubscriptionHookOptions<MachineStateSubscription, MachineStateSubscriptionVariables>) {
+        return Apollo.useSubscription<MachineStateSubscription, MachineStateSubscriptionVariables>(MachineStateDocument, baseOptions);
+      }
+export type MachineStateSubscriptionHookResult = ReturnType<typeof useMachineStateSubscription>;
+export type MachineStateSubscriptionResult = Apollo.SubscriptionResult<MachineStateSubscription>;
+export const MachineSettingsDocument = gql`
+    subscription MachineSettings($portName: String!) {
+  machine: onMachineSetting(portName: $portName) {
+    settings {
+      ...MachineSetting
+    }
+  }
+}
+    ${MachineSettingFragmentDoc}`;
+
+/**
+ * __useMachineSettingsSubscription__
+ *
+ * To run a query within a React component, call `useMachineSettingsSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useMachineSettingsSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMachineSettingsSubscription({
+ *   variables: {
+ *      portName: // value for 'portName'
+ *   },
+ * });
+ */
+export function useMachineSettingsSubscription(baseOptions: Apollo.SubscriptionHookOptions<MachineSettingsSubscription, MachineSettingsSubscriptionVariables>) {
+        return Apollo.useSubscription<MachineSettingsSubscription, MachineSettingsSubscriptionVariables>(MachineSettingsDocument, baseOptions);
+      }
+export type MachineSettingsSubscriptionHookResult = ReturnType<typeof useMachineSettingsSubscription>;
+export type MachineSettingsSubscriptionResult = Apollo.SubscriptionResult<MachineSettingsSubscription>;
 export const ListPortsDocument = gql`
     query ListPorts {
   ports: listPorts {

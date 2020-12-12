@@ -11,7 +11,7 @@ const Machine: ToolBase = (props) => {
   const port = ports.portMap[portName];
 
   return (
-    <Grid item xs={12}>
+    <Grid container>
       <PortStatus port={port} showName={true} />
     </Grid>
   );
