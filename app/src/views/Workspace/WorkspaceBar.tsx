@@ -1,10 +1,11 @@
-import {Box, Grid } from '@material-ui/core';
+import {Grid} from '@material-ui/core';
 import WorkBar from 'components/WorkBar';
 import * as React from 'react';
 import {tryUseController} from '../../providers';
 import {IHaveWorkspace} from '../../components/Workspaces';
 import {IMaybeHavePortStatus} from '../../components/Ports/types';
 import {tryUseGcodeVisualizer} from '../../components/GWiz';
+import {WorkspaceState} from '../../api/graphql';
 
 type Props = IHaveWorkspace & IMaybeHavePortStatus & {
  children: React.ReactNode;
@@ -23,7 +24,7 @@ const WorkspaceBar: React.FunctionComponent<Props> = (props) => {
             workspace={workspace}
             port={port}
             controller={controller}
-            wiz={wiz}
+            wiz={workspace.state === WorkspaceState.Active ? wiz : undefined}
           />
         </Grid>
       </Grid>

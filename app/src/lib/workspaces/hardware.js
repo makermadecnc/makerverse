@@ -1,6 +1,6 @@
 import log from 'js-logger';
-import i18n from 'lib/i18n';
 import analytics from 'lib/analytics';
+import { TTranslateFunc } from '@openworkshop/lib';
 import { MASLOW, MARLIN } from 'constants/index';
 
 class Hardware {
@@ -61,35 +61,6 @@ class Hardware {
 
   get controllerType() {
     return this._controllerType;
-  }
-
-  // Examine some firmware record from the server. Check if it is compatible with this hardware.
-  // Returns null if no requirement provided by the firmware
-  getFirmwareCompatibility(requiredFirmware) {
-    const { name, requiredVersion, suggestedVersion } = requiredFirmware;
-    if (!name || !requiredVersion) {
-      return null;
-    }
-    if (!this.hasFirmware) {
-      return { error: i18n._('Unable to detect firmware version.') };
-    }
-    if (name !== this.firmware.name) {
-      return {
-        warning: i18n._('Unexpected firmware type: {{ name }}', { name: this.firmware.name }),
-      };
-    }
-    if (!this.hasFirmwareVersion(requiredVersion)) {
-      return {
-        error: i18n._('Required version: v{{ requiredVersion }}', { requiredVersion }),
-      };
-    }
-    if (!this.hasFirmwareVersion(suggestedVersion)) {
-      return {
-        warning: i18n._('Update available: v{{ suggestedVersion }}', { suggestedVersion }),
-      };
-    }
-
-    return { success: i18n._('You have the latest firmware.') };
   }
 
   // Cast the internal firmware.version to a number, if it exists.

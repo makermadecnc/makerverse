@@ -13,8 +13,6 @@ import theme from '@openworkshop/ui/themes/Makerverse';
 import {BackendConnection} from "./lib/Makerverse/apollo";
 import MakerverseProvider from './providers/MakerverseProvider';
 import auth from './lib/auth';
-import './styles/vendor.styl';
-import './styles/app.styl';
 
 // Create browser history to use in the Redux store
 // const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href');
