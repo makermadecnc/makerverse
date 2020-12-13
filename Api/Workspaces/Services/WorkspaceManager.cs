@@ -85,6 +85,7 @@ namespace Makerverse.Api.Workspaces.Services {
       if (!_workspaces.TryRemove(workspaceId, out Workspace? ws)) {
         throw new KeyNotFoundException($"{workspaceId}'s workspace did not exist");
       }
+      EmitState(ws, WorkspaceState.Deleted);
 
       Dictionary<string, WorkspaceSettings> map = Settings;
       if (!map.ContainsKey(workspaceId)) {
@@ -94,7 +95,6 @@ namespace Makerverse.Api.Workspaces.Services {
 
       _makerverseSettings.Workspaces = map.Values.ToList();
       _configFile.Save();
-      EmitState(ws, WorkspaceState.Deleted);
       ws.Dispose();
       return ws;
     }

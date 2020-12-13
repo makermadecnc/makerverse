@@ -12,3 +12,10 @@ export interface IHaveWorkspace {
   workspace: Workspace;
 }
 
+export interface IWorkspaceSettingsTab {
+  key: string;
+
+  title: string;
+
+  component: React.ReactNode,
+}

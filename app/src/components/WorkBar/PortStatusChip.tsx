@@ -26,17 +26,17 @@ const PortStatusChip: React.FunctionComponent<Props> = (props) => {
 
   function renderConnection(conn: ConnectedPortStatusFragment) {
     return [
-      <Grid item key="h-charsRead" xs={8} className={classes.popoverRowAlt} >
-        <Typography variant="body1">{t('Characters Read')}</Typography>
+      <Grid item key="h-linesRead" xs={8} className={classes.popoverRowAlt} >
+        <Typography variant="body1">{t('Lines Read')}</Typography>
       </Grid>,
-      <Grid item key="charsRead" xs={4} className={classes.popoverRowAlt} style={{ textAlign: 'right' }} >
-        <Typography variant="subtitle2">{conn.status.charactersRead}</Typography>
+      <Grid item key="linesRead" xs={4} className={classes.popoverRowAlt} style={{ textAlign: 'right' }} >
+        <Typography variant="subtitle2">{conn.status.linesRead}</Typography>
       </Grid>,
-      <Grid item key="h-charactersWritten" xs={8} className={classes.popoverRow} >
-        <Typography variant="body1">{t('Characters Written')}</Typography>
+      <Grid item key="h-linesWritten" xs={8} className={classes.popoverRow} >
+        <Typography variant="body1">{t('Lines Written')}</Typography>
       </Grid>,
-      <Grid item key="charactersWritten" xs={4} className={classes.popoverRow} style={{ textAlign: 'right' }} >
-        <Typography variant="subtitle2">{conn.status.charactersWritten}</Typography>
+      <Grid item key="linesWritten" xs={4} className={classes.popoverRow} style={{ textAlign: 'right' }} >
+        <Typography variant="subtitle2">{conn.status.linesWritten}</Typography>
       </Grid>,
     ];
   }

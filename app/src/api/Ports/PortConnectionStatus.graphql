@@ -3,4 +3,6 @@ fragment PortIOStatus on PortStatus {
     bytesToWrite
     charactersRead
     charactersWritten
+    linesRead
+    linesWritten
 }

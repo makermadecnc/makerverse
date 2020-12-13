@@ -29,6 +29,12 @@ mutation CreateWorkspace($workspaceSettings: WorkspaceSettingsInput!) {
     }
 }
 
+mutation DeleteWorkspace($workspaceId: String!) {
+    workspace: deleteWorkspace(workspaceId: $workspaceId) {
+        ...WorkspaceFull
+    }
+}
+
 subscription WorkspaceChange {
     workspace: onWorkspaceChange {
         ...WorkspaceFull

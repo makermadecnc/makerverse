@@ -8,6 +8,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   header: {
     marginBottom: theme.spacing(2),
   },
+  paper: {
+    padding: theme.spacing(1),
+  },
   formControl: {
     minWidth: 120,
     margin: theme.spacing(1),

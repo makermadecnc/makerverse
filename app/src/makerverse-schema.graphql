@@ -8,9 +8,12 @@ schema {
 
 interface IMachineFirmwareRequirement {
     controllerType: MachineControllerType!
+    downloadUrl: String
     edition: String
+    helpUrl: String
     name: String
     requiredVersion: Decimal!
+    suggestedVersion: Decimal!
 }
 
 interface ISerialPortOptions {
@@ -84,13 +87,6 @@ type FileSystemSettings {
     programDirectory: String!
 }
 
-type FirmwareRequirement implements IMachineFirmwareRequirement {
-    controllerType: MachineControllerType!
-    edition: String
-    name: String
-    requiredVersion: Decimal!
-}
-
 type MachineAlert {
     code: String!
     message: String!
@@ -148,7 +144,6 @@ type MachineFirmwareSettings implements IMachineFirmwareRequirement {
     requiredVersion: Decimal!
     rtscts: Boolean!
     suggestedVersion: Decimal!
-    toRequirement: FirmwareRequirement!
 }
 
 type MachinePartSettings {
@@ -194,10 +189,10 @@ type MachineSpecSettings {
 }
 
 type MachineState {
+    activityState: ActiveState!
     alarm: MachineAlert
     error: MachineAlert
     machinePosition: MachinePosition!
-    state: ActiveState!
     workPosition: MachinePosition
 }
 
@@ -270,6 +265,8 @@ type PortStatus {
     charactersRead: Int!
     charactersWritten: Int!
     isOpen: Boolean!
+    linesRead: Int!
+    linesWritten: Int!
 }
 
 type Query {
@@ -461,9 +458,12 @@ input ConnectionSettingsInput {
 
 input FirmwareRequirementInput {
     controllerType: MachineControllerType!
+    downloadUrl: String
     edition: String
+    helpUrl: String
     name: String
     requiredVersion: Decimal!
+    suggestedVersion: Decimal!
 }
 
 input MachineAxisSettingsInput {

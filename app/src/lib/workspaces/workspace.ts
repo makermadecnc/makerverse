@@ -123,6 +123,8 @@ class Workspace extends events.EventEmitter {
     return this.isConnected && this.activeState.isImperialUnits;
   }
 
+  get autoReconnect(): boolean { return this._settings.autoReconnect; }
+
   onActivated(): void {
     if (this._settings.autoReconnect) {
       void this.openPort();

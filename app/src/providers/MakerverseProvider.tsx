@@ -80,10 +80,11 @@ const MakerverseProvider: FunctionComponent<IProps> = (props) => {
       const newFragments = [...workspaceFragments];
 
       if (workspaceFragment.state === WorkspaceState.Deleted) {
-        log.debug('[WORKSPACE]', 'delete', changedWorkspaceId, workspaceFragment);
         const ei = _.findIndex(newFragments, ws => ws.id === changedWorkspaceId);
         if (ei >= 0) {
           newFragments.splice(ei, 1);
+          log.debug('[WORKSPACE]', 'delete', changedWorkspaceId, workspaceFragment, newFragments);
+          setWorkspaceFragments(newFragments);
         }
       } else if (_.has(workspaceObjects, changedWorkspaceId)) {
         log.debug('[WORKSPACE]', 'update', changedWorkspaceId, workspaceFragment);

@@ -39,6 +39,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginBottom: theme.spacing(0.5),
     marginRight: theme.spacing(1),
   },
+  error: {
+    color: theme.palette.error.dark,
+  },
   selectMenuItem: {
     // height: iconSize,
   },

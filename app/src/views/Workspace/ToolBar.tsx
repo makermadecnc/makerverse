@@ -8,23 +8,33 @@ import {useMakerverseTrans, useWindowSize} from '../../providers';
 import {OpenWorkShopIcon} from '@openworkshop/ui/components';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import ToolPane from './ToolPane';
+import {Route, Switch, useHistory} from 'react-router-dom';
+import {IToolGroup} from '../../components/Tools';
 
-type Props = IHaveWorkspace;
+type Props = IHaveWorkspace & {
+  selectedToolGroupId?: string;
+}
 
 const ToolBar: React.FunctionComponent<Props> = (props) => {
   const log = useLogger(ToolBar);
   const classes = useStyles();
   const t = useMakerverseTrans();
-  const { workspace } = props;
-  const [selectedToolId, setSelectedToolId] = React.useState<string | undefined>(undefined);
-  const selectedTool = selectedToolId ? _.find(workspace.tools, t => t.id === selectedToolId) : undefined;
+  const { workspace, selectedToolGroupId } = props;
+  const history = useHistory();
+  // const [selectedToolId, setSelectedToolId] = React.useState<string | undefined>(undefined);
   const windowSize = useWindowSize();
   const isOnBottom = windowSize.width < windowSize.height;
+  const workspacePath = `/workspaces/${workspace.id}`;
 
-  function onSelectedToolId(id: string): void {
-    const toolId = id === selectedToolId ? undefined : id;
-    log.debug('[TOOL]', toolId);
-    setSelectedToolId(toolId);
+  function getToolGroupPath(toolGroup: IToolGroup): string {
+    return `${workspacePath}/${toolGroup.id}`;
+  }
+
+  function onSelectedToolGroup(toolGroup: IToolGroup): void {
+    const toolGroupId = toolGroup.id === selectedToolGroupId ? undefined : toolGroup.id;
+    log.debug('[TOOL]', selectedToolGroupId, '->', toolGroup.id, toolGroupId);
+    // setSelectedToolId(toolId);
+    history.push(`${workspacePath}/${toolGroupId ?? ''}`);
   }
 
   return (
@@ -38,7 +48,15 @@ const ToolBar: React.FunctionComponent<Props> = (props) => {
       })}
     >
       <Grid item xs={isOnBottom ? 12 : 10}>
-        {selectedTool && <ToolPane toolGroup={selectedTool} workspace={workspace} />}
+        <Switch>
+          {workspace.tools.map((toolGroup) => {
+            return (
+              <Route exact key={toolGroup.id} path={getToolGroupPath(toolGroup)} >
+                <ToolPane toolGroup={toolGroup} workspace={workspace} />
+              </Route>
+            );
+          })}
+        </Switch>
       </Grid>
       <Grid item xs={isOnBottom ? 12 : 2}>
         <Paper className={classes.toolBarPaper} >
@@ -47,16 +65,16 @@ const ToolBar: React.FunctionComponent<Props> = (props) => {
             orientation={isOnBottom ? 'horizontal' : 'vertical'}
             aria-label={t('Toolbar Tabs')}
           >
-            {workspace.tools.map(tool => {
+            {workspace.tools.map(toolGroup => {
               return (
                 <Button
-                  key={tool.titleKey}
+                  key={toolGroup.titleKey}
                   className={clsx({ [classes.tabSide]: !isOnBottom, [classes.tabBottom]: isOnBottom })}
-                  color={tool.titleKey === selectedToolId ? 'secondary' : 'primary'}
-                  onClick={() => onSelectedToolId(tool.id)}
-                  aria-label={tool.titleKey}
+                  color={toolGroup.id === selectedToolGroupId ? 'secondary' : 'primary'}
+                  onClick={() => onSelectedToolGroup(toolGroup)}
+                  aria-label={toolGroup.titleKey}
                 >
-                  <OpenWorkShopIcon name={tool.icon} />
+                  <OpenWorkShopIcon name={toolGroup.icon} />
                 </Button>
               );
             })}

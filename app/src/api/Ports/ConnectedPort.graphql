@@ -3,6 +3,9 @@ fragment FirmwareRequirement on IMachineFirmwareRequirement {
     name
     edition
     requiredVersion
+    suggestedVersion
+    helpUrl
+    downloadUrl
 }
 
 fragment ConnectedPortStatus on ConnectedPort {

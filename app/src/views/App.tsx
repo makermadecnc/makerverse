@@ -52,7 +52,7 @@ const App: React.FunctionComponent<IProps> = (props) => {
       <Switch>
         {workspaceIds.map((workspaceId) => {
           return (
-            <Route exact key={workspaceId} path={`/workspaces/${workspaceId}`} >
+            <Route exact key={workspaceId} path={`/workspaces/${workspaceId}/:selectedToolGroupId?`} >
               <Workspace id={workspaceId} />
             </Route>
           );

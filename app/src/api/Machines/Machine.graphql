@@ -20,6 +20,8 @@ fragment DetectedFirmware on MachineDetectedFirmware {
     name
     value
     edition
+    protocol
+    welcomeMessage
 }
 
 fragment MachineConfig on MachineConfiguration {
@@ -43,7 +45,7 @@ fragment MachinePosition on MachinePosition {
 }
 
 fragment MachineState on MachineState {
-    state
+    activityState
     machinePosition {
         ...MachinePosition
     }

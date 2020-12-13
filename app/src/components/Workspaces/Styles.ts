@@ -4,6 +4,12 @@ import CardStyles from '@openworkshop/ui/components/Cards/CardStyles';
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
   },
+  dialog: {
+    padding: 0,
+  },
+  formControl: {
+    width: '100%',
+  },
   titleBar: {
     backgroundColor: theme.palette.background.paper,
     borderBottomWidth: 1,
@@ -48,12 +54,16 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: 0,
   },
   dialogContent: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(1),
   },
   dialogFooter: {
     justifyContent: 'center',
     margin: 0,
     backgroundColor: theme.palette.grey.A100,
+  },
+  deleteButton: {
+    backgroundColor: theme.palette.error.dark,
+    color: 'white',
   }
 }));
 

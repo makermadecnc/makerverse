@@ -1,5 +1,17 @@
 import _ from 'lodash';
-import { Typography, FormControl, InputLabel, Input, Grid, FormHelperText, FormControlLabel, Checkbox, Fab, useTheme } from '@material-ui/core';
+import {
+  Checkbox,
+  Fab,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  Grid,
+  Input,
+  InputLabel,
+  Typography,
+  useTheme,
+  Paper
+} from '@material-ui/core';
 import * as React from 'react';
 import CardDialog from '@openworkshop/ui/components/Cards/CardDialog';
 import useStyles from './Styles';
@@ -12,19 +24,17 @@ import {useSystemPorts} from '../../providers/SystemPortHooks';
 import PortStatus from '../../components/Ports/PortStatus';
 import {OpenWorkShopIcon} from '@openworkshop/ui/components';
 import {
-  WorkspaceSettingsInput,
-  useCreateWorkspaceMutation,
-  MachineSettingSettingsInput,
   MachinePartSettingsInput,
+  MachineSettingSettingsInput,
+  useCreateWorkspaceMutation,
+  WorkspaceSettingsInput,
 } from '../../api/graphql';
 import Colors from '@openworkshop/ui/themes/Colors';
-import {
-  MachinePartCompleteFragment,
-  MachinePresetSettingPropsFragment
-} from '@openworkshop/lib/api/graphql';
-import {IAlertMessage, AlertList} from '@openworkshop/ui/components/Alerts';
-import { Redirect } from 'react-router-dom';
+import {AxisName, MachinePartCompleteFragment, MachinePresetSettingPropsFragment} from '@openworkshop/lib/api/graphql';
+import {AlertList, IAlertMessage} from '@openworkshop/ui/components/Alerts';
+import {Redirect} from 'react-router-dom';
 import {useMakerverseTrans} from '../../providers';
+import {normalizeAxisName} from '@openworkshop/lib/api/Machines/AxisName';
 
 type Props = {
   machine?: ICustomizedMachine;
@@ -105,7 +115,11 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
       machineProfileId: machine.profile.machineProfileId ?? null,
       onboarded: false,
       axes: Object.values(machine.axes).map((axis) => {
-        return _.omit(axis, ['__typename']);
+        return {
+          ...{ id: null, accuracy: null, precision: null, min: 0, max: 0, name: AxisName.X },
+          ..._.omit(axis, ['__typename']),
+          name: normalizeAxisName(axis.name) ?? AxisName.X,
+        };
       }),
       commands: machine.commands.map((cmd) => {
         return _.omit(cmd, ['__typename']);
@@ -147,57 +161,63 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
     >
       <Grid container spacing={2}>
         <Grid item xs={12} >
-          <FormControl
-            className={classes.formControl}
-            margin='normal'
-            fullWidth={true}
-            required={true}
-            variant='outlined'
-          >
-            <InputLabel htmlFor='workspace-name'>{t('Workspace Name')}</InputLabel>
-            <Input
-              id='workspace-name'
-              name='workspace-name'
-              error={false}
-              type='text'
-              value={workspaceName}
-              autoFocus={true}
-              onChange={(e) => updateWorkspaceName(e.target.value)}
-              startAdornment={<OpenWorkShopIcon name={icon} className={classes.leftButtonIconAdornment} />}
-            />
-            <FormHelperText >{window.location.origin}/workspaces/<strong>{workspaceId}</strong></FormHelperText>
-          </FormControl>
+          <Paper className={classes.paper}>
+            <FormControl
+              className={classes.formControl}
+              margin='normal'
+              fullWidth={true}
+              required={true}
+              variant='outlined'
+            >
+              <InputLabel htmlFor='workspace-name'>{t('Workspace Name')}</InputLabel>
+              <Input
+                id='workspace-name'
+                name='workspace-name'
+                error={false}
+                type='text'
+                value={workspaceName}
+                autoFocus={true}
+                onChange={(e) => updateWorkspaceName(e.target.value)}
+                startAdornment={<OpenWorkShopIcon name={icon} className={classes.leftButtonIconAdornment} />}
+              />
+              <FormHelperText >{window.location.origin}/workspaces/<strong>{workspaceId}</strong></FormHelperText>
+            </FormControl>
+          </Paper>
         </Grid>
         <Grid item xs={12}>
           <Typography variant="h6">{t('Personal Preferences')}</Typography>
         </Grid>
         <Grid item xs={12}>
-          <FormControl className={classes.formControl}>
-            <FormControlLabel
-              control={<Checkbox checked={preferImperial} onChange={() => setPreferImperial(!preferImperial)} />}
-              label={t('I prefer imperial (inches) to metric (mm)')}
-            />
-          </FormControl>
-          <FormControl className={classes.formControl}>
-            <FormControlLabel
-              control={<Checkbox checked={autoReconnect} onChange={() => setAutoReconnect(!autoReconnect)} />}
-              label={t('Automatically (re)connect to the machine when the workspace is opened.')}
-            />
-          </FormControl>
+          <Paper className={classes.paper}>
+            <FormControl className={classes.formControl}>
+              <FormControlLabel
+                control={<Checkbox checked={preferImperial} onChange={() => setPreferImperial(!preferImperial)} />}
+                label={t('I prefer imperial (inches) to metric (mm)')}
+              />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <FormControlLabel
+                control={<Checkbox checked={autoReconnect} onChange={() => setAutoReconnect(!autoReconnect)} />}
+                label={t('Automatically (re)connect to the machine when the workspace is opened.')}
+              />
+            </FormControl>
+          </Paper>
         </Grid>
         <Grid item xs={12}>
           <Typography variant="h6">{t('One Last Thing...')}</Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="body1">
-            {t('Makerverse is an open-source project with a rich history and ambitious goals.')}
-            <analytics.OutboundLink
-              eventLabel='learn more'
-              to={docs.urlAbout}
-              target='_blank'>
-              {t('Learn More')}
-            </analytics.OutboundLink>
-          </Typography>
+          <Paper className={classes.paper}>
+            <Typography variant="body1">
+              {t('Makerverse is an open-source project with a rich history and ambitious goals.')}
+              <analytics.OutboundLink
+                eventLabel='learn more'
+                to={docs.urlAbout}
+                target='_blank'>
+                {t('Learn More')}
+              </analytics.OutboundLink>
+            </Typography>
+          </Paper>
         </Grid>
         <Grid item xs={12} style={{ textAlign: 'center' }} >
           <FormControl

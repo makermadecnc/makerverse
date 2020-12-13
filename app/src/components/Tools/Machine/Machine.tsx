@@ -1,18 +1,20 @@
 import * as React from 'react';
 import { Grid } from '@material-ui/core';
-import PortStatus from '../../Ports/PortStatus';
-import {useSystemPorts} from '../../../providers/SystemPortHooks';
 import {ToolBase} from '../types';
+import {useController} from '../../../providers';
+import useStyles from './Styles';
 
 const Machine: ToolBase = (props) => {
-  const { workspace } = props;
-  const ports = useSystemPorts();
-  const portName = workspace.connection.portName;
-  const port = ports.portMap[portName];
+  // const { workspace } = props;
+  const classes = useStyles();
+  const controller = useController();
 
   return (
-    <Grid container>
-      <PortStatus port={port} showName={true} />
+    <Grid container className={classes.root}>
+      <Grid item xs={12}>
+        {controller.machine.state.activityState.toString()}
+      </Grid>
+
     </Grid>
   );
 };

@@ -67,6 +67,9 @@ const OpenMachinePort: FunctionComponent<Props> = (props) => {
       name: machine.firmware.name ?? null,
       edition: machine.firmware.edition ?? null,
       requiredVersion: machine.firmware.requiredVersion ? machine.firmware.requiredVersion as number : 0,
+      suggestedVersion: machine.firmware.suggestedVersion ? machine.firmware.suggestedVersion as number : 0,
+      helpUrl: machine.firmware.helpUrl ?? null,
+      downloadUrl: machine.firmware.downloadUrl ?? null,
       controllerType: machine.firmware.controllerType,
     };
 

@@ -50,8 +50,5 @@ namespace Makerverse.Api.Workspaces.Models {
     public void LoadSettings(JObject obj) {
       JsonConvert.PopulateObject(JsonConvert.SerializeObject(obj), this);
     }
-
-    public FirmwareRequirement ToRequirement() =>
-      new FirmwareRequirement() { ControllerType = ControllerType, Name = Name };
   }
 }
