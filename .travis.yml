@@ -1,107 +1,106 @@
-branches:
-  # PRs are always built. So we exclude branch builds other than master to prevent double-builds.
-  # https://stackoverflow.com/questions/31882306/how-to-configure-travis-ci-to-build-pull-requests-merges-to-master-w-o-redunda
-  only:
-    - master
+# branches:
+#   # PRs are always built. So we exclude branch builds other than master to prevent double-builds.
+#   # https://stackoverflow.com/questions/31882306/how-to-configure-travis-ci-to-build-pull-requests-merges-to-master-w-o-redunda
+#   only:
+#     - master
 
 # Job queue; see below for default job settings.
 jobs:
 # [Job] [Docker] multi-ach: https://www.docker.com/blog/multi-arch-build-what-about-travis/
-- name: "Docker"
-  language: node_js
-  dist: bionic
-  sudo: required
-  os: linux
-  arch: amd64
-  # services:
-  #   - docker
-  before_install:
-    - npm install -g npm
-    # Install Docker 19.x, not 18
-    - curl -fsSL https://get.docker.com | sh
-    - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
-    - mkdir -p $HOME/.docker
-    - echo '{"experimental":"enabled"}' | sudo tee $HOME/.docker/config.json
-    - sudo service docker start
-    - docker --version
-    # Install docker-buildx plugin for cross-architecture compilation.
-    - mkdir -p ~/.docker/cli-plugins/
-    - curl -fsSL -o ~/.docker/cli-plugins/docker-buildx https://github.com/docker/buildx/releases/download/v0.4.1/buildx-v0.4.1.linux-amd64
-    - chmod a+x ~/.docker/cli-plugins/docker-buildx
-    - docker context ls
-  install:
-    # With a multi-arch build, installing on the host machine first is faster.
-    - npm install
-    # Create a multi-arch buildx user: https://github.com/docker/buildx/issues/138
-    - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-    - docker buildx create --platform linux/arm64,linux/arm/v7 --name xbuilder --use
-    - docker buildx inspect --bootstrap
-  script:
-    - echo "Building $CI_SEMVER"
-    # Pre-build assets; this prevents the multi-arch from running each build in the Dockerfile.
-    - npm run build-latest
-    # Only the master branch supports a "deploy" step. For others, go ahead and push a dev image.
-    - scripts/docker.sh build
-  after_success: [] # Override.
-  addons:
-    apt:
-      packages:
-        - qemu-user-static # multi-arch build tools
-        - icnsutils
-        - graphicsmagick
-        - gcc-multilib
-        - g++-multilib
-        - rpm
-  deploy:
-    skip_cleanup: true # Leave build artifacts in place (don't git clean)
-    provider: script
-    script: scripts/docker.sh deploy
-# [Job] Raspberry Pi Image built with Docker
-- name: "Raspberry Pi OS Lite"
-  language: shell
-  sudo: required
-  os: linux
-  dist: bionic
-  install: []
-  services:
-    - docker
-  script:
-  - scripts/pack-rpi.sh lite
-# [Job] Raspberry Pi Image built with Docker
-- name: "Raspberry Pi OS Desktop"
-  language: shell
-  sudo: required
-  os: linux
-  dist: bionic
-  install: []
-  services:
-    - docker
-  script:
-  - scripts/pack-rpi.sh desktop
-# [Job] Linux (Electron App)
-- name: "Linux"
-  os: linux
-  script:
-  - npm run build-latest
-  - npm run build:linux-ia32
-  - npm run build:linux-x64
+# - name: "Docker"
+#   language: node_js
+#   dist: bionic
+#   sudo: required
+#   os: linux
+#   arch: amd64
+#   # services:
+#   #   - docker
+#   before_install:
+#     - npm install -g npm
+#     # Install Docker 19.x, not 18
+#     - curl -fsSL https://get.docker.com | sh
+#     - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
+#     - mkdir -p $HOME/.docker
+#     - echo '{"experimental":"enabled"}' | sudo tee $HOME/.docker/config.json
+#     - sudo service docker start
+#     - docker --version
+#     # Install docker-buildx plugin for cross-architecture compilation.
+#     - mkdir -p ~/.docker/cli-plugins/
+#     - curl -fsSL -o ~/.docker/cli-plugins/docker-buildx https://github.com/docker/buildx/releases/download/v0.4.1/buildx-v0.4.1.linux-amd64
+#     - chmod a+x ~/.docker/cli-plugins/docker-buildx
+#     - docker context ls
+#   install:
+#     # With a multi-arch build, installing on the host machine first is faster.
+#     - npm install
+#     # Create a multi-arch buildx user: https://github.com/docker/buildx/issues/138
+#     - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+#     - docker buildx create --platform linux/arm64,linux/arm/v7 --name xbuilder --use
+#     - docker buildx inspect --bootstrap
+#   script:
+#     - echo "Building $CI_SEMVER"
+#     # Pre-build assets; this prevents the multi-arch from running each build in the Dockerfile.
+#     - npm run build-latest
+#     # Only the master branch supports a "deploy" step. For others, go ahead and push a dev image.
+#     - scripts/docker.sh build
+#   after_success: [] # Override.
+#   addons:
+#     apt:
+#       packages:
+#         - qemu-user-static # multi-arch build tools
+#         - icnsutils
+#         - graphicsmagick
+#         - gcc-multilib
+#         - g++-multilib
+#         - rpm
+#   deploy:
+#     skip_cleanup: true # Leave build artifacts in place (don't git clean)
+#     provider: script
+#     script: scripts/docker.sh deploy
+# # [Job] Raspberry Pi Image built with Docker
+# - name: "Raspberry Pi OS Lite"
+#   language: shell
+#   sudo: required
+#   os: linux
+#   dist: bionic
+#   install: []
+#   services:
+#     - docker
+#   script:
+#   - scripts/pack-rpi.sh lite
+# # [Job] Raspberry Pi Image built with Docker
+# - name: "Raspberry Pi OS Desktop"
+#   language: shell
+#   sudo: required
+#   os: linux
+#   dist: bionic
+#   install: []
+#   services:
+#     - docker
+#   script:
+#   - scripts/pack-rpi.sh desktop
+# # [Job] Linux (Electron App)
+# - name: "Linux"
+#   os: linux
+#   script:
+#   - npm run build-latest
+#   - npm run build:linux-ia32
+#   - npm run build:linux-x64
 # [Job] MacOS (Electron App)
 - name: "MacOS"
   os: osx
   osx_image: xcode8.3
-  # before_install:
-  # - brew update
-  # before_deploy:
-  # - scripts/add-osx-cert.sh
+  before_install:
+  - scripts/add-osx-cert.sh
   script:
   - npm run build-latest
   - npm run build:mac-x64
+
 # [Job] Windows (Electron App)
-- name: "Windows"
-  os: windows
-  script:
-  - npm run build-latest
-  - npm run build:win-x64
+# - name: "Windows"
+#   os: windows
+#   script:
+#   - npm run build-latest
+#   - npm run build:win-x64
 
 # --------------------------------------------------------------------------------------------------
 # Default job settings, when not overwritten by specific jobs.
