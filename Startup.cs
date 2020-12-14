@@ -64,6 +64,7 @@ namespace Makerverse {
               .AddHttpRequestInterceptor<MakerverseHttpRequestInterceptor>()
               .AddAuthorization()
               .AddMakerverseSchema()
+              .TryAddSchemaInterceptor<SchemaSplitterInterceptor>()
               .AddErrorFilter<GraphqlErrorFilter>();
     }
 

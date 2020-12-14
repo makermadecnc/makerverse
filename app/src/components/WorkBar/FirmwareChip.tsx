@@ -32,7 +32,8 @@ const FirmwareChip: React.FunctionComponent<Props> = (props) => {
     const allowed = !requiredFirmware || match;
     const icon = allowed ? faCheckCircle : faExclamationCircle;
     const color = !allowed ? theme.palette.error.dark : theme.palette.info.light;
-    const tip = t('Expected "{{ expectation }}"', { expectation });
+    const exptTip = t('Expected "{{ expectation }}"', { expectation });
+    const tip = requiredFirmware ? exptTip : t('(No firmware requirement in workspace.)');
     return [
       <Grid key={`${title}-title`} item xs={6} className={classes.popoverRow}>
         <Typography variant="subtitle1">

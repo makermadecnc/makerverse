@@ -5,7 +5,8 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
+export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } &
+  { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -86,7 +87,7 @@ export type ConnectionSettings = {
 export type ControlledMachine = {
   __typename?: 'ControlledMachine';
   configuration: MachineConfiguration;
-  firmwareRequirement: IMachineFirmwareRequirement;
+  firmwareRequirement: FirmwareRequirement;
   lastTopic: MachineTopic;
   machineProfileId: Maybe<Scalars['String']>;
   settings: Array<MachineSetting>;
@@ -108,6 +109,17 @@ export type FileSystemSettings = {
   __typename?: 'FileSystemSettings';
   mountPoints: Array<MountPointSettings>;
   programDirectory: Scalars['String'];
+};
+
+export type FirmwareRequirement = IMachineFirmwareRequirement & {
+  __typename?: 'FirmwareRequirement';
+  controllerType: MachineControllerType;
+  downloadUrl: Maybe<Scalars['String']>;
+  edition: Maybe<Scalars['String']>;
+  helpUrl: Maybe<Scalars['String']>;
+  name: Maybe<Scalars['String']>;
+  requiredVersion: Scalars['Decimal'];
+  suggestedVersion: Scalars['Decimal'];
 };
 
 export type MachineAlert = {
@@ -289,21 +301,17 @@ export type Mutation = {
   updateWorkspace: Workspace;
 };
 
-
 export type MutationClosePortArgs = {
   portName: Scalars['String'];
 };
-
 
 export type MutationCreateWorkspaceArgs = {
   workspaceSettings: WorkspaceSettingsInput;
 };
 
-
 export type MutationDeleteWorkspaceArgs = {
   workspaceId: Scalars['String'];
 };
-
 
 export type MutationOpenPortArgs = {
   firmware: FirmwareRequirementInput;
@@ -311,11 +319,9 @@ export type MutationOpenPortArgs = {
   portName: Scalars['String'];
 };
 
-
 export type MutationOpenWorkspaceArgs = {
   workspaceId: Scalars['String'];
 };
-
 
 export type MutationUpdateWorkspaceArgs = {
   workspaceSettings: WorkspaceSettingsInput;
@@ -356,16 +362,13 @@ export type Query = {
   listWorkspaces: Array<Workspace>;
 };
 
-
 export type QueryAuthenticateArgs = {
   token: Scalars['String'];
 };
 
-
 export type QueryGetPortArgs = {
   portName: Scalars['String'];
 };
-
 
 export type QueryGetWorkspaceArgs = {
   workspaceId: Scalars['String'];
@@ -380,16 +383,13 @@ export type Subscription = {
   onWorkspaceChange: Workspace;
 };
 
-
 export type SubscriptionOnMachineConfigurationArgs = {
   portName: Scalars['String'];
 };
 
-
 export type SubscriptionOnMachineSettingArgs = {
   portName: Scalars['String'];
 };
-
 
 export type SubscriptionOnMachineStateArgs = {
   portName: Scalars['String'];
@@ -444,18 +444,18 @@ export enum ActiveState {
   IdleReady = 'IDLE_READY',
   Initializing = 'INITIALIZING',
   Run = 'RUN',
-  Sleep = 'SLEEP'
+  Sleep = 'SLEEP',
 }
 
 export enum ApplyPolicy {
   AfterResolver = 'AFTER_RESOLVER',
-  BeforeResolver = 'BEFORE_RESOLVER'
+  BeforeResolver = 'BEFORE_RESOLVER',
 }
 
 export enum AxisName {
   X = 'X',
   Y = 'Y',
-  Z = 'Z'
+  Z = 'Z',
 }
 
 export enum BaudRate {
@@ -465,14 +465,14 @@ export enum BaudRate {
   Br250000 = 'BR250000',
   Br38400 = 'BR38400',
   Br57600 = 'BR57600',
-  Br9600 = 'BR9600'
+  Br9600 = 'BR9600',
 }
 
 export enum Handshake {
   None = 'NONE',
   RequestToSend = 'REQUEST_TO_SEND',
   RequestToSendXOnXOff = 'REQUEST_TO_SEND_X_ON_X_OFF',
-  XOnXOff = 'X_ON_X_OFF'
+  XOnXOff = 'X_ON_X_OFF',
 }
 
 export enum MachineControllerType {
@@ -481,7 +481,7 @@ export enum MachineControllerType {
   Maslow = 'MASLOW',
   Smoothie = 'SMOOTHIE',
   TinyG = 'TINY_G',
-  Unknown = 'UNKNOWN'
+  Unknown = 'UNKNOWN',
 }
 
 export enum MachinePartType {
@@ -497,12 +497,12 @@ export enum MachinePartType {
   Shield = 'SHIELD',
   Sled = 'SLED',
   Spindle = 'SPINDLE',
-  Unknown = 'UNKNOWN'
+  Unknown = 'UNKNOWN',
 }
 
 export enum MachineSettingType {
   Grbl = 'GRBL',
-  Kv = 'KV'
+  Kv = 'KV',
 }
 
 export enum MachineSpecType {
@@ -517,13 +517,13 @@ export enum MachineSpecType {
   NumberOfMaterials = 'NUMBER_OF_MATERIALS',
   TipSize = 'TIP_SIZE',
   Watts = 'WATTS',
-  WaveLength = 'WAVE_LENGTH'
+  WaveLength = 'WAVE_LENGTH',
 }
 
 export enum MachineTopic {
   Configuration = 'CONFIGURATION',
   Setting = 'SETTING',
-  State = 'STATE'
+  State = 'STATE',
 }
 
 export enum Parity {
@@ -531,7 +531,7 @@ export enum Parity {
   Mark = 'MARK',
   None = 'NONE',
   Odd = 'ODD',
-  Space = 'SPACE'
+  Space = 'SPACE',
 }
 
 export enum PortState {
@@ -542,14 +542,14 @@ export enum PortState {
   Opening = 'OPENING',
   Ready = 'READY',
   Startup = 'STARTUP',
-  Unplugged = 'UNPLUGGED'
+  Unplugged = 'UNPLUGGED',
 }
 
 export enum StopBits {
   None = 'NONE',
   One = 'ONE',
   OnePointFive = 'ONE_POINT_FIVE',
-  Two = 'TWO'
+  Two = 'TWO',
 }
 
 export enum WorkspaceState {
@@ -558,7 +558,7 @@ export enum WorkspaceState {
   Deleted = 'DELETED',
   Disconnected = 'DISCONNECTED',
   Error = 'ERROR',
-  Opening = 'OPENING'
+  Opening = 'OPENING',
 }
 
 export type ConnectionSettingsInput = {
@@ -673,13 +673,7 @@ export type WorkspaceSettingsInput = {
   preferImperial: Scalars['Boolean'];
 };
 
-
-
-
-
-
 export type ResolverTypeWrapper<T> = Promise<T> | T;
-
 
 export type LegacyStitchingResolver<TResult, TParent, TContext, TArgs> = {
   fragment: string;
@@ -690,7 +684,9 @@ export type NewStitchingResolver<TResult, TParent, TContext, TArgs> = {
   selectionSet: string;
   resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
 };
-export type StitchingResolver<TResult, TParent, TContext, TArgs> = LegacyStitchingResolver<TResult, TParent, TContext, TArgs> | NewStitchingResolver<TResult, TParent, TContext, TArgs>;
+export type StitchingResolver<TResult, TParent, TContext, TArgs> =
+  | LegacyStitchingResolver<TResult, TParent, TContext, TArgs>
+  | NewStitchingResolver<TResult, TParent, TContext, TArgs>;
 export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
   | ResolverFn<TResult, TParent, TContext, TArgs>
   | StitchingResolver<TResult, TParent, TContext, TArgs>;
@@ -699,21 +695,21 @@ export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
   args: TArgs,
   context: TContext,
-  info: GraphQLResolveInfo
+  info: GraphQLResolveInfo,
 ) => Promise<TResult> | TResult;
 
 export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
   args: TArgs,
   context: TContext,
-  info: GraphQLResolveInfo
+  info: GraphQLResolveInfo,
 ) => AsyncIterator<TResult> | Promise<AsyncIterator<TResult>>;
 
 export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
   args: TArgs,
   context: TContext,
-  info: GraphQLResolveInfo
+  info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>;
 
 export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs> {
@@ -737,10 +733,14 @@ export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TCo
 export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
   parent: TParent,
   context: TContext,
-  info: GraphQLResolveInfo
+  info: GraphQLResolveInfo,
 ) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
 
-export type IsTypeOfResolverFn<T = {}, TContext = {}> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
+export type IsTypeOfResolverFn<T = {}, TContext = {}> = (
+  obj: T,
+  context: TContext,
+  info: GraphQLResolveInfo,
+) => boolean | Promise<boolean>;
 
 export type NextResolverFn<T> = () => Promise<T>;
 
@@ -749,12 +749,12 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
   parent: TParent,
   args: TArgs,
   context: TContext,
-  info: GraphQLResolveInfo
+  info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>;
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  IMachineFirmwareRequirement: ResolversTypes['MachineFirmwareSettings'];
+  IMachineFirmwareRequirement: ResolversTypes['FirmwareRequirement'] | ResolversTypes['MachineFirmwareSettings'];
   String: ResolverTypeWrapper<Scalars['String']>;
   ISerialPortOptions: ResolversTypes['PortOptions'];
   Int: ResolverTypeWrapper<Scalars['Int']>;
@@ -767,6 +767,7 @@ export type ResolversTypes = {
   ControlledMachine: ResolverTypeWrapper<ControlledMachine>;
   EventSettings: ResolverTypeWrapper<EventSettings>;
   FileSystemSettings: ResolverTypeWrapper<FileSystemSettings>;
+  FirmwareRequirement: ResolverTypeWrapper<FirmwareRequirement>;
   MachineAlert: ResolverTypeWrapper<MachineAlert>;
   MachineAxisSettings: ResolverTypeWrapper<MachineAxisSettings>;
   MachineCommandSettings: ResolverTypeWrapper<MachineCommandSettings>;
@@ -826,7 +827,9 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  IMachineFirmwareRequirement: ResolversParentTypes['MachineFirmwareSettings'];
+  IMachineFirmwareRequirement:
+    | ResolversParentTypes['FirmwareRequirement']
+    | ResolversParentTypes['MachineFirmwareSettings'];
   String: Scalars['String'];
   ISerialPortOptions: ResolversParentTypes['PortOptions'];
   Int: Scalars['Int'];
@@ -839,6 +842,7 @@ export type ResolversParentTypes = {
   ControlledMachine: ControlledMachine;
   EventSettings: EventSettings;
   FileSystemSettings: FileSystemSettings;
+  FirmwareRequirement: FirmwareRequirement;
   MachineAlert: MachineAlert;
   MachineAxisSettings: MachineAxisSettings;
   MachineCommandSettings: MachineCommandSettings;
@@ -882,8 +886,11 @@ export type ResolversParentTypes = {
   Long: Scalars['Long'];
 };
 
-export type IMachineFirmwareRequirementResolvers<ContextType = any, ParentType extends ResolversParentTypes['IMachineFirmwareRequirement'] = ResolversParentTypes['IMachineFirmwareRequirement']> = {
-  __resolveType: TypeResolveFn<'MachineFirmwareSettings', ParentType, ContextType>;
+export type IMachineFirmwareRequirementResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['IMachineFirmwareRequirement'] = ResolversParentTypes['IMachineFirmwareRequirement']
+> = {
+  __resolveType: TypeResolveFn<'FirmwareRequirement' | 'MachineFirmwareSettings', ParentType, ContextType>;
   controllerType: Resolver<ResolversTypes['MachineControllerType'], ParentType, ContextType>;
   downloadUrl: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   edition: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -893,7 +900,10 @@ export type IMachineFirmwareRequirementResolvers<ContextType = any, ParentType e
   suggestedVersion: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
 };
 
-export type ISerialPortOptionsResolvers<ContextType = any, ParentType extends ResolversParentTypes['ISerialPortOptions'] = ResolversParentTypes['ISerialPortOptions']> = {
+export type ISerialPortOptionsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['ISerialPortOptions'] = ResolversParentTypes['ISerialPortOptions']
+> = {
   __resolveType: TypeResolveFn<'PortOptions', ParentType, ContextType>;
   baudRate: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   dataBits: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -907,19 +917,28 @@ export type ISerialPortOptionsResolvers<ContextType = any, ParentType extends Re
   writeTimeout: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
 };
 
-export type AlertErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['AlertError'] = ResolversParentTypes['AlertError']> = {
+export type AlertErrorResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['AlertError'] = ResolversParentTypes['AlertError']
+> = {
   message: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type AppUpdatesResolvers<ContextType = any, ParentType extends ResolversParentTypes['AppUpdates'] = ResolversParentTypes['AppUpdates']> = {
+export type AppUpdatesResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['AppUpdates'] = ResolversParentTypes['AppUpdates']
+> = {
   checkForUpdates: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   prereleases: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type CommandSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['CommandSettings'] = ResolversParentTypes['CommandSettings']> = {
+export type CommandSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['CommandSettings'] = ResolversParentTypes['CommandSettings']
+> = {
   commands: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   enabled: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -928,7 +947,10 @@ export type CommandSettingsResolvers<ContextType = any, ParentType extends Resol
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type ConnectedPortResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConnectedPort'] = ResolversParentTypes['ConnectedPort']> = {
+export type ConnectedPortResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['ConnectedPort'] = ResolversParentTypes['ConnectedPort']
+> = {
   createdAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   machine: Resolver<ResolversTypes['ControlledMachine'], ParentType, ContextType>;
   port: Resolver<ResolversTypes['SystemPort'], ParentType, ContextType>;
@@ -936,7 +958,10 @@ export type ConnectedPortResolvers<ContextType = any, ParentType extends Resolve
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type ConnectionSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConnectionSettings'] = ResolversParentTypes['ConnectionSettings']> = {
+export type ConnectionSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['ConnectionSettings'] = ResolversParentTypes['ConnectionSettings']
+> = {
   firmware: Resolver<ResolversTypes['MachineFirmwareSettings'], ParentType, ContextType>;
   firmwareRequirement: Resolver<ResolversTypes['IMachineFirmwareRequirement'], ParentType, ContextType>;
   machineProfileId: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -946,9 +971,12 @@ export type ConnectionSettingsResolvers<ContextType = any, ParentType extends Re
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type ControlledMachineResolvers<ContextType = any, ParentType extends ResolversParentTypes['ControlledMachine'] = ResolversParentTypes['ControlledMachine']> = {
+export type ControlledMachineResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['ControlledMachine'] = ResolversParentTypes['ControlledMachine']
+> = {
   configuration: Resolver<ResolversTypes['MachineConfiguration'], ParentType, ContextType>;
-  firmwareRequirement: Resolver<ResolversTypes['IMachineFirmwareRequirement'], ParentType, ContextType>;
+  firmwareRequirement: Resolver<ResolversTypes['FirmwareRequirement'], ParentType, ContextType>;
   lastTopic: Resolver<ResolversTypes['MachineTopic'], ParentType, ContextType>;
   machineProfileId: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   settings: Resolver<Array<ResolversTypes['MachineSetting']>, ParentType, ContextType>;
@@ -957,7 +985,10 @@ export type ControlledMachineResolvers<ContextType = any, ParentType extends Res
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type EventSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['EventSettings'] = ResolversParentTypes['EventSettings']> = {
+export type EventSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['EventSettings'] = ResolversParentTypes['EventSettings']
+> = {
   commands: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   enabled: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   event: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -967,20 +998,43 @@ export type EventSettingsResolvers<ContextType = any, ParentType extends Resolve
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type FileSystemSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['FileSystemSettings'] = ResolversParentTypes['FileSystemSettings']> = {
+export type FileSystemSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['FileSystemSettings'] = ResolversParentTypes['FileSystemSettings']
+> = {
   mountPoints: Resolver<Array<ResolversTypes['MountPointSettings']>, ParentType, ContextType>;
   programDirectory: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MachineAlertResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachineAlert'] = ResolversParentTypes['MachineAlert']> = {
+export type FirmwareRequirementResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['FirmwareRequirement'] = ResolversParentTypes['FirmwareRequirement']
+> = {
+  controllerType: Resolver<ResolversTypes['MachineControllerType'], ParentType, ContextType>;
+  downloadUrl: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  edition: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  helpUrl: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  requiredVersion: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
+  suggestedVersion: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MachineAlertResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MachineAlert'] = ResolversParentTypes['MachineAlert']
+> = {
   code: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   message: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MachineAxisSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachineAxisSettings'] = ResolversParentTypes['MachineAxisSettings']> = {
+export type MachineAxisSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MachineAxisSettings'] = ResolversParentTypes['MachineAxisSettings']
+> = {
   accuracy: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   id: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   max: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
@@ -990,20 +1044,29 @@ export type MachineAxisSettingsResolvers<ContextType = any, ParentType extends R
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MachineCommandSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachineCommandSettings'] = ResolversParentTypes['MachineCommandSettings']> = {
+export type MachineCommandSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MachineCommandSettings'] = ResolversParentTypes['MachineCommandSettings']
+> = {
   id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   value: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MachineConfigurationResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachineConfiguration'] = ResolversParentTypes['MachineConfiguration']> = {
+export type MachineConfigurationResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MachineConfiguration'] = ResolversParentTypes['MachineConfiguration']
+> = {
   firmware: Resolver<ResolversTypes['MachineDetectedFirmware'], ParentType, ContextType>;
   workOffset: Resolver<ResolversTypes['MachinePosition'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MachineDetectedFirmwareResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachineDetectedFirmware'] = ResolversParentTypes['MachineDetectedFirmware']> = {
+export type MachineDetectedFirmwareResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MachineDetectedFirmware'] = ResolversParentTypes['MachineDetectedFirmware']
+> = {
   edition: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   friendlyName: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   isValid: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -1014,7 +1077,10 @@ export type MachineDetectedFirmwareResolvers<ContextType = any, ParentType exten
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MachineFeatureSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachineFeatureSettings'] = ResolversParentTypes['MachineFeatureSettings']> = {
+export type MachineFeatureSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MachineFeatureSettings'] = ResolversParentTypes['MachineFeatureSettings']
+> = {
   description: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   disabled: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   icon: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -1024,7 +1090,10 @@ export type MachineFeatureSettingsResolvers<ContextType = any, ParentType extend
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MachineFirmwareSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachineFirmwareSettings'] = ResolversParentTypes['MachineFirmwareSettings']> = {
+export type MachineFirmwareSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MachineFirmwareSettings'] = ResolversParentTypes['MachineFirmwareSettings']
+> = {
   baudRate: Resolver<Maybe<ResolversTypes['BaudRate']>, ParentType, ContextType>;
   baudRateValue: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   controllerType: Resolver<ResolversTypes['MachineControllerType'], ParentType, ContextType>;
@@ -1039,7 +1108,10 @@ export type MachineFirmwareSettingsResolvers<ContextType = any, ParentType exten
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MachinePartSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachinePartSettings'] = ResolversParentTypes['MachinePartSettings']> = {
+export type MachinePartSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MachinePartSettings'] = ResolversParentTypes['MachinePartSettings']
+> = {
   dataBlob: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   description: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -1052,7 +1124,10 @@ export type MachinePartSettingsResolvers<ContextType = any, ParentType extends R
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MachinePositionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachinePosition'] = ResolversParentTypes['MachinePosition']> = {
+export type MachinePositionResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MachinePosition'] = ResolversParentTypes['MachinePosition']
+> = {
   e: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
   isValid: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   x: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
@@ -1061,7 +1136,10 @@ export type MachinePositionResolvers<ContextType = any, ParentType extends Resol
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MachineSettingResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachineSetting'] = ResolversParentTypes['MachineSetting']> = {
+export type MachineSettingResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MachineSetting'] = ResolversParentTypes['MachineSetting']
+> = {
   id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   key: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   settingType: Resolver<ResolversTypes['MachineSettingType'], ParentType, ContextType>;
@@ -1070,7 +1148,10 @@ export type MachineSettingResolvers<ContextType = any, ParentType extends Resolv
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MachineSettingSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachineSettingSettings'] = ResolversParentTypes['MachineSettingSettings']> = {
+export type MachineSettingSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MachineSettingSettings'] = ResolversParentTypes['MachineSettingSettings']
+> = {
   id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   key: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   settingType: Resolver<ResolversTypes['MachineSettingType'], ParentType, ContextType>;
@@ -1079,14 +1160,20 @@ export type MachineSettingSettingsResolvers<ContextType = any, ParentType extend
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MachineSpecSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachineSpecSettings'] = ResolversParentTypes['MachineSpecSettings']> = {
+export type MachineSpecSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MachineSpecSettings'] = ResolversParentTypes['MachineSpecSettings']
+> = {
   id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   specType: Resolver<ResolversTypes['MachineSpecType'], ParentType, ContextType>;
   value: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MachineStateResolvers<ContextType = any, ParentType extends ResolversParentTypes['MachineState'] = ResolversParentTypes['MachineState']> = {
+export type MachineStateResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MachineState'] = ResolversParentTypes['MachineState']
+> = {
   activityState: Resolver<ResolversTypes['ActiveState'], ParentType, ContextType>;
   alarm: Resolver<Maybe<ResolversTypes['MachineAlert']>, ParentType, ContextType>;
   error: Resolver<Maybe<ResolversTypes['MachineAlert']>, ParentType, ContextType>;
@@ -1095,7 +1182,10 @@ export type MachineStateResolvers<ContextType = any, ParentType extends Resolver
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MacroSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MacroSettings'] = ResolversParentTypes['MacroSettings']> = {
+export type MacroSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MacroSettings'] = ResolversParentTypes['MacroSettings']
+> = {
   content: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   mtime: Resolver<ResolversTypes['Long'], ParentType, ContextType>;
@@ -1103,19 +1193,28 @@ export type MacroSettingsResolvers<ContextType = any, ParentType extends Resolve
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MakerHubSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MakerHubSettings'] = ResolversParentTypes['MakerHubSettings']> = {
+export type MakerHubSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MakerHubSettings'] = ResolversParentTypes['MakerHubSettings']
+> = {
   enabled: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MakerverseSessionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MakerverseSession'] = ResolversParentTypes['MakerverseSession']> = {
+export type MakerverseSessionResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MakerverseSession'] = ResolversParentTypes['MakerverseSession']
+> = {
   roles: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   token: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   user: Resolver<ResolversTypes['MakerverseUser'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MakerverseSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MakerverseSettings'] = ResolversParentTypes['MakerverseSettings']> = {
+export type MakerverseSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MakerverseSettings'] = ResolversParentTypes['MakerverseSettings']
+> = {
   appUpdates: Resolver<ResolversTypes['AppUpdates'], ParentType, ContextType>;
   commands: Resolver<Array<ResolversTypes['CommandSettings']>, ParentType, ContextType>;
   events: Resolver<Array<ResolversTypes['EventSettings']>, ParentType, ContextType>;
@@ -1127,7 +1226,10 @@ export type MakerverseSettingsResolvers<ContextType = any, ParentType extends Re
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MakerverseUserResolvers<ContextType = any, ParentType extends ResolversParentTypes['MakerverseUser'] = ResolversParentTypes['MakerverseUser']> = {
+export type MakerverseUserResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MakerverseUser'] = ResolversParentTypes['MakerverseUser']
+> = {
   authenticationType: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   enabled: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   id: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -1136,22 +1238,61 @@ export type MakerverseUserResolvers<ContextType = any, ParentType extends Resolv
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MountPointSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MountPointSettings'] = ResolversParentTypes['MountPointSettings']> = {
+export type MountPointSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['MountPointSettings'] = ResolversParentTypes['MountPointSettings']
+> = {
   route: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   target: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  closePort: Resolver<ResolversTypes['SystemPort'], ParentType, ContextType, RequireFields<MutationClosePortArgs, 'portName'>>;
-  createWorkspace: Resolver<ResolversTypes['Workspace'], ParentType, ContextType, RequireFields<MutationCreateWorkspaceArgs, 'workspaceSettings'>>;
-  deleteWorkspace: Resolver<ResolversTypes['Workspace'], ParentType, ContextType, RequireFields<MutationDeleteWorkspaceArgs, 'workspaceId'>>;
-  openPort: Resolver<ResolversTypes['SystemPort'], ParentType, ContextType, RequireFields<MutationOpenPortArgs, 'firmware' | 'options' | 'portName'>>;
-  openWorkspace: Resolver<ResolversTypes['Workspace'], ParentType, ContextType, RequireFields<MutationOpenWorkspaceArgs, 'workspaceId'>>;
-  updateWorkspace: Resolver<ResolversTypes['Workspace'], ParentType, ContextType, RequireFields<MutationUpdateWorkspaceArgs, 'workspaceSettings'>>;
+export type MutationResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
+> = {
+  closePort: Resolver<
+    ResolversTypes['SystemPort'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationClosePortArgs, 'portName'>
+  >;
+  createWorkspace: Resolver<
+    ResolversTypes['Workspace'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreateWorkspaceArgs, 'workspaceSettings'>
+  >;
+  deleteWorkspace: Resolver<
+    ResolversTypes['Workspace'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteWorkspaceArgs, 'workspaceId'>
+  >;
+  openPort: Resolver<
+    ResolversTypes['SystemPort'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationOpenPortArgs, 'firmware' | 'options' | 'portName'>
+  >;
+  openWorkspace: Resolver<
+    ResolversTypes['Workspace'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationOpenWorkspaceArgs, 'workspaceId'>
+  >;
+  updateWorkspace: Resolver<
+    ResolversTypes['Workspace'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationUpdateWorkspaceArgs, 'workspaceSettings'>
+  >;
 };
 
-export type PortOptionsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PortOptions'] = ResolversParentTypes['PortOptions']> = {
+export type PortOptionsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['PortOptions'] = ResolversParentTypes['PortOptions']
+> = {
   baudRate: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   dataBits: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   handshake: Resolver<Maybe<ResolversTypes['Handshake']>, ParentType, ContextType>;
@@ -1165,7 +1306,10 @@ export type PortOptionsResolvers<ContextType = any, ParentType extends Resolvers
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type PortStatusResolvers<ContextType = any, ParentType extends ResolversParentTypes['PortStatus'] = ResolversParentTypes['PortStatus']> = {
+export type PortStatusResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['PortStatus'] = ResolversParentTypes['PortStatus']
+> = {
   bytesToRead: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   bytesToWrite: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   charactersRead: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -1176,24 +1320,61 @@ export type PortStatusResolvers<ContextType = any, ParentType extends ResolversP
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  authenticate: Resolver<ResolversTypes['MakerverseSession'], ParentType, ContextType, RequireFields<QueryAuthenticateArgs, 'token'>>;
+export type QueryResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
+> = {
+  authenticate: Resolver<
+    ResolversTypes['MakerverseSession'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryAuthenticateArgs, 'token'>
+  >;
   getPort: Resolver<ResolversTypes['SystemPort'], ParentType, ContextType, RequireFields<QueryGetPortArgs, 'portName'>>;
   getSettings: Resolver<ResolversTypes['MakerverseSettings'], ParentType, ContextType>;
-  getWorkspace: Resolver<ResolversTypes['Workspace'], ParentType, ContextType, RequireFields<QueryGetWorkspaceArgs, 'workspaceId'>>;
+  getWorkspace: Resolver<
+    ResolversTypes['Workspace'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetWorkspaceArgs, 'workspaceId'>
+  >;
   listPorts: Resolver<Array<ResolversTypes['SystemPort']>, ParentType, ContextType>;
   listWorkspaces: Resolver<Array<ResolversTypes['Workspace']>, ParentType, ContextType>;
 };
 
-export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
-  onMachineConfiguration: SubscriptionResolver<ResolversTypes['ControlledMachine'], "onMachineConfiguration", ParentType, ContextType, RequireFields<SubscriptionOnMachineConfigurationArgs, 'portName'>>;
-  onMachineSetting: SubscriptionResolver<ResolversTypes['ControlledMachine'], "onMachineSetting", ParentType, ContextType, RequireFields<SubscriptionOnMachineSettingArgs, 'portName'>>;
-  onMachineState: SubscriptionResolver<ResolversTypes['ControlledMachine'], "onMachineState", ParentType, ContextType, RequireFields<SubscriptionOnMachineStateArgs, 'portName'>>;
-  onPortChange: SubscriptionResolver<ResolversTypes['SystemPort'], "onPortChange", ParentType, ContextType>;
-  onWorkspaceChange: SubscriptionResolver<ResolversTypes['Workspace'], "onWorkspaceChange", ParentType, ContextType>;
+export type SubscriptionResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']
+> = {
+  onMachineConfiguration: SubscriptionResolver<
+    ResolversTypes['ControlledMachine'],
+    'onMachineConfiguration',
+    ParentType,
+    ContextType,
+    RequireFields<SubscriptionOnMachineConfigurationArgs, 'portName'>
+  >;
+  onMachineSetting: SubscriptionResolver<
+    ResolversTypes['ControlledMachine'],
+    'onMachineSetting',
+    ParentType,
+    ContextType,
+    RequireFields<SubscriptionOnMachineSettingArgs, 'portName'>
+  >;
+  onMachineState: SubscriptionResolver<
+    ResolversTypes['ControlledMachine'],
+    'onMachineState',
+    ParentType,
+    ContextType,
+    RequireFields<SubscriptionOnMachineStateArgs, 'portName'>
+  >;
+  onPortChange: SubscriptionResolver<ResolversTypes['SystemPort'], 'onPortChange', ParentType, ContextType>;
+  onWorkspaceChange: SubscriptionResolver<ResolversTypes['Workspace'], 'onWorkspaceChange', ParentType, ContextType>;
 };
 
-export type SystemPortResolvers<ContextType = any, ParentType extends ResolversParentTypes['SystemPort'] = ResolversParentTypes['SystemPort']> = {
+export type SystemPortResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['SystemPort'] = ResolversParentTypes['SystemPort']
+> = {
   connection: Resolver<Maybe<ResolversTypes['ConnectedPort']>, ParentType, ContextType>;
   error: Resolver<Maybe<ResolversTypes['AlertError']>, ParentType, ContextType>;
   options: Resolver<ResolversTypes['PortOptions'], ParentType, ContextType>;
@@ -1203,7 +1384,10 @@ export type SystemPortResolvers<ContextType = any, ParentType extends ResolversP
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type WorkspaceResolvers<ContextType = any, ParentType extends ResolversParentTypes['Workspace'] = ResolversParentTypes['Workspace']> = {
+export type WorkspaceResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['Workspace'] = ResolversParentTypes['Workspace']
+> = {
   error: Resolver<Maybe<ResolversTypes['AlertError']>, ParentType, ContextType>;
   id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   port: Resolver<Maybe<ResolversTypes['SystemPort']>, ParentType, ContextType>;
@@ -1214,7 +1398,10 @@ export type WorkspaceResolvers<ContextType = any, ParentType extends ResolversPa
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type WorkspaceSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['WorkspaceSettings'] = ResolversParentTypes['WorkspaceSettings']> = {
+export type WorkspaceSettingsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['WorkspaceSettings'] = ResolversParentTypes['WorkspaceSettings']
+> = {
   autoReconnect: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   axes: Resolver<Array<ResolversTypes['MachineAxisSettings']>, ParentType, ContextType>;
   bkColor: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -1256,6 +1443,7 @@ export type Resolvers<ContextType = any> = {
   ControlledMachine: ControlledMachineResolvers<ContextType>;
   EventSettings: EventSettingsResolvers<ContextType>;
   FileSystemSettings: FileSystemSettingsResolvers<ContextType>;
+  FirmwareRequirement: FirmwareRequirementResolvers<ContextType>;
   MachineAlert: MachineAlertResolvers<ContextType>;
   MachineAxisSettings: MachineAxisSettingsResolvers<ContextType>;
   MachineCommandSettings: MachineCommandSettingsResolvers<ContextType>;
@@ -1288,7 +1476,6 @@ export type Resolvers<ContextType = any> = {
   Long: GraphQLScalarType;
 };
 
-
 /**
  * @deprecated
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
@@ -1299,235 +1486,155 @@ export type AuthenticateQueryVariables = Exact<{
   token: Scalars['String'];
 }>;
 
+export type AuthenticateQuery = { __typename?: 'Query' } & {
+  session: { __typename?: 'MakerverseSession' } & MakerverseSessionFragment;
+};
 
-export type AuthenticateQuery = (
-  { __typename?: 'Query' }
-  & { session: (
-    { __typename?: 'MakerverseSession' }
-    & MakerverseSessionFragment
-  ) }
-);
+export type MakerverseSessionFragment = { __typename?: 'MakerverseSession' } & Pick<MakerverseSession, 'token'> & {
+    user: { __typename?: 'MakerverseUser' } & MakerverseUserFullFragment;
+  };
 
-export type MakerverseSessionFragment = (
-  { __typename?: 'MakerverseSession' }
-  & Pick<MakerverseSession, 'token'>
-  & { user: (
-    { __typename?: 'MakerverseUser' }
-    & MakerverseUserFullFragment
-  ) }
-);
+export type MakerverseUserMinFragment = { __typename?: 'MakerverseUser' } & Pick<MakerverseUser, 'username'>;
 
-export type MakerverseUserMinFragment = (
-  { __typename?: 'MakerverseUser' }
-  & Pick<MakerverseUser, 'username'>
-);
+export type MakerverseUserFullFragment = { __typename?: 'MakerverseUser' } & Pick<
+  MakerverseUser,
+  'id' | 'authenticationType' | 'enabled'
+> &
+  MakerverseUserMinFragment;
 
-export type MakerverseUserFullFragment = (
-  { __typename?: 'MakerverseUser' }
-  & Pick<MakerverseUser, 'id' | 'authenticationType' | 'enabled'>
-  & MakerverseUserMinFragment
-);
+export type ControlledMachineFragment = { __typename?: 'ControlledMachine' } & Pick<
+  ControlledMachine,
+  'machineProfileId'
+> & {
+    firmwareRequirement: { __typename?: 'FirmwareRequirement' } & FirmwareRequirement_FirmwareRequirement_Fragment;
+    configuration: { __typename?: 'MachineConfiguration' } & MachineConfigFragment;
+    state: { __typename?: 'MachineState' } & MachineStateFragment;
+    settings: Array<{ __typename?: 'MachineSetting' } & MachineSettingFragment>;
+  };
 
-export type ControlledMachineFragment = (
-  { __typename?: 'ControlledMachine' }
-  & Pick<ControlledMachine, 'machineProfileId'>
-  & { firmwareRequirement: (
-    { __typename?: 'MachineFirmwareSettings' }
-    & FirmwareRequirementFragment
-  ), configuration: (
-    { __typename?: 'MachineConfiguration' }
-    & MachineConfigFragment
-  ), state: (
-    { __typename?: 'MachineState' }
-    & MachineStateFragment
-  ), settings: Array<(
-    { __typename?: 'MachineSetting' }
-    & MachineSettingFragment
-  )> }
-);
+export type DetectedFirmwareFragment = { __typename?: 'MachineDetectedFirmware' } & Pick<
+  MachineDetectedFirmware,
+  'friendlyName' | 'isValid' | 'name' | 'value' | 'edition' | 'protocol' | 'welcomeMessage'
+>;
 
-export type DetectedFirmwareFragment = (
-  { __typename?: 'MachineDetectedFirmware' }
-  & Pick<MachineDetectedFirmware, 'friendlyName' | 'isValid' | 'name' | 'value' | 'edition' | 'protocol' | 'welcomeMessage'>
-);
+export type MachineConfigFragment = { __typename?: 'MachineConfiguration' } & {
+  firmware: { __typename?: 'MachineDetectedFirmware' } & DetectedFirmwareFragment;
+};
 
-export type MachineConfigFragment = (
-  { __typename?: 'MachineConfiguration' }
-  & { firmware: (
-    { __typename?: 'MachineDetectedFirmware' }
-    & DetectedFirmwareFragment
-  ) }
-);
+export type MachineAlertFragment = { __typename?: 'MachineAlert' } & Pick<MachineAlert, 'code' | 'name' | 'message'>;
 
-export type MachineAlertFragment = (
-  { __typename?: 'MachineAlert' }
-  & Pick<MachineAlert, 'code' | 'name' | 'message'>
-);
+export type MachinePositionFragment = { __typename?: 'MachinePosition' } & Pick<
+  MachinePosition,
+  'x' | 'y' | 'z' | 'e' | 'isValid'
+>;
 
-export type MachinePositionFragment = (
-  { __typename?: 'MachinePosition' }
-  & Pick<MachinePosition, 'x' | 'y' | 'z' | 'e' | 'isValid'>
-);
+export type MachineStateFragment = { __typename?: 'MachineState' } & Pick<MachineState, 'activityState'> & {
+    machinePosition: { __typename?: 'MachinePosition' } & MachinePositionFragment;
+    workPosition: Maybe<{ __typename?: 'MachinePosition' } & MachinePositionFragment>;
+    error: Maybe<{ __typename?: 'MachineAlert' } & MachineAlertFragment>;
+    alarm: Maybe<{ __typename?: 'MachineAlert' } & MachineAlertFragment>;
+  };
 
-export type MachineStateFragment = (
-  { __typename?: 'MachineState' }
-  & Pick<MachineState, 'activityState'>
-  & { machinePosition: (
-    { __typename?: 'MachinePosition' }
-    & MachinePositionFragment
-  ), workPosition: Maybe<(
-    { __typename?: 'MachinePosition' }
-    & MachinePositionFragment
-  )>, error: Maybe<(
-    { __typename?: 'MachineAlert' }
-    & MachineAlertFragment
-  )>, alarm: Maybe<(
-    { __typename?: 'MachineAlert' }
-    & MachineAlertFragment
-  )> }
-);
-
-export type MachineSettingFragment = (
-  { __typename?: 'MachineSetting' }
-  & Pick<MachineSetting, 'id' | 'title' | 'settingType' | 'key' | 'value'>
-);
+export type MachineSettingFragment = { __typename?: 'MachineSetting' } & Pick<
+  MachineSetting,
+  'id' | 'title' | 'settingType' | 'key' | 'value'
+>;
 
 export type MachineConfigurationSubscriptionVariables = Exact<{
   portName: Scalars['String'];
 }>;
 
-
-export type MachineConfigurationSubscription = (
-  { __typename?: 'Subscription' }
-  & { machine: (
-    { __typename?: 'ControlledMachine' }
-    & { configuration: (
-      { __typename?: 'MachineConfiguration' }
-      & MachineConfigFragment
-    ) }
-  ) }
-);
+export type MachineConfigurationSubscription = { __typename?: 'Subscription' } & {
+  machine: { __typename?: 'ControlledMachine' } & {
+    configuration: { __typename?: 'MachineConfiguration' } & MachineConfigFragment;
+  };
+};
 
 export type MachineStateSubscriptionVariables = Exact<{
   portName: Scalars['String'];
 }>;
 
-
-export type MachineStateSubscription = (
-  { __typename?: 'Subscription' }
-  & { machine: (
-    { __typename?: 'ControlledMachine' }
-    & { state: (
-      { __typename?: 'MachineState' }
-      & MachineStateFragment
-    ) }
-  ) }
-);
+export type MachineStateSubscription = { __typename?: 'Subscription' } & {
+  machine: { __typename?: 'ControlledMachine' } & { state: { __typename?: 'MachineState' } & MachineStateFragment };
+};
 
 export type MachineSettingsSubscriptionVariables = Exact<{
   portName: Scalars['String'];
 }>;
 
+export type MachineSettingsSubscription = { __typename?: 'Subscription' } & {
+  machine: { __typename?: 'ControlledMachine' } & {
+    settings: Array<{ __typename?: 'MachineSetting' } & MachineSettingFragment>;
+  };
+};
 
-export type MachineSettingsSubscription = (
-  { __typename?: 'Subscription' }
-  & { machine: (
-    { __typename?: 'ControlledMachine' }
-    & { settings: Array<(
-      { __typename?: 'MachineSetting' }
-      & MachineSettingFragment
-    )> }
-  ) }
-);
+type FirmwareRequirement_FirmwareRequirement_Fragment = { __typename?: 'FirmwareRequirement' } & Pick<
+  FirmwareRequirement,
+  'controllerType' | 'name' | 'edition' | 'requiredVersion' | 'suggestedVersion' | 'helpUrl' | 'downloadUrl'
+>;
 
-export type FirmwareRequirementFragment = (
-  { __typename?: 'MachineFirmwareSettings' }
-  & Pick<MachineFirmwareSettings, 'controllerType' | 'name' | 'edition' | 'requiredVersion' | 'suggestedVersion' | 'helpUrl' | 'downloadUrl'>
-);
+type FirmwareRequirement_MachineFirmwareSettings_Fragment = { __typename?: 'MachineFirmwareSettings' } & Pick<
+  MachineFirmwareSettings,
+  'controllerType' | 'name' | 'edition' | 'requiredVersion' | 'suggestedVersion' | 'helpUrl' | 'downloadUrl'
+>;
 
-export type ConnectedPortStatusFragment = (
-  { __typename?: 'ConnectedPort' }
-  & { machine: (
-    { __typename?: 'ControlledMachine' }
-    & { firmwareRequirement: (
-      { __typename?: 'MachineFirmwareSettings' }
-      & FirmwareRequirementFragment
-    ) }
-  ), status: (
-    { __typename?: 'PortStatus' }
-    & PortIoStatusFragment
-  ) }
-);
+export type FirmwareRequirementFragment =
+  | FirmwareRequirement_FirmwareRequirement_Fragment
+  | FirmwareRequirement_MachineFirmwareSettings_Fragment;
 
-export type ConnectedPortFragment = (
-  { __typename?: 'ConnectedPort' }
-  & { machine: (
-    { __typename?: 'ControlledMachine' }
-    & ControlledMachineFragment
-  ), status: (
-    { __typename?: 'PortStatus' }
-    & PortIoStatusFragment
-  ) }
-);
+export type ConnectedPortStatusFragment = { __typename?: 'ConnectedPort' } & {
+  machine: { __typename?: 'ControlledMachine' } & {
+    firmwareRequirement: { __typename?: 'FirmwareRequirement' } & FirmwareRequirement_FirmwareRequirement_Fragment;
+  };
+  status: { __typename?: 'PortStatus' } & PortIoStatusFragment;
+};
 
-export type PortIoStatusFragment = (
-  { __typename?: 'PortStatus' }
-  & Pick<PortStatus, 'bytesToRead' | 'bytesToWrite' | 'charactersRead' | 'charactersWritten' | 'linesRead' | 'linesWritten'>
-);
+export type ConnectedPortFragment = { __typename?: 'ConnectedPort' } & {
+  machine: { __typename?: 'ControlledMachine' } & ControlledMachineFragment;
+  status: { __typename?: 'PortStatus' } & PortIoStatusFragment;
+};
 
-export type PortOptionsFragment = (
-  { __typename?: 'PortOptions' }
-  & Pick<PortOptions, 'baudRate' | 'parity' | 'dataBits' | 'stopBits' | 'handshake' | 'readBufferSize' | 'writeBufferSize' | 'rtsEnable' | 'readTimeout' | 'writeTimeout'>
-);
+export type PortIoStatusFragment = { __typename?: 'PortStatus' } & Pick<
+  PortStatus,
+  'bytesToRead' | 'bytesToWrite' | 'charactersRead' | 'charactersWritten' | 'linesRead' | 'linesWritten'
+>;
 
-export type SystemPortFragment = (
-  { __typename?: 'SystemPort' }
-  & Pick<SystemPort, 'portName' | 'state'>
-  & { error: Maybe<(
-    { __typename?: 'AlertError' }
-    & AlertErrorFragment
-  )>, options: (
-    { __typename?: 'PortOptions' }
-    & PortOptionsFragment
-  ), connection: Maybe<(
-    { __typename?: 'ConnectedPort' }
-    & ConnectedPortFragment
-  )> }
-);
+export type PortOptionsFragment = { __typename?: 'PortOptions' } & Pick<
+  PortOptions,
+  | 'baudRate'
+  | 'parity'
+  | 'dataBits'
+  | 'stopBits'
+  | 'handshake'
+  | 'readBufferSize'
+  | 'writeBufferSize'
+  | 'rtsEnable'
+  | 'readTimeout'
+  | 'writeTimeout'
+>;
 
-export type PortStatusFragment = (
-  { __typename?: 'SystemPort' }
-  & Pick<SystemPort, 'portName' | 'state'>
-  & { error: Maybe<(
-    { __typename?: 'AlertError' }
-    & AlertErrorFragment
-  )>, connection: Maybe<(
-    { __typename?: 'ConnectedPort' }
-    & ConnectedPortStatusFragment
-  )> }
-);
+export type SystemPortFragment = { __typename?: 'SystemPort' } & Pick<SystemPort, 'portName' | 'state'> & {
+    error: Maybe<{ __typename?: 'AlertError' } & AlertErrorFragment>;
+    options: { __typename?: 'PortOptions' } & PortOptionsFragment;
+    connection: Maybe<{ __typename?: 'ConnectedPort' } & ConnectedPortFragment>;
+  };
 
-export type ListPortsQueryVariables = Exact<{ [key: string]: never; }>;
+export type PortStatusFragment = { __typename?: 'SystemPort' } & Pick<SystemPort, 'portName' | 'state'> & {
+    error: Maybe<{ __typename?: 'AlertError' } & AlertErrorFragment>;
+    connection: Maybe<{ __typename?: 'ConnectedPort' } & ConnectedPortStatusFragment>;
+  };
 
+export type ListPortsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type ListPortsQuery = (
-  { __typename?: 'Query' }
-  & { ports: Array<(
-    { __typename?: 'SystemPort' }
-    & PortStatusFragment
-  )> }
-);
+export type ListPortsQuery = { __typename?: 'Query' } & {
+  ports: Array<{ __typename?: 'SystemPort' } & PortStatusFragment>;
+};
 
-export type PortChangeSubscriptionVariables = Exact<{ [key: string]: never; }>;
+export type PortChangeSubscriptionVariables = Exact<{ [key: string]: never }>;
 
-
-export type PortChangeSubscription = (
-  { __typename?: 'Subscription' }
-  & { port: (
-    { __typename?: 'SystemPort' }
-    & PortStatusFragment
-  ) }
-);
+export type PortChangeSubscription = { __typename?: 'Subscription' } & {
+  port: { __typename?: 'SystemPort' } & PortStatusFragment;
+};
 
 export type OpenPortMutationVariables = Exact<{
   portName: Scalars['String'];
@@ -1535,707 +1642,637 @@ export type OpenPortMutationVariables = Exact<{
   options: SerialPortOptionsInput;
 }>;
 
-
-export type OpenPortMutation = (
-  { __typename?: 'Mutation' }
-  & { port: (
-    { __typename?: 'SystemPort' }
-    & SystemPortFragment
-  ) }
-);
+export type OpenPortMutation = { __typename?: 'Mutation' } & {
+  port: { __typename?: 'SystemPort' } & SystemPortFragment;
+};
 
 export type ClosePortMutationVariables = Exact<{
   portName: Scalars['String'];
 }>;
 
+export type ClosePortMutation = { __typename?: 'Mutation' } & {
+  port: { __typename?: 'SystemPort' } & PortStatusFragment;
+};
 
-export type ClosePortMutation = (
-  { __typename?: 'Mutation' }
-  & { port: (
-    { __typename?: 'SystemPort' }
-    & PortStatusFragment
-  ) }
-);
+export type EventFragment = { __typename?: 'EventSettings' } & Pick<
+  EventSettings,
+  'id' | 'mtime' | 'enabled' | 'event' | 'trigger' | 'commands'
+>;
 
-export type EventFragment = (
-  { __typename?: 'EventSettings' }
-  & Pick<EventSettings, 'id' | 'mtime' | 'enabled' | 'event' | 'trigger' | 'commands'>
-);
+export type FileSystemFragment = { __typename?: 'FileSystemSettings' } & Pick<
+  FileSystemSettings,
+  'programDirectory'
+> & { mountPoints: Array<{ __typename?: 'MountPointSettings' } & Pick<MountPointSettings, 'route' | 'target'>> };
 
-export type FileSystemFragment = (
-  { __typename?: 'FileSystemSettings' }
-  & Pick<FileSystemSettings, 'programDirectory'>
-  & { mountPoints: Array<(
-    { __typename?: 'MountPointSettings' }
-    & Pick<MountPointSettings, 'route' | 'target'>
-  )> }
-);
+export type CommandFragment = { __typename?: 'CommandSettings' } & Pick<
+  CommandSettings,
+  'id' | 'mtime' | 'commands' | 'title' | 'enabled'
+>;
 
-export type CommandFragment = (
-  { __typename?: 'CommandSettings' }
-  & Pick<CommandSettings, 'id' | 'mtime' | 'commands' | 'title' | 'enabled'>
-);
+export type AppUpdatesFragment = { __typename?: 'AppUpdates' } & Pick<AppUpdates, 'checkForUpdates' | 'prereleases'>;
 
-export type AppUpdatesFragment = (
-  { __typename?: 'AppUpdates' }
-  & Pick<AppUpdates, 'checkForUpdates' | 'prereleases'>
-);
+export type MakerHubFragment = { __typename?: 'MakerHubSettings' } & Pick<MakerHubSettings, 'enabled'>;
 
-export type MakerHubFragment = (
-  { __typename?: 'MakerHubSettings' }
-  & Pick<MakerHubSettings, 'enabled'>
-);
+export type MakerverseEssentialSettingsFragment = { __typename?: 'MakerverseSettings' } & {
+  fileSystem: { __typename?: 'FileSystemSettings' } & FileSystemFragment;
+  appUpdates: { __typename?: 'AppUpdates' } & AppUpdatesFragment;
+  commands: Array<{ __typename?: 'CommandSettings' } & CommandFragment>;
+  events: Array<{ __typename?: 'EventSettings' } & EventFragment>;
+  hub: { __typename?: 'MakerHubSettings' } & MakerHubFragment;
+  users: Array<{ __typename?: 'MakerverseUser' } & MakerverseUserFullFragment>;
+};
 
-export type MakerverseEssentialSettingsFragment = (
-  { __typename?: 'MakerverseSettings' }
-  & { fileSystem: (
-    { __typename?: 'FileSystemSettings' }
-    & FileSystemFragment
-  ), appUpdates: (
-    { __typename?: 'AppUpdates' }
-    & AppUpdatesFragment
-  ), commands: Array<(
-    { __typename?: 'CommandSettings' }
-    & CommandFragment
-  )>, events: Array<(
-    { __typename?: 'EventSettings' }
-    & EventFragment
-  )>, hub: (
-    { __typename?: 'MakerHubSettings' }
-    & MakerHubFragment
-  ), users: Array<(
-    { __typename?: 'MakerverseUser' }
-    & MakerverseUserFullFragment
-  )> }
-);
-
-export type StartupFragment = (
-  { __typename?: 'Query' }
-  & { settings: (
-    { __typename?: 'MakerverseSettings' }
-    & MakerverseEssentialSettingsFragment
-  ), workspaces: Array<(
-    { __typename?: 'Workspace' }
-    & WorkspaceFullFragment
-  )> }
-);
+export type StartupFragment = { __typename?: 'Query' } & {
+  settings: { __typename?: 'MakerverseSettings' } & MakerverseEssentialSettingsFragment;
+  workspaces: Array<{ __typename?: 'Workspace' } & WorkspaceFullFragment>;
+};
 
 export type StartupQueryVariables = Exact<{
   token: Scalars['String'];
 }>;
 
+export type StartupQuery = { __typename?: 'Query' } & {
+  session: { __typename?: 'MakerverseSession' } & MakerverseSessionFragment;
+} & StartupFragment;
 
-export type StartupQuery = (
-  { __typename?: 'Query' }
-  & { session: (
-    { __typename?: 'MakerverseSession' }
-    & MakerverseSessionFragment
-  ) }
-  & StartupFragment
-);
+export type MachineAxisFragment = { __typename?: 'MachineAxisSettings' } & Pick<
+  MachineAxisSettings,
+  'id' | 'name' | 'min' | 'max' | 'precision' | 'accuracy'
+>;
 
-export type MachineAxisFragment = (
-  { __typename?: 'MachineAxisSettings' }
-  & Pick<MachineAxisSettings, 'id' | 'name' | 'min' | 'max' | 'precision' | 'accuracy'>
-);
+export type MachineCommandFragment = { __typename?: 'MachineCommandSettings' } & Pick<
+  MachineCommandSettings,
+  'id' | 'name' | 'value'
+>;
 
-export type MachineCommandFragment = (
-  { __typename?: 'MachineCommandSettings' }
-  & Pick<MachineCommandSettings, 'id' | 'name' | 'value'>
-);
+export type MachineConnectionFragment = { __typename?: 'ConnectionSettings' } & Pick<
+  ConnectionSettings,
+  'portName' | 'manufacturer'
+> & { firmware: { __typename?: 'MachineFirmwareSettings' } & MachineFirmwareFragment };
 
-export type MachineConnectionFragment = (
-  { __typename?: 'ConnectionSettings' }
-  & Pick<ConnectionSettings, 'portName' | 'manufacturer'>
-  & { firmware: (
-    { __typename?: 'MachineFirmwareSettings' }
-    & MachineFirmwareFragment
-  ) }
-);
+export type MachineFeatureFragment = { __typename?: 'MachineFeatureSettings' } & Pick<
+  MachineFeatureSettings,
+  'id' | 'disabled' | 'key' | 'title' | 'description' | 'icon'
+>;
 
-export type MachineFeatureFragment = (
-  { __typename?: 'MachineFeatureSettings' }
-  & Pick<MachineFeatureSettings, 'id' | 'disabled' | 'key' | 'title' | 'description' | 'icon'>
-);
+export type MachineFirmwareFragment = { __typename?: 'MachineFirmwareSettings' } & Pick<
+  MachineFirmwareSettings,
+  | 'id'
+  | 'controllerType'
+  | 'baudRateValue'
+  | 'name'
+  | 'edition'
+  | 'rtscts'
+  | 'requiredVersion'
+  | 'suggestedVersion'
+  | 'downloadUrl'
+  | 'helpUrl'
+>;
 
-export type MachineFirmwareFragment = (
-  { __typename?: 'MachineFirmwareSettings' }
-  & Pick<MachineFirmwareSettings, 'id' | 'controllerType' | 'baudRateValue' | 'name' | 'edition' | 'rtscts' | 'requiredVersion' | 'suggestedVersion' | 'downloadUrl' | 'helpUrl'>
-);
+export type MachinePartFragment = { __typename?: 'MachinePartSettings' } & Pick<
+  MachinePartSettings,
+  'id' | 'partType' | 'title' | 'description' | 'optional' | 'isDefault' | 'dataBlob'
+> & {
+    settings: Array<{ __typename?: 'MachineSettingSettings' } & MachineSettingsFragment>;
+    specs: Array<{ __typename?: 'MachineSpecSettings' } & MachineSpecFragment>;
+  };
 
-export type MachinePartFragment = (
-  { __typename?: 'MachinePartSettings' }
-  & Pick<MachinePartSettings, 'id' | 'partType' | 'title' | 'description' | 'optional' | 'isDefault' | 'dataBlob'>
-  & { settings: Array<(
-    { __typename?: 'MachineSettingSettings' }
-    & MachineSettingsFragment
-  )>, specs: Array<(
-    { __typename?: 'MachineSpecSettings' }
-    & MachineSpecFragment
-  )> }
-);
+export type MachineSettingsFragment = { __typename?: 'MachineSettingSettings' } & Pick<
+  MachineSettingSettings,
+  'id' | 'title' | 'settingType' | 'key' | 'value'
+>;
 
-export type MachineSettingsFragment = (
-  { __typename?: 'MachineSettingSettings' }
-  & Pick<MachineSettingSettings, 'id' | 'title' | 'settingType' | 'key' | 'value'>
-);
+export type MachineSpecFragment = { __typename?: 'MachineSpecSettings' } & Pick<
+  MachineSpecSettings,
+  'id' | 'specType' | 'value'
+>;
 
-export type MachineSpecFragment = (
-  { __typename?: 'MachineSpecSettings' }
-  & Pick<MachineSpecSettings, 'id' | 'specType' | 'value'>
-);
-
-export type WorkspaceFullFragment = (
-  { __typename?: 'Workspace' }
-  & Pick<Workspace, 'id' | 'portName' | 'state'>
-  & { error: Maybe<(
-    { __typename?: 'AlertError' }
-    & AlertErrorFragment
-  )>, settings: (
-    { __typename?: 'WorkspaceSettings' }
-    & WorkspaceFullSettingsFragment
-  ), port: Maybe<(
-    { __typename?: 'SystemPort' }
-    & { connection: Maybe<(
-      { __typename?: 'ConnectedPort' }
-      & { machine: (
-        { __typename?: 'ControlledMachine' }
-        & ControlledMachineFragment
-      ) }
-    )> }
-  )> }
-);
+export type WorkspaceFullFragment = { __typename?: 'Workspace' } & Pick<Workspace, 'id' | 'portName' | 'state'> & {
+    error: Maybe<{ __typename?: 'AlertError' } & AlertErrorFragment>;
+    settings: { __typename?: 'WorkspaceSettings' } & WorkspaceFullSettingsFragment;
+    port: Maybe<
+      { __typename?: 'SystemPort' } & {
+        connection: Maybe<
+          { __typename?: 'ConnectedPort' } & {
+            machine: { __typename?: 'ControlledMachine' } & ControlledMachineFragment;
+          }
+        >;
+      }
+    >;
+  };
 
 export type WorkspaceQueryVariables = Exact<{
   workspaceId: Scalars['String'];
 }>;
 
-
-export type WorkspaceQuery = (
-  { __typename?: 'Query' }
-  & { workspace: (
-    { __typename?: 'Workspace' }
-    & WorkspaceFullFragment
-  ) }
-);
+export type WorkspaceQuery = { __typename?: 'Query' } & {
+  workspace: { __typename?: 'Workspace' } & WorkspaceFullFragment;
+};
 
 export type CreateWorkspaceMutationVariables = Exact<{
   workspaceSettings: WorkspaceSettingsInput;
 }>;
 
-
-export type CreateWorkspaceMutation = (
-  { __typename?: 'Mutation' }
-  & { workspace: (
-    { __typename?: 'Workspace' }
-    & WorkspaceFullFragment
-  ) }
-);
+export type CreateWorkspaceMutation = { __typename?: 'Mutation' } & {
+  workspace: { __typename?: 'Workspace' } & WorkspaceFullFragment;
+};
 
 export type DeleteWorkspaceMutationVariables = Exact<{
   workspaceId: Scalars['String'];
 }>;
 
+export type DeleteWorkspaceMutation = { __typename?: 'Mutation' } & {
+  workspace: { __typename?: 'Workspace' } & WorkspaceFullFragment;
+};
 
-export type DeleteWorkspaceMutation = (
-  { __typename?: 'Mutation' }
-  & { workspace: (
-    { __typename?: 'Workspace' }
-    & WorkspaceFullFragment
-  ) }
-);
+export type WorkspaceChangeSubscriptionVariables = Exact<{ [key: string]: never }>;
 
-export type WorkspaceChangeSubscriptionVariables = Exact<{ [key: string]: never; }>;
-
-
-export type WorkspaceChangeSubscription = (
-  { __typename?: 'Subscription' }
-  & { workspace: (
-    { __typename?: 'Workspace' }
-    & WorkspaceFullFragment
-  ) }
-);
+export type WorkspaceChangeSubscription = { __typename?: 'Subscription' } & {
+  workspace: { __typename?: 'Workspace' } & WorkspaceFullFragment;
+};
 
 export type OpenWorkspaceMutationVariables = Exact<{
   workspaceId: Scalars['String'];
 }>;
 
+export type OpenWorkspaceMutation = { __typename?: 'Mutation' } & {
+  workspace: { __typename?: 'Workspace' } & WorkspaceFullFragment;
+};
 
-export type OpenWorkspaceMutation = (
-  { __typename?: 'Mutation' }
-  & { workspace: (
-    { __typename?: 'Workspace' }
-    & WorkspaceFullFragment
-  ) }
-);
+export type WorkspacePropsFragment = { __typename?: 'WorkspaceSettings' } & Pick<
+  WorkspaceSettings,
+  | 'id'
+  | 'machineProfileId'
+  | 'name'
+  | 'onboarded'
+  | 'path'
+  | 'color'
+  | 'bkColor'
+  | 'icon'
+  | 'autoReconnect'
+  | 'preferImperial'
+>;
 
-export type WorkspacePropsFragment = (
-  { __typename?: 'WorkspaceSettings' }
-  & Pick<WorkspaceSettings, 'id' | 'machineProfileId' | 'name' | 'onboarded' | 'path' | 'color' | 'bkColor' | 'icon' | 'autoReconnect' | 'preferImperial'>
-);
+export type WorkspaceFullSettingsFragment = { __typename?: 'WorkspaceSettings' } & {
+  connection: { __typename?: 'ConnectionSettings' } & MachineConnectionFragment;
+  axes: Array<{ __typename?: 'MachineAxisSettings' } & MachineAxisFragment>;
+  features: Array<{ __typename?: 'MachineFeatureSettings' } & MachineFeatureFragment>;
+  commands: Array<{ __typename?: 'MachineCommandSettings' } & MachineCommandFragment>;
+  parts: Array<{ __typename?: 'MachinePartSettings' } & MachinePartFragment>;
+} & WorkspacePropsFragment;
 
-export type WorkspaceFullSettingsFragment = (
-  { __typename?: 'WorkspaceSettings' }
-  & { connection: (
-    { __typename?: 'ConnectionSettings' }
-    & MachineConnectionFragment
-  ), axes: Array<(
-    { __typename?: 'MachineAxisSettings' }
-    & MachineAxisFragment
-  )>, features: Array<(
-    { __typename?: 'MachineFeatureSettings' }
-    & MachineFeatureFragment
-  )>, commands: Array<(
-    { __typename?: 'MachineCommandSettings' }
-    & MachineCommandFragment
-  )>, parts: Array<(
-    { __typename?: 'MachinePartSettings' }
-    & MachinePartFragment
-  )> }
-  & WorkspacePropsFragment
-);
+export type WorkspaceEssentialSettingsFragment = { __typename?: 'WorkspaceSettings' } & WorkspaceFullSettingsFragment;
 
-export type WorkspaceEssentialSettingsFragment = (
-  { __typename?: 'WorkspaceSettings' }
-  & WorkspaceFullSettingsFragment
-);
-
-export type AlertErrorFragment = (
-  { __typename?: 'AlertError' }
-  & Pick<AlertError, 'name' | 'message'>
-);
+export type AlertErrorFragment = { __typename?: 'AlertError' } & Pick<AlertError, 'name' | 'message'>;
 
 export const MakerverseUserMinFragmentDoc = gql`
-    fragment MakerverseUserMin on MakerverseUser {
-  username
-}
-    `;
+  fragment MakerverseUserMin on MakerverseUser {
+    username
+  }
+`;
 export const MakerverseUserFullFragmentDoc = gql`
-    fragment MakerverseUserFull on MakerverseUser {
-  ...MakerverseUserMin
-  id
-  authenticationType
-  enabled
-}
-    ${MakerverseUserMinFragmentDoc}`;
+  fragment MakerverseUserFull on MakerverseUser {
+    ...MakerverseUserMin
+    id
+    authenticationType
+    enabled
+  }
+  ${MakerverseUserMinFragmentDoc}
+`;
 export const MakerverseSessionFragmentDoc = gql`
-    fragment MakerverseSession on MakerverseSession {
-  token
-  user {
-    ...MakerverseUserFull
+  fragment MakerverseSession on MakerverseSession {
+    token
+    user {
+      ...MakerverseUserFull
+    }
   }
-}
-    ${MakerverseUserFullFragmentDoc}`;
+  ${MakerverseUserFullFragmentDoc}
+`;
 export const AlertErrorFragmentDoc = gql`
-    fragment AlertError on AlertError {
-  name
-  message
-}
-    `;
+  fragment AlertError on AlertError {
+    name
+    message
+  }
+`;
 export const PortOptionsFragmentDoc = gql`
-    fragment PortOptions on PortOptions {
-  baudRate
-  parity
-  dataBits
-  stopBits
-  handshake
-  readBufferSize
-  writeBufferSize
-  rtsEnable
-  readTimeout
-  writeTimeout
-}
-    `;
+  fragment PortOptions on PortOptions {
+    baudRate
+    parity
+    dataBits
+    stopBits
+    handshake
+    readBufferSize
+    writeBufferSize
+    rtsEnable
+    readTimeout
+    writeTimeout
+  }
+`;
 export const FirmwareRequirementFragmentDoc = gql`
-    fragment FirmwareRequirement on IMachineFirmwareRequirement {
-  controllerType
-  name
-  edition
-  requiredVersion
-  suggestedVersion
-  helpUrl
-  downloadUrl
-}
-    `;
+  fragment FirmwareRequirement on IMachineFirmwareRequirement {
+    controllerType
+    name
+    edition
+    requiredVersion
+    suggestedVersion
+    helpUrl
+    downloadUrl
+  }
+`;
 export const DetectedFirmwareFragmentDoc = gql`
-    fragment DetectedFirmware on MachineDetectedFirmware {
-  friendlyName
-  isValid
-  name
-  value
-  edition
-  protocol
-  welcomeMessage
-}
-    `;
+  fragment DetectedFirmware on MachineDetectedFirmware {
+    friendlyName
+    isValid
+    name
+    value
+    edition
+    protocol
+    welcomeMessage
+  }
+`;
 export const MachineConfigFragmentDoc = gql`
-    fragment MachineConfig on MachineConfiguration {
-  firmware {
-    ...DetectedFirmware
+  fragment MachineConfig on MachineConfiguration {
+    firmware {
+      ...DetectedFirmware
+    }
   }
-}
-    ${DetectedFirmwareFragmentDoc}`;
+  ${DetectedFirmwareFragmentDoc}
+`;
 export const MachinePositionFragmentDoc = gql`
-    fragment MachinePosition on MachinePosition {
-  x
-  y
-  z
-  e
-  isValid
-}
-    `;
+  fragment MachinePosition on MachinePosition {
+    x
+    y
+    z
+    e
+    isValid
+  }
+`;
 export const MachineAlertFragmentDoc = gql`
-    fragment MachineAlert on MachineAlert {
-  code
-  name
-  message
-}
-    `;
+  fragment MachineAlert on MachineAlert {
+    code
+    name
+    message
+  }
+`;
 export const MachineStateFragmentDoc = gql`
-    fragment MachineState on MachineState {
-  activityState
-  machinePosition {
-    ...MachinePosition
+  fragment MachineState on MachineState {
+    activityState
+    machinePosition {
+      ...MachinePosition
+    }
+    workPosition {
+      ...MachinePosition
+    }
+    error {
+      ...MachineAlert
+    }
+    alarm {
+      ...MachineAlert
+    }
   }
-  workPosition {
-    ...MachinePosition
-  }
-  error {
-    ...MachineAlert
-  }
-  alarm {
-    ...MachineAlert
-  }
-}
-    ${MachinePositionFragmentDoc}
-${MachineAlertFragmentDoc}`;
+  ${MachinePositionFragmentDoc}
+  ${MachineAlertFragmentDoc}
+`;
 export const MachineSettingFragmentDoc = gql`
-    fragment MachineSetting on MachineSetting {
-  id
-  title
-  settingType
-  key
-  value
-}
-    `;
+  fragment MachineSetting on MachineSetting {
+    id
+    title
+    settingType
+    key
+    value
+  }
+`;
 export const ControlledMachineFragmentDoc = gql`
-    fragment ControlledMachine on ControlledMachine {
-  machineProfileId
-  firmwareRequirement {
-    ...FirmwareRequirement
-  }
-  configuration {
-    ...MachineConfig
-  }
-  state {
-    ...MachineState
-  }
-  settings {
-    ...MachineSetting
-  }
-}
-    ${FirmwareRequirementFragmentDoc}
-${MachineConfigFragmentDoc}
-${MachineStateFragmentDoc}
-${MachineSettingFragmentDoc}`;
-export const PortIoStatusFragmentDoc = gql`
-    fragment PortIOStatus on PortStatus {
-  bytesToRead
-  bytesToWrite
-  charactersRead
-  charactersWritten
-  linesRead
-  linesWritten
-}
-    `;
-export const ConnectedPortFragmentDoc = gql`
-    fragment ConnectedPort on ConnectedPort {
-  machine {
-    ...ControlledMachine
-  }
-  status {
-    ...PortIOStatus
-  }
-}
-    ${ControlledMachineFragmentDoc}
-${PortIoStatusFragmentDoc}`;
-export const SystemPortFragmentDoc = gql`
-    fragment SystemPort on SystemPort {
-  portName
-  state
-  error {
-    ...AlertError
-  }
-  options {
-    ...PortOptions
-  }
-  connection {
-    ...ConnectedPort
-  }
-}
-    ${AlertErrorFragmentDoc}
-${PortOptionsFragmentDoc}
-${ConnectedPortFragmentDoc}`;
-export const ConnectedPortStatusFragmentDoc = gql`
-    fragment ConnectedPortStatus on ConnectedPort {
-  machine {
+  fragment ControlledMachine on ControlledMachine {
+    machineProfileId
     firmwareRequirement {
       ...FirmwareRequirement
     }
+    configuration {
+      ...MachineConfig
+    }
+    state {
+      ...MachineState
+    }
+    settings {
+      ...MachineSetting
+    }
   }
-  status {
-    ...PortIOStatus
+  ${FirmwareRequirementFragmentDoc}
+  ${MachineConfigFragmentDoc}
+  ${MachineStateFragmentDoc}
+  ${MachineSettingFragmentDoc}
+`;
+export const PortIoStatusFragmentDoc = gql`
+  fragment PortIOStatus on PortStatus {
+    bytesToRead
+    bytesToWrite
+    charactersRead
+    charactersWritten
+    linesRead
+    linesWritten
   }
-}
-    ${FirmwareRequirementFragmentDoc}
-${PortIoStatusFragmentDoc}`;
-export const PortStatusFragmentDoc = gql`
-    fragment PortStatus on SystemPort {
-  portName
-  state
-  error {
-    ...AlertError
+`;
+export const ConnectedPortFragmentDoc = gql`
+  fragment ConnectedPort on ConnectedPort {
+    machine {
+      ...ControlledMachine
+    }
+    status {
+      ...PortIOStatus
+    }
   }
-  connection {
-    ...ConnectedPortStatus
-  }
-}
-    ${AlertErrorFragmentDoc}
-${ConnectedPortStatusFragmentDoc}`;
-export const FileSystemFragmentDoc = gql`
-    fragment FileSystem on FileSystemSettings {
-  programDirectory
-  mountPoints {
-    route
-    target
-  }
-}
-    `;
-export const AppUpdatesFragmentDoc = gql`
-    fragment AppUpdates on AppUpdates {
-  checkForUpdates
-  prereleases
-}
-    `;
-export const CommandFragmentDoc = gql`
-    fragment Command on CommandSettings {
-  id
-  mtime
-  commands
-  title
-  enabled
-}
-    `;
-export const EventFragmentDoc = gql`
-    fragment Event on EventSettings {
-  id
-  mtime
-  enabled
-  event
-  trigger
-  commands
-}
-    `;
-export const MakerHubFragmentDoc = gql`
-    fragment MakerHub on MakerHubSettings {
-  enabled
-}
-    `;
-export const MakerverseEssentialSettingsFragmentDoc = gql`
-    fragment MakerverseEssentialSettings on MakerverseSettings {
-  fileSystem {
-    ...FileSystem
-  }
-  appUpdates {
-    ...AppUpdates
-  }
-  commands {
-    ...Command
-  }
-  events {
-    ...Event
-  }
-  hub {
-    ...MakerHub
-  }
-  users {
-    ...MakerverseUserFull
-  }
-}
-    ${FileSystemFragmentDoc}
-${AppUpdatesFragmentDoc}
-${CommandFragmentDoc}
-${EventFragmentDoc}
-${MakerHubFragmentDoc}
-${MakerverseUserFullFragmentDoc}`;
-export const WorkspacePropsFragmentDoc = gql`
-    fragment WorkspaceProps on WorkspaceSettings {
-  id
-  machineProfileId
-  name
-  onboarded
-  path
-  color
-  bkColor
-  icon
-  autoReconnect
-  preferImperial
-}
-    `;
-export const MachineFirmwareFragmentDoc = gql`
-    fragment MachineFirmware on MachineFirmwareSettings {
-  id
-  controllerType
-  baudRateValue
-  name
-  edition
-  rtscts
-  requiredVersion
-  suggestedVersion
-  downloadUrl
-  helpUrl
-}
-    `;
-export const MachineConnectionFragmentDoc = gql`
-    fragment MachineConnection on ConnectionSettings {
-  portName
-  manufacturer
-  firmware {
-    ...MachineFirmware
-  }
-}
-    ${MachineFirmwareFragmentDoc}`;
-export const MachineAxisFragmentDoc = gql`
-    fragment MachineAxis on MachineAxisSettings {
-  id
-  name
-  min
-  max
-  precision
-  accuracy
-}
-    `;
-export const MachineFeatureFragmentDoc = gql`
-    fragment MachineFeature on MachineFeatureSettings {
-  id
-  disabled
-  key
-  title
-  description
-  icon
-}
-    `;
-export const MachineCommandFragmentDoc = gql`
-    fragment MachineCommand on MachineCommandSettings {
-  id
-  name
-  value
-}
-    `;
-export const MachineSettingsFragmentDoc = gql`
-    fragment MachineSettings on MachineSettingSettings {
-  id
-  title
-  settingType
-  key
-  value
-}
-    `;
-export const MachineSpecFragmentDoc = gql`
-    fragment MachineSpec on MachineSpecSettings {
-  id
-  specType
-  value
-}
-    `;
-export const MachinePartFragmentDoc = gql`
-    fragment MachinePart on MachinePartSettings {
-  id
-  partType
-  title
-  description
-  optional
-  isDefault
-  dataBlob
-  settings {
-    ...MachineSettings
-  }
-  specs {
-    ...MachineSpec
-  }
-}
-    ${MachineSettingsFragmentDoc}
-${MachineSpecFragmentDoc}`;
-export const WorkspaceFullSettingsFragmentDoc = gql`
-    fragment WorkspaceFullSettings on WorkspaceSettings {
-  ...WorkspaceProps
-  connection {
-    ...MachineConnection
-  }
-  axes {
-    ...MachineAxis
-  }
-  features {
-    ...MachineFeature
-  }
-  commands {
-    ...MachineCommand
-  }
-  parts {
-    ...MachinePart
-  }
-}
-    ${WorkspacePropsFragmentDoc}
-${MachineConnectionFragmentDoc}
-${MachineAxisFragmentDoc}
-${MachineFeatureFragmentDoc}
-${MachineCommandFragmentDoc}
-${MachinePartFragmentDoc}`;
-export const WorkspaceFullFragmentDoc = gql`
-    fragment WorkspaceFull on Workspace {
-  id
-  portName
-  state
-  error {
-    ...AlertError
-  }
-  settings {
-    ...WorkspaceFullSettings
-  }
-  port {
+  ${ControlledMachineFragmentDoc}
+  ${PortIoStatusFragmentDoc}
+`;
+export const SystemPortFragmentDoc = gql`
+  fragment SystemPort on SystemPort {
+    portName
+    state
+    error {
+      ...AlertError
+    }
+    options {
+      ...PortOptions
+    }
     connection {
-      machine {
-        ...ControlledMachine
+      ...ConnectedPort
+    }
+  }
+  ${AlertErrorFragmentDoc}
+  ${PortOptionsFragmentDoc}
+  ${ConnectedPortFragmentDoc}
+`;
+export const ConnectedPortStatusFragmentDoc = gql`
+  fragment ConnectedPortStatus on ConnectedPort {
+    machine {
+      firmwareRequirement {
+        ...FirmwareRequirement
+      }
+    }
+    status {
+      ...PortIOStatus
+    }
+  }
+  ${FirmwareRequirementFragmentDoc}
+  ${PortIoStatusFragmentDoc}
+`;
+export const PortStatusFragmentDoc = gql`
+  fragment PortStatus on SystemPort {
+    portName
+    state
+    error {
+      ...AlertError
+    }
+    connection {
+      ...ConnectedPortStatus
+    }
+  }
+  ${AlertErrorFragmentDoc}
+  ${ConnectedPortStatusFragmentDoc}
+`;
+export const FileSystemFragmentDoc = gql`
+  fragment FileSystem on FileSystemSettings {
+    programDirectory
+    mountPoints {
+      route
+      target
+    }
+  }
+`;
+export const AppUpdatesFragmentDoc = gql`
+  fragment AppUpdates on AppUpdates {
+    checkForUpdates
+    prereleases
+  }
+`;
+export const CommandFragmentDoc = gql`
+  fragment Command on CommandSettings {
+    id
+    mtime
+    commands
+    title
+    enabled
+  }
+`;
+export const EventFragmentDoc = gql`
+  fragment Event on EventSettings {
+    id
+    mtime
+    enabled
+    event
+    trigger
+    commands
+  }
+`;
+export const MakerHubFragmentDoc = gql`
+  fragment MakerHub on MakerHubSettings {
+    enabled
+  }
+`;
+export const MakerverseEssentialSettingsFragmentDoc = gql`
+  fragment MakerverseEssentialSettings on MakerverseSettings {
+    fileSystem {
+      ...FileSystem
+    }
+    appUpdates {
+      ...AppUpdates
+    }
+    commands {
+      ...Command
+    }
+    events {
+      ...Event
+    }
+    hub {
+      ...MakerHub
+    }
+    users {
+      ...MakerverseUserFull
+    }
+  }
+  ${FileSystemFragmentDoc}
+  ${AppUpdatesFragmentDoc}
+  ${CommandFragmentDoc}
+  ${EventFragmentDoc}
+  ${MakerHubFragmentDoc}
+  ${MakerverseUserFullFragmentDoc}
+`;
+export const WorkspacePropsFragmentDoc = gql`
+  fragment WorkspaceProps on WorkspaceSettings {
+    id
+    machineProfileId
+    name
+    onboarded
+    path
+    color
+    bkColor
+    icon
+    autoReconnect
+    preferImperial
+  }
+`;
+export const MachineFirmwareFragmentDoc = gql`
+  fragment MachineFirmware on MachineFirmwareSettings {
+    id
+    controllerType
+    baudRateValue
+    name
+    edition
+    rtscts
+    requiredVersion
+    suggestedVersion
+    downloadUrl
+    helpUrl
+  }
+`;
+export const MachineConnectionFragmentDoc = gql`
+  fragment MachineConnection on ConnectionSettings {
+    portName
+    manufacturer
+    firmware {
+      ...MachineFirmware
+    }
+  }
+  ${MachineFirmwareFragmentDoc}
+`;
+export const MachineAxisFragmentDoc = gql`
+  fragment MachineAxis on MachineAxisSettings {
+    id
+    name
+    min
+    max
+    precision
+    accuracy
+  }
+`;
+export const MachineFeatureFragmentDoc = gql`
+  fragment MachineFeature on MachineFeatureSettings {
+    id
+    disabled
+    key
+    title
+    description
+    icon
+  }
+`;
+export const MachineCommandFragmentDoc = gql`
+  fragment MachineCommand on MachineCommandSettings {
+    id
+    name
+    value
+  }
+`;
+export const MachineSettingsFragmentDoc = gql`
+  fragment MachineSettings on MachineSettingSettings {
+    id
+    title
+    settingType
+    key
+    value
+  }
+`;
+export const MachineSpecFragmentDoc = gql`
+  fragment MachineSpec on MachineSpecSettings {
+    id
+    specType
+    value
+  }
+`;
+export const MachinePartFragmentDoc = gql`
+  fragment MachinePart on MachinePartSettings {
+    id
+    partType
+    title
+    description
+    optional
+    isDefault
+    dataBlob
+    settings {
+      ...MachineSettings
+    }
+    specs {
+      ...MachineSpec
+    }
+  }
+  ${MachineSettingsFragmentDoc}
+  ${MachineSpecFragmentDoc}
+`;
+export const WorkspaceFullSettingsFragmentDoc = gql`
+  fragment WorkspaceFullSettings on WorkspaceSettings {
+    ...WorkspaceProps
+    connection {
+      ...MachineConnection
+    }
+    axes {
+      ...MachineAxis
+    }
+    features {
+      ...MachineFeature
+    }
+    commands {
+      ...MachineCommand
+    }
+    parts {
+      ...MachinePart
+    }
+  }
+  ${WorkspacePropsFragmentDoc}
+  ${MachineConnectionFragmentDoc}
+  ${MachineAxisFragmentDoc}
+  ${MachineFeatureFragmentDoc}
+  ${MachineCommandFragmentDoc}
+  ${MachinePartFragmentDoc}
+`;
+export const WorkspaceFullFragmentDoc = gql`
+  fragment WorkspaceFull on Workspace {
+    id
+    portName
+    state
+    error {
+      ...AlertError
+    }
+    settings {
+      ...WorkspaceFullSettings
+    }
+    port {
+      connection {
+        machine {
+          ...ControlledMachine
+        }
       }
     }
   }
-}
-    ${AlertErrorFragmentDoc}
-${WorkspaceFullSettingsFragmentDoc}
-${ControlledMachineFragmentDoc}`;
+  ${AlertErrorFragmentDoc}
+  ${WorkspaceFullSettingsFragmentDoc}
+  ${ControlledMachineFragmentDoc}
+`;
 export const StartupFragmentDoc = gql`
-    fragment Startup on Query {
-  settings: getSettings {
-    ...MakerverseEssentialSettings
+  fragment Startup on Query {
+    settings: getSettings {
+      ...MakerverseEssentialSettings
+    }
+    workspaces: listWorkspaces {
+      ...WorkspaceFull
+    }
   }
-  workspaces: listWorkspaces {
-    ...WorkspaceFull
-  }
-}
-    ${MakerverseEssentialSettingsFragmentDoc}
-${WorkspaceFullFragmentDoc}`;
+  ${MakerverseEssentialSettingsFragmentDoc}
+  ${WorkspaceFullFragmentDoc}
+`;
 export const WorkspaceEssentialSettingsFragmentDoc = gql`
-    fragment WorkspaceEssentialSettings on WorkspaceSettings {
-  ...WorkspaceFullSettings
-}
-    ${WorkspaceFullSettingsFragmentDoc}`;
-export const AuthenticateDocument = gql`
-    query Authenticate($token: String!) {
-  session: authenticate(token: $token) {
-    ...MakerverseSession
+  fragment WorkspaceEssentialSettings on WorkspaceSettings {
+    ...WorkspaceFullSettings
   }
-}
-    ${MakerverseSessionFragmentDoc}`;
+  ${WorkspaceFullSettingsFragmentDoc}
+`;
+export const AuthenticateDocument = gql`
+  query Authenticate($token: String!) {
+    session: authenticate(token: $token) {
+      ...MakerverseSession
+    }
+  }
+  ${MakerverseSessionFragmentDoc}
+`;
 
 /**
  * __useAuthenticateQuery__
@@ -2253,24 +2290,29 @@ export const AuthenticateDocument = gql`
  *   },
  * });
  */
-export function useAuthenticateQuery(baseOptions: Apollo.QueryHookOptions<AuthenticateQuery, AuthenticateQueryVariables>) {
-        return Apollo.useQuery<AuthenticateQuery, AuthenticateQueryVariables>(AuthenticateDocument, baseOptions);
-      }
-export function useAuthenticateLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AuthenticateQuery, AuthenticateQueryVariables>) {
-          return Apollo.useLazyQuery<AuthenticateQuery, AuthenticateQueryVariables>(AuthenticateDocument, baseOptions);
-        }
+export function useAuthenticateQuery(
+  baseOptions: Apollo.QueryHookOptions<AuthenticateQuery, AuthenticateQueryVariables>,
+) {
+  return Apollo.useQuery<AuthenticateQuery, AuthenticateQueryVariables>(AuthenticateDocument, baseOptions);
+}
+export function useAuthenticateLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<AuthenticateQuery, AuthenticateQueryVariables>,
+) {
+  return Apollo.useLazyQuery<AuthenticateQuery, AuthenticateQueryVariables>(AuthenticateDocument, baseOptions);
+}
 export type AuthenticateQueryHookResult = ReturnType<typeof useAuthenticateQuery>;
 export type AuthenticateLazyQueryHookResult = ReturnType<typeof useAuthenticateLazyQuery>;
 export type AuthenticateQueryResult = Apollo.QueryResult<AuthenticateQuery, AuthenticateQueryVariables>;
 export const MachineConfigurationDocument = gql`
-    subscription MachineConfiguration($portName: String!) {
-  machine: onMachineConfiguration(portName: $portName) {
-    configuration {
-      ...MachineConfig
+  subscription MachineConfiguration($portName: String!) {
+    machine: onMachineConfiguration(portName: $portName) {
+      configuration {
+        ...MachineConfig
+      }
     }
   }
-}
-    ${MachineConfigFragmentDoc}`;
+  ${MachineConfigFragmentDoc}
+`;
 
 /**
  * __useMachineConfigurationSubscription__
@@ -2288,20 +2330,29 @@ export const MachineConfigurationDocument = gql`
  *   },
  * });
  */
-export function useMachineConfigurationSubscription(baseOptions: Apollo.SubscriptionHookOptions<MachineConfigurationSubscription, MachineConfigurationSubscriptionVariables>) {
-        return Apollo.useSubscription<MachineConfigurationSubscription, MachineConfigurationSubscriptionVariables>(MachineConfigurationDocument, baseOptions);
-      }
+export function useMachineConfigurationSubscription(
+  baseOptions: Apollo.SubscriptionHookOptions<
+    MachineConfigurationSubscription,
+    MachineConfigurationSubscriptionVariables
+  >,
+) {
+  return Apollo.useSubscription<MachineConfigurationSubscription, MachineConfigurationSubscriptionVariables>(
+    MachineConfigurationDocument,
+    baseOptions,
+  );
+}
 export type MachineConfigurationSubscriptionHookResult = ReturnType<typeof useMachineConfigurationSubscription>;
 export type MachineConfigurationSubscriptionResult = Apollo.SubscriptionResult<MachineConfigurationSubscription>;
 export const MachineStateDocument = gql`
-    subscription MachineState($portName: String!) {
-  machine: onMachineConfiguration(portName: $portName) {
-    state {
-      ...MachineState
+  subscription MachineState($portName: String!) {
+    machine: onMachineConfiguration(portName: $portName) {
+      state {
+        ...MachineState
+      }
     }
   }
-}
-    ${MachineStateFragmentDoc}`;
+  ${MachineStateFragmentDoc}
+`;
 
 /**
  * __useMachineStateSubscription__
@@ -2319,20 +2370,26 @@ export const MachineStateDocument = gql`
  *   },
  * });
  */
-export function useMachineStateSubscription(baseOptions: Apollo.SubscriptionHookOptions<MachineStateSubscription, MachineStateSubscriptionVariables>) {
-        return Apollo.useSubscription<MachineStateSubscription, MachineStateSubscriptionVariables>(MachineStateDocument, baseOptions);
-      }
+export function useMachineStateSubscription(
+  baseOptions: Apollo.SubscriptionHookOptions<MachineStateSubscription, MachineStateSubscriptionVariables>,
+) {
+  return Apollo.useSubscription<MachineStateSubscription, MachineStateSubscriptionVariables>(
+    MachineStateDocument,
+    baseOptions,
+  );
+}
 export type MachineStateSubscriptionHookResult = ReturnType<typeof useMachineStateSubscription>;
 export type MachineStateSubscriptionResult = Apollo.SubscriptionResult<MachineStateSubscription>;
 export const MachineSettingsDocument = gql`
-    subscription MachineSettings($portName: String!) {
-  machine: onMachineSetting(portName: $portName) {
-    settings {
-      ...MachineSetting
+  subscription MachineSettings($portName: String!) {
+    machine: onMachineSetting(portName: $portName) {
+      settings {
+        ...MachineSetting
+      }
     }
   }
-}
-    ${MachineSettingFragmentDoc}`;
+  ${MachineSettingFragmentDoc}
+`;
 
 /**
  * __useMachineSettingsSubscription__
@@ -2350,18 +2407,24 @@ export const MachineSettingsDocument = gql`
  *   },
  * });
  */
-export function useMachineSettingsSubscription(baseOptions: Apollo.SubscriptionHookOptions<MachineSettingsSubscription, MachineSettingsSubscriptionVariables>) {
-        return Apollo.useSubscription<MachineSettingsSubscription, MachineSettingsSubscriptionVariables>(MachineSettingsDocument, baseOptions);
-      }
+export function useMachineSettingsSubscription(
+  baseOptions: Apollo.SubscriptionHookOptions<MachineSettingsSubscription, MachineSettingsSubscriptionVariables>,
+) {
+  return Apollo.useSubscription<MachineSettingsSubscription, MachineSettingsSubscriptionVariables>(
+    MachineSettingsDocument,
+    baseOptions,
+  );
+}
 export type MachineSettingsSubscriptionHookResult = ReturnType<typeof useMachineSettingsSubscription>;
 export type MachineSettingsSubscriptionResult = Apollo.SubscriptionResult<MachineSettingsSubscription>;
 export const ListPortsDocument = gql`
-    query ListPorts {
-  ports: listPorts {
-    ...PortStatus
+  query ListPorts {
+    ports: listPorts {
+      ...PortStatus
+    }
   }
-}
-    ${PortStatusFragmentDoc}`;
+  ${PortStatusFragmentDoc}
+`;
 
 /**
  * __useListPortsQuery__
@@ -2379,21 +2442,24 @@ export const ListPortsDocument = gql`
  * });
  */
 export function useListPortsQuery(baseOptions?: Apollo.QueryHookOptions<ListPortsQuery, ListPortsQueryVariables>) {
-        return Apollo.useQuery<ListPortsQuery, ListPortsQueryVariables>(ListPortsDocument, baseOptions);
-      }
-export function useListPortsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ListPortsQuery, ListPortsQueryVariables>) {
-          return Apollo.useLazyQuery<ListPortsQuery, ListPortsQueryVariables>(ListPortsDocument, baseOptions);
-        }
+  return Apollo.useQuery<ListPortsQuery, ListPortsQueryVariables>(ListPortsDocument, baseOptions);
+}
+export function useListPortsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<ListPortsQuery, ListPortsQueryVariables>,
+) {
+  return Apollo.useLazyQuery<ListPortsQuery, ListPortsQueryVariables>(ListPortsDocument, baseOptions);
+}
 export type ListPortsQueryHookResult = ReturnType<typeof useListPortsQuery>;
 export type ListPortsLazyQueryHookResult = ReturnType<typeof useListPortsLazyQuery>;
 export type ListPortsQueryResult = Apollo.QueryResult<ListPortsQuery, ListPortsQueryVariables>;
 export const PortChangeDocument = gql`
-    subscription PortChange {
-  port: onPortChange {
-    ...PortStatus
+  subscription PortChange {
+    port: onPortChange {
+      ...PortStatus
+    }
   }
-}
-    ${PortStatusFragmentDoc}`;
+  ${PortStatusFragmentDoc}
+`;
 
 /**
  * __usePortChangeSubscription__
@@ -2410,18 +2476,24 @@ export const PortChangeDocument = gql`
  *   },
  * });
  */
-export function usePortChangeSubscription(baseOptions?: Apollo.SubscriptionHookOptions<PortChangeSubscription, PortChangeSubscriptionVariables>) {
-        return Apollo.useSubscription<PortChangeSubscription, PortChangeSubscriptionVariables>(PortChangeDocument, baseOptions);
-      }
+export function usePortChangeSubscription(
+  baseOptions?: Apollo.SubscriptionHookOptions<PortChangeSubscription, PortChangeSubscriptionVariables>,
+) {
+  return Apollo.useSubscription<PortChangeSubscription, PortChangeSubscriptionVariables>(
+    PortChangeDocument,
+    baseOptions,
+  );
+}
 export type PortChangeSubscriptionHookResult = ReturnType<typeof usePortChangeSubscription>;
 export type PortChangeSubscriptionResult = Apollo.SubscriptionResult<PortChangeSubscription>;
 export const OpenPortDocument = gql`
-    mutation OpenPort($portName: String!, $firmware: FirmwareRequirementInput!, $options: SerialPortOptionsInput!) {
-  port: openPort(portName: $portName, firmware: $firmware, options: $options) {
-    ...SystemPort
+  mutation OpenPort($portName: String!, $firmware: FirmwareRequirementInput!, $options: SerialPortOptionsInput!) {
+    port: openPort(portName: $portName, firmware: $firmware, options: $options) {
+      ...SystemPort
+    }
   }
-}
-    ${SystemPortFragmentDoc}`;
+  ${SystemPortFragmentDoc}
+`;
 export type OpenPortMutationFn = Apollo.MutationFunction<OpenPortMutation, OpenPortMutationVariables>;
 
 /**
@@ -2443,19 +2515,22 @@ export type OpenPortMutationFn = Apollo.MutationFunction<OpenPortMutation, OpenP
  *   },
  * });
  */
-export function useOpenPortMutation(baseOptions?: Apollo.MutationHookOptions<OpenPortMutation, OpenPortMutationVariables>) {
-        return Apollo.useMutation<OpenPortMutation, OpenPortMutationVariables>(OpenPortDocument, baseOptions);
-      }
+export function useOpenPortMutation(
+  baseOptions?: Apollo.MutationHookOptions<OpenPortMutation, OpenPortMutationVariables>,
+) {
+  return Apollo.useMutation<OpenPortMutation, OpenPortMutationVariables>(OpenPortDocument, baseOptions);
+}
 export type OpenPortMutationHookResult = ReturnType<typeof useOpenPortMutation>;
 export type OpenPortMutationResult = Apollo.MutationResult<OpenPortMutation>;
 export type OpenPortMutationOptions = Apollo.BaseMutationOptions<OpenPortMutation, OpenPortMutationVariables>;
 export const ClosePortDocument = gql`
-    mutation ClosePort($portName: String!) {
-  port: closePort(portName: $portName) {
-    ...PortStatus
+  mutation ClosePort($portName: String!) {
+    port: closePort(portName: $portName) {
+      ...PortStatus
+    }
   }
-}
-    ${PortStatusFragmentDoc}`;
+  ${PortStatusFragmentDoc}
+`;
 export type ClosePortMutationFn = Apollo.MutationFunction<ClosePortMutation, ClosePortMutationVariables>;
 
 /**
@@ -2475,21 +2550,24 @@ export type ClosePortMutationFn = Apollo.MutationFunction<ClosePortMutation, Clo
  *   },
  * });
  */
-export function useClosePortMutation(baseOptions?: Apollo.MutationHookOptions<ClosePortMutation, ClosePortMutationVariables>) {
-        return Apollo.useMutation<ClosePortMutation, ClosePortMutationVariables>(ClosePortDocument, baseOptions);
-      }
+export function useClosePortMutation(
+  baseOptions?: Apollo.MutationHookOptions<ClosePortMutation, ClosePortMutationVariables>,
+) {
+  return Apollo.useMutation<ClosePortMutation, ClosePortMutationVariables>(ClosePortDocument, baseOptions);
+}
 export type ClosePortMutationHookResult = ReturnType<typeof useClosePortMutation>;
 export type ClosePortMutationResult = Apollo.MutationResult<ClosePortMutation>;
 export type ClosePortMutationOptions = Apollo.BaseMutationOptions<ClosePortMutation, ClosePortMutationVariables>;
 export const StartupDocument = gql`
-    query Startup($token: String!) {
-  session: authenticate(token: $token) {
-    ...MakerverseSession
+  query Startup($token: String!) {
+    session: authenticate(token: $token) {
+      ...MakerverseSession
+    }
+    ...Startup
   }
-  ...Startup
-}
-    ${MakerverseSessionFragmentDoc}
-${StartupFragmentDoc}`;
+  ${MakerverseSessionFragmentDoc}
+  ${StartupFragmentDoc}
+`;
 
 /**
  * __useStartupQuery__
@@ -2508,21 +2586,22 @@ ${StartupFragmentDoc}`;
  * });
  */
 export function useStartupQuery(baseOptions: Apollo.QueryHookOptions<StartupQuery, StartupQueryVariables>) {
-        return Apollo.useQuery<StartupQuery, StartupQueryVariables>(StartupDocument, baseOptions);
-      }
+  return Apollo.useQuery<StartupQuery, StartupQueryVariables>(StartupDocument, baseOptions);
+}
 export function useStartupLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<StartupQuery, StartupQueryVariables>) {
-          return Apollo.useLazyQuery<StartupQuery, StartupQueryVariables>(StartupDocument, baseOptions);
-        }
+  return Apollo.useLazyQuery<StartupQuery, StartupQueryVariables>(StartupDocument, baseOptions);
+}
 export type StartupQueryHookResult = ReturnType<typeof useStartupQuery>;
 export type StartupLazyQueryHookResult = ReturnType<typeof useStartupLazyQuery>;
 export type StartupQueryResult = Apollo.QueryResult<StartupQuery, StartupQueryVariables>;
 export const WorkspaceDocument = gql`
-    query Workspace($workspaceId: String!) {
-  workspace: getWorkspace(workspaceId: $workspaceId) {
-    ...WorkspaceFull
+  query Workspace($workspaceId: String!) {
+    workspace: getWorkspace(workspaceId: $workspaceId) {
+      ...WorkspaceFull
+    }
   }
-}
-    ${WorkspaceFullFragmentDoc}`;
+  ${WorkspaceFullFragmentDoc}
+`;
 
 /**
  * __useWorkspaceQuery__
@@ -2541,22 +2620,28 @@ export const WorkspaceDocument = gql`
  * });
  */
 export function useWorkspaceQuery(baseOptions: Apollo.QueryHookOptions<WorkspaceQuery, WorkspaceQueryVariables>) {
-        return Apollo.useQuery<WorkspaceQuery, WorkspaceQueryVariables>(WorkspaceDocument, baseOptions);
-      }
-export function useWorkspaceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WorkspaceQuery, WorkspaceQueryVariables>) {
-          return Apollo.useLazyQuery<WorkspaceQuery, WorkspaceQueryVariables>(WorkspaceDocument, baseOptions);
-        }
+  return Apollo.useQuery<WorkspaceQuery, WorkspaceQueryVariables>(WorkspaceDocument, baseOptions);
+}
+export function useWorkspaceLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<WorkspaceQuery, WorkspaceQueryVariables>,
+) {
+  return Apollo.useLazyQuery<WorkspaceQuery, WorkspaceQueryVariables>(WorkspaceDocument, baseOptions);
+}
 export type WorkspaceQueryHookResult = ReturnType<typeof useWorkspaceQuery>;
 export type WorkspaceLazyQueryHookResult = ReturnType<typeof useWorkspaceLazyQuery>;
 export type WorkspaceQueryResult = Apollo.QueryResult<WorkspaceQuery, WorkspaceQueryVariables>;
 export const CreateWorkspaceDocument = gql`
-    mutation CreateWorkspace($workspaceSettings: WorkspaceSettingsInput!) {
-  workspace: createWorkspace(workspaceSettings: $workspaceSettings) {
-    ...WorkspaceFull
+  mutation CreateWorkspace($workspaceSettings: WorkspaceSettingsInput!) {
+    workspace: createWorkspace(workspaceSettings: $workspaceSettings) {
+      ...WorkspaceFull
+    }
   }
-}
-    ${WorkspaceFullFragmentDoc}`;
-export type CreateWorkspaceMutationFn = Apollo.MutationFunction<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>;
+  ${WorkspaceFullFragmentDoc}
+`;
+export type CreateWorkspaceMutationFn = Apollo.MutationFunction<
+  CreateWorkspaceMutation,
+  CreateWorkspaceMutationVariables
+>;
 
 /**
  * __useCreateWorkspaceMutation__
@@ -2575,20 +2660,32 @@ export type CreateWorkspaceMutationFn = Apollo.MutationFunction<CreateWorkspaceM
  *   },
  * });
  */
-export function useCreateWorkspaceMutation(baseOptions?: Apollo.MutationHookOptions<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>) {
-        return Apollo.useMutation<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>(CreateWorkspaceDocument, baseOptions);
-      }
+export function useCreateWorkspaceMutation(
+  baseOptions?: Apollo.MutationHookOptions<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>,
+) {
+  return Apollo.useMutation<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>(
+    CreateWorkspaceDocument,
+    baseOptions,
+  );
+}
 export type CreateWorkspaceMutationHookResult = ReturnType<typeof useCreateWorkspaceMutation>;
 export type CreateWorkspaceMutationResult = Apollo.MutationResult<CreateWorkspaceMutation>;
-export type CreateWorkspaceMutationOptions = Apollo.BaseMutationOptions<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>;
+export type CreateWorkspaceMutationOptions = Apollo.BaseMutationOptions<
+  CreateWorkspaceMutation,
+  CreateWorkspaceMutationVariables
+>;
 export const DeleteWorkspaceDocument = gql`
-    mutation DeleteWorkspace($workspaceId: String!) {
-  workspace: deleteWorkspace(workspaceId: $workspaceId) {
-    ...WorkspaceFull
+  mutation DeleteWorkspace($workspaceId: String!) {
+    workspace: deleteWorkspace(workspaceId: $workspaceId) {
+      ...WorkspaceFull
+    }
   }
-}
-    ${WorkspaceFullFragmentDoc}`;
-export type DeleteWorkspaceMutationFn = Apollo.MutationFunction<DeleteWorkspaceMutation, DeleteWorkspaceMutationVariables>;
+  ${WorkspaceFullFragmentDoc}
+`;
+export type DeleteWorkspaceMutationFn = Apollo.MutationFunction<
+  DeleteWorkspaceMutation,
+  DeleteWorkspaceMutationVariables
+>;
 
 /**
  * __useDeleteWorkspaceMutation__
@@ -2607,19 +2704,28 @@ export type DeleteWorkspaceMutationFn = Apollo.MutationFunction<DeleteWorkspaceM
  *   },
  * });
  */
-export function useDeleteWorkspaceMutation(baseOptions?: Apollo.MutationHookOptions<DeleteWorkspaceMutation, DeleteWorkspaceMutationVariables>) {
-        return Apollo.useMutation<DeleteWorkspaceMutation, DeleteWorkspaceMutationVariables>(DeleteWorkspaceDocument, baseOptions);
-      }
+export function useDeleteWorkspaceMutation(
+  baseOptions?: Apollo.MutationHookOptions<DeleteWorkspaceMutation, DeleteWorkspaceMutationVariables>,
+) {
+  return Apollo.useMutation<DeleteWorkspaceMutation, DeleteWorkspaceMutationVariables>(
+    DeleteWorkspaceDocument,
+    baseOptions,
+  );
+}
 export type DeleteWorkspaceMutationHookResult = ReturnType<typeof useDeleteWorkspaceMutation>;
 export type DeleteWorkspaceMutationResult = Apollo.MutationResult<DeleteWorkspaceMutation>;
-export type DeleteWorkspaceMutationOptions = Apollo.BaseMutationOptions<DeleteWorkspaceMutation, DeleteWorkspaceMutationVariables>;
+export type DeleteWorkspaceMutationOptions = Apollo.BaseMutationOptions<
+  DeleteWorkspaceMutation,
+  DeleteWorkspaceMutationVariables
+>;
 export const WorkspaceChangeDocument = gql`
-    subscription WorkspaceChange {
-  workspace: onWorkspaceChange {
-    ...WorkspaceFull
+  subscription WorkspaceChange {
+    workspace: onWorkspaceChange {
+      ...WorkspaceFull
+    }
   }
-}
-    ${WorkspaceFullFragmentDoc}`;
+  ${WorkspaceFullFragmentDoc}
+`;
 
 /**
  * __useWorkspaceChangeSubscription__
@@ -2636,18 +2742,24 @@ export const WorkspaceChangeDocument = gql`
  *   },
  * });
  */
-export function useWorkspaceChangeSubscription(baseOptions?: Apollo.SubscriptionHookOptions<WorkspaceChangeSubscription, WorkspaceChangeSubscriptionVariables>) {
-        return Apollo.useSubscription<WorkspaceChangeSubscription, WorkspaceChangeSubscriptionVariables>(WorkspaceChangeDocument, baseOptions);
-      }
+export function useWorkspaceChangeSubscription(
+  baseOptions?: Apollo.SubscriptionHookOptions<WorkspaceChangeSubscription, WorkspaceChangeSubscriptionVariables>,
+) {
+  return Apollo.useSubscription<WorkspaceChangeSubscription, WorkspaceChangeSubscriptionVariables>(
+    WorkspaceChangeDocument,
+    baseOptions,
+  );
+}
 export type WorkspaceChangeSubscriptionHookResult = ReturnType<typeof useWorkspaceChangeSubscription>;
 export type WorkspaceChangeSubscriptionResult = Apollo.SubscriptionResult<WorkspaceChangeSubscription>;
 export const OpenWorkspaceDocument = gql`
-    mutation OpenWorkspace($workspaceId: String!) {
-  workspace: openWorkspace(workspaceId: $workspaceId) {
-    ...WorkspaceFull
+  mutation OpenWorkspace($workspaceId: String!) {
+    workspace: openWorkspace(workspaceId: $workspaceId) {
+      ...WorkspaceFull
+    }
   }
-}
-    ${WorkspaceFullFragmentDoc}`;
+  ${WorkspaceFullFragmentDoc}
+`;
 export type OpenWorkspaceMutationFn = Apollo.MutationFunction<OpenWorkspaceMutation, OpenWorkspaceMutationVariables>;
 
 /**
@@ -2667,9 +2779,14 @@ export type OpenWorkspaceMutationFn = Apollo.MutationFunction<OpenWorkspaceMutat
  *   },
  * });
  */
-export function useOpenWorkspaceMutation(baseOptions?: Apollo.MutationHookOptions<OpenWorkspaceMutation, OpenWorkspaceMutationVariables>) {
-        return Apollo.useMutation<OpenWorkspaceMutation, OpenWorkspaceMutationVariables>(OpenWorkspaceDocument, baseOptions);
-      }
+export function useOpenWorkspaceMutation(
+  baseOptions?: Apollo.MutationHookOptions<OpenWorkspaceMutation, OpenWorkspaceMutationVariables>,
+) {
+  return Apollo.useMutation<OpenWorkspaceMutation, OpenWorkspaceMutationVariables>(OpenWorkspaceDocument, baseOptions);
+}
 export type OpenWorkspaceMutationHookResult = ReturnType<typeof useOpenWorkspaceMutation>;
 export type OpenWorkspaceMutationResult = Apollo.MutationResult<OpenWorkspaceMutation>;
-export type OpenWorkspaceMutationOptions = Apollo.BaseMutationOptions<OpenWorkspaceMutation, OpenWorkspaceMutationVariables>;
+export type OpenWorkspaceMutationOptions = Apollo.BaseMutationOptions<
+  OpenWorkspaceMutation,
+  OpenWorkspaceMutationVariables
+>;

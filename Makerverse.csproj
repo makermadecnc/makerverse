@@ -18,7 +18,7 @@
   <ItemGroup>
     <PackageReference Include="ElectronNET.API" Version="9.31.2" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.0.0" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.0" />
     <PackageReference Include="SemanticVersion" Version="2.1.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.1-dev-00188" />
@@ -45,6 +45,7 @@
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
     <Content Remove="$(SpaRoot)**" />
     <Content Include="App\src\api\shared.graphql" />
+    <Content Include="App\src\components\Machines\.graphqlconfig" />
     <None Remove="$(SpaRoot)**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
     <None Remove="output\**" />
@@ -98,6 +99,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="App\src\components\Machines\types" />
     <Folder Include="App\src\components\Tools\Plans" />
   </ItemGroup>
 

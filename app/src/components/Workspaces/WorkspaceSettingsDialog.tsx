@@ -7,7 +7,6 @@ import {TabContext, TabList, TabPanel } from '@material-ui/lab';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import AxesTab from './AxesTab';
 import WorkspaceTab from './WorkspaceTab';
-import {ComponentType} from 'react';
 import PartsTab from './PartsTab';
 
 type Props = IHaveWorkspace & {
@@ -38,9 +37,11 @@ const WorkspaceSettingsDialog: React.FunctionComponent<Props> = (props) => {
     {
       key: 'parts',
       title: t('Parts'),
-      component: <PartsTab />
+      component: <PartsTab workspace={workspace} />
     },
   ];
+
+  log.verbose('open', open, 'selectedTab', selectedTab);
 
   return (
     <Dialog

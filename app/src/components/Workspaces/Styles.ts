@@ -55,6 +55,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   dialogContent: {
     padding: theme.spacing(1),
+    backgroundColor: theme.palette.background.default,
+    minHeight: 400,
   },
   dialogFooter: {
     justifyContent: 'center',

@@ -1,13 +1,13 @@
 {
-  "name": "Makerverse GraphQL Schema",
-  "schemaPath": "./src/makerverse-schema.graphql",
-  "includes": ["./src/api/**"],
+  "name": "Machines",
+  "schemaPath": "./schema.graphql",
   "extensions": {
     "endpoints": {
       "Makerverse": {
         "url": "http://dev.makerverse:8000/api/graphql",
         "headers": {
-          "user-agent": "Makerverse"
+          "user-agent": "Makerverse",
+          "module": "Machines"
         },
         "introspect": true
       }

@@ -1,17 +1,34 @@
+# Big example ref: https://github.com/dotansimha/graphql-code-generator/blob/master/dev-test/codegen.yml
+hooks:
+  afterAllFileWrite:
+    - prettier --write
 overwrite: true
 schema: './src/makerverse-schema.graphql'
-documents: './src/**/*.graphql'
 generates:
   ./src/api/graphql.ts:
+    documents: './src/**/*.graphql'
     plugins:
       - 'typescript'
       - 'typescript-resolvers'
       - 'typescript-operations'
       - 'typescript-react-apollo'
-#      - 'typescript-graphql-request'
+    #      - 'typescript-graphql-request'
     config:
       avoidOptionals: true
   ./graphql.schema.json:
+    documents: './src/**/*.graphql'
     plugins:
       - 'introspection'
-
+#  ./src/components/:
+#    preset: graphql-modules
+#    schema: ./src/components/*/types/*.graphql
+#    presetConfig:
+#      baseTypesPath: types.ts
+#      filename: graphql.ts
+#    plugins:
+##      - add:
+##          content: '/* eslint-disable */'
+#      - 'typescript'
+#      - 'typescript-resolvers'
+#      - 'typescript-operations'
+#      - 'typescript-react-apollo'

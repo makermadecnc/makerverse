@@ -68,7 +68,7 @@ const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
 
   function getSettingsInput(setting: MachinePresetSettingPropsFragment): MachineSettingSettingsInput {
     return {
-      id: setting.id,
+      id: setting.id ?? '',
       key: setting.key,
       settingType: setting.settingType,
       title: setting.title,

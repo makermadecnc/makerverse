@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   actionButton: {
     position: 'fixed',
-    top: 78,
+    top: 110,
     right: theme.spacing(1),
     padding: 0,
     backgroundColor: theme.palette.background.paper,
@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     right: theme.spacing(1),
   },
   toolBarSide: {
-    top: 140,
+    top: 168,
     maxWidth: maxWidth, // Make space for right column, but keep ToolPane the same size.
   },
   toolBarBottom: {
