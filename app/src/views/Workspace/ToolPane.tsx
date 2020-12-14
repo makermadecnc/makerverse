@@ -1,16 +1,16 @@
 import { Paper, Grid, Typography, CircularProgress } from '@material-ui/core';
 import * as React from 'react';
-import { IHaveToolGroup } from '../../components/Tools';
+import { IHaveToolGroup } from '@openworkshop/ui/open-controller/Tools';
 import useStyles from './Styles';
-import {useMakerverseTrans} from '../../providers';
-import ToolLoader from '../../components/Tools/ToolLoader';
-import {IHaveWorkspace} from '../../components/Workspaces';
+import {useTrans} from '@openworkshop/ui/open-controller/Context';
+import ToolLoader from '@openworkshop/ui/open-controller/Tools/ToolLoader';
+import {IHaveWorkspace} from '@openworkshop/ui/open-controller/Workspaces';
 
 type Props = IHaveToolGroup & IHaveWorkspace;
 
 const ToolPane: React.FunctionComponent<Props> = (props) => {
   const classes = useStyles();
-  const t = useMakerverseTrans();
+  const t = useTrans();
   const { toolGroup, workspace } = props;
   const { tools } = toolGroup;
   const showTitle = false;

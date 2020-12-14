@@ -2,11 +2,11 @@ import {useNetworkStatus} from '@openworkshop/lib/utils/device';
 import React, { FunctionComponent } from 'react';
 import settings from '../../config/settings';
 import {OfflineAlertList} from '@openworkshop/ui/components/Alerts';
-import {useMakerverse, useMakerverseTrans} from '../../providers';
+import {useOpenController, useTrans} from '@openworkshop/ui/open-controller/Context';
 
 const Docs: FunctionComponent = () => {
   const isOnline = useNetworkStatus();
-  const t = useMakerverseTrans();
+  const t = useTrans();
   const fs = { width: '100%', height: '100%' };
 
   if (!isOnline) {

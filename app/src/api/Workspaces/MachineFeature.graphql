@@ -1,9 +1,0 @@
-
-fragment MachineFeature on MachineFeatureSettings {
-    id
-    disabled
-    key
-    title
-    description
-    icon
-}

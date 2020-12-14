@@ -1,6 +1,0 @@
-fragment MakerverseSession on MakerverseSession {
-    token
-    user {
-        ...MakerverseUserFull
-    }
-}

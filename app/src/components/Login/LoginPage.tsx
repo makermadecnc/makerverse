@@ -11,19 +11,19 @@ import {AlertList} from '@openworkshop/ui/components/Alerts';
 import ToolbarCard from '@openworkshop/ui/components/Cards/ToolbarCard';
 import ThreeColumns from '@openworkshop/ui/components/Layout/ThreeColumns';
 import React, { FunctionComponent } from 'react';
-import {MakerverseUser} from '../../api/graphql';
+import {OpenControllerUser} from '@openworkshop/lib/api/graphql';
 import useStyles from './Styles';
-import analytics from 'lib/analytics';
+import analytics from '@openworkshop/ui/open-controller/analytics';
 import settings from 'config/settings';
 import docs from 'constants/docs';
-import {useMakerverseTrans} from '../../providers';
+import {useTrans} from '@openworkshop/ui/open-controller/Context';
 
 const LoginPage: FunctionComponent = () => {
   const log = useLogger(LoginPage);
   const ows = useOpenWorkShop();
   const classes = useStyles();
-  const t = useMakerverseTrans();
-  const [guest, setGuest] = React.useState<MakerverseUser | undefined>(undefined);
+  const t = useTrans();
+  const [guest, setGuest] = React.useState<OpenControllerUser | undefined>(undefined);
   const [useCookies, setUseCookies] = React.useState<boolean>(false);
   const [dangerous, setDangerous] = React.useState<boolean>(false);
   const [authenticating, setAuthenticating] = React.useState<boolean>(false);

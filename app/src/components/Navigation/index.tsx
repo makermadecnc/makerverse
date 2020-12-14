@@ -3,7 +3,7 @@ import HeaderBar from './HeaderBar';
 import SideDrawer from './SideDrawer';
 import useStyles from './Styles';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
-import {IMaybeHaveWorkspace} from '../Workspaces';
+import {IMaybeHaveWorkspace} from '@openworkshop/ui/open-controller/Workspaces';
 export { default as ProtectedRoute } from './ProtectedRoute';
 export { default as NotFound } from './NotFound';
 
@@ -31,5 +31,6 @@ const Navigation: FunctionComponent<Props> = (props) => {
     </div>
   );
 };
+
 
 export default Navigation;

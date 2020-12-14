@@ -1,13 +1,13 @@
 import { useLogger } from '@openworkshop/lib/utils/logging/UseLogger';
 import React from 'react';
 import {Route, Switch, useLocation } from 'react-router-dom';
-import analytics from '../lib/analytics';
+import analytics from '@openworkshop/ui/open-controller/analytics';
 import settings from '../config/settings';
 import { Settings, Home, WorkspaceCreator, Docs, Workspace } from './';
-import Navigation, { NotFound } from 'components/Navigation';
-import BackendDiconnectedModal from '../components/Modals/BackendDiconnectedModal';
+import Navigation, { NotFound } from '../components/Navigation';
+import BackendDiconnectedModal from '@openworkshop/ui/open-controller/Modals/BackendDiconnectedModal';
 import _ from 'lodash';
-import {useMakerverse} from '../providers';
+import {useOpenController} from '@openworkshop/ui/open-controller/Context';
 
 interface IProps {
   currentWorkspaceId?: string;
@@ -15,7 +15,7 @@ interface IProps {
 
 const App: React.FunctionComponent<IProps> = (props) => {
   const log = useLogger(App);
-  const makerverse = useMakerverse();
+  const makerverse = useOpenController();
   const workspaceIds = makerverse.workspaces.map(ws => ws.id);
   const { currentWorkspaceId } = props;
   const workspace = _.find(makerverse.workspaces, ws => ws.id === currentWorkspaceId);

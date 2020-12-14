@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from 'react';
-import {useMakerverse} from '../../providers';
+import {useOpenController} from '@openworkshop/ui/open-controller/Context';
 
 const Home: FunctionComponent = () => {
-  const makerverse = useMakerverse();
+  const makerverse = useOpenController();
   const hasWorkspaces = makerverse.workspaces.length > 0;
 
   return (

@@ -3,14 +3,14 @@ import {ICustomizedMachine} from '@openworkshop/lib/api/Machines/CustomizedMachi
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import CustomizeMachine from '@openworkshop/ui/components/MachineProfiles/CustomizeMachine';
 import React, { FunctionComponent } from 'react';
-import OpenMachinePort from '../../components/Ports/OpenMachinePort';
+import OpenMachinePort from '@openworkshop/ui/open-controller/Ports/OpenMachinePort';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
 import useStyles from './Styles';
-import {useMakerverseTrans} from '../../providers';
+import {useTrans} from '@openworkshop/ui/open-controller/Context';
 
 const WorkspaceCreator: FunctionComponent = () => {
   const log = useLogger(WorkspaceCreator);
-  const t = useMakerverseTrans();
+  const t = useTrans();
   const classes = useStyles();
   const [machine, setMachine] = React.useState<ICustomizedMachine | undefined>(undefined);
   const [selectedPortName, setSelectedPortName] = React.useState<string>('');

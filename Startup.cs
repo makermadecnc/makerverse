@@ -2,12 +2,6 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ElectronNET.API;
-using Makerverse.Api;
-using Makerverse.Api.Identity.Services;
-using Makerverse.Api.Workspaces.Services;
-using Makerverse.Lib;
-using Makerverse.Lib.Graphql;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -15,11 +9,15 @@ using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
+using OpenWorkEngine.OpenController;
 using OpenWorkEngine.OpenController.Controllers;
 using OpenWorkEngine.OpenController.Controllers.Services;
+using OpenWorkEngine.OpenController.Identity.Services;
 using OpenWorkEngine.OpenController.Lib.Api;
+using OpenWorkEngine.OpenController.Lib.Filesystem;
 using OpenWorkEngine.OpenController.Lib.Graphql;
 using OpenWorkEngine.OpenController.Ports.Services;
+using OpenWorkEngine.OpenController.Workspaces.Services;
 using Serilog;
 
 namespace Makerverse {
@@ -36,7 +34,7 @@ namespace Makerverse {
       services.AddSingleton<SessionManager>();
       services.AddSingleton<ControllerManager>();
       services.AddSingleton<WorkspaceManager>();
-      services.AddTransient<MakerverseContext>();
+      services.AddTransient<OpenControllerContext>();
       services.AddScoped<IdentityService>();
       services.AddHttpContextAccessor();
       //
@@ -63,8 +61,8 @@ namespace Makerverse {
               .AddSocketSessionInterceptor<MakerverseSocketSessionInterceptor>()
               .AddHttpRequestInterceptor<MakerverseHttpRequestInterceptor>()
               .AddAuthorization()
-              .AddMakerverseSchema()
-              .TryAddSchemaInterceptor<SchemaSplitterInterceptor>()
+              .AddOpenControllerSchema()
+              // .TryAddSchemaInterceptor<SchemaSplitterInterceptor>()
               .AddErrorFilter<GraphqlErrorFilter>();
     }
 

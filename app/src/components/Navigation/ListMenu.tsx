@@ -13,11 +13,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCogs, faProjectDiagram, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { faUsb } from '@fortawesome/free-brands-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import {PortStatusFragment} from '../../api/graphql';
+import {PortStatusFragment} from '@openworkshop/lib/api/graphql';
 import ListMenuItem from './ListMenuItem';
-import {useSystemPorts} from '../../providers/SystemPortHooks';
-import WorkspaceStatus from '../Workspaces/WorkspaceStatus';
-import {useMakerverse, useMakerverseTrans} from '../../providers';
+import {useSystemPorts} from '@openworkshop/ui/open-controller/Ports';
+import {Workspace, WorkspaceStatus} from '@openworkshop/ui/open-controller/Workspaces/';
+import {useOpenController, useTrans} from '@openworkshop/ui/open-controller/Context';
 
 interface OwnProps {
   isOpen: boolean;
@@ -33,11 +33,11 @@ const useStyles = makeStyles((theme: Theme) =>
 const ListMenu: FunctionComponent<Props> = (props) => {
   const log = useLogger(ListMenu);
   const ports = useSystemPorts();
-  const t = useMakerverseTrans();
+  const t = useTrans();
   const portList: PortStatusFragment[] = Object.values(ports.portMap);
   const classes = useStyles();
-  const makerverse = useMakerverse();
-  const workspaces = _.sortBy(makerverse.workspaces, ws => ws.name.toLowerCase());
+  const makerverse = useOpenController();
+  const workspaces: Workspace[] = _.sortBy(makerverse.workspaces, ws => ws.name.toLowerCase());
   const showWorkspaces = makerverse.workspaces.length > 0;
   const iconStyle = { width: 24, height: 24, marginLeft: -2 };
 

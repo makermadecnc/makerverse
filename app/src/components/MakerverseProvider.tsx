@@ -5,27 +5,25 @@ import {Redirect, Route, Switch, useLocation, Link } from 'react-router-dom';
 import {useOpenWorkShop} from '@openworkshop/lib';
 import {
   StartupFragment,
-  MakerverseEssentialSettingsFragment,
-  MakerverseSessionFragment,
+  EssentialSettingsFragment,
+  OpenControllerSessionFragment,
   useWorkspaceChangeSubscription,
   WorkspaceFullFragment,
   WorkspaceState,
-} from '../api/graphql';
-import i18nConfig from '../config/i18n';
-import analytics from '../lib/analytics';
-import {IMakerverse, MakerverseContext} from '../lib/Makerverse';
-import { LoginPage, CallbackPage } from 'components/Login';
-import usePromise from 'react-promise-suspense';
+} from '@openworkshop/lib/api/graphql';
+import {
+  IOpenController,
+  BackendConnection,
+  OpenControllerContext
+} from '@openworkshop/ui/open-controller/Context';
+import { LoginPage, CallbackPage } from '../components/Login';
 import i18next, { StringMap } from 'i18next';
-import XHR from 'i18next-xhr-backend';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import { Workspace } from 'lib/workspaces';
-import {BackendConnection} from '../lib/Makerverse/apollo';
+import { Workspace } from '@openworkshop/ui/open-controller/Workspaces';
 import {AppState} from '../store/redux';
 import ProtectedApp from '../views/ProtectedApp';
 import { useSelector } from 'react-redux';
 import { User } from 'oidc-client';
-import SystemPortProvider from './SystemPortProvider';
+import SystemPortProvider from '@openworkshop/ui/open-controller/Ports/SystemPortProvider';
 
 const workspaceObjects: { [key: string]: Workspace } = {};
 
@@ -40,8 +38,8 @@ const MakerverseProvider: FunctionComponent<IProps> = (props) => {
   const { connection } = props;
   const location = useLocation();
   const [workspaceFragments, setWorkspaceFragments] = React.useState<WorkspaceFullFragment[]>([]);
-  const [settings, setSettings] = React.useState<MakerverseEssentialSettingsFragment | undefined>(undefined);
-  const [session, setSession] = React.useState<MakerverseSessionFragment | undefined>(undefined);
+  const [settings, setSettings] = React.useState<EssentialSettingsFragment | undefined>(undefined);
+  const [session, setSession] = React.useState<OpenControllerSessionFragment | undefined>(undefined);
 
   const user = useSelector<AppState, User | undefined>((state) => state.oidc.user);
 
@@ -102,15 +100,9 @@ const MakerverseProvider: FunctionComponent<IProps> = (props) => {
   }
 
   // Set up the IMakerverse interface for the .Provider...
-  const makerverse: IMakerverse = { ows, connection, session, workspaces, t };
+  const makerverse: IOpenController = { ows, connection, session, workspaces, t };
 
-  usePromise(async () => {
-    log.debug('loading...', ows);
-    await i18next.use(XHR).use(LanguageDetector).init(i18nConfig);
-    analytics.initialize(ows);
-  }, []);
-
-  function onLoaded(session: MakerverseSessionFragment, startup: StartupFragment) {
+  function onLoaded(session: OpenControllerSessionFragment, startup: StartupFragment) {
     log.debug('loaded', 'session', !!session, 'settings', !!startup);
     setSession(session);
     setSettings(startup.settings);
@@ -118,7 +110,7 @@ const MakerverseProvider: FunctionComponent<IProps> = (props) => {
   }
 
   return (
-    <MakerverseContext.Provider value={makerverse} >
+    <OpenControllerContext.Provider value={makerverse} >
       <SystemPortProvider >
         <Switch>
           <Route path='/login' component={LoginPage} />
@@ -135,7 +127,7 @@ const MakerverseProvider: FunctionComponent<IProps> = (props) => {
           </Route>}
         </Switch>
       </SystemPortProvider>
-    </MakerverseContext.Provider>
+    </OpenControllerContext.Provider>
   );
 };
 

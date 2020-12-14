@@ -1,15 +1,15 @@
 import * as React from 'react';
-import { useMakerverseTrans} from '../../providers';
+import { useTrans} from '@openworkshop/ui/open-controller/Context';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import ToolBar from './ToolBar';
 import { Tooltip, Fab, useTheme } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useStyles from './Styles';
-import {IHaveWorkspace} from '../../components/Workspaces';
-import {IHavePortStatus} from '../../components/Ports/types';
+import {IHaveWorkspace} from '@openworkshop/ui/open-controller/Workspaces';
+import {IHavePortStatus} from '@openworkshop/ui/open-controller/Ports';
 import WorkspaceBar from './WorkspaceBar';
-import GWiz from 'components/GWiz';
-import GcodeVisualizerProvider from '../../components/GWiz/GcodeVisualizerProvider';
+import GWiz from '@openworkshop/ui/open-controller/GWiz';
+import GcodeVisualizerProvider from '@openworkshop/ui/open-controller/GWiz/GcodeVisualizerProvider';
 import {useParams} from 'react-router-dom';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 
@@ -21,7 +21,7 @@ interface IParams {
 
 const Workspace: React.FunctionComponent<Props> = (props) => {
   const log = useLogger(Workspace);
-  const t = useMakerverseTrans();
+  const t = useTrans();
   const { workspace, port } = props;
   const theme = useTheme();
   const classes = useStyles();

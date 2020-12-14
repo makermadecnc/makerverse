@@ -1,10 +1,10 @@
 import * as owsStore from '@openworkshop/lib/store';
 import { Store } from 'redux';
-import {makerverseReducer} from '../lib/Makerverse/reducers';
-import {IMakerverseState} from '../lib/Makerverse/types';
+// import {makerverseReducer} from '../lib/Makerverse/reducers';
+// import {IMakerverseState} from '../lib/Makerverse/types';
 
 // The top-level state object
-export type AppState = owsStore.IOwsState & IMakerverseState;
+export type AppState = owsStore.IOwsState; // & IMakerverseState;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function configureStore(): Store<AppState> {
@@ -19,7 +19,7 @@ export default function configureStore(): Store<AppState> {
 
   return owsStore.configureStore<AppState>(
     {
-      makerverse: makerverseReducer,
+      // makerverse: makerverseReducer,
     },
     [ ],
     enhancers,

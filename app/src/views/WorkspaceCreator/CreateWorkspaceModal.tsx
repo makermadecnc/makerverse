@@ -16,24 +16,24 @@ import * as React from 'react';
 import CardDialog from '@openworkshop/ui/components/Cards/CardDialog';
 import useStyles from './Styles';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
-import analytics from 'lib/analytics';
+import analytics from '@openworkshop/ui/open-controller/analytics';
 import docs from '../../constants/docs';
 import {ICustomizedMachine} from '@openworkshop/lib/api/Machines/CustomizedMachine';
 import {slugify} from '@openworkshop/lib/utils';
-import {useSystemPorts} from '../../providers/SystemPortHooks';
-import PortStatus from '../../components/Ports/PortStatus';
+import {useSystemPorts} from '@openworkshop/ui/open-controller/Ports/SystemPortHooks';
+import PortStatus from '@openworkshop/ui/open-controller/Ports/PortStatus';
 import {OpenWorkShopIcon} from '@openworkshop/ui/components';
 import {
   MachinePartSettingsInput,
   MachineSettingSettingsInput,
   useCreateWorkspaceMutation,
   WorkspaceSettingsInput,
-} from '../../api/graphql';
+} from '@openworkshop/lib/api/graphql';
 import Colors from '@openworkshop/ui/themes/Colors';
 import {AxisName, MachinePartCompleteFragment, MachinePresetSettingPropsFragment} from '@openworkshop/lib/api/graphql';
 import {AlertList, IAlertMessage} from '@openworkshop/ui/components/Alerts';
 import {Redirect} from 'react-router-dom';
-import {useMakerverseTrans} from '../../providers';
+import {useTrans} from '@openworkshop/ui/open-controller/Context';
 import {normalizeAxisName} from '@openworkshop/lib/api/Machines/AxisName';
 
 type Props = {
@@ -45,7 +45,7 @@ type Props = {
 
 const CreateWorkspaceModal: React.FunctionComponent<Props> = (props) => {
   const log = useLogger(CreateWorkspaceModal);
-  const t = useMakerverseTrans();
+  const t = useTrans();
   const { open, onClose, machine, portName } = props;
   const ports = useSystemPorts();
   const port = portName ? ports.portMap[portName] : undefined;

@@ -1,15 +1,15 @@
 import _ from 'lodash';
 import { ButtonGroup, Button, Paper, Grid } from '@material-ui/core';
 import * as React from 'react';
-import {IHaveWorkspace} from 'components/Workspaces';
+import {IHaveWorkspace} from '@openworkshop/ui/open-controller/Workspaces';
 import useStyles from './Styles';
 import clsx from 'clsx';
-import {useMakerverseTrans, useWindowSize} from '../../providers';
+import {useTrans, useWindowSize} from '@openworkshop/ui/open-controller/Context';
 import {OpenWorkShopIcon} from '@openworkshop/ui/components';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import ToolPane from './ToolPane';
 import {Route, Switch, useHistory} from 'react-router-dom';
-import {IToolGroup} from '../../components/Tools';
+import {IToolGroup} from '@openworkshop/ui/open-controller/Tools';
 
 type Props = IHaveWorkspace & {
   selectedToolGroupId?: string;
@@ -18,7 +18,7 @@ type Props = IHaveWorkspace & {
 const ToolBar: React.FunctionComponent<Props> = (props) => {
   const log = useLogger(ToolBar);
   const classes = useStyles();
-  const t = useMakerverseTrans();
+  const t = useTrans();
   const { workspace, selectedToolGroupId } = props;
   const history = useHistory();
   // const [selectedToolId, setSelectedToolId] = React.useState<string | undefined>(undefined);

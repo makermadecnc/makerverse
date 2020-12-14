@@ -1,15 +1,13 @@
 import React, {FunctionComponent, ReactNode} from 'react';
-import {useSystemPorts} from '../../providers/SystemPortHooks';
-import {useWorkspace, useWorkspaceEvent} from '../../providers';
+import {useSystemPorts} from '@openworkshop/ui/open-controller/Ports';
+import {useWorkspace, useWorkspaceEvent} from '@openworkshop/ui/open-controller/Context';
 import {
   WorkspaceState
-} from '../../api/graphql';
+} from '@openworkshop/lib/api/graphql';
 import WorkspaceConnector from './WorkspaceConnector';
-import {WorkspaceEventType} from '../../lib/workspaces/types';
-import ControllerProvider from '../../providers/ControllerProvider';
+import {WorkspaceEventType} from '@openworkshop/ui/open-controller/Workspaces/types';
+import ControllerProvider from '@openworkshop/ui/open-controller/Controllers/ControllerProvider';
 import Workspace from './Workspace';
-import { Grid } from '@material-ui/core';
-import WorkBar from 'components/WorkBar';
 
 interface OwnProps {
   id: string;

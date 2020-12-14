@@ -1,4 +1,4 @@
-import { parseSemver } from 'lib/semvers';
+import { parseSemver } from '@openworkshop/ui/open-controller/semvers';
 import pkg from '../../package.json';
 
 const webroot = '/';

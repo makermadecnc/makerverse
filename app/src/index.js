@@ -10,8 +10,8 @@ import { initReactI18next } from 'react-i18next';
 import { ThemeProvider } from '@material-ui/core';
 import usePromise from 'react-promise-suspense';
 import theme from '@openworkshop/ui/themes/Makerverse';
-import {BackendConnection} from "./lib/Makerverse/apollo";
-import MakerverseProvider from './providers/MakerverseProvider';
+import {BackendConnection} from "@openworkshop/ui/open-controller/Context/apollo";
+import MakerverseProvider from './components/MakerverseProvider';
 import auth from './lib/auth';
 
 // Create browser history to use in the Redux store

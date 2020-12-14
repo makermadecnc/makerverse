@@ -1,15 +1,15 @@
 import * as React from 'react';
 import ThreeColumns from '@openworkshop/ui/components/Layout/ThreeColumns';
 import ToolbarCard from '@openworkshop/ui/components/Cards/ToolbarCard';
-import PortConnectionSteps from '../../components/Ports/PortConnectionSteps';
-import {IHaveWorkspaceId} from '../../components/Workspaces';
-import {useWorkspace, useSystemPorts} from '../../providers';
+import PortConnectionSteps from '@openworkshop/ui/open-controller/Ports/PortConnectionSteps';
+import {IHaveWorkspaceId} from '@openworkshop/ui/open-controller/Workspaces';
+import {useWorkspace} from '@openworkshop/ui/open-controller/Context';
 import { Grid } from '@material-ui/core';
-import {IMaybeHavePortStatus} from '../../components/Ports/types';
+import {IMaybeHavePortStatus} from '@openworkshop/ui/open-controller/Ports/types';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import OpenWorkspaceButton from './OpenWorkspaceButton';
-import WorkBar from '../../components/WorkBar';
 import WorkspaceBar from './WorkspaceBar';
+import {useSystemPorts} from '@openworkshop/ui/open-controller/Ports';
 
 type Props = IHaveWorkspaceId & IMaybeHavePortStatus;
 

@@ -7,18 +7,18 @@ import { User } from 'oidc-client';
 import React, { FunctionComponent } from 'react';
 import { Link } from 'react-router-dom';
 import { CallbackComponent } from 'redux-oidc';
-import analytics from '../../lib/analytics';
+import analytics from '@openworkshop/ui/open-controller/analytics';
 import ReconnectRedirect from '../Navigation/ReconnectRedirect';
 import useStyles from './Styles';
-import {useMakerverse, useMakerverseTrans} from '../../providers';
+import {useOpenController, useTrans} from '@openworkshop/ui/open-controller/Context';
 
 type Props = {
 
 };
 
 const CallbackPage: FunctionComponent<Props> = () => {
-  const makerverse = useMakerverse();
-  const t = useMakerverseTrans();
+  const makerverse = useOpenController();
+  const t = useTrans();
   const log = useLogger(CallbackPage);
   const classes = useStyles();
   const [error, setError] = React.useState<Error | undefined>(undefined);

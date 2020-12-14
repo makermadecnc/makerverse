@@ -1,4 +1,0 @@
-fragment AlertError on AlertError {
-    name
-    message
-}

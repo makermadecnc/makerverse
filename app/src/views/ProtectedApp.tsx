@@ -5,22 +5,22 @@ import React from 'react';
 import {Link } from 'react-router-dom';
 import {
   StartupFragment,
-  MakerverseSessionFragment,
+  OpenControllerSessionFragment,
   useStartupQuery,
-} from '../api/graphql';
+} from '@openworkshop/lib/api/graphql';
 import App from './App';
 import {AlertDialog} from '@openworkshop/ui/components/Alerts';
-import {useMakerverseTrans} from '../providers';
+import {useTrans} from '@openworkshop/ui/open-controller/Context';
 
 interface IProps {
   token: string;
   currentWorkspaceId?: string;
-  onLoaded: (u: MakerverseSessionFragment, s: StartupFragment) => void;
+  onLoaded: (u: OpenControllerSessionFragment, s: StartupFragment) => void;
 }
 
 const ProtectedApp: React.FunctionComponent<IProps> = (props) => {
   const log = useLogger(ProtectedApp);
-  const t = useMakerverseTrans();
+  const t = useTrans();
   const { onLoaded, currentWorkspaceId, token } = props;
   const [ dataError, setDataError ] = React.useState<Error | undefined>(undefined);
   const { loading, data, error } = useStartupQuery({ variables: { token: token ?? '' }});

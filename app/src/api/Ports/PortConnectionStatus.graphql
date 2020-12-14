@@ -1,8 +1,0 @@
-fragment PortIOStatus on PortStatus {
-    bytesToRead
-    bytesToWrite
-    charactersRead
-    charactersWritten
-    linesRead
-    linesWritten
-}

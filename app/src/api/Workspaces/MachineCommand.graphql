@@ -1,6 +1,0 @@
-
-fragment MachineCommand on MachineCommandSettings {
-    id
-    name
-    value
-}

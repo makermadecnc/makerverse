@@ -1,11 +1,11 @@
 import {Grid} from '@material-ui/core';
-import WorkBar from 'components/WorkBar';
+import WorkBar from '@openworkshop/ui/open-controller/WorkBar';
 import * as React from 'react';
-import {tryUseController} from '../../providers';
-import {IHaveWorkspace} from '../../components/Workspaces';
-import {IMaybeHavePortStatus} from '../../components/Ports/types';
-import {tryUseGcodeVisualizer} from '../../components/GWiz';
-import {WorkspaceState} from '../../api/graphql';
+import {tryUseController} from '@openworkshop/ui/open-controller/Controllers';
+import {IHaveWorkspace} from '@openworkshop/ui/open-controller/Workspaces';
+import {IMaybeHavePortStatus} from '@openworkshop/ui/open-controller/Ports/types';
+import {tryUseGcodeVisualizer} from '@openworkshop/ui/open-controller/GWiz';
+import {WorkspaceState} from '@openworkshop/lib/api/graphql';
 
 type Props = IHaveWorkspace & IMaybeHavePortStatus & {
  children: React.ReactNode;

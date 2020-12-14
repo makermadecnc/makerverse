@@ -1,9 +1,9 @@
 import { Typography } from '@material-ui/core';
 import React, { FunctionComponent } from 'react';
-import {useMakerverseTrans} from '../../providers';
+import {useTrans} from '@openworkshop/ui/open-controller/Context';
 
 const NotFound: FunctionComponent = () => {
-  const t = useMakerverseTrans();
+  const t = useTrans();
 
   return (<div style={{ padding: 10 }}>
     <Typography variant="h4" >{t('Not Found')}</Typography>

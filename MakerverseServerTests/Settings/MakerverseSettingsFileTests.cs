@@ -1,9 +1,10 @@
 using System.Linq;
 using FluentAssertions;
-using Makerverse.Api.Settings.Models;
-using Makerverse.Api.Workspaces.Models;
 using Newtonsoft.Json.Linq;
+using OpenWorkEngine.OpenController.Identity.Models;
 using OpenWorkEngine.OpenController.MachineProfiles.Enums;
+using OpenWorkEngine.OpenController.Settings.Models;
+using OpenWorkEngine.OpenController.Workspaces.Models;
 using Serilog;
 using Xunit;
 using Xunit.Abstractions;
@@ -38,14 +39,14 @@ namespace MakerverseServerTests {
         !string.IsNullOrWhiteSpace(ws.Path) && ValidateConnection(ws.Connection);
     }
 
-    private bool ValidateUser(MakerverseUser u) {
+    private bool ValidateUser(OpenControllerUser u) {
       return !string.IsNullOrWhiteSpace(u.Username) && u.Tokens.Count > 0;
     }
 
     [Theory]
     [JsonFileData("makerverse112.json")]
     public void CanLoadLegacy(JObject obj) {
-      MakerverseSettings settings = new();
+      OpenControllerSettings settings = new();
       settings.LoadSettings(obj);
 
       settings.FileSystem.ProgramDirectory.Should().NotBeEmpty();

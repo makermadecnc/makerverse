@@ -4,7 +4,7 @@ import React, { FunctionComponent } from 'react';
 import settings from '../../config/settings';
 import useStyles from './Styles';
 import UserMenu from './UserMenu';
-import {IMaybeHaveWorkspace} from '../Workspaces';
+import {IMaybeHaveWorkspace} from '@openworkshop/ui/open-controller/Workspaces';
 
 interface OwnProps {
   toggleDrawerOpen: () => void;

@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import usePromise from 'react-promise-suspense';
 import { Redirect } from 'react-router-dom';
-import {useMakerverse} from '../../providers';
+import {useOpenController} from '@openworkshop/ui/open-controller/Context';
 
 interface OwnProps {
   to: string;
@@ -10,7 +10,7 @@ interface OwnProps {
 type Props = OwnProps;
 
 const ReconnectRedirect: FunctionComponent<Props> = (props) => {
-  const makerverse = useMakerverse();
+  const makerverse = useOpenController();
   const { connection } = makerverse;
 
   usePromise(async () => await connection.reconnect(), [connection]);

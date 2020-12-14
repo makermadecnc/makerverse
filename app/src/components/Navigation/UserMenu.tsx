@@ -5,13 +5,12 @@ import {useOpenWorkShop} from '@openworkshop/lib';
 import {useNetworkStatus} from '@openworkshop/lib/utils/device';
 import useLogger from '@openworkshop/lib/utils/logging/UseLogger';
 import React, {FunctionComponent} from 'react';
-import {useBackendConnectionState, useMakerverse, useMakerverseTrans} from '../../providers';
-import {ConnectionState} from '../../lib/Makerverse/apollo';
+import {useBackendConnectionState, useOpenController, useTrans, ConnectionState} from '@openworkshop/ui/open-controller/Context';
 
 const UserMenu: FunctionComponent = () => {
   const log = useLogger(UserMenu);
-  const makerverse = useMakerverse();
-  const t = useMakerverseTrans();
+  const makerverse = useOpenController();
+  const t = useTrans();
   const { isOnline } = useNetworkStatus();
   // const history = useHistory();
   const ows = useOpenWorkShop();
