@@ -1,8 +1,8 @@
-# branches:
-#   # PRs are always built. So we exclude branch builds other than master to prevent double-builds.
-#   # https://stackoverflow.com/questions/31882306/how-to-configure-travis-ci-to-build-pull-requests-merges-to-master-w-o-redunda
-#   only:
-#     - master
+branches:
+  # PRs are always built. So we exclude branch builds other than master to prevent double-builds.
+  # https://stackoverflow.com/questions/31882306/how-to-configure-travis-ci-to-build-pull-requests-merges-to-master-w-o-redunda
+  only:
+    - master
 
 # Job queue; see below for default job settings.
 jobs:
@@ -93,7 +93,7 @@ jobs:
   - scripts/add-osx-cert.sh
   script:
   - npm run build-latest
-  - npm run build:mac-x64
+  - travis_wait npm run build:mac-x64
 
 # [Job] Windows (Electron App)
 # - name: "Windows"
