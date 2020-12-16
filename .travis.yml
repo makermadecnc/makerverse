@@ -88,7 +88,7 @@ jobs:
 # [Job] MacOS (Electron App)
 - name: "MacOS"
   os: osx
-  osx_image: xcode8.3
+  osx_image: xcode12.2
   before_install:
   - scripts/add-osx-cert.sh
   script:
