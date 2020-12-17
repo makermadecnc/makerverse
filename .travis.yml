@@ -93,7 +93,7 @@ jobs:
   - scripts/add-osx-cert.sh
   script:
   - npm run build-latest
-  - travis_wait npm run build:mac-x64
+  - travis_wait 50 npm run build:mac-x64
 
 # [Job] Windows (Electron App)
 # - name: "Windows"
@@ -127,7 +127,6 @@ env:
     - RELEASE_FILE="makerverse-${CI_SEMVER}"
     - LAST_COMMIT_DATE=`git log -1 --pretty=%cD`
     - PUBLISH_FOR_PULL_REQUEST=true
-    - CSC_FOR_PULL_REQUEST=true
 
 cache:
   directories:
