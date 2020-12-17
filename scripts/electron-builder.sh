@@ -1,4 +1,4 @@
-#!/bin/bash
+-#!/bin/bash
 
 __dirname="$(CDPATH= cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 root="${__dirname}/../"
@@ -34,15 +34,6 @@ if [ ! -z "$CI_VERSION" ]; then
   # Force rebuild modules on CI
   echo "Cleaning up \"`pwd`/node_modules\""
   rm -rf node_modules
-
-  if [ "$1" = "--mac" ]; then
-    # https://github.com/electron-userland/electron-builder/issues/398
-    security import "scripts/certs/Certum-Code-Signing-CA-SHA2.cer" -k ~/Library/Keychains/login.keychain -T /usr/bin/codesign;
-    # https://github.com/electron-userland/electron-osx-sign/issues/83
-    # Temporarily Bypass Gatekeeper
-    sudo spctl --master-disable;
-    sudo spctl --status;
-  fi
 fi
 echo "Installing packages..."
 npm install --production
