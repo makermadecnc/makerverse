@@ -17,9 +17,9 @@
 
   <ItemGroup>
     <PackageReference Include="ElectronNET.API" Version="9.31.2" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.0" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.8" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.1" />
     <PackageReference Include="SemanticVersion" Version="2.1.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.1-dev-00188" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0-dev-00761" />
@@ -62,6 +62,8 @@
     <Content Remove="MakerverseServerTests\**" />
     <None Remove="logs\**" />
     <Content Remove="logs\**" />
+    <None Remove="App\**" />
+    <Content Remove="App\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -83,12 +85,59 @@
     <EmbeddedResource Remove="dist\**" />
     <EmbeddedResource Remove="MakerverseServerTests\**" />
     <EmbeddedResource Remove="logs\**" />
+    <EmbeddedResource Remove="App\**" />
   </ItemGroup>
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="output\**" />
     <_ContentIncludedByDefault Remove="dist\**" />
     <_ContentIncludedByDefault Remove="logs\**" />
+    <_ContentIncludedByDefault Remove="App\.prettierrc.json" />
+    <_ContentIncludedByDefault Remove="App\package.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\cs\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\cs\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\cs\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\de\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\de\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\de\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\en\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\en\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\en\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\es\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\es\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\es\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\fr\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\fr\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\fr\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\hu\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\hu\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\hu\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\it\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\it\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\it\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\ja\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\ja\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\ja\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\nl\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\nl\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\nl\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\pt-br\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\pt-br\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\pt-br\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\ru\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\ru\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\ru\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\tr\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\tr\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\tr\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\zh-cn\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\zh-cn\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\zh-cn\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\zh-tw\controller.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\zh-tw\gcode.json" />
+    <_ContentIncludedByDefault Remove="App\public\i18n\zh-tw\resource.json" />
+    <_ContentIncludedByDefault Remove="App\public\manifest.json" />
+    <_ContentIncludedByDefault Remove="App\tsconfig.json" />
   </ItemGroup>
 
   <ItemGroup>

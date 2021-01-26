@@ -1,5 +1,5 @@
 import { IOpenControllerPackage } from '@openworkshop/ui/open-controller';
-import { parseSemver } from '@openworkshop/ui/open-controller/semvers';
+import { parseSemver } from '@openworkshop/ui/utils/semvers';
 import devDeployment from '@openworkshop/ui/deployment';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require('../package.json');

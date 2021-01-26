@@ -12,7 +12,6 @@
     "@babel/runtime": "~7.4.3",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.18.3",
-    "chalk": "~2.4.2",
     "commander": "~2.20.0",
     "compression": "~1.7.4",
     "connect-multiparty": "~2.2.0",
