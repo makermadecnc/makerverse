@@ -96,20 +96,20 @@ class TableRecords extends PureComponent {
                     },
                     {
                         title: i18n._('Controller'),
-                        key: 'controller',
+                        key: 'firmware',
                         render: (value, row, index) => {
                             return (
                                 <FlexContainer fluid gutterWidth={0}>
                                     <Row>
                                         <Col width="auto">
                                             <div>
-                                                {`Type = ${_get(row, 'controller.controllerType')}`}
+                                                {`Type = ${_get(row, 'firmware.controllerType')}`}
                                             </div>
                                             <div>
-                                                {`Port = ${_get(row, 'controller.port')}`}
+                                                {`Port = ${_get(row, 'firmware.port')}`}
                                             </div>
                                             <div>
-                                                {`Baud Rate = ${_get(row, 'controller.baudRate')}`}
+                                                {`Baud Rate = ${_get(row, 'firmware.baudRate')}`}
                                             </div>
                                         </Col>
                                     </Row>

@@ -77,7 +77,7 @@ class CustomizeWorkspace extends React.PureComponent {
         const { autoReconnect, preferImperial } = this.state;
         const { actions, connectionStatus, workspaceSettings } = this.props;
 
-        const icons = ['xyz', 'maslow', '3dp', 'cnc'];
+        const icons = ['xyz', 'maslow', '3dp', 'cnc', 'makermade'];
         // const color = workspaceSettings.color || Workspaces.defaultColor;
         const bkColor = workspaceSettings.bkColor || Workspaces.defaultBkColor;
         const icon = workspaceSettings.icon || Workspaces.defaultIcon;
@@ -139,7 +139,6 @@ class CustomizeWorkspace extends React.PureComponent {
                                         searchable={false}
                                         value={icon}
                                         valueRenderer={this.renderIcon}
-                                        // disabled={disabled}
                                     />
                                 </div>
                                 <div className={styles.widgetControl} >
@@ -151,7 +150,7 @@ class CustomizeWorkspace extends React.PureComponent {
                                     />
                                 </div>
                                 <div style={{ marginTop: 20 }}>
-                                    <div className="checkbox">
+                                    <div className="checkbox-setting">
                                         <label>
                                             <input
                                                 type="checkbox"
@@ -161,7 +160,7 @@ class CustomizeWorkspace extends React.PureComponent {
                                             {i18n._('Connect automatically')}
                                         </label>
                                     </div>
-                                    <div className="checkbox">
+                                    <div className="checkbox-setting">
                                         <label>
                                             <input
                                                 type="checkbox"

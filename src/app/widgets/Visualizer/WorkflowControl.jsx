@@ -15,9 +15,7 @@ import {
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
-import {
-    MODAL_WATCH_DIRECTORY
-} from './constants';
+//import { MODAL_WATCH_DIRECTORY} from './constants';
 import styles from './workflow-control.styl';
 import AlertErrorToast from './AlertErrorToast';
 
@@ -184,7 +182,7 @@ class WorkflowControl extends PureComponent {
     }
 
     render() {
-        const { state, actions } = this.props;
+        const { state } = this.props;
         const { controller } = state;
         const activeState = this.workspace.activeState;
         activeState.updateControllerState(controller.state);
@@ -222,30 +220,6 @@ class WorkflowControl extends PureComponent {
                         >
                             {i18n._('Upload Program')}
                         </button>
-                        <Dropdown
-                            id="upload-dropdown"
-                        >
-                            <Dropdown.Toggle
-                                bsStyle="primary"
-                                noCaret
-                            >
-                                <i className="fa fa-caret-down" />
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <MenuItem header>
-                                    {i18n._('Watch Directory')}
-                                </MenuItem>
-                                <MenuItem
-                                    onSelect={() => {
-                                        actions.openModal(MODAL_WATCH_DIRECTORY);
-                                    }}
-                                >
-                                    <i className="fa fa-search" />
-                                    <Space width="4" />
-                                    {i18n._('Browse...')}
-                                </MenuItem>
-                            </Dropdown.Menu>
-                        </Dropdown>
                     </div>
                     <div className="btn-group btn-group-sm">
                         {this.renderButtonFeature('cyclestart', null, playPauseText, 'fa-play', 'success', !canPlay)}
