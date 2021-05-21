@@ -8,6 +8,7 @@ RUN apt-get update -y && \
   apt-get -y autoclean
 
 # Install Docker, for access within the container.
+ENV VERSION=19.03.15
 RUN curl -sSL https://get.docker.com | sh
 RUN usermod -aG docker node
 
