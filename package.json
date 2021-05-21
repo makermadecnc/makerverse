@@ -291,7 +291,6 @@
     "coveralls": "~3.0.3",
     "cross-env": "~5.2.0",
     "css-loader": "~2.1.1",
-    "css-split-webpack-plugin": "~0.2.6",
     "dotenv": "~7.0.0",
     "electron": "~4.2.12",
     "electron-builder": "~22.4.0",
