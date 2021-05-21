@@ -216,6 +216,7 @@
     "oidc-client": "^1.10.1",
     "opencollective": "~1.0.3",
     "perfect-scrollbar": "~1.4.0",
+    "postcss": "^8.2.15",
     "prop-types": "~15.7.2",
     "pubsub-js": "~1.7.0",
     "push.js": "~1.0.9",
