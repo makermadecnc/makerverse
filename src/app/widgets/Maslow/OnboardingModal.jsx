@@ -66,6 +66,8 @@ class OnboardingModal extends React.PureComponent {
                 <i>{i18n._('Or, have you installed new firmware?')}</i>
                 <hr />
                 {i18n._('Selecting "yes" will reset (erase) and apply reccomended settings.')}
+                <br/>
+                {i18n._('Select "no" if your machine has already been calibrated.')}
             </div>
         );
     }

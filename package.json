@@ -1,6 +1,6 @@
 {
   "name": "makerverse",
-  "version": "1.1.0-dev",
+  "version": "1.1.3-laser",
   "description": "A web-based interface for CNC milling controller.",
   "homepage": "https://github.com/makermadecnc/makerverse",
   "author": "Maker Made <info@makermade.com>",
@@ -216,6 +216,7 @@
     "oidc-client": "^1.10.1",
     "opencollective": "~1.0.3",
     "perfect-scrollbar": "~1.4.0",
+    "postcss": "^8.2.15",
     "prop-types": "~15.7.2",
     "pubsub-js": "~1.7.0",
     "push.js": "~1.0.9",
@@ -291,7 +292,6 @@
     "coveralls": "~3.0.3",
     "cross-env": "~5.2.0",
     "css-loader": "~2.1.1",
-    "css-split-webpack-plugin": "~0.2.6",
     "dotenv": "~7.0.0",
     "electron": "~4.2.12",
     "electron-builder": "~22.4.0",

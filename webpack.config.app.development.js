@@ -1,5 +1,5 @@
 const path = require('path');
-const CSSSplitWebpackPlugin = require('css-split-webpack-plugin').default;
+//const CSSSplitWebpackPlugin = require('css-split-webpack-plugin').default;
 const dotenv = require('dotenv');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const without = require('lodash/without');
@@ -168,12 +168,12 @@ module.exports = {
             filename: `[name].css?_=${timestamp}`,
             chunkFilename: `[id].css?_=${timestamp}`
         }),
-        new CSSSplitWebpackPlugin({
+        /*new CSSSplitWebpackPlugin({
             size: 4000,
             imports: '[name].[ext]?[hash]',
             filename: '[name]-[part].[ext]?[hash]',
             preserve: false
-        }),
+        }),*/
         new HtmlWebpackPlugin({
             filename: 'index.hbs',
             template: path.resolve(__dirname, 'index.hbs'),

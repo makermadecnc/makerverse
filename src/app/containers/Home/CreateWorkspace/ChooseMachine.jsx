@@ -216,6 +216,7 @@ class ChooseMachine extends React.PureComponent {
 
     render() {
         const { machineProfiles } = this.props;
+        console.log('machine profiles', machineProfiles);
         const {
             selectedMachineProfileId,
             selectedMachineCategory,
