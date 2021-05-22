@@ -89,8 +89,8 @@ jobs:
 - name: "MacOS"
   os: osx
   osx_image: xcode12.2
-  before_install:
-  - scripts/add-osx-cert.sh
+  # before_install:
+  # - scripts/add-osx-cert.sh
   script:
   - npm run build-latest
   - travis_wait 50 npm run build:mac-x64
