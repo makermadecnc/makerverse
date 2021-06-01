@@ -18,18 +18,14 @@
       "dom"
     ],
     "skipLibCheck": true,
-    "rootDir": "src",
-    "baseUrl": "src",
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": "."
   },
   "include": [
     "src"
   ],
   "exclude": [
-    "node_modules"
-  ],
-  "references": [
-    {"path": "../../npm-packages/lib"},
-    {"path": "../../npm-packages/ui"}
+    "node_modules",
+    "dist"
   ]
 }

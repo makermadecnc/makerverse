@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
-using OpenWorkEngine.OpenController;
-using OpenWorkEngine.OpenController.Identity.Services;
-using OpenWorkEngine.OpenController.Lib.Api;
-using OpenWorkEngine.OpenController.Lib.Filesystem;
+using OpenWorkShop.MakerHub;
+using OpenWorkShop.MakerHub.Identity.Services;
+using OpenWorkShop.MakerHub.Lib.Api;
+using OpenWorkShop.MakerHub.Lib.Filesystem;
 using Serilog;
 
 namespace Makerverse {
@@ -27,19 +27,19 @@ namespace Makerverse {
       services.AddSpaStaticFiles(configuration => {
         configuration.RootPath = "App/build";
       });
-      services.AddOpenControllerServices();
+      services.AddMakerHubServices();
       services.AddAuthentication();
       services.AddAuthorization(opts => {
-        opts.AddOpenControllerPolicies();
+        opts.AddMakerHubPolicies();
       });
-      services.AddOpenControllerGraphQLServer();
+      services.AddMakerHubGraphQLServer();
     }
 
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
-      ConfigFile? sf = app.ApplicationServices.GetService<ConfigFile>();
-      Log.Information("[CONFIG] load filename: {sf}", sf);
+      // ConfigFile? sf = app.ApplicationServices.GetService<ConfigFile>();
+      // Log.Information("[CONFIG] load filename: {sf}", sf);
 
       app.UseExceptionHandler(new ExceptionHandlerOptions {
         ExceptionHandler = new ApiExceptionMiddleware().Invoke

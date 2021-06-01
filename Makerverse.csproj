@@ -15,6 +15,11 @@
     <LangVersion>9</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>bin/Debug/</OutputPath>
+    <InformationalVersion>Debug</InformationalVersion>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="ElectronNET.API" Version="9.31.2" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.8" />
@@ -32,13 +37,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <ProjectReference Include="..\OpenController\OpenController.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(BuildingInsideVisualStudio)'=='true'">
-    <Reference Include="OpenController, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>Plugins\$(Configuration)\OpenController.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\MakerHub\MakerHub.csproj" />
+    <Watch Remove="..\..\MakerHub\Generated\**" />
   </ItemGroup>
 
   <ItemGroup>

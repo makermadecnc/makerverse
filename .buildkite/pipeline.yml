@@ -1,0 +1,14 @@
+steps:
+  - command: "./.buildkite/build.sh"
+    label: ":docker: :hammer:"
+    agents:
+      geo: "co"
+      arch: "amd64"
+
+  - block: "Release?"
+
+  - command: "./.buildkite/push.sh"
+    label: ":docker: ${PRODUCT_NAME}:${DOCKER_BUILD_TAG} :rocket:"
+    agents:
+      geo: "co"
+      arch: "amd64"

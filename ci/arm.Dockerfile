@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /app
 
 # Install NPM
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_15.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && echo "node version: $(node --version)" \
     && echo "npm version: $(npm --version)" \
