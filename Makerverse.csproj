@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
@@ -14,13 +13,17 @@
     <Nullable>enable</Nullable>
     <LangVersion>9</LangVersion>
   </PropertyGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\..\MakerHub\MakerHub.csproj" />
+    <Watch Remove="..\..\MakerHub\Generated\**" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <OutputPath>bin/Debug/</OutputPath>
     <InformationalVersion>Debug</InformationalVersion>
   </PropertyGroup>
-
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.4" />
+    <PackageReference Include="Datadog.Trace" Version="1.26.3" />
     <PackageReference Include="ElectronNET.API" Version="11.5.1" />
     <PackageReference Include="EntityFramework" Version="7.0.0-beta4" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="11.2.2" />
@@ -41,7 +44,11 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+    <PackageReference Include="MySqlConnector" Version="1.3.9" />
     <PackageReference Include="ObjectsComparer" Version="1.4.1" />
+    <PackageReference Include="OpenTelemetry" Version="1.0.1" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0" />
+    <PackageReference Include="SendGrid" Version="9.23.2" />
     <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0-dev-00761" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2-dev-00741" />
@@ -49,115 +56,13 @@
     <PackageReference Include="Serilog.Exceptions" Version="6.1.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0-dev-00839" />
+    <PackageReference Include="Serilog.Sinks.Datadog.Logs" Version="0.3.4" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <ProjectReference Include="..\..\MakerHub\MakerHub.csproj" />
-    <Watch Remove="..\..\MakerHub\Generated\**" />
-  </ItemGroup>
 
   <ItemGroup>
-    <!-- Don't publish the SPA source files, but do show them in the project files list -->
     <Content Remove="$(SpaRoot)**" />
     <None Remove="$(SpaRoot)**" />
-    <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
-    <None Remove="output\**" />
-    <Content Remove="output\**" />
-    <None Include="App\public\i18n\cs\controller.json" />
-    <None Include="App\public\i18n\cs\gcode.json" />
-    <None Remove="src\**" />
-    <Content Remove="src\**" />
-    <None Remove="server\**" />
-    <Content Remove="server\**" />
-    <None Remove="electron-build\**" />
-    <Content Remove="electron-build\**" />
-    <None Remove="dist\**" />
-    <Content Remove="dist\**" />
-    <None Remove="MakerverseServerTests\**" />
-    <Content Remove="MakerverseServerTests\**" />
-    <None Remove="logs\**" />
-    <Content Remove="logs\**" />
-    <None Remove="App\**" />
-    <Content Remove="App\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="App\**" />
-    <Compile Remove="output\**" />
-    <Compile Remove="src\**" />
-    <Compile Remove="server\**" />
-    <Compile Remove="electron-build\**" />
-    <Compile Remove="dist\**" />
-    <Compile Remove="MakerverseServerTests\**" />
-    <Compile Remove="logs\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Remove="output\**" />
-    <EmbeddedResource Remove="src\**" />
-    <EmbeddedResource Remove="server\**" />
-    <EmbeddedResource Remove="electron-build\**" />
-    <EmbeddedResource Remove="dist\**" />
-    <EmbeddedResource Remove="MakerverseServerTests\**" />
-    <EmbeddedResource Remove="logs\**" />
-    <EmbeddedResource Remove="App\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="output\**" />
-    <_ContentIncludedByDefault Remove="dist\**" />
-    <_ContentIncludedByDefault Remove="logs\**" />
-    <_ContentIncludedByDefault Remove="App\.prettierrc.json" />
-    <_ContentIncludedByDefault Remove="App\package.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\cs\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\cs\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\cs\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\de\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\de\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\de\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\en\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\en\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\en\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\es\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\es\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\es\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\fr\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\fr\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\fr\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\hu\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\hu\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\hu\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\it\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\it\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\it\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\ja\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\ja\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\ja\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\nl\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\nl\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\nl\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\pt-br\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\pt-br\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\pt-br\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\ru\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\ru\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\ru\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\tr\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\tr\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\tr\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\zh-cn\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\zh-cn\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\zh-cn\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\zh-tw\controller.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\zh-tw\gcode.json" />
-    <_ContentIncludedByDefault Remove="App\public\i18n\zh-tw\resource.json" />
-    <_ContentIncludedByDefault Remove="App\public\manifest.json" />
-    <_ContentIncludedByDefault Remove="App\tsconfig.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <TypeScriptCompile Include="App\src\**\*.ts" />
-    <TypeScriptCompile Include="App\src\**\*.tsx" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
@@ -167,14 +72,12 @@
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
     <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn install" />
   </Target>
-
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
-    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
-
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn run build" />
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>
       <DistFiles Include="$(SpaRoot)build\**; $(SpaRoot)build-ssr\**" />
@@ -185,5 +88,12 @@
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
-
+  <ItemGroup>
+    <Content Update="electron.manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="src\package.json" />
+  </ItemGroup>
 </Project>

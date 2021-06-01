@@ -14,15 +14,18 @@ RUN npm install --global yarn
 
 # Copy csproj and restore as distinct layers
 COPY *.csproj ./
-#COPY NuGet.config ./
 RUN dotnet restore
 
 # Copy everything else and buil
 COPY . ./
+RUN cd App && yarn install && cd ../
 RUN dotnet publish -c Release -o out --no-restore
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
+
+# Runtime dependencies...
+RUN apt-get -y update && apt-get install -y procps
 
 WORKDIR /app
 COPY --from=build-env /app/out .

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "target": "es6",
+    "module": "esnext",
+    "declaration": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "composite": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "importHelpers": true,
+    "jsx": "react",
+    "paths": {
+      "@makerverse/core/*": ["./src"]
+    }
+  }
+}
