@@ -9,5 +9,6 @@ makerHubMain(
       version: getDevSemver(),
     },
     { organization: 'openworkshop', product: 'maker-hub' },
-  )
+  ),
+  () => null
 );

@@ -7,7 +7,7 @@
   "author": "Maker Made <info@makermade.com>",
   "license": "MIT",
   "dependencies": {
-    "@openworkshop/maker-hub": "^0.0.5",
+    "@openworkshop/maker-hub": "^0.0.8",
     "@apollo/client": "^3.3.6",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^11.3.0",
