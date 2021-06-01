@@ -5,11 +5,25 @@ apt-get -y install wget gpg
 
 # https://github.com/drud/ddev/issues/2772
 
+if [ $BUILDKITE_AGENT_META_DATA_ARCH == "arm64v8" ]; then
+  export DOTNET_ARCH="arm64v8"
+  export DOTNET_RID="linux-arm64"
+  export BUILDAH_ARCH="Raspbian"
+elif [ $BUILDKITE_AGENT_META_DATA_ARCH == "arm32v7" ]; then
+  export DOTNET_ARCH="arm32v7"
+  export DOTNET_RID="linux-arm"
+  export BUILDAH_ARCH="Raspbian"
+else
+  export DOTNET_ARCH="amd64"
+#  export DOTNET_RID="linux-x64"
+  export BUILDAH_ARCH="xUbuntu"
+fi
+
 # install buildah
 if [ ! $(which buildah) ]; then
   . /etc/os-release
-  sh -c "echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x${ID^}_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"
-  wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x${ID^}_${VERSION_ID}/Release.key -O Release.key
+  sh -c "echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/${BUILDAH_ARCH}_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"
+  wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/${BUILDAH_ARCH}_${VERSION_ID}/Release.key -O Release.key
   apt-key add - < Release.key
   apt-get update
   apt-get -y install buildah

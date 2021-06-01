@@ -1,9 +1,15 @@
 steps:
   - command: "./.buildkite/build.sh"
-    label: ":docker: :hammer:"
+    label: ":ubuntu: :docker: :hammer:"
     agents:
       geo: "co"
       arch: "amd64"
+
+  - command: "./.buildkite/build.sh"
+    label: ":raspberry-pi: :docker: :hammer:"
+    agents:
+      geo: "co"
+      arch: "arm64v8"
 
   - block: "Release?"
 

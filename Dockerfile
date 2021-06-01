@@ -14,15 +14,19 @@ RUN npm install --global yarn
 
 # Copy csproj and restore as distinct layers
 COPY *.csproj ./
-RUN dotnet restore -r linux-arm
+RUN dotnet restore
 
-# Copy everything else and build
+# Copy everything else and buil
 COPY . ./
 RUN cd App && yarn install && cd ../
-RUN dotnet publish -c Release -o out -r linux-arm --self-contained false --no-restore
+RUN if [[ ! -z "$DOTNET_RID" ]]; then \
+    dotnet publish -c Release -o out -r "${DOTNET_RID}" --self-contained false --no-restore; \
+  else \
+    dotnet publish -c Release -o out --no-restore; \
+  fi
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-arm32v7
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-${DOTNET_ARCH:-amd64}
 
 # Runtime dependencies...
 RUN apt-get -y update && apt-get install -y procps

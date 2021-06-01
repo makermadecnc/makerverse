@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-VERSIONED_IMAGE="${DOCKER_REPO}:b${BUILDKITE_BUILD_NUMBER}"
-echo "building from ${BUILDKITE_AGENT_META_DATA_ARCH}.Dockerfile"
-buildah bud -t $VERSIONED_IMAGE "${BUILDKITE_AGENT_META_DATA_ARCH}.Dockerfile"
+VERSIONED_IMAGE="${DOCKER_REPO}:${BUILDKITE_AGENT_META_DATA_ARCH}-${BUILDKITE_BUILD_NUMBER}"
+echo "building for ${BUILDKITE_AGENT_META_DATA_ARCH}"
+buildah bud -t $VERSIONED_IMAGE .
 
 #mkdir -p bin
 #FN="./bin/${PRODUCT_NAME}.tar"
