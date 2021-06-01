@@ -14,15 +14,15 @@ RUN npm install --global yarn
 
 # Copy csproj and restore as distinct layers
 COPY *.csproj ./
-COPY NuGet.config ./
-RUN dotnet restore
+#COPY NuGet.config ./
+RUN dotnet restore -r linux-arm
 
-# Copy everything else and buil
+# Copy everything else and build
 COPY . ./
-RUN dotnet publish -c Release -o out --no-restore
+RUN dotnet publish -c Release -o out -r linux-arm --self-contained false --no-restore
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:5.0
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-arm32v7
 
 WORKDIR /app
 COPY --from=build-env /app/out .
