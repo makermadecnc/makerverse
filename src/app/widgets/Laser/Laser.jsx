@@ -12,7 +12,9 @@ import {
     // Grbl
     GRBL,
     // Marlin
-    MARLIN
+    MARLIN,
+    //Maslow
+    MASLOW
 } from '../../constants';
 import styles from './index.styl';
 
@@ -65,6 +67,10 @@ class Laser extends PureComponent {
       }
       if (controllerType === MARLIN) {
           const ovS = _.get(controllerState, 'ovS');
+          scale = Number(ovS) || 0;
+      }
+      if (controllerType === MASLOW) {
+          const ovS = _.get(controllerState, 'status.ov[2]', []);
           scale = Number(ovS) || 0;
       }
       return scale;
@@ -201,20 +207,29 @@ class Laser extends PureComponent {
                                       {i18n._('Test duration')}
                                   </div>
                                   <div className="table-form-col">
+                                      <div className="text-center">{test.duration}ms</div>
                                       <div
                                           className="input-group input-group-sm"
                                           style={{ width: '100%' }}
                                       >
-                                          <input
+                                          <Slider
+                                              style={{ padding: 0 }}
+                                              defaultValue={test.duration}
+                                              min={0}
+                                              max={5000}
+                                              step={100}
+                                              onChange={actions.changeLaserTestDuration}
+                                          />
+                                          {/*<input
                                               type="number"
                                               className="form-control"
                                               style={{ borderRadius: 0 }}
-                                              value={test.duration}
                                               min={0}
+                                              max={5000}
                                               step={1}
                                               onChange={actions.changeLaserTestDuration}
-                                          />
-                                          <span className="input-group-addon">{i18n._('ms')}</span>
+                                          />*/}
+                                          {/*<span className="input-group-addon">{i18n._('ms')}</span>*/}
                                       </div>
                                   </div>
                               </div>

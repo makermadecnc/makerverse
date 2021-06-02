@@ -14,7 +14,9 @@ import {
     // Grbl
     GRBL,
     // Marlin
-    MARLIN
+    MARLIN,
+    //Maslow
+    MASLOW
 } from '../../constants';
 import styles from './index.styl';
 
@@ -78,8 +80,8 @@ class LaserWidget extends PureComponent {
                 }
             });
         },
-        changeLaserTestDuration: (event) => {
-            const value = event.target.value;
+        changeLaserTestDuration: (value) => {
+            const durationValue = Number(value) || 0;
             if (typeof value === 'string' && value.trim() === '') {
                 this.setState({
                     test: {
@@ -91,7 +93,7 @@ class LaserWidget extends PureComponent {
                 this.setState({
                     test: {
                         ...this.state.test,
-                        duration: ensurePositiveNumber(value)
+                        duration: ensurePositiveNumber(durationValue)
                     }
                 });
             }
@@ -211,7 +213,7 @@ class LaserWidget extends PureComponent {
         if (!port) {
             return false;
         }
-        if (!includes([GRBL, MARLIN], controllerType)) {
+        if (!includes([GRBL, MARLIN, MASLOW], controllerType)) {
             return false;
         }
         if (!(isNumber(test.power) && isNumber(test.duration) && isNumber(test.maxS))) {
