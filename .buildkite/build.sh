@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+cd App
+yarn install
+yarn run build
+cd ../
+
 VERSIONED_IMAGE="${DOCKER_REPO}:${BUILDKITE_AGENT_META_DATA_ARCH}-${BUILDKITE_BUILD_NUMBER}"
 echo "building for ${BUILDKITE_AGENT_META_DATA_ARCH}"
 buildah bud -t $VERSIONED_IMAGE .

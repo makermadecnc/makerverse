@@ -1,7 +1,37 @@
 #!/bin/bash
 
-apt-get -y update
-apt-get -y install wget gpg
+echo "Setting exports..."
+export NVM_DIR="$HOME/.nvm"
+
+if [[ -f "$NVM_DIR/nvm.sh" ]]; then
+  source "$NVM_DIR/nvm.sh"
+fi
+
+if [ ! $(which gpg) ]; then
+  apt-get -y update
+  apt-get -y install wget gpg
+fi
+
+# NodeJS version via NVM
+NODE_VERS=$(node --version)
+if [[ $NODE_VERS != v15* ]]; then
+  echo "Upgrading Node from ${NODE_VERS}..."
+  apt-get update -y && apt-get install -y curl
+  curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+  source "$NVM_DIR/nvm.sh"
+
+  NV="15"
+  nvm install "${NV}"
+  nvm use "${NV}"
+  nvm alias default "${NV}"
+fi
+
+# Yarn
+if [ ! $(which yarn) ]; then
+  echo "Installing Yarn..."
+  apt-get install -y libatomic1
+  npm install -g yarn
+fi
 
 # https://github.com/drud/ddev/issues/2772
 
