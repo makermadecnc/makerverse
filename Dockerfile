@@ -18,8 +18,8 @@ RUN dotnet restore
 
 # Copy everything else and buil
 COPY . ./
-RUN cd App && yarn install && cd ../
-RUN if [[ ! -z "$DOTNET_RID" ]]; then \
+RUN cd App && yarn install && yarn run build && cd ../
+RUN if [ ! -z "$DOTNET_RID" ]; then \
     dotnet publish -c Release -o out -r "${DOTNET_RID}" --self-contained false --no-restore; \
   else \
     dotnet publish -c Release -o out --no-restore; \
