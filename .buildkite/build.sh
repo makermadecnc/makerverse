@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-cd App
-yarn install
-yarn run build
-cd ../
+buildkite-agent artifact download App/node_modules/* App/node_modules/
+ls -la App/node_modules
 
 VERSIONED_IMAGE="${DOCKER_REPO}:${BUILDKITE_AGENT_META_DATA_ARCH}-${BUILDKITE_BUILD_NUMBER}"
 echo "building for ${BUILDKITE_AGENT_META_DATA_ARCH}"
