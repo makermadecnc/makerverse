@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-buildkite-agent artifact download App/node_modules/* App/node_modules/
-ls -la App/node_modules
-
 VERSIONED_IMAGE="${DOCKER_REPO}:${BUILDKITE_AGENT_META_DATA_ARCH}-${BUILDKITE_BUILD_NUMBER}"
 echo "building for ${BUILDKITE_AGENT_META_DATA_ARCH}"
 buildah bud -t $VERSIONED_IMAGE .

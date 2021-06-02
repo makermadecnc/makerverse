@@ -1,27 +1,19 @@
 steps:
-  # Prebuild the YARN package
-  - command: "cd App && yarn install && yarn build"
-    label: ":ubuntu: :nodejs: :hammer_and_wrench:"
-    artifact_paths:
-      - "App/node_modules/**/*"
+  # AMD64 Docker Container
+  - command: "./.buildkite/build.sh"
+    label: ":docker: :ubuntu: :hammer_and_wrench:"
     agents:
       geo: "co"
       arch: "amd64"
 
-  - wait
-
+  # ARM Docker Container
   - command: "./.buildkite/build.sh"
-    label: ":ubuntu: :docker: :hammer_and_wrench:"
-    agents:
-      geo: "co"
-      arch: "amd64"
-
-  - command: "./.buildkite/build.sh"
-    label: ":raspberry-pi: :docker: :hammer_and_wrench:"
+    label: ":docker: :raspberry-pi: :hammer_and_wrench:"
     agents:
       geo: "co"
       arch: "arm64v8"
 
+  # Block release
   - block: "Release?"
 
   - command: "./.buildkite/push.sh"
