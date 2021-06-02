@@ -8,7 +8,7 @@ makerHubMain(
       name: 'Makerverse',
       version: getDevSemver(),
     },
-    { organization: 'openworkshop', product: 'maker-hub' },
+    { organization: 'makermadecnc', product: 'makerverse' },
   ),
   () => null,
 );

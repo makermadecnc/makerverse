@@ -92,7 +92,7 @@
     "dev": "concurrently \"yarn dev-lib\" \"yarn dev-ui\" \"react-scripts start\"",
     "start": "react-scripts start",
     "link": "cd ../ && bash ./ci/link-dev.sh",
-    "build": "NODE_OPTIONS=\"--max-old-space-size=8192\" react-scripts build",
+    "build": "react-scripts --expose-gc --max-old-space-size=4096 build",
     "test": "cross-env CI=true react-scripts test --env=jsdom",
     "lint": "eslint ./src/**/*.ts ./src/**/*.tsx"
   },
