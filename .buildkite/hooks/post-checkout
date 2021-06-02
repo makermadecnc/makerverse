@@ -51,10 +51,13 @@ fi
 
 # install buildah
 if [ ! $(which buildah) ]; then
+  apt-get update -y
+  apt-get install -y curl gpg
+
   . /etc/os-release
   sh -c "echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/${BUILDAH_ARCH}_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"
-  wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/${BUILDAH_ARCH}_${VERSION_ID}/Release.key -O Release.key
-  apt-key add - < Release.key
+  curl -L https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/${BUILDAH_ARCH}_${VERSION_ID}/Release.key | apt-key add
+
   apt-get update
   apt-get -y install buildah
 fi

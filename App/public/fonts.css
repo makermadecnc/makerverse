@@ -12,3 +12,14 @@
   font-family: 'Roboto Mono';
   src: local('Roboto Mono'), url(./fonts/RobotoMono-Regular.ttf) format('truetype');
 }
+
+body {
+  margin: 0;
+}
+a {
+  color: #4a148c;
+  font-weight: bold;
+}
+a:visited {
+  color: #12005e;
+}
