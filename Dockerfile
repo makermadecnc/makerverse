@@ -16,7 +16,7 @@ RUN npm install --global yarn
 COPY *.csproj ./
 RUN dotnet restore
 
-# Copy everything else and buil
+# Copy everything else and build
 COPY . ./
 RUN cd App && yarn install && cd ../
 RUN if [ ! -z "$DOTNET_RID" ]; then \
