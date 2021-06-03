@@ -1878,10 +1878,10 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@openworkshop/maker-hub@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@openworkshop/maker-hub/-/maker-hub-0.1.1.tgz#96ce5e9846bf64c7be07a7ab2e19c0696c49e826"
-  integrity sha512-l35ph4KC7s6F0CMOEkrfxozjd0kUixOmlSY3ApGCTvHCKlFsxIRTg4pwtrGkKSxi3TCLJL1GVNSLtTjR71GJfg==
+"@openworkshop/maker-hub@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-hub/-/maker-hub-0.1.2.tgz#62a21668fcc62773e23ca99f4e56ad74909f0d36"
+  integrity sha512-OQp3yvaxPO6J7RbM6dGc5pyjFgzOug/T4iDDQ/AaLxfW6wPEKLjnjG9Nk8QZHy/FR6VmqxzpPHjWueaEqap3Eg==
 
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":
   version "0.4.3"

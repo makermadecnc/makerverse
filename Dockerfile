@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /app
 
 # Install NPM
-RUN curl -sL https://deb.nodesource.com/setup_15.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && echo "node version: $(node --version)" \
     && echo "npm version: $(npm --version)" \
@@ -27,9 +27,6 @@ RUN if [ ! -z "$DOTNET_RID" ]; then \
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-${DOTNET_ARCH:-amd64}
-
-# Runtime dependencies...
-RUN apt-get -y update && apt-get install -y procps
 
 WORKDIR /app
 COPY --from=build-env /app/out .
