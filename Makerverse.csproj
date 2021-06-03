@@ -12,6 +12,7 @@
     <PackageProjectUrl>http://makerverse.com</PackageProjectUrl>
     <Nullable>enable</Nullable>
     <LangVersion>9</LangVersion>
+    <RuntimeIdentifiers>linux-arm;linux-arm64;linux-x64</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MakerHub\MakerHub.csproj" />
