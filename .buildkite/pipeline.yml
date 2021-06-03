@@ -1,14 +1,21 @@
 steps:
   # AMD64 Docker Container
   - command: "./.buildkite/build.sh"
-    label: ":docker: :ubuntu: :hammer_and_wrench:"
+    label: ":docker: :ubuntu: AMD x64 :hammer_and_wrench:"
     agents:
       geo: "co"
       arch: "amd64"
 
-  # ARM Docker Container
+  # ARM32v7 Docker Container
+  - command: "./.buildkite/build.sh arm32v7"
+    label: ":docker: :raspberry-pi: ARM v7 :hammer_and_wrench:"
+    agents:
+      geo: "co"
+      arch: "arm64v8"
+
+  # ARM64v8 Docker Container
   - command: "./.buildkite/build.sh"
-    label: ":docker: :raspberry-pi: :hammer_and_wrench:"
+    label: ":docker: :raspberry-pi: ARM v8 :hammer_and_wrench:"
     agents:
       geo: "co"
       arch: "arm64v8"

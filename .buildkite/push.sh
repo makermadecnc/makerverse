@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-
-ARM_IMAGE="${DOCKER_REPO}:arm64v8-${BUILDKITE_BUILD_NUMBER}"
+ARM7_IMAGE="${DOCKER_REPO}:arm32v7-${BUILDKITE_BUILD_NUMBER}"
+ARM8_IMAGE="${DOCKER_REPO}:arm64v8-${BUILDKITE_BUILD_NUMBER}"
 AMD64_IMAGE="${DOCKER_REPO}:amd64-${BUILDKITE_BUILD_NUMBER}"
 IMAGE="${DOCKER_REPO}:${DOCKER_BUILD_TAG}"
 
@@ -12,9 +12,13 @@ echo "Adding ${AMD64_IMAGE} to ${MANIFEST}"
 buildah pull "docker.io/${AMD64_IMAGE}"
 buildah manifest add $MANIFEST ${AMD64_IMAGE}
 
-echo "Adding ${ARM_IMAGE} to ${MANIFEST}"
-buildah pull "docker.io/${ARM_IMAGE}"
-buildah manifest add --arch arm --variant v8 $MANIFEST ${ARM_IMAGE}
+echo "Adding ${ARM7_IMAGE} to ${MANIFEST}"
+buildah pull "docker.io/${ARM7_IMAGE}"
+buildah manifest add --arch arm --variant v7 $MANIFEST ${ARM7_IMAGE}
+
+echo "Adding ${ARM8_IMAGE} to ${MANIFEST}"
+buildah pull "docker.io/${ARM8_IMAGE}"
+buildah manifest add --arch arm --variant v8 $MANIFEST ${ARM8_IMAGE}
 
 buildah manifest push $MANIFEST "--creds=$DOCKER_USER:$DOCKER_PASS" "docker://docker.io/$MANIFEST"
 

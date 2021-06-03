@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 
-VERSIONED_IMAGE="${DOCKER_REPO}:${BUILDKITE_AGENT_META_DATA_ARCH}-${BUILDKITE_BUILD_NUMBER}"
+if [[ -z "$1" ]]; then
+  ARCH=${BUILDKITE_AGENT_META_DATA_ARCH:-amd64}
+else
+  ARCH="$1"
+fi
 
-if [[ $BUILDKITE_AGENT_META_DATA_ARCH == "arm64v8" ]]; then
+VERSIONED_IMAGE="${DOCKER_REPO}:${ARCH}-${BUILDKITE_BUILD_NUMBER}"
+
+if [[ $ARCH == "arm64v8" ]]; then
   echo "building ARM v8"
   buildah bud --arch arm --variant v8 -t $VERSIONED_IMAGE arm64v8.Dockerfile
-elif [[ $BUILDKITE_AGENT_META_DATA_ARCH == "arm32v7" ]]; then
+elif [[ $ARCH == "arm32v7" ]]; then
   echo "building ARM v7"
-  buildah bud --arch arm --variant v7 -t $VERSIONED_IMAGE arm.Dockerfile
+  buildah bud --arch arm --variant v7 -t $VERSIONED_IMAGE arm32v7.Dockerfile
 else
-  echo "building for ${BUILDKITE_AGENT_META_DATA_ARCH}"
+  echo "building for ${$ARCH}"
   buildah bud -t $VERSIONED_IMAGE amd64.Dockerfile
 fi
 
