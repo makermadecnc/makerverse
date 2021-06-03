@@ -2,6 +2,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /app
 
+ARG DOTNET_RID=""
+ARG DOTNET_ARCH="amd64"
+RUN echo "Building ${DOTNET_ARCH} (${DOTNET_RID})"
+
 # Install NPM
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
@@ -25,10 +29,6 @@ COPY . ./
 RUN cd App && yarn install && cd ../
 
 # Build the app
-ENV DOTNET_RID=""
-ENV DOTNET_ARCH=amd64
-RUN echo "Building ${DOTNET_ARCH} (${DOTNET_RID})"
-
 RUN if [ ! -z "$DOTNET_RID" ]; then \
     dotnet publish -c Release -o out -r "${DOTNET_RID}" --self-contained false --no-restore; \
   else \
