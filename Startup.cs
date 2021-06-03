@@ -42,7 +42,7 @@ namespace Makerverse {
       // Log.Information("[CONFIG] load filename: {sf}", sf);
 
       app.UseExceptionHandler(new ExceptionHandlerOptions {
-        ExceptionHandler = new ApiExceptionMiddleware().Invoke
+        ExceptionHandler = ApiExceptionMiddleware.Invoke
       });
 
       app.UseAuthentication();

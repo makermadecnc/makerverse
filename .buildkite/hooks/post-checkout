@@ -43,4 +43,6 @@ fi
 
 export DOCKER_USER="inzania"
 export PRODUCT_NAME="makerverse"
-export DOCKER_REPO="makerverse/core"
+export DOCKER_ORG="makerverse"
+export DOCKER_IMAGE="core"
+export DOCKER_REPO="$DOCKER_ORG/$DOCKER_IMAGE"

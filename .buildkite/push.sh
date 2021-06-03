@@ -5,15 +5,18 @@ ARM_IMAGE="${DOCKER_REPO}:arm64v8-${BUILDKITE_BUILD_NUMBER}"
 AMD64_IMAGE="${DOCKER_REPO}:amd64-${BUILDKITE_BUILD_NUMBER}"
 IMAGE="${DOCKER_REPO}:${DOCKER_BUILD_TAG}"
 
-echo "Retagging arm64v8 + amd64 as ${IMAGE}"
-buildah pull "docker.io/${ARM_IMAGE}"
-buildah pull "docker.io/${AMD64_IMAGE}"
+MANIFEST="$IMAGE"
+buildah manifest create $MANIFEST
 
-# Create new manifest
-buildah manifest create Makerverse
-buildah manifest add Makerverse ${AMD64_IMAGE}
-buildah manifest add Makerverse ${ARM_IMAGE}
-buildah manifest push Makerverse "--creds=$DOCKER_USER:$DOCKER_PASS" $IMAGE
+echo "Adding ${AMD64_IMAGE} to ${MANIFEST}"
+buildah pull "docker.io/${AMD64_IMAGE}"
+buildah manifest add $MANIFEST ${AMD64_IMAGE}
+
+echo "Adding ${ARM_IMAGE} to ${MANIFEST}"
+buildah pull "docker.io/${ARM_IMAGE}"
+buildah manifest add $MANIFEST ${ARM_IMAGE}
+
+buildah manifest push $MANIFEST "--creds=$DOCKER_USER:$DOCKER_PASS" "docker://docker.io/$IMAGE"
 
 #buildah tag ${VERSIONED_IMAGE} ${IMAGE}
 
