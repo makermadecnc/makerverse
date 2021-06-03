@@ -2,7 +2,14 @@
 
 VERSIONED_IMAGE="${DOCKER_REPO}:${BUILDKITE_AGENT_META_DATA_ARCH}-${BUILDKITE_BUILD_NUMBER}"
 echo "building for ${BUILDKITE_AGENT_META_DATA_ARCH}"
-buildah bud -t $VERSIONED_IMAGE .
+
+if [[ $BUILDKITE_AGENT_META_DATA_ARCH == "arm64v8" ]]; then
+  buildah bud --arch arm --variant v8 -t $VERSIONED_IMAGE .
+elif [[ $BUILDKITE_AGENT_META_DATA_ARCH == "arm32v7" ]]; then
+  buildah bud --arch arm --variant v7 -t $VERSIONED_IMAGE .
+else
+  buildah bud -t $VERSIONED_IMAGE .
+fi
 
 #mkdir -p bin
 #FN="./bin/${PRODUCT_NAME}.tar"

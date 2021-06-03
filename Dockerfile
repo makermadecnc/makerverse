@@ -9,6 +9,10 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && echo "npm version: $(npm --version)" \
     && rm -rf /var/lib/apt/lists/*
 
+# Upgrade NPM
+ENV NPM_VERSION="7.15.1"
+RUN npm install -g "npm@${NPM_VERSION}"
+
 # Install yarn
 RUN npm install --global yarn
 
@@ -16,9 +20,15 @@ RUN npm install --global yarn
 COPY *.csproj ./
 RUN dotnet restore
 
-# Copy everything else and build
+# Copy everything else and install requirements
 COPY . ./
 RUN cd App && yarn install && cd ../
+
+# Build the app
+ENV DOTNET_RID=""
+ENV DOTNET_ARCH=amd64
+RUN echo "Building ${DOTNET_ARCH} (${DOTNET_RID})"
+
 RUN if [ ! -z "$DOTNET_RID" ]; then \
     dotnet publish -c Release -o out -r "${DOTNET_RID}" --self-contained false --no-restore; \
   else \
@@ -26,7 +36,7 @@ RUN if [ ! -z "$DOTNET_RID" ]; then \
   fi
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-${DOTNET_ARCH:-amd64}
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-${DOTNET_ARCH}
 
 WORKDIR /app
 COPY --from=build-env /app/out .

@@ -14,9 +14,9 @@ buildah manifest add $MANIFEST ${AMD64_IMAGE}
 
 echo "Adding ${ARM_IMAGE} to ${MANIFEST}"
 buildah pull "docker.io/${ARM_IMAGE}"
-buildah manifest add $MANIFEST ${ARM_IMAGE}
+buildah manifest add --arch arm --variant v8 $MANIFEST ${ARM_IMAGE}
 
-buildah manifest push $MANIFEST "--creds=$DOCKER_USER:$DOCKER_PASS" "docker://docker.io/$IMAGE"
+buildah manifest push $MANIFEST "--creds=$DOCKER_USER:$DOCKER_PASS" "docker://docker.io/$MANIFEST"
 
 #buildah tag ${VERSIONED_IMAGE} ${IMAGE}
 
