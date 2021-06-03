@@ -154,7 +154,9 @@ class Workspaces extends events.EventEmitter {
     }
 
     static defaultColor = '#4078c0';
+
     static defaultIcon = 'xyz';
+
     static defaultBkColor = '#f6f7f8';
 
     // Sidebar icon.
@@ -460,7 +462,7 @@ class Workspaces extends events.EventEmitter {
         });
     }
 
-    openPort(callback) {
+    openPort(callback, port) {
         if (this._connected) {
             if (callback) {
                 callback(null);
@@ -468,6 +470,9 @@ class Workspaces extends events.EventEmitter {
             return;
         }
         const firmware = this.firmware;
+        if (port) {
+            firmware.port = port;
+        }
         this._connecting = true;
         this._connected = false;
         log.debug('Open port with firmware', firmware);

@@ -25,7 +25,7 @@ const AboutContainer = ({ version }) => {
                     Build #{version.currentVersion.build}
                 </div>
                 <div className={styles.aboutProductDescription}>
-                    A collarboration between MakerMade and OpenWorkShop.
+                    A collaboration between MakerMade and OpenWorkShop.
                     <br />
                     Forked from the CNCjs project.
                 </div>

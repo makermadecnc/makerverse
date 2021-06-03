@@ -55,8 +55,9 @@ class ConnectionWidget extends PureComponent {
                 alertMessage: ''
             }));
         },
-        handleOpenPort: (event) => {
-            this.openPort();
+        handleOpenPort: (event, port) => {
+            console.log(event, 'handleopenport details');
+            this.openPort(port);
         },
         handleClosePort: (event) => {
             const { port } = this.state;
@@ -148,7 +149,8 @@ class ConnectionWidget extends PureComponent {
         }));
     }
 
-    openPort() {
+    openPort(port) {
+        console.log(port, 'openPort port details');
         this.setState(state => ({
             connecting: true
         }));
@@ -161,7 +163,7 @@ class ConnectionWidget extends PureComponent {
                     connected: false
                 }));
             }
-        });
+        }, port);
     }
 
     closePort() {

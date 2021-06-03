@@ -92,6 +92,7 @@ class Connection extends PureComponent {
         } = this.props;
         const { port } = this.state;
         const canConnect = !disabled && port && !connectionStatus.connected;
+        console.log(port, 'port details from create workspace');
 
         return (
             <div>
