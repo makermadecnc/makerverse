@@ -24,7 +24,7 @@ COPY . ./
 RUN cd App && yarn install --production && cd ../
 
 # Build the app
-RUN dotnet publish -c Release -o out -r linux-arm --self-contained false --no-restore;
+RUN dotnet publish -c Release -o out -r linux-arm --no-restore
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-arm32v7

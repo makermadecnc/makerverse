@@ -24,13 +24,10 @@ COPY . ./
 RUN cd App && yarn install --production && cd ../
 
 # Build the app
-RUN dotnet publish -c Release -o out -r linux-arm64 --self-contained false --no-restore;
+RUN dotnet publish -c Release -o out -r linux-arm64 --no-restore
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-arm64v8
-
-# RPi-specific dependencies
-RUN apt-get -y update && apt-get install -y libunwind8
 
 WORKDIR /app
 COPY --from=build-env /app/out .
