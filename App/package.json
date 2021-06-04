@@ -11,7 +11,7 @@
     "dev": "concurrently \"yarn dev-lib\" \"yarn dev-ui\" \"react-scripts start\"",
     "start": "react-scripts start",
     "link": "cd ../ && bash ./ci/link-dev.sh",
-    "build": "react-scripts --expose-gc --max-old-space-size=3000 build",
+    "build": "react-scripts --expose-gc build",
     "test": "cross-env CI=true react-scripts test --env=jsdom",
     "lint": "eslint ./src/**/*.ts ./src/**/*.tsx"
   },

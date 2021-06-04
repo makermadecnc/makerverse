@@ -15,7 +15,7 @@ elif [[ $ARCH == "arm32v7" ]]; then
   echo "building ARM v7"
   buildah bud --arch arm --variant v7 -t $VERSIONED_IMAGE arm32v7.Dockerfile
 else
-  echo "building for ${$ARCH}"
+  echo "building for ${ARCH}"
   buildah bud -t $VERSIONED_IMAGE amd64.Dockerfile
 fi
 

@@ -10,8 +10,7 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && rm -rf /var/lib/apt/lists/*
 
 # Upgrade NPM
-ARG NPM_VERSION="7.15.1"
-RUN npm install -g "npm@${NPM_VERSION}"
+RUN npm install -g npm@latest
 
 # Install yarn
 RUN npm install --global yarn
@@ -22,13 +21,16 @@ RUN dotnet restore
 
 # Copy everything else and install requirements
 COPY . ./
-RUN cd App && yarn install && cd ../
+RUN cd App && yarn install --production && cd ../
 
 # Build the app
 RUN dotnet publish -c Release -o out -r linux-arm64 --self-contained false --no-restore;
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-arm64v8
+
+# RPi-specific dependencies
+RUN apt-get -y update && apt-get install -y libunwind8
 
 WORKDIR /app
 COPY --from=build-env /app/out .
