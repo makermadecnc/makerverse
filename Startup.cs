@@ -32,7 +32,7 @@ namespace Makerverse {
       services.AddAuthorization(opts => {
         opts.AddMakerHubPolicies();
       });
-      services.AddMakerHubGraphQLServer();
+      services.AddMakerHubServer();
     }
 
 
@@ -63,15 +63,9 @@ namespace Makerverse {
       });
 
       app.UseEndpoints(endpoints => {
-        endpoints.MapControllerRoute(
-          "default",
-          "{controller}/{action=Index}/{id?}"
-        );
-
         endpoints.MapGraphQL(GraphqlPath);
       });
 
-      // App: www.openwork.shop
       app.UseSpa(spa => {
         spa.Options.SourcePath = "App";
         spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions {
@@ -87,7 +81,7 @@ namespace Makerverse {
         if (env.IsDevelopment()) spa.UseProxyToSpaDevelopmentServer("http://localhost:8001");
       });
 
-      Task.Run(async () => await Electron.WindowManager.CreateWindowAsync());
+      // Task.Run(async () => await Electron.WindowManager.CreateWindowAsync());
     }
   }
 }
