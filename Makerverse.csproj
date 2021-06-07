@@ -14,21 +14,21 @@
     <LangVersion>9</LangVersion>
     <RuntimeIdentifiers>linux-arm;linux-arm64;linux-x64</RuntimeIdentifiers>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\MakerHub\MakerHub.csproj" />
-    <Watch Remove="..\..\MakerHub\Generated\**" />
+  
+  <!-- MakerHub Debug/Release Includes -->
+  <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ProjectReference Include="$MH\MakerHub.csproj" />
+    <Watch Remove="$MH\Generated\**" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <OutputPath>bin/Debug/</OutputPath>
-    <InformationalVersion>Debug</InformationalVersion>
-  </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)' != 'Debug' ">
     <PackageReference Include="OpenWorkShop.MakerHub" Version="0.1.6" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <PackageReference Include="ElectronNET.API" Version="11.5.1" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.6" />
     <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
   </ItemGroup>
-
 
   <ItemGroup>
     <Content Remove="$(SpaRoot)**" />
@@ -44,6 +44,7 @@
     <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn install" />
   </Target>
+  
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn" />
@@ -58,6 +59,7 @@
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
+  
   <ItemGroup>
     <Content Update="electron.manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

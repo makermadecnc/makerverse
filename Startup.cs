@@ -23,7 +23,6 @@ namespace Makerverse {
     // This method gets called by the runtime. Use this method to add services to the container.
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services) {
-      services.AddControllers();
       services.AddSpaStaticFiles(configuration => {
         configuration.RootPath = "App/build";
       });
@@ -49,35 +48,13 @@ namespace Makerverse {
       app.UseRouting();
       app.UseSerilogRequestLogging();
       app.UseWebSockets();
-
-      // Static files come before routing
       app.UseStaticFiles();
-      app.UseSpaStaticFiles(new StaticFileOptions {
-        OnPrepareResponse = ctx => {
-          ResponseHeaders headers = ctx.Context.Response.GetTypedHeaders();
-          headers.CacheControl = new CacheControlHeaderValue {
-            Public = true,
-            MaxAge = TimeSpan.FromDays(0)
-          };
-        }
-      });
-
+      app.UseSpaStaticFiles();
       app.UseEndpoints(endpoints => {
         endpoints.MapGraphQL(GraphqlPath);
       });
-
       app.UseSpa(spa => {
         spa.Options.SourcePath = "App";
-        spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions {
-          OnPrepareResponse = ctx => {
-            ResponseHeaders headers = ctx.Context.Response.GetTypedHeaders();
-            headers.CacheControl = new CacheControlHeaderValue {
-              Public = true,
-              MaxAge = TimeSpan.FromDays(0)
-            };
-          }
-        };
-
         if (env.IsDevelopment()) spa.UseProxyToSpaDevelopmentServer("http://localhost:8001");
       });
 
