@@ -19,18 +19,12 @@ RUN npm install --global yarn
 COPY *.csproj ./
 RUN dotnet restore
 
-# Copy everything else and install requirements
+# Copy file contents & build
 COPY . ./
-RUN cd App && yarn install --production && cd ../
-
-# Build the app
 RUN dotnet publish -c Release -o out -r linux-arm --no-restore
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-arm32v7
-
-# RPi-specific dependencies
-RUN apt-get -y update && apt-get install -y libunwind8
 
 WORKDIR /app
 COPY --from=build-env /app/out .
