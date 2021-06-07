@@ -23,7 +23,7 @@
     <InformationalVersion>Debug</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.1.5" />
+    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.1.6" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.4" />
     <PackageReference Include="Datadog.Trace" Version="1.26.3" />
     <PackageReference Include="ElectronNET.API" Version="11.5.1" />
