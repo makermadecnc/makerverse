@@ -492,7 +492,8 @@ class Workspaces extends events.EventEmitter {
         });
     }
 
-    closePort(callback) {
+    closePort(callback, port) {
+        console.log(port, 'workspaces port to close');
         if (!this._connecting && !this._connected) {
             if (callback) {
                 callback(null);
@@ -500,7 +501,7 @@ class Workspaces extends events.EventEmitter {
         }
         this._connecting = false;
         this._connected = false;
-        this.controller.closePort(this.firmware.port, (err) => {
+        this.controller.closePort(port, (err) => {
             if (err) {
                 log.error(err);
             }

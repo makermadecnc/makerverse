@@ -56,11 +56,9 @@ class ConnectionWidget extends PureComponent {
             }));
         },
         handleOpenPort: (event, port) => {
-            console.log(event, 'handleopenport details');
             this.openPort(port);
         },
-        handleClosePort: (event) => {
-            const { port } = this.state;
+        handleClosePort: (event, port) => {
             this.closePort(port);
         }
     };
@@ -150,7 +148,6 @@ class ConnectionWidget extends PureComponent {
     }
 
     openPort(port) {
-        console.log(port, 'openPort port details');
         this.setState(state => ({
             connecting: true
         }));
@@ -166,12 +163,21 @@ class ConnectionWidget extends PureComponent {
         }, port);
     }
 
-    closePort() {
+    closePort(port) {
+        console.log(port, 'close port details');
         this.setState(state => ({
             connecting: false,
             connected: false
         }));
-        this.workspace.closePort();
+        this.workspace.closePort((err) => {
+            if (err) {
+                this.setState(state => ({
+                    alertMessage: i18n._('Error closing serial port'),
+                    connecting: false,
+                    connected: false
+                }));
+            }
+        }, port);
     }
 
     render() {

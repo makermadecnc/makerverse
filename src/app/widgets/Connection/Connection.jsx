@@ -233,7 +233,6 @@ class Connection extends PureComponent {
         const port = this.state?.port;
         const baudrate = controllerConfig.baudRate;
         const canOpenPort = port && baudrate && !connecting && !connected;
-        console.log(controllerConfig, 'controlllllllller config');
 
         return (
             <div>
@@ -264,7 +263,7 @@ class Connection extends PureComponent {
                             {i18n._('Port')}
                         </div>
                     </div>
-                    <div className="col col-xs-8">
+                    <div className="col col-xs-7">
                         <Select
                             options={map(this.state?.ports, (o) => ({
                                 value: o.port,
@@ -283,17 +282,14 @@ class Connection extends PureComponent {
                             className="sm"
                         />
                     </div>
-                </div>
-                <div className="row no-gutters">
-                    <div className="col col-xs-4">
-                        <div className={styles.textEllipsis} title={i18n._('Port')}>
-                            {i18n._('Port')}
-                        </div>
-                    </div>
-                    <div className="col col-xs-8">
-                        <div className={styles.well} title={port}>
-                            {port}
-                        </div>
+                    <div className="col col-xs-1">
+                        <button
+                            onClick={() => {
+                                this.refreshPorts();
+                            }}
+                            style={{ padding: 0, height: 30, marginLeft: 3 }}
+                        ><i className="fa fa-undo fa-fw" />
+                        </button>
                     </div>
                 </div>
                 <div className="row no-gutters">
@@ -328,7 +324,9 @@ class Connection extends PureComponent {
                         <button
                             type="button"
                             className="btn btn-danger"
-                            onClick={actions.handleClosePort}
+                            onClick={(e) => {
+                                actions.handleClosePort(e, this.state.port);
+                            }}
                             title="Close connection to control board"
                         >
                             <i className="fa fa-toggle-on" />
