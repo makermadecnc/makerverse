@@ -140,8 +140,8 @@ class CreateWorkspaceWidget extends PureComponent {
                     window.location.reload();
                 })
                 .catch((res) => {
-                    const err = res.body && res.body.msg ? res.body.msg :
-                        i18n._('An unexpected error has occurred.');
+                    const err = res.body && res.body.msg ? res.body.msg
+                        : i18n._('An unexpected error has occurred.');
                     this.setState({
                         createWorkspaceError: err,
                         creating: false
@@ -176,7 +176,6 @@ class CreateWorkspaceWidget extends PureComponent {
     controllerEvents = {
         'serialport:list': (ports) => {
             log.debug('Received a list of serial ports:', ports);
-
             this.stopLoading();
             this.setPortList(ports);
         },

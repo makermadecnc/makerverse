@@ -154,7 +154,9 @@ class Workspaces extends events.EventEmitter {
     }
 
     static defaultColor = '#4078c0';
+
     static defaultIcon = 'xyz';
+
     static defaultBkColor = '#f6f7f8';
 
     // Sidebar icon.
@@ -460,7 +462,7 @@ class Workspaces extends events.EventEmitter {
         });
     }
 
-    openPort(callback) {
+    openPort(callback, port) {
         if (this._connected) {
             if (callback) {
                 callback(null);
@@ -468,6 +470,9 @@ class Workspaces extends events.EventEmitter {
             return;
         }
         const firmware = this.firmware;
+        if (port) {
+            firmware.port = port;
+        }
         this._connecting = true;
         this._connected = false;
         log.debug('Open port with firmware', firmware);
@@ -487,7 +492,8 @@ class Workspaces extends events.EventEmitter {
         });
     }
 
-    closePort(callback) {
+    closePort(callback, port) {
+        console.log(port, 'workspaces port to close');
         if (!this._connecting && !this._connected) {
             if (callback) {
                 callback(null);
@@ -495,7 +501,7 @@ class Workspaces extends events.EventEmitter {
         }
         this._connecting = false;
         this._connected = false;
-        this.controller.closePort(this.firmware.port, (err) => {
+        this.controller.closePort(port, (err) => {
             if (err) {
                 log.error(err);
             }
