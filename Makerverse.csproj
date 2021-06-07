@@ -24,40 +24,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="OpenWorkShop.MakerHub" Version="0.1.6" />
-    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.4" />
-    <PackageReference Include="Datadog.Trace" Version="1.26.3" />
     <PackageReference Include="ElectronNET.API" Version="11.5.1" />
-    <PackageReference Include="EntityFramework" Version="7.0.0-beta4" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="11.2.2" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.2.2" />
-    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="11.2.2" />
-    <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="5.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="5.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.6" />
-    <PackageReference Include="Microsoft.DotNet.Watcher.Tools" Version="2.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.6">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.6" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
-    <PackageReference Include="MySqlConnector" Version="1.3.9" />
-    <PackageReference Include="ObjectsComparer" Version="1.4.1" />
-    <PackageReference Include="OpenTelemetry" Version="1.0.1" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0" />
-    <PackageReference Include="SendGrid" Version="9.23.2" />
     <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
-    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0-dev-00761" />
-    <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2-dev-00741" />
-    <PackageReference Include="Serilog.Enrichers.Thread" Version="3.2.0-dev-00747" />
-    <PackageReference Include="Serilog.Exceptions" Version="6.1.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0-dev-00839" />
-    <PackageReference Include="Serilog.Sinks.Datadog.Logs" Version="0.3.4" />
   </ItemGroup>
 
 
