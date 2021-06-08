@@ -32,10 +32,8 @@ class Laser extends PureComponent {
   controllerEvents = {
       'controller:settings': (type, data) => {
           this.workspace.machineSettings.update(data);
-          this.setState({
-              settingsEdits: this.getEmptySettings(),
-              controller: {
-                  type: type,
+          this.setState({ settingsEdits: this.getEmptySettings(),
+              controller: { type: type,
                   settings: data } });
       }
   };
@@ -51,6 +49,7 @@ class Laser extends PureComponent {
   componentDidMount() {
       this.workspace.addControllerEvents(this.controllerEvents);
   }
+
   componentWillUnmount() {
       this.workspace.removeControllerEvents(this.controllerEvents);
   }
@@ -81,7 +80,6 @@ class Laser extends PureComponent {
       const none = '–';
       const { canClick, panel, test } = state;
       const laserIntensityScale = this.getLaserIntensityScale();
-
       return (
           <div>
               <div className="form-group">
@@ -95,7 +93,7 @@ class Laser extends PureComponent {
                           }}
                       />
                   </div>
-                  <hr style={{ marginTop: 5, marginBottom: 10 }}/>
+                  <hr style={{ marginTop: 5, marginBottom: 10 }} />
 
                   <label className="control-label">
                       {i18n._('Laser Intensity Control')}

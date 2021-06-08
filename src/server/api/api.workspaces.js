@@ -18,7 +18,7 @@ const CONFIG_KEY = 'workspaces';
 const defaultFeatures = {
     [MASLOW]: {
         homing: {
-            title: 'Reset Chain',
+            title: 'Set Home',
             description: 'Inform the Maslow that the chains (not the sled) are in the exact same position as they were when you used "Set Chains".',
             icon: 'fa-link',
         },
