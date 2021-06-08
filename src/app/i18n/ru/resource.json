@@ -515,7 +515,6 @@
     "Frame": "",
     "Update Firmware": "",
     "Chains": "",
-    "Stock": "",
     "Uplload Program": "",
     "Upload Program": "",
     "Sled": "",
@@ -609,5 +608,7 @@
     "I understand \"guest mode\" is hazardous. ": "",
     "Continue as Guest": "",
     "Select \"no\" if your machine has already been calibrated.": "",
-    "Laser Mode": ""
+    "Laser Mode": "",
+    "Error closing serial port": "",
+    "Wasteboard": ""
 }

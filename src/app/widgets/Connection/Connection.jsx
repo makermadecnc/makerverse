@@ -288,6 +288,7 @@ class Connection extends PureComponent {
                                 this.refreshPorts();
                             }}
                             style={{ padding: 0, height: 30, marginLeft: 3 }}
+                            type="button"
                         ><i className="fa fa-undo fa-fw" />
                         </button>
                     </div>

@@ -90,7 +90,7 @@ class CalibrationModal extends PureComponent {
     state = {
         ...this.internalState,
         measurements: defaultMeasurements,
-        activeTab: this.props.activeTab || 'welcome',
+        activeTab: this.props.activeTab || 'machine',
         setMachineSettings: false,
         setWorkspaceSettings: false,
         setFrameSettings: false,
@@ -611,9 +611,9 @@ class CalibrationModal extends PureComponent {
                             style={{ marginBottom: 10 }}
                         >
                             <NavItem eventKey="machine">{i18n._('Machine')}</NavItem>
-                            <NavItem eventKey="stock">{i18n._('Stock')}</NavItem>
+                            <NavItem eventKey="stock">{i18n._('Wasteboard')}</NavItem>
                             <NavItem eventKey="frame">{i18n._('Frame')}</NavItem>
-                            <NavItem eventKey="sled">{i18n._('Sled')}</NavItem>
+                            {/*<NavItem eventKey="sled">{i18n._('Sled')}</NavItem>*/}
                             <NavItem eventKey="z">{i18n._('Z-Axis')}</NavItem>
                             <NavItem eventKey="chains">{i18n._('Chains')}</NavItem>
                             <NavItem eventKey="edge">{i18n._('Edge')}</NavItem>
@@ -641,7 +641,7 @@ class CalibrationModal extends PureComponent {
                         )}
                         {curTab === 'triangular' && (
                             <div className={styles.tabFull}>
-                                <div className={styles.center} style={ this.getBkImageStyle('calibration_overview.png') } />
+                                <div className={styles.center} style={this.getBkImageStyle('calibration_overview.png')} />
                                 <div className={styles.top}>
                                     {'Your Maslow is not using "triangular" kinematics.'}
                                     <br />
@@ -711,17 +711,16 @@ class CalibrationModal extends PureComponent {
                         )}
                         {curTab === 'machine' && (
                             <div className={styles.tabFull}>
-                                <div className={styles.center} style={ this.getBkImageStyle('calibration_overview.png') }>
+                                <div className={styles.center} style={this.getBkImageStyle('calibration_overview.png')}>
                                     <div style={{ position: 'absolute', bottom: '0px', right: '30%' }}>
                                         (Newtons)
                                     </div>
-                                    <div style={{ position: 'absolute', bottom: '20%', right: '5%' }}>
-                                    </div>
+                                    <div style={{ position: 'absolute', bottom: '20%', right: '5%' }} />
                                 </div>
                                 <div className={styles.top}>
-                                    {'Your Maslow must be calibrated to account for the variables below.'}
+                                    {'Your M2 must be calibrated to account for the variables below.'}
                                     <br />
-                                    {'Please validate the four settings (inputs) on this tab, then press "Next Step."'}
+                                    {'Please validate the four settings (inputs) on this tab, then press "Apply."'}
                                     <br />
                                     {'For help, or to change units, see the lower-left corner of this dialog.'}
                                 </div>
@@ -804,18 +803,18 @@ class CalibrationModal extends PureComponent {
                         )}
                         {curTab === 'stock' && (
                             <div className={styles.tabFull}>
-                                <div className={styles.center} style={ this.getBkImageStyle('calibration_dimensions.png') } />
+                                <div className={styles.center} style={this.getBkImageStyle('calibration_dimensions.png')} />
                                 <div className={styles.top}>
-                                    {'Please be certain of the size of your stock before pressing "Next Step."'}
+                                    {'Measure the actual height and width of your M2 cutting area. For the width, measure from end to end of your wasteboard/canvases.'}
                                     <br />
-                                    {'Most Maslows use 8\'x4\' plywood. Later calibration steps will rely on this measurement being accurate.'}
+                                    {'For the height, measure from the top of your skirt to the top of your wasteboard.'}
                                 </div>
                                 <div className={styles.bottom}>
                                     <div>
                                         {'Note: if your sled is not yet attached, it will be done later in Calibration.'}
                                     </div>
                                     <div>
-                                        Stock Width:
+                                        Wasteboard Width:
                                         <input
                                             type="text"
                                             name="machineWidth"
@@ -826,7 +825,7 @@ class CalibrationModal extends PureComponent {
                                                 this.setState({ machineWidth: e.target.value });
                                             }}
                                         />
-                                        Stock Height:
+                                        Wasteboard Height:
                                         <input
                                             type="text"
                                             name="machineHeight"
@@ -865,7 +864,7 @@ class CalibrationModal extends PureComponent {
                         )}
                         {curTab === 'frame' && (
                             <div className={styles.tabFull}>
-                                <div className={styles.center} style={ this.getBkImageStyle('calibration_motor.png') } />
+                                <div className={styles.center} style={this.getBkImageStyle('calibration_motor.png')} />
                                 <div className={styles.top}>
                                     {chainError && (
                                         <div>
@@ -876,17 +875,18 @@ class CalibrationModal extends PureComponent {
                                     )}
                                     {!chainError && (
                                         <div>
-                                            {'Enter approximate measurements, within 6mm (1/4") tolerance. Then, press "Set Frame".'}
+                                            {'Measure within 6mm (1/4") tolerance. Then, press "Apply".'}
                                         </div>
                                     )}
                                 </div>
                                 {alreadyStartedCalibration && this.renderAlreadyCalibrated()}
                                 {!alreadyStartedCalibration && (
                                     <div className={styles.bottom}>
-                                        <div>
-                                            {'Use the center of the sprocket (motor axis) for both motor measurements.'}
+                                        <div className={styles.frameMeasurementHelperText}>
+                                            {'Measure from the center of the Left motor sprocket to the center of the Right motor sprocket to determine Motor Width.'}
                                             <br />
-                                            {'Measure motor height coplanar with the stock.'}
+                                            {'Measure from the center of one motor sprocket to the top of your wasteboard, on the same angle as your motor sprocket, to determine Motor Height.'}
+                                            <br />
                                         </div>
                                         Motor Height:
                                         <input
@@ -940,7 +940,7 @@ class CalibrationModal extends PureComponent {
                                     {'This allows calibration to determine the end-mill location based upon the edge of the sled.'}
                                 </div>
                                 <div className={styles.center}>
-                                    <div style={{ paddingTop: '20px' }} >
+                                    <div style={{ paddingTop: '20px' }}>
                                         <span>
                                             Sled Type:
                                             <select
@@ -991,9 +991,9 @@ class CalibrationModal extends PureComponent {
                                 <div className={styles.top}>
                                     {'This step checks that your Z-axis is moving up and down correctly.'}
                                     <br />
-                                    {'It may be skipped if you have already tested the Z-axis, or your machine came preconfigured for Z-movement.'}
+                                    {'Note: Z-axis must be inverted for Easel Gcode.'}
                                 </div>
-                                <div className={styles.center} >
+                                <div className={styles.center}>
                                     {stepDirectionInvert && (
                                         <div>
                                             {'Invert Z-axis motion? '}
@@ -1006,8 +1006,8 @@ class CalibrationModal extends PureComponent {
                                                     this.setInvertZ(event.target.value);
                                                 }}
                                             >
-                                                <option value="1">{i18n._('yes')}</option>
-                                                <option default value="0">{i18n._('no')}</option>
+                                                <option default value="1">{i18n._('yes')}</option>
+                                                <option value="0">{i18n._('no')}</option>
                                             </select>
                                         </div>
                                     )}
@@ -1024,12 +1024,12 @@ class CalibrationModal extends PureComponent {
                                     {zAxisResSetting && !zEditRaw && (
                                         <div>
                                             <h3>Test Z-Axis</h3>
-                                            You will move the Z axis up or down, and then measure the actual distance moved.
+                                            You will move the Z-axis up or down, and then measure the actual distance moved.
                                             <br />
-                                            This allows Calibration to scale the Z axis correctly.
+                                            This allows calibration to scale the Z-axis correctly.
                                             <br />
 
-                                            Distance:
+                                            Distance (mm):
                                             <input
                                                 type="text"
                                                 className={styles.mmInput}
@@ -1041,21 +1041,21 @@ class CalibrationModal extends PureComponent {
                                             />
                                             <button
                                                 type="button"
-                                                className="btn btn-medium"
+                                                className="btn btn-warning"
                                                 onClick={() => this.zMove(Number(zMove))}
                                             >
                                                 Move Up
                                             </button>
                                             <button
                                                 type="button"
-                                                className="btn btn-medium"
+                                                className="btn btn-warning"
                                                 onClick={() => this.zMoveTo(0)}
                                             >
                                                 Go To Zero
                                             </button>
                                             <button
                                                 type="button"
-                                                className="btn btn-medium"
+                                                className="btn btn-warning"
                                                 onClick={() => this.zMove(-Number(zMove))}
                                             >
                                                 Move Down
@@ -1081,11 +1081,11 @@ class CalibrationModal extends PureComponent {
                                                 Apply Scaling
                                             </button>
                                             <br /><br />
-                                            Once the Z-axis movement is correct, touch the bit to the stock and press Define Zero:
+                                            Once the Z-axis movement is correct, touch the bit to the wasteboard and press Define Zero:
                                             <br />
                                             <button
                                                 type="button"
-                                                className="btn btn-medium"
+                                                className="btn btn-primary"
                                                 onClick={() => this.zDefineZero()}
                                             >
                                                 Define Zero
@@ -1193,7 +1193,7 @@ class CalibrationModal extends PureComponent {
                                     {'Please read carefully; "Chains" are the most important step in all of calibration.'}
                                 </div>
                                 {!alreadyStartedCalibration && !measuredChains && (
-                                    <div className={styles.center} >
+                                    <div className={styles.center}>
                                         <MeasureChainsFlow
                                             calibration={this.calibration}
                                             step={this.state.chainsStep}
@@ -1207,7 +1207,7 @@ class CalibrationModal extends PureComponent {
                                     </div>
                                 )}
                                 {!alreadyStartedCalibration && measuredChains && (
-                                    <div className={styles.center} >
+                                    <div className={styles.center}>
                                         <h4>Chains Set</h4>
                                         <span>
                                             Accuracy is currently at {Math.max(1, Math.round(measuredChains.optimized.maxErrDist * 10) / 10)}mm

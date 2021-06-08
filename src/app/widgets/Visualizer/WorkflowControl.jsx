@@ -126,6 +126,9 @@ class WorkflowControl extends PureComponent {
     renderButtonFeature(key, title, desc, icon, btnType, disabled) {
         const feature = this.workspace.getFeature(key, { title: title, description: desc || title, icon: icon });
         btnType = disabled ? 'default' : btnType;
+        if (feature.title === 'Reset Chains') {
+            feature.title = 'Set Home';
+        }
         return !feature ? '' : (
             <Tooltip
                 placement="bottom"

@@ -304,6 +304,10 @@ class Workspaces extends events.EventEmitter {
             // Disabled feature.
             return null;
         }
+        if (f && f.id === 'maslow-homing') {
+            f.title = 'Set Home';
+            //return f;
+        }
         return { ...defaults, ...(typeof f !== 'object' ? {} : f) };
     }
 
