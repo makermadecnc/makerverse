@@ -6,12 +6,13 @@
   "homepage": "http://makerverse.com",
   "author": "Maker Made <info@makermadecnc.com>",
   "license": "MIT",
+  "repository": "github:makermadecnc/makerverse",
   "scripts": {
     "dev-dotnet": "cd ../ && dotnet watch run",
     "dev": "concurrently \"yarn dev-lib\" \"yarn dev-ui\" \"react-scripts start\"",
-    "start": "react-scripts start",
+    "start": "craco start",
     "link": "cd ../ && bash ./ci/link-dev.sh",
-    "build": "react-scripts --expose-gc build",
+    "build": "craco build",
     "test": "cross-env CI=true react-scripts test --env=jsdom",
     "lint": "eslint ./src/**/*.ts ./src/**/*.tsx"
   },

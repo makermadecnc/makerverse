@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Makerverse
-Comment=Makerverse UI (web browser)
-Icon=/home/pi/makerverse/logo.png
-Exec=/home/pi/makerverse/bin/kiosk
-Terminal=false
-Categories=Internet;

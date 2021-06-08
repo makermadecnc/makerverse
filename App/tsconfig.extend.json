@@ -11,6 +11,33 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "importHelpers": true,
-    "jsx": "react"
-  }
+    "allowJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "lib": [
+      "es2015",
+      "dom"
+    ],
+    "noFallthroughCasesInSwitch": true,
+
+    "paths": {
+      "@openworkshop/current-app/*": [
+        "./"
+      ],
+      "@openworkshop/maker-hub/*": [
+        "../../../maker-hub/src/*"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ElectronNET.API;
+using ElectronNET.API.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +24,9 @@ namespace Makerverse {
     // This method gets called by the runtime. Use this method to add services to the container.
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services) {
+      // Electron Setup
+      services.AddElectron();
+
       services.AddSpaStaticFiles(configuration => {
         configuration.RootPath = "App/build";
       });
@@ -55,10 +59,15 @@ namespace Makerverse {
       });
       app.UseSpa(spa => {
         spa.Options.SourcePath = "App";
-        if (env.IsDevelopment()) spa.UseProxyToSpaDevelopmentServer("http://localhost:8001");
+        if (env.IsDevelopment()) spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
       });
 
-      // Task.Run(async () => await Electron.WindowManager.CreateWindowAsync());
+      WebPreferences wp = new WebPreferences();
+      wp.NodeIntegration = false;
+      BrowserWindowOptions browserWindowOptions = new BrowserWindowOptions {
+        WebPreferences = wp
+      };
+      Task.Run(async () => await Electron.WindowManager.CreateWindowAsync(browserWindowOptions));
     }
   }
 }
