@@ -23,7 +23,7 @@ email: zane@technicallywizardry.com
 description: >- # this means to ignore newlines until "baseurl:"
   Documentation for the web-based CNC & 3DP control software.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://www.makerverse.com" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://www.makerverse.com" # the base hostname & protocol for your site, e.g. http://example.com
 logo: "/assets/logo.png"
 
 permalink: pretty
@@ -62,7 +62,7 @@ heading_anchors: true
 # Aux links for the upper right navigation
 aux_links:
   "Makerverse on GitHub":
-    - "//github.com/makermadecnc/makerverse"
+    - "https://github.com/makermadecnc/makerverse"
 
 # Makes Aux links open in a new tab. Default is false
 aux_links_new_tab: true
