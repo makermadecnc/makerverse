@@ -1,9 +1,8 @@
-import { getDevSemver, packageDeployment } from '@openworkshop/maker-hub/deployments';
+import {packageDeployment} from '@openworkshop/maker-hub/deployments';
+import packageJson from './package';
 
-const deployment = packageDeployment({
-  name: '[DEV] Makerverse',
-  version: getDevSemver(),
-  pathPrefix: '/make',
-});
+const deployment = packageDeployment(packageJson);
+
+console.log('deployment', deployment);
 
 export default deployment;

@@ -1,24 +1,17 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Net.Http.Headers;
 using OpenWorkShop.MakerHub;
 using OpenWorkShop.MakerHub.Identity.Services;
 using OpenWorkShop.MakerHub.Lib.Api;
-using OpenWorkShop.MakerHub.Lib.Filesystem;
 using Serilog;
 
 namespace Makerverse {
   public class Startup {
-    private const string GraphqlPath = "/api/graphql";
-
     private static readonly ILogger Log = Serilog.Log.ForContext(typeof(Startup));
 
     // This method gets called by the runtime. Use this method to add services to the container.
@@ -38,7 +31,6 @@ namespace Makerverse {
       services.AddMakerHubServer();
     }
 
-
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
       // ConfigFile? sf = app.ApplicationServices.GetService<ConfigFile>();
@@ -55,7 +47,7 @@ namespace Makerverse {
       app.UseStaticFiles();
       app.UseSpaStaticFiles();
       app.UseEndpoints(endpoints => {
-        endpoints.MapGraphQL(GraphqlPath);
+        endpoints.MapGraphQL(MakerHubDeployment.Singleton.GraphqlPath);
       });
       app.UseSpa(spa => {
         spa.Options.SourcePath = "App";

@@ -7,7 +7,6 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "strict": true,
-    "composite": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "importHelpers": true,
@@ -22,22 +21,16 @@
       "es2015",
       "dom"
     ],
-    "noFallthroughCasesInSwitch": true,
-
-    "paths": {
-      "@openworkshop/current-app/*": [
-        "./"
-      ],
-      "@openworkshop/maker-hub/*": [
-        "../../../maker-hub/src/*"
-      ]
-    }
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src"
   ],
   "exclude": [
     "node_modules",
+    "out",
+    "bin",
+    "build",
     "dist"
   ]
 }

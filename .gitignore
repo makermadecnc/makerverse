@@ -8,6 +8,7 @@ yarn-error.log
 node_modules
 npm-debug.log
 package-lock.json
+preferences.json
 logs/makerverse*
 /.eslintcache
 /.nyc_output
