@@ -1,28 +1,32 @@
 #!/usr/bin/env bash
 
-ARM7_IMAGE="${DOCKER_REPO}:arm32v7-${BUILDKITE_BUILD_NUMBER}"
-ARM8_IMAGE="${DOCKER_REPO}:arm64v8-${BUILDKITE_BUILD_NUMBER}"
-AMD64_IMAGE="${DOCKER_REPO}:amd64-${BUILDKITE_BUILD_NUMBER}"
 IMAGE="${DOCKER_REPO}:${DOCKER_BUILD_TAG}"
+MANIFEST="${REGISTRY_PUBLIC}/${IMAGE}"
 
-MANIFEST="$IMAGE"
+echo "Creating $MANIFEST ..."
 buildah manifest create $MANIFEST
 
 function addToManifest() {
-  echo "Adding ${1} to ${MANIFEST} ($2 $3)"
-  buildah pull "${REGISTRY_LOCAL}/${1}"
+  VERSIONED_IMAGE="${REGISTRY_LOCAL}/${DOCKER_REPO}:${1}-${BUILDKITE_BUILD_NUMBER}"
+  PUBLIC_IMAGE="${REGISTRY_PUBLIC}/${DOCKER_REPO}:${DOCKER_BUILD_TAG}-${1}"
+
+  echo "Converting ${VERSIONED_IMAGE} to ${PUBLIC_IMAGE}..."
+  buildah pull $VERSIONED_IMAGE
+  buildah tag $VERSIONED_IMAGE $PUBLIC_IMAGE
+  buildah push "--creds=$DOCKER_USER:$DOCKER_PASS" "${PUBLIC_IMAGE}"
+
   if [[ -z "$2" ]]; then
-    buildah manifest add $MANIFEST ${1}
+    buildah manifest add $MANIFEST $PUBLIC_IMAGE
   else
-    buildah manifest add --arch ${2} --variant ${3} $MANIFEST ${1}
+    buildah manifest add --arch ${2} --variant ${3} $MANIFEST $PUBLIC_IMAGE
   fi
 }
 
-addToManifest $AMD64_IMAGE
-addToManifest $ARM7_IMAGE arm v7
-addToManifest $ARM7_IMAGE arm v8
+addToManifest amd64
+addToManifest arm32v7 arm v7
+addToManifest arm64v8 arm v8
 
-buildah manifest push $MANIFEST "--creds=$DOCKER_USER:$DOCKER_PASS" "docker://${REGISTRY_PUBLIC}/${MANIFEST}"
+buildah manifest push $MANIFEST "--creds=$DOCKER_USER:$DOCKER_PASS" "docker://$MANIFEST"
 
 #buildah tag ${VERSIONED_IMAGE} ${IMAGE}
 

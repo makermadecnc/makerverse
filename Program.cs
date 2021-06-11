@@ -1,4 +1,3 @@
-using ElectronNET.API;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using OpenWorkShop.MakerHub;
@@ -15,7 +14,7 @@ namespace Makerverse {
       Host.CreateDefaultBuilder(args)
           .ConfigureWebHostDefaults(webBuilder => {
              webBuilder.UseUrls("http://*:" + MakerHubDeployment.Singleton.Port);
-             webBuilder.UseElectron(args);
+             webBuilder.ConfigureElectronDeployment(args);
              webBuilder.UseSerilog();
              webBuilder.UseStartup<Startup>();
            });

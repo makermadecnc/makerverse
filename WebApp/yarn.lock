@@ -2355,10 +2355,10 @@
     "@open-wc/rollup-plugin-html" "^1.2.5"
     polyfills-loader "^1.7.5"
 
-"@openworkshop/maker-hub@0.1.7":
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/@openworkshop/maker-hub/-/maker-hub-0.1.7.tgz#048769095210d600d3c79c2e9f65d43f562fc72c"
-  integrity sha512-k1647D2bGxGQTXYQbAJaThz4uW9PNkHMSI5OKTi7XYK+xpMVKtxPbmXjvLtFujQBITFgP4pqe4f4QxqECYQ5TA==
+"@openworkshop/maker-hub@0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-hub/-/maker-hub-0.1.8.tgz#088b6afb5958adcbb5df15aded87c5b8ffab7d90"
+  integrity sha512-RxVEu1GoN7NHfT5GvFtwmzK3IRN2de/+ZWuMA0X5/fmP9KbT3Gk3LrfSaG412sCcnYNYjLPlMicDrD/aBf0rRA==
 
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":
   version "0.4.3"
@@ -7511,7 +7511,14 @@ i18next-browser-languagedetector@^6.0.1:
   dependencies:
     "@babel/runtime" "^7.5.5"
 
-i18next-http-backend@^1.0.21:
+i18next-chained-backend@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/i18next-chained-backend/-/i18next-chained-backend-3.0.2.tgz#8968c9e12412d24fd23eec109f0340386154384a"
+  integrity sha512-0dd/7oVtPHJnCDMuDvjzlXmWxwfbLOGBFXd1+cgcZ54QlMwv6/ofQ9xhrBIhCFjNh97WQ5pytEeTdcAGwLQ/QA==
+  dependencies:
+    "@babel/runtime" "^7.14.0"
+
+i18next-http-backend@^1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/i18next-http-backend/-/i18next-http-backend-1.2.6.tgz#80b12e8b207814aebb3b8a74c4487dd156973bee"
   integrity sha512-NeNNRofj+rR6Cw+/Elf8bCVaCiqWg2Y6F+CrmDvHiPzAW2Dtxxlk8O0na2et/rr1n3ST6rJr4nMXH/QOFuhaeA==

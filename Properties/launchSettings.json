@@ -1,30 +1,18 @@
 {
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:22836",
-      "sslPort": 44342
-    }
-  },
   "profiles": {
-    "Electron.NET App": {
+    "Makerverse Stand-Alone App": {
       "commandName": "Executable",
-      "executablePath": "electronize",
+      "executablePath": "/Users/zaneclaes/.dotnet/tools/electronize",
       "commandLineArgs": "start",
-      "workingDirectory": "."
-    },
-
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
+      "workingDirectory": ".",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Staging",
+        "BUILD_ELECTRON": "true"
       }
     },
     "Makerverse": {
       "commandName": "Project",
-      "applicationUrl": "https://localhost:5001;http://localhost:5000",
+      "applicationUrl": "http://localhost:8000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
