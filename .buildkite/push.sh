@@ -8,19 +8,21 @@ IMAGE="${DOCKER_REPO}:${DOCKER_BUILD_TAG}"
 MANIFEST="$IMAGE"
 buildah manifest create $MANIFEST
 
-echo "Adding ${AMD64_IMAGE} to ${MANIFEST}"
-buildah pull "docker.io/${AMD64_IMAGE}"
-buildah manifest add $MANIFEST ${AMD64_IMAGE}
+function addToManifest() {
+  echo "Adding ${1} to ${MANIFEST} ($2 $3)"
+  buildah pull "${REGISTRY_LOCAL}/${1}"
+  if [[ -z "$2" ]]; then
+    buildah manifest add $MANIFEST ${1}
+  else
+    buildah manifest add --arch ${2} --variant ${3} $MANIFEST ${1}
+  fi
+}
 
-echo "Adding ${ARM7_IMAGE} to ${MANIFEST}"
-buildah pull "docker.io/${ARM7_IMAGE}"
-buildah manifest add --arch arm --variant v7 $MANIFEST ${ARM7_IMAGE}
+addToManifest $AMD64_IMAGE
+addToManifest $ARM7_IMAGE arm v7
+addToManifest $ARM7_IMAGE arm v8
 
-echo "Adding ${ARM8_IMAGE} to ${MANIFEST}"
-buildah pull "docker.io/${ARM8_IMAGE}"
-buildah manifest add --arch arm --variant v8 $MANIFEST ${ARM8_IMAGE}
-
-buildah manifest push $MANIFEST "--creds=$DOCKER_USER:$DOCKER_PASS" "docker://docker.io/$MANIFEST"
+buildah manifest push $MANIFEST "--creds=$DOCKER_USER:$DOCKER_PASS" "docker://${REGISTRY_PUBLIC}/${MANIFEST}"
 
 #buildah tag ${VERSIONED_IMAGE} ${IMAGE}
 

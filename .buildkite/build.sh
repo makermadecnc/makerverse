@@ -6,7 +6,7 @@ else
   ARCH="$1"
 fi
 
-VERSIONED_IMAGE="${DOCKER_REPO}:${ARCH}-${BUILDKITE_BUILD_NUMBER}"
+VERSIONED_IMAGE="${REGISTRY_LOCAL}/${DOCKER_REPO}:${ARCH}-${BUILDKITE_BUILD_NUMBER}"
 
 if [[ $ARCH == "arm64v8" ]]; then
   echo "building ARM v8"
@@ -23,4 +23,5 @@ fi
 #FN="./bin/${PRODUCT_NAME}.tar"
 echo "pushing ${VERSIONED_IMAGE}"
 #buildah push $IMAGE "docker-archive:${FN}:${VERSIONED_IMAGE}"
-buildah push "--creds=$DOCKER_USER:$DOCKER_PASS" $VERSIONED_IMAGE
+# "--creds=$DOCKER_USER:$DOCKER_PASS"
+buildah push $VERSIONED_IMAGE
