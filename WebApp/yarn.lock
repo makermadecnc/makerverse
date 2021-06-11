@@ -2355,10 +2355,10 @@
     "@open-wc/rollup-plugin-html" "^1.2.5"
     polyfills-loader "^1.7.5"
 
-"@openworkshop/maker-hub@0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@openworkshop/maker-hub/-/maker-hub-0.1.6.tgz#713124d5d7b034795a5ebd66015c7828f8a2c61f"
-  integrity sha512-tBiwreTfJjl2Y7UgcOVBQ7cs2NqXsSLYHheJOyB4+ofc8KWVzAMoHZLlmNRPRM11pciKoDkw1ufLLQZzSJXMWA==
+"@openworkshop/maker-hub@0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-hub/-/maker-hub-0.1.7.tgz#048769095210d600d3c79c2e9f65d43f562fc72c"
+  integrity sha512-k1647D2bGxGQTXYQbAJaThz4uW9PNkHMSI5OKTi7XYK+xpMVKtxPbmXjvLtFujQBITFgP4pqe4f4QxqECYQ5TA==
 
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":
   version "0.4.3"

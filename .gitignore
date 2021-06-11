@@ -28,4 +28,4 @@ MakerverseServerTests/bin/**
 /events
 .makerverse-status
 **/tsconfig.tsbuildinfo
-App/build
+WebApp/build

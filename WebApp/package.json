@@ -15,7 +15,7 @@
     "build": "craco build",
     "test": "cross-env CI=true react-scripts test --env=jsdom",
     "lint": "eslint ./src/**/*.ts ./src/**/*.tsx",
-    "prepare": "cd .. && husky install App/.husky"
+    "prepare": "cd .. && husky install WebApp/.husky"
   },
   "dependencies": {
     "@apollo/client": "^3.3.6",
@@ -29,7 +29,7 @@
     "@material-ui/core": "5.0.0-alpha.34",
     "@material-ui/lab": "5.0.0-alpha.34",
     "@material-ui/styles": "5.0.0-alpha.33",
-    "@openworkshop/maker-hub": "0.1.6",
+    "@openworkshop/maker-hub": "0.1.7",
     "@popperjs/core": "^2.5.4",
     "@reduxjs/toolkit": "^1.4.0",
     "graphql": "^15.4.0",

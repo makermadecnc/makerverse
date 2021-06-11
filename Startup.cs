@@ -21,7 +21,7 @@ namespace Makerverse {
       services.AddElectron();
 
       services.AddSpaStaticFiles(configuration => {
-        configuration.RootPath = "App/build";
+        configuration.RootPath = "WebApp/build";
       });
       services.AddMakerHubServices();
       services.AddAuthentication();
@@ -50,7 +50,7 @@ namespace Makerverse {
         endpoints.MapGraphQL(MakerHubDeployment.Singleton.GraphqlPath);
       });
       app.UseSpa(spa => {
-        spa.Options.SourcePath = "App";
+        spa.Options.SourcePath = "WebApp";
         if (env.IsDevelopment()) spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
       });
 

@@ -6,7 +6,7 @@
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <IsPackable>false</IsPackable>
-    <SpaRoot>App\</SpaRoot>
+    <SpaRoot>WebApp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExclusiondes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
     <PackageVersion>1.1.3</PackageVersion>
     <Title>Makerverse</Title>
@@ -17,7 +17,7 @@
     <RuntimeIdentifiers>linux-arm;linux-arm64;linux-x64;osx-x64;win-x64</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.1.6" />
+    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.1.7" />
     <PackageReference Include="ElectronNET.API" Version="11.5.1" />
   </ItemGroup>
   <ItemGroup>
