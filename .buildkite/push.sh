@@ -4,6 +4,7 @@ IMAGE="${DOCKER_REPO}:${DOCKER_BUILD_TAG}"
 MANIFEST="${REGISTRY_PUBLIC}/${IMAGE}"
 
 echo "Creating $MANIFEST ..."
+buildah manifest rm $MANIFEST
 buildah manifest create $MANIFEST
 
 function addToManifest() {

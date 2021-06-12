@@ -10,9 +10,9 @@
   "scripts": {
     "dev-dotnet": "cd ../ && dotnet watch run",
     "dev": "concurrently \"yarn dev-lib\" \"yarn dev-ui\" \"react-scripts start\"",
-    "start": "craco start",
+    "start": "react-scripts start",
     "link": "cd ../ && bash ./ci/link-dev.sh",
-    "build": "craco build",
+    "build": "react-scripts build",
     "test": "cross-env CI=true react-scripts test --env=jsdom",
     "lint": "eslint ./src/**/*.ts ./src/**/*.tsx",
     "prepare": "cd .. && husky install WebApp/.husky"
