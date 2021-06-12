@@ -10,13 +10,16 @@ VERSIONED_IMAGE="${REGISTRY_LOCAL}/${DOCKER_REPO}:${ARCH}-${BUILDKITE_BUILD_NUMB
 
 if [[ $ARCH == "arm64v8" ]]; then
   echo "building ARM v8"
-  buildah bud --arch arm --variant v8 -t $VERSIONED_IMAGE arm64v8.Dockerfile
+  buildah bud --arch arm --variant v8 --build-arg YARN_REGISTRY="$NPM_LOCAL_REGISTRY" \
+    -t $VERSIONED_IMAGE arm64v8.Dockerfile
 elif [[ $ARCH == "arm32v7" ]]; then
   echo "building ARM v7"
-  buildah bud --arch arm --variant v7 -t $VERSIONED_IMAGE arm32v7.Dockerfile
+  buildah bud --arch arm --variant v7 --build-arg YARN_REGISTRY="$NPM_LOCAL_REGISTRY" \
+    -t $VERSIONED_IMAGE arm32v7.Dockerfile
 else
   echo "building for ${ARCH}"
-  buildah bud -t $VERSIONED_IMAGE amd64.Dockerfile
+  buildah bud --build-arg YARN_REGISTRY="$NPM_LOCAL_REGISTRY" \
+    -t $VERSIONED_IMAGE amd64.Dockerfile
 fi
 
 #mkdir -p bin

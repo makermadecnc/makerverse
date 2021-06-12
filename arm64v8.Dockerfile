@@ -14,6 +14,9 @@ RUN npm install -g npm@latest
 
 # Install yarn
 RUN npm install --global yarn
+ARG YARN_REGISTRY="https://registry.npmjs.org/"
+RUN yarn config set registry $YARN_REGISTRY
+RUN yarn config list
 
 # Copy csproj and restore as distinct layers
 COPY *.csproj ./
