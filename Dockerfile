@@ -1,5 +1,10 @@
-# https://github.com/dotnet/dotnet-docker/blob/master/samples/dotnetapp/Dockerfile.debian-arm32
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
+ARG DOCKER_REGISTRY="mcr.microsoft.com"
+ARG YARN_REGISTRY="https://registry.npmjs.org"
+ARG DOTNET_VERSION="5.0"
+ARG DOTNET_SDK="$DOTNET_VERSION"
+ARG DOTNET_RUNTIME="buster-slim"
+
+FROM $DOCKER_REGISTRY/dotnet/sdk:$DOTNET_SDK AS build-env
 WORKDIR /app
 
 # Install NPM
@@ -14,9 +19,7 @@ RUN npm install -g npm@latest
 
 # Install yarn
 RUN npm install --global yarn
-ARG YARN_REGISTRY="https://registry.npmjs.org/"
 RUN yarn config set registry $YARN_REGISTRY
-RUN yarn config list
 
 # Copy csproj and restore as distinct layers
 COPY *.csproj ./
@@ -26,7 +29,7 @@ COPY . ./
 RUN dotnet publish -c Release -o out
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim
+FROM $DOCKER_REGISTRY/dotnet/aspnet:$DOTNET_VERSION-$DOTNET_RUNTIME
 
 WORKDIR /app
 COPY --from=build-env /app/out .

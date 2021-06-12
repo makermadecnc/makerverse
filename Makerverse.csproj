@@ -17,7 +17,7 @@
     <RuntimeIdentifiers>linux-arm;linux-arm64;linux-x64;osx-x64;win-x64</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.1.8" />
+    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.1.9" />
   </ItemGroup>
   <ItemGroup Condition=" '$(BUILD_ELECTRON)' == 'true' ">
     <PackageReference Include="ElectronNET.API" Version="11.5.1" />
