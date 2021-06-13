@@ -1,31 +1,28 @@
 #!/usr/bin/env bash
 
 if [[ -z "$1" ]]; then
-  ARCH=${BUILDKITE_AGENT_META_DATA_ARCH:-amd64}
+  ARCH=${BUILDKITE_AGENT_META_DATA_ARCH:-amd}
 else
   ARCH="$1"
 fi
 
+CPU="${BUILDKITE_AGENT_META_DATA_CPU:-64}"
+ARCH_VARIANT="${BUILDKITE_AGENT_META_DATA_ARCH_VARIANT:-x64}"
+
 VERSIONED_IMAGE="${DOCKER_LOCAL_REGISTRY}/${DOCKER_REPO}:${ARCH}-${BUILDKITE_BUILD_NUMBER}"
 
-if [[ $ARCH == "arm64v8" ]]; then
-  echo "building ARM v8"
-  buildah bud --arch arm --variant v8 \
+if [[ $ARCH == "arm" ]]; then
+  ARCH_FULL="${ARCH}${CPU}${ARCH_VARIANT}"
+
+  echo "building $ARCH_FULL"
+  buildah bud --arch arm --variant $BUILDKITE_AGENT_META_DATA_ARCH_VARIANT \
     --build-arg YARN_REGISTRY="$NPM_LOCAL_REGISTRY" \
     --build-arg DOCKER_REGISTRY="$DOCKER_LOCAL_REGISTRY" \
-    --build-arg DOTNET_RUNTIME="buster-slim-${ARCH}" \
-    --build-arg DOTNET_SDK="5.0-arm" \
-    -t $VERSIONED_IMAGE Dockerfile
-elif [[ $ARCH == "arm32v7" ]]; then
-  echo "building ARM v7"
-  buildah bud --arch arm --variant v7 \
-    --build-arg YARN_REGISTRY="$NPM_LOCAL_REGISTRY" \
-    --build-arg DOCKER_REGISTRY="$DOCKER_LOCAL_REGISTRY" \
-    --build-arg DOTNET_RUNTIME="buster-slim-${ARCH}" \
+    --build-arg DOTNET_RUNTIME="buster-slim-${ARCH_FULL}" \
     --build-arg DOTNET_SDK="5.0-arm" \
     -t $VERSIONED_IMAGE Dockerfile
 else
-  echo "building for ${ARCH}"
+  echo "building for ${ARCH} ${ARCH_VARIANT}"
   buildah bud \
     --build-arg YARN_REGISTRY="$NPM_LOCAL_REGISTRY" \
     --build-arg DOCKER_REGISTRY="$DOCKER_LOCAL_REGISTRY" \

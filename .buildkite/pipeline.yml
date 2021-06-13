@@ -1,38 +1,59 @@
 steps:
   # Linux x64 Stand-Alone
-  - command: "dotnet restore && electronize build /target linux"
+  - command: "./.buildkite/build-electron.sh"
     label: ":ubuntu: .deb :hammer_and_wrench:"
     env:
       BUILD_ELECTRON: true
     agents:
       geo: "co"
-      arch: "amd64"
+      arch: "amd"
+      os: "linux"
+      cpu: "64"
+      arch_variant: "x64"
+
+  # Win x64 Stand-Alone can be built on linux
+  - command: "./.buildkite/build-electron.sh win"
+    label: ":windows: .exe :hammer_and_wrench:"
+    env:
+      BUILD_ELECTRON: true
+    agents:
+      geo: "co"
+      arch: "amd"
+      os: "linux"
+      cpu: "64"
+      arch_variant: "x64"
 
   # AMD64 Docker Container
-  - command: "./.buildkite/build.sh"
+  - command: "./.buildkite/build-docker.sh"
     label: ":docker: :ubuntu: AMD x64 :hammer_and_wrench:"
     agents:
       geo: "co"
-      arch: "amd64"
+      arch: "amd"
+      # cpu: "64"
+      # arch_variant: "x64"
 
   # ARM32v7 Docker Container
-  - command: "./.buildkite/build.sh arm32v7"
+  - command: "./.buildkite/build-docker.sh"
     label: ":docker: :raspberry-pi: ARM v7 :hammer_and_wrench:"
     agents:
       geo: "co"
-      arch: "arm64v8"
+      arch: "arm"
+      # cpu: "32"
+      # arch_variant: "v7"
 
   # ARM64v8 Docker Container
-  - command: "./.buildkite/build.sh"
+  - command: "./.buildkite/build-docker.sh"
     label: ":docker: :raspberry-pi: ARM v8 :hammer_and_wrench:"
     agents:
       geo: "co"
-      arch: "arm64v8"
+      arch: "arm"
+      # cpu: "32"
+      # arch_variant: "v7"
 
   # Block release
   - block: "Release?"
 
-  - command: "./.buildkite/push.sh"
+  - command: "./.buildkite/build-docker.sh"
     label: ":docker: ${PRODUCT_NAME}:${DOCKER_BUILD_TAG} :rocket:"
     agents:
       geo: "co"

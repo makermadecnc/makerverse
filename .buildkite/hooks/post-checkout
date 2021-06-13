@@ -1,23 +1,68 @@
 #!/bin/bash
-export DOTNET_ROOT=$HOME/dotnet
-export PATH=$PATH:$DOTNET_ROOT
+
+export LOCAL_DOMAIN="${LOCAL_DOMAIN:-oodalolly.camp}"
+
+export DOCKER_USER="inzania"
+export PRODUCT_NAME="makerverse"
+export DOCKER_ORG="makerverse"
+export DOCKER_IMAGE="core"
+export DOCKER_REPO="$DOCKER_ORG/$DOCKER_IMAGE"
+
+export NPM_LOCAL_REGISTRY="https://npm.${LOCAL_DOMAIN}"
+export DOCKER_LOCAL_REGISTRY="containers.${LOCAL_DOMAIN}"
+export DOCKER_PUBLIC_REGISTRY="docker.io"
 
 # https://github.com/drud/ddev/issues/2772
-if [ $BUILDKITE_AGENT_META_DATA_ARCH == "arm64v8" ]; then
-  export BUILDAH_OS="Raspbian"
-elif [ $BUILDKITE_AGENT_META_DATA_ARCH == "arm32v7" ]; then
+if [ $BUILDKITE_AGENT_META_DATA_ARCH == "arm" ]; then
   export BUILDAH_OS="Raspbian"
 else
   export BUILDAH_OS="xUbuntu"
 
-  # Dotnet
-  if [ ! $(which dotnet) ]; then
-    echo "Installing Dotnet..."
-    mkdir -p $HOME/dotnet
-    tar zxf /assets/dotnet-sdk-5.0.300-linux-x64.tar.gz -C $HOME/dotnet
-  fi
+  if [ $BUILD_ELECTRON == "true" ]; then
+    # Dotnet
+    export DOTNET_ROOT=$HOME/dotnet
+    export PATH=$PATH:$DOTNET_ROOT:$HOME/.dotnet/tools
 
-  dotnet --version
+    if [ ! $(which dotnet) ]; then
+      echo "Installing Dotnet..."
+      mkdir -p $HOME/dotnet
+      tar zxf /assets/dotnet-sdk-5.0.300-linux-x64.tar.gz -C $HOME/dotnet
+    fi
+
+    dotnet --version
+
+    # Electronize
+    if [ ! $(which electronize) ]; then
+      dotnet tool install ElectronNET.CLI -g
+    fi
+
+    # Load NVM if present
+    export NVM_DIR="$HOME/.nvm"
+    if [[ -f "$NVM_DIR/nvm.sh" ]]; then
+      source "$NVM_DIR/nvm.sh"
+    fi
+
+    # NodeJS version via NVM
+    NODE_VERS=$(node --version)
+    if [[ $NODE_VERS != v16* ]]; then
+      echo "Upgrading Node from ${NODE_VERS}..."
+      curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+      source "$NVM_DIR/nvm.sh"
+
+      NV=$(cat .nvmrc)
+      nvm install "${NV}"
+      nvm use "${NV}"
+      nvm alias default "${NV}"
+    fi
+
+    # Yarn
+    if [ ! $(which yarn) ]; then
+      echo "Installing Yarn..."
+      npm install -g yarn
+    fi
+
+    yarn config set registry $NPM_LOCAL_REGISTRY
+  fi
 fi
 
 # install buildah
@@ -45,12 +90,3 @@ else
   export DOCKER_BUILD_TAG="latest"
 fi
 
-export DOCKER_USER="inzania"
-export PRODUCT_NAME="makerverse"
-export DOCKER_ORG="makerverse"
-export DOCKER_IMAGE="core"
-export DOCKER_REPO="$DOCKER_ORG/$DOCKER_IMAGE"
-
-export NPM_LOCAL_REGISTRY="https://npm.oodalolly.camp"
-export DOCKER_LOCAL_REGISTRY="containers.oodalolly.camp"
-export DOCKER_PUBLIC_REGISTRY="docker.io"
