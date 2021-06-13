@@ -1,4 +1,13 @@
 steps:
+  # Linux x64 Stand-Alone
+  - command: "dotnet restore && electronize build /target linux"
+    label: ":ubuntu: .deb :hammer_and_wrench:"
+    env:
+      BUILD_ELECTRON: true
+    agents:
+      geo: "co"
+      arch: "amd64"
+
   # AMD64 Docker Container
   - command: "./.buildkite/build.sh"
     label: ":docker: :ubuntu: AMD x64 :hammer_and_wrench:"

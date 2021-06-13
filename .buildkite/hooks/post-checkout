@@ -1,4 +1,6 @@
 #!/bin/bash
+export DOTNET_ROOT=$HOME/dotnet
+export PATH=$PATH:$DOTNET_ROOT
 
 # https://github.com/drud/ddev/issues/2772
 if [ $BUILDKITE_AGENT_META_DATA_ARCH == "arm64v8" ]; then
@@ -7,6 +9,15 @@ elif [ $BUILDKITE_AGENT_META_DATA_ARCH == "arm32v7" ]; then
   export BUILDAH_OS="Raspbian"
 else
   export BUILDAH_OS="xUbuntu"
+
+  # Dotnet
+  if [ ! $(which dotnet) ]; then
+    echo "Installing Dotnet..."
+    mkdir -p $HOME/dotnet
+    tar zxf /assets/dotnet-sdk-5.0.300-linux-x64.tar.gz -C $HOME/dotnet
+  fi
+
+  dotnet --version
 fi
 
 # install buildah
