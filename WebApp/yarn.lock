@@ -2357,7 +2357,7 @@
 
 "@openworkshop/maker-hub@0.1.9":
   version "0.1.9"
-  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-hub/-/maker-hub-0.1.9.tgz#c40195644190a964615071299f15017d274fba2e"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-hub/-/maker-hub-0.1.9.tgz#c40195644190a964615071299f15017d274fba2e"
   integrity sha512-hkjCc1fcEnLiz4MutLZrgvOP127i7jtP9rigO988PuBvIjXvaBXDWKyxhFDjTl+CfqpEf8+4H3R5fGnX/UGm5g==
 
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":

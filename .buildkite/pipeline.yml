@@ -11,17 +11,29 @@ steps:
       cpu: "64"
       arch_variant: "x64"
 
-  # Win x64 Stand-Alone can be built on linux
-  - command: "./.buildkite/build-electron.sh win"
-    label: ":windows: .exe :hammer_and_wrench:"
+  # OSX x64 Stand-Alone can be built on linux
+  - command: "./.buildkite/build-electron.sh osx"
+    label: ":mac: .app :apple: .dmg :hammer_and_wrench:"
     env:
       BUILD_ELECTRON: true
     agents:
       geo: "co"
       arch: "amd"
-      os: "linux"
+      os: "mac"
       cpu: "64"
       arch_variant: "x64"
+#
+#  # Win x64 Stand-Alone can be built on linux
+#  - command: "./.buildkite/build-electron.sh win"
+#    label: ":windows: .exe :hammer_and_wrench:"
+#    env:
+#      BUILD_ELECTRON: true
+#    agents:
+#      geo: "co"
+#      arch: "amd"
+#      os: "linux"
+#      cpu: "64"
+#      arch_variant: "x64"
 
   # AMD64 Docker Container
   - command: "./.buildkite/build-docker.sh"
