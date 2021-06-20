@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/bash
 
 IMAGE="${DOCKER_REPO}:${DOCKER_BUILD_TAG}"
 MANIFEST="${DOCKER_PUBLIC_REGISTRY}/${IMAGE}"

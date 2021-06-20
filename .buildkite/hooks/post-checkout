@@ -1,4 +1,4 @@
-#!/bin/env sh
+#!/bin/bash
 
 export LOCAL_DOMAIN="${LOCAL_DOMAIN:-oodalolly.camp}"
 export PRODUCT_NAME="makerverse"

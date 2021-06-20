@@ -2,5 +2,9 @@
 . "$(dirname "$0")/_/husky.sh"
 
 yarn run lint-staged
-cd ../../ && src/maker-builder/src/project.js Makerverse prod
 
+if [ -d "$MH" ]; then
+  node "$MH/src/maker-builder/src/project.js" Makerverse prod
+else
+  echo "No \$MH directory found; skipped version checks."
+fi
