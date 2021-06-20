@@ -4,7 +4,9 @@
 yarn run lint-staged
 
 if [ -d "$MH" ]; then
-  node "$MH/src/maker-builder/src/project.js" Makerverse prod
+  pushd $MH
+  node "./src/maker-builder/src/project.js" Makerverse prod
+  popd
 else
   echo "No \$MH directory found; skipped version checks."
 fi

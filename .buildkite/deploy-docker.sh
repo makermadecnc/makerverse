@@ -1,4 +1,5 @@
 #!/bin/bash
+source .buildkite/bootstrap.sh
 
 IMAGE="${DOCKER_REPO}:${DOCKER_BUILD_TAG}"
 MANIFEST="${DOCKER_PUBLIC_REGISTRY}/${IMAGE}"

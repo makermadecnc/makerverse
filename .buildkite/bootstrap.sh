@@ -11,10 +11,10 @@ export DOCKER_LOCAL_REGISTRY="containers.${LOCAL_DOMAIN}"
 export DOCKER_PUBLIC_REGISTRY="docker.io"
 
 # Infer the real branch from CI env
-if [ $BUILDKITE_PULL_REQUEST != "false" ]; then
+if [[ $BUILDKITE_PULL_REQUEST != "false" ]]; then
   # Pull requests always build as the "beta" branch.
   export DOCKER_BUILD_TAG="beta"
-elif [ $BUILDKITE_BRANCH != "master" ]; then
+elif [[ $BUILDKITE_BRANCH != "master" ]]; then
   # Non-master branch builds are always "alpha".
   export DOCKER_BUILD_TAG="alpha"
 else

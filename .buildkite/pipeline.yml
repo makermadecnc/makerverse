@@ -1,6 +1,6 @@
 steps:
   # Linux x64 Stand-Alone
-  - command: "./.buildkite/build-electron.sh"
+  - command: "bash .buildkite/build-electron.sh"
     label: ":ubuntu: .deb :hammer_and_wrench:"
     env:
       BUILD_ELECTRON: true
@@ -12,7 +12,7 @@ steps:
       arch_variant: "x64"
 
   # OSX x64 Stand-Alone can be built on linux
-  - command: "./.buildkite/build-electron.sh osx"
+  - command: "bash .buildkite/build-electron.sh osx"
     label: ":mac: .app :apple: .dmg :hammer_and_wrench:"
     env:
       BUILD_ELECTRON: true
@@ -24,7 +24,7 @@ steps:
       arch_variant: "x64"
 #
 #  # Win x64 Stand-Alone can be built on linux
-  - command: "./.buildkite/build-electron.sh win"
+  - command: "bash .buildkite/build-electron.sh win"
     label: ":windows: .exe :hammer_and_wrench:"
     env:
       BUILD_ELECTRON: true
@@ -36,7 +36,7 @@ steps:
       arch_variant: "x64"
 
   # AMD64 Docker Container
-  - command: "./.buildkite/build-docker.sh"
+  - command: "bash .buildkite/build-docker.sh"
     label: ":docker: :ubuntu: AMD x64 :hammer_and_wrench:"
     agents:
       geo: "co"
@@ -45,7 +45,7 @@ steps:
       # arch_variant: "x64"
 
   # ARM32v7 Docker Container
-  - command: "./.buildkite/build-docker.sh"
+  - command: "bash .buildkite/build-docker.sh"
     label: ":docker: :raspberry-pi: ARM v7 :hammer_and_wrench:"
     agents:
       geo: "co"
@@ -54,7 +54,7 @@ steps:
       # arch_variant: "v7"
 
   # ARM64v8 Docker Container
-  - command: "./.buildkite/build-docker.sh"
+  - command: "bash .buildkite/build-docker.sh"
     label: ":docker: :raspberry-pi: ARM v8 :hammer_and_wrench:"
     agents:
       geo: "co"
@@ -65,7 +65,7 @@ steps:
   # Block release
   - block: "Release?"
 
-  - command: "./.buildkite/build-docker.sh"
+  - command: "bash .buildkite/build-docker.sh"
     label: ":docker: ${PRODUCT_NAME}:${DOCKER_BUILD_TAG} :rocket:"
     agents:
       geo: "co"

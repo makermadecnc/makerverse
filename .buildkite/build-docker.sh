@@ -1,5 +1,6 @@
 #!/bin/bash
-buildah rm -all
+source .buildkite/bootstrap.sh
+# buildah rm -all
 
 if [[ -z "$1" ]]; then
   ARCH=${BUILDKITE_AGENT_META_DATA_ARCH:-amd}
