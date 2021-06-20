@@ -1,9 +1,11 @@
 steps:
   # Linux x64 Stand-Alone
   - command: "bash .buildkite/build-electron.sh"
-    label: ":ubuntu: .deb :hammer_and_wrench:"
+    label: ".deb :ubuntu: AMD :hammer_and_wrench: x64"
     env:
       BUILD_ELECTRON: true
+    artifact_paths:
+      - "bin/Desktop/**/*"
     agents:
       geo: "co"
       arch: "amd"
@@ -13,21 +15,25 @@ steps:
 
   # OSX x64 Stand-Alone can be built on linux
   - command: "bash .buildkite/build-electron.sh osx"
-    label: ":mac: .app :apple: .dmg :hammer_and_wrench:"
+    label: ".app, .dmg :mac: AMD :hammer_and_wrench: x64"
     env:
       BUILD_ELECTRON: true
+    artifact_paths:
+      - "bin/Desktop/**/*"
     agents:
       geo: "co"
       arch: "amd"
       os: "mac"
       cpu: "64"
       arch_variant: "x64"
-#
-#  # Win x64 Stand-Alone can be built on linux
-  - command: "bash .buildkite/build-electron.sh win"
-    label: ":windows: .exe :hammer_and_wrench:"
+
+  # Windows has dependencies installed natively, and needs a native style invocation.
+  - command: "cmd.exe /c \".buildkite\\build-electron.cmd\""
+    label: ".exe :windows: AMD :hammer_and_wrench: x64"
     env:
       BUILD_ELECTRON: true
+    artifact_paths:
+      - "bin/Desktop/**/*"
     agents:
       geo: "co"
       arch: "amd"
@@ -37,7 +43,7 @@ steps:
 
   # AMD64 Docker Container
   - command: "bash .buildkite/build-docker.sh"
-    label: ":docker: :ubuntu: AMD x64 :hammer_and_wrench:"
+    label: ":ubuntu: AMD :hammer_and_wrench: x64 :docker:"
     agents:
       geo: "co"
       arch: "amd"
@@ -46,7 +52,7 @@ steps:
 
   # ARM32v7 Docker Container
   - command: "bash .buildkite/build-docker.sh"
-    label: ":docker: :raspberry-pi: ARM v7 :hammer_and_wrench:"
+    label: ":raspberry-pi: ARM :hammer_and_wrench: v7 :docker:"
     agents:
       geo: "co"
       arch: "arm"
@@ -55,7 +61,7 @@ steps:
 
   # ARM64v8 Docker Container
   - command: "bash .buildkite/build-docker.sh"
-    label: ":docker: :raspberry-pi: ARM v8 :hammer_and_wrench:"
+    label: ":raspberry-pi: ARM :hammer_and_wrench: v8 :docker:"
     agents:
       geo: "co"
       arch: "arm"
@@ -65,7 +71,7 @@ steps:
   # Block release
   - block: "Release?"
 
-  - command: "bash .buildkite/build-docker.sh"
+  - command: "bash .buildkite/deploy-docker.sh"
     label: ":docker: ${PRODUCT_NAME}:${DOCKER_BUILD_TAG} :rocket:"
     agents:
       geo: "co"

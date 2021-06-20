@@ -15,7 +15,9 @@
     "build": "react-scripts build",
     "test": "cross-env CI=true react-scripts test --env=jsdom",
     "lint": "eslint ./src/**/*.ts ./src/**/*.tsx",
-    "prepare": "cd .. && husky install WebApp/.husky"
+    "prepare": "cd .. && husky install WebApp/.husky",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "dependencies": {
     "@apollo/client": "^3.3.6",
@@ -123,8 +125,7 @@
     "rollup-plugin-visualizer": "^5.5.0",
     "semver": "^7.3.5",
     "tslib": "^2.2.0",
-    "typescript": "^4.2.4",
-    "electron-builder": "^22.11.7"
+    "typescript": "^4.2.4"
   },
   "eslintConfig": {
     "extends": [
