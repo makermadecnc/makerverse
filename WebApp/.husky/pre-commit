@@ -2,5 +2,5 @@
 . "$(dirname "$0")/_/husky.sh"
 
 yarn run lint-staged
-cd ../../ && ci/project.js Makerverse prod
+cd ../../ && src/maker-builder/src/project.js Makerverse prod
 

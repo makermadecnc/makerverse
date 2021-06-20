@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
-if [[ -z "$1" ]]; then
+if [ -z "$1" ]; then
   ARCH=${BUILDKITE_AGENT_META_DATA_ARCH:-amd}
 else
   ARCH="$1"

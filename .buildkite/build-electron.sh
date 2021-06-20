@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 ELECTRON_TARGET="${1:-linux}"
 
 echo "Adding required build tools..."

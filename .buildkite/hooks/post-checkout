@@ -1,82 +1,14 @@
-#!/bin/bash
+#!/bin/env sh
 
 export LOCAL_DOMAIN="${LOCAL_DOMAIN:-oodalolly.camp}"
-
-export DOCKER_USER="inzania"
 export PRODUCT_NAME="makerverse"
-export DOCKER_ORG="makerverse"
-export DOCKER_IMAGE="core"
-export DOCKER_REPO="$DOCKER_ORG/$DOCKER_IMAGE"
 
 export NPM_LOCAL_REGISTRY="https://npm.${LOCAL_DOMAIN}"
+
+export DOCKER_USER="inzania"
+export DOCKER_REPO="$PRODUCT_NAME/core"
 export DOCKER_LOCAL_REGISTRY="containers.${LOCAL_DOMAIN}"
 export DOCKER_PUBLIC_REGISTRY="docker.io"
-
-# https://github.com/drud/ddev/issues/2772
-if [ $BUILDKITE_AGENT_META_DATA_ARCH == "arm" ]; then
-  export BUILDAH_OS="Raspbian"
-else
-  export BUILDAH_OS="xUbuntu"
-
-  if [ $BUILD_ELECTRON == "true" ]; then
-    # Dotnet
-    export DOTNET_ROOT=$HOME/dotnet
-    export PATH=$PATH:$DOTNET_ROOT:$HOME/.dotnet/tools
-
-    if [ ! $(which dotnet) ]; then
-      echo "Installing Dotnet..."
-      mkdir -p $HOME/dotnet
-      tar zxf /assets/dotnet-sdk-5.0.300-linux-x64.tar.gz -C $HOME/dotnet
-    fi
-
-    dotnet --version
-
-    # Electronize
-    if [ ! $(which electronize) ]; then
-      dotnet tool install ElectronNET.CLI -g
-    fi
-
-    # Load NVM if present
-    export NVM_DIR="$HOME/.nvm"
-    if [[ -f "$NVM_DIR/nvm.sh" ]]; then
-      source "$NVM_DIR/nvm.sh"
-    fi
-
-    # NodeJS version via NVM
-    NODE_VERS=$(node --version)
-    if [[ $NODE_VERS != v16* ]]; then
-      echo "Upgrading Node from ${NODE_VERS}..."
-      curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
-      source "$NVM_DIR/nvm.sh"
-
-      NV=$(cat .nvmrc)
-      nvm install "${NV}"
-      nvm use "${NV}"
-      nvm alias default "${NV}"
-    fi
-
-    # Yarn
-    if [ ! $(which yarn) ]; then
-      echo "Installing Yarn..."
-      npm install -g yarn
-    fi
-
-    yarn config set registry $NPM_LOCAL_REGISTRY
-  fi
-fi
-
-# install buildah
-if [ ! $(which buildah) ]; then
-  apt-get update -y
-  apt-get install -y curl gpg
-
-  . /etc/os-release
-  sh -c "echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/${BUILDAH_OS}_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"
-  curl -L https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/${BUILDAH_OS}_${VERSION_ID}/Release.key | apt-key add
-
-  apt-get update
-  apt-get -y install buildah
-fi
 
 # Infer the real branch from CI env
 if [ $BUILDKITE_PULL_REQUEST != "false" ]; then
@@ -89,4 +21,3 @@ else
   # Full production build, tagged latest.
   export DOCKER_BUILD_TAG="latest"
 fi
-
