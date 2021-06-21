@@ -34,15 +34,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.1.9" />
+    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.2.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(BUILD_ELECTRON)' == 'true' ">
     <PackageReference Include="ElectronNET.API" Version="11.5.1" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ProjectReference Include="..\..\MakerHub\MakerHub.csproj" />
-    <PackageReference Include="..\..\..\ElectronNET.API\ElectronNET.API.csproj" />
-    <PackageReference Include="..\..\..\ElectronNET.CLI\ElectronNET.CLI.csproj" />
   </ItemGroup>
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') And '$(BUILD_ELECTRON)' != 'true' ">
     <!-- Ensure Node.js is installed -->

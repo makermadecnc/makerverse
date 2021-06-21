@@ -59,13 +59,14 @@
     lodash "^4.17.15"
     tmp-promise "^3.0.2"
 
-"@openworkshop/maker-builder@latest":
-  version "0.0.2"
-  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-builder/-/maker-builder-0.0.2.tgz#1ac45ac00102f403f75c50ab3b861e7c7febbc53"
-  integrity sha512-7o+15maqcc8SMx9IT3hNlm7XZqbpm5jIXIxZYOl+4lTz6e43tQT42Z7uIDb5i/9yWPzeA2f2AM6QJ82vCeo31w==
+"@openworkshop/maker-builder@^0.0.3":
+  version "0.0.3"
+  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-builder/-/maker-builder-0.0.3.tgz#c6e6ca618bd1b07991da60b001f861cd258adcb5"
+  integrity sha512-OE8ahXVRz+Q9AAKJe0Ux1BC5rrsRXBTYh3rDDMWhF0urnclo2qiP15nGqU3yttQCiJHtezjOQ1aOlLBpSukktA==
   dependencies:
     child_process "^1.0.2"
     command-exists "^1.2.9"
+    rimraf "^3.0.2"
     yargs "^17.0.1"
 
 "@sindresorhus/is@^0.14.0":
@@ -1418,7 +1419,7 @@ responselike@^1.0.2:
   dependencies:
     lowercase-keys "^1.0.0"
 
-rimraf@^3.0.0:
+rimraf@^3.0.0, rimraf@^3.0.2:
   version "3.0.2"
   resolved "https://npm.oodalolly.camp/rimraf/-/rimraf-3.0.2.tgz#f1a5402ba6220ad52cc1282bac1ae3aa49fd061a"
   integrity sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==
