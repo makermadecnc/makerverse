@@ -1,7 +1,9 @@
 steps:
   # Linux x64 Stand-Alone
-  - command: "bash .buildkite/build-electron.sh"
-    label: ".deb :ubuntu: AMD :hammer_and_wrench: x64"
+  - label: ".deb :ubuntu: AMD :hammer_and_wrench: x64"
+    commands:
+      - "npm install -g @openworkshop/maker-builder@latest"
+      - "maker-electron build"
     env:
       BUILD_ELECTRON: true
     artifact_paths:
@@ -14,8 +16,10 @@ steps:
       arch_variant: "x64"
 
   # OSX x64 Stand-Alone can be built on linux
-  - command: "bash .buildkite/build-electron.sh osx"
-    label: ".app, .dmg :mac: AMD :hammer_and_wrench: x64"
+  - label: ".app, .dmg :mac: AMD :hammer_and_wrench: x64"
+    commands:
+      - "npm install -g @openworkshop/maker-builder@latest"
+      - "maker-electron build"
     env:
       BUILD_ELECTRON: true
     artifact_paths:
@@ -28,8 +32,10 @@ steps:
       arch_variant: "x64"
 
   # Windows has dependencies installed natively, and needs a native style invocation.
-  - command: "cmd.exe /c \".buildkite\\build-electron.cmd\""
-    label: ".exe :windows: AMD :hammer_and_wrench: x64"
+  - label: ".exe :windows: AMD :hammer_and_wrench: x64"
+    commands:
+      - "npm install -g @openworkshop/maker-builder@latest"
+      - "maker-electron build"
     env:
       BUILD_ELECTRON: true
     artifact_paths:

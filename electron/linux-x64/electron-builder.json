@@ -1,0 +1,21 @@
+{
+  "appId": "com.Makerverse.app",
+  "productName": "Makerverse",
+  "copyright": "Copyright © 2020",
+  "buildVersion": "1.1.2",
+  "compression": "maximum",
+  "npmRebuild": "false",
+  "directories": {
+    "output": "../../bin/Desktop",
+    "buildResources": "public"
+  },
+  "extraResources": [
+    {
+      "from": "./bin",
+      "to": "bin",
+      "filter": [
+        "**/*"
+      ]
+    }
+  ]
+}
