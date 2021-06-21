@@ -42,8 +42,10 @@ steps:
       arch_variant: "x64"
 
   # AMD64 Docker Container
-  - command: "bash .buildkite/build-docker.sh"
-    label: ":ubuntu: AMD :hammer_and_wrench: x64 :docker:"
+  - label: ":ubuntu: AMD :hammer_and_wrench: x64 :docker:"
+    commands:
+      - "npm install -g @openworkshop/maker-builder@latest"
+      - "maker-container build makerverse/core"
     agents:
       geo: "co"
       arch: "amd"
@@ -51,8 +53,10 @@ steps:
       # arch_variant: "x64"
 
   # ARM32v7 Docker Container
-  - command: "bash .buildkite/build-docker.sh"
-    label: ":raspberry-pi: ARM :hammer_and_wrench: v7 :docker:"
+  - label: ":raspberry-pi: ARM :hammer_and_wrench: v7 :docker:"
+    commands:
+    - "npm install -g @openworkshop/maker-builder@latest"
+    - "maker-container build makerverse/core"
     agents:
       geo: "co"
       arch: "arm"
@@ -60,8 +64,10 @@ steps:
       # arch_variant: "v7"
 
   # ARM64v8 Docker Container
-  - command: "bash .buildkite/build-docker.sh"
-    label: ":raspberry-pi: ARM :hammer_and_wrench: v8 :docker:"
+  - label: ":raspberry-pi: ARM :hammer_and_wrench: v8 :docker:"
+    commands:
+      - "npm install -g @openworkshop/maker-builder@latest"
+      - "maker-container build makerverse/core"
     agents:
       geo: "co"
       arch: "arm"
@@ -71,8 +77,10 @@ steps:
   # Block release
   - block: "Release?"
 
-  - command: "bash .buildkite/deploy-docker.sh"
-    label: ":docker: ${PRODUCT_NAME}:${DOCKER_BUILD_TAG} :rocket:"
+  - label: ":docker: ${PRODUCT_NAME}:${DOCKER_BUILD_TAG} :rocket:"
+    commands:
+      - "npm install -g @openworkshop/maker-builder@latest"
+      - "maker-container build makerverse/core"
     agents:
       geo: "co"
       arch: "amd64"

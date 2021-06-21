@@ -18,17 +18,10 @@
       "output": "../../../bin/Desktop",
       "buildResources": "public"
     },
-    "extraResources": [
-      {
-        "from": "./bin",
-        "to": "bin",
-        "filter": [ "**/*" ]
-      }
-    ],
     "files": [
       {
-        "from": "./ElectronHostHook/node_modules",
-        "to": "ElectronHostHook/node_modules",
+        "from": "../../../node_modules",
+        "to": "./node_modules",
         "filter": [ "**/*" ]
       },
       "**/*"
