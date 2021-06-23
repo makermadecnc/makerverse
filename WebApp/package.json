@@ -31,7 +31,8 @@
     "@material-ui/core": "5.0.0-alpha.34",
     "@material-ui/lab": "5.0.0-alpha.34",
     "@material-ui/styles": "5.0.0-alpha.33",
-    "@openworkshop/maker-hub": "0.2.0",
+    "@openworkshop/maker-hub": "0.2.4",
+    "@openworkshop/maker-builder": "0.2.4",
     "@popperjs/core": "^2.5.4",
     "@reduxjs/toolkit": "^1.4.0",
     "graphql": "^15.4.0",
@@ -130,7 +131,11 @@
     "semver": "^7.3.5",
     "tslib": "^2.2.0",
     "typescript": "^4.2.4",
-    "electron-builder": "^22.11.7"
+    "electron-builder": "^22.11.7",
+    "child_process": "^1.0.2",
+    "command-exists": "^1.2.9",
+    "yargs": "^17.0.1",
+    "dotenv": "^10.0.0"
   },
   "eslintConfig": {
     "extends": [

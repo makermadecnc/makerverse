@@ -2396,10 +2396,21 @@
     "@open-wc/rollup-plugin-html" "^1.2.5"
     polyfills-loader "^1.7.5"
 
-"@openworkshop/maker-hub@0.2.0":
-  version "0.2.0"
-  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-hub/-/maker-hub-0.2.0.tgz#f52a31bb3828b91a450a1a68fdaddf356b6f723e"
-  integrity sha512-L0x5FZhOvw1sOSqfoYAXCXGYtnQuAPEsH4wD7gEN4szCBvjN0F3sXXUtWJN3Z8IbmA7F0wZYMo0mD3N19gLbFA==
+"@openworkshop/maker-builder@0.2.3":
+  version "0.2.3"
+  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-builder/-/maker-builder-0.2.3.tgz#904515d74b54a6fa75cedc0943968a2c55a26622"
+  integrity sha512-agus5/uj8y7q2tKfzbpGvihesM7O/ht7DgR+uRh2U1N4wqRRNr8mbxvVmEYZ+0FaFUwNv4aA8A/F1vDGfq3jSg==
+  dependencies:
+    child_process "^1.0.2"
+    command-exists "^1.2.9"
+    dotenv "^10.0.0"
+    rimraf "^3.0.2"
+    yargs "^17.0.1"
+
+"@openworkshop/maker-hub@0.2.3":
+  version "0.2.3"
+  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-hub/-/maker-hub-0.2.3.tgz#996e9ba2fd9db44fddd5c46a2eaf0c7c5d668c6c"
+  integrity sha512-UCQYyZPmzdeSIScrLODPvCPw+sE1eEOba7qlHb4qUE31E1HO+DqKO5esbEJzCI5ETvmaWGf4df7vhFHY86lTbA==
 
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":
   version "0.4.3"
@@ -4835,6 +4846,11 @@ check-types@^11.1.1:
   resolved "https://registry.yarnpkg.com/check-types/-/check-types-11.1.2.tgz#86a7c12bf5539f6324eb0e70ca8896c0e38f3e2f"
   integrity sha512-tzWzvgePgLORb9/3a0YenggReLKAIb2owL03H2Xdoe5pKcUyWRSEQ8xfCar8t2SIAuEDwtmx2da1YB52YuHQMQ==
 
+child_process@^1.0.2:
+  version "1.0.2"
+  resolved "https://npm.oodalolly.camp/child_process/-/child_process-1.0.2.tgz#b1f7e7fc73d25e7fd1d455adc94e143830182b5a"
+  integrity sha1-sffn/HPSXn/R1FWtyU4UODAYK1o=
+
 chokidar@^2.1.8:
   version "2.1.8"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-2.1.8.tgz#804b3a7b6a99358c3c5c61e71d8728f041cff917"
@@ -5119,6 +5135,11 @@ comma-separated-tokens@^1.0.0:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/comma-separated-tokens/-/comma-separated-tokens-1.0.8.tgz#632b80b6117867a158f1080ad498b2fbe7e3f5ea"
   integrity sha512-GHuDRO12Sypu2cV70d1dkA2EUmXHgntrzbpvOB+Qy+49ypNfGgFQIC2fhhXbnyrJRynDCAARsT7Ou0M6hirpfw==
+
+command-exists@^1.2.9:
+  version "1.2.9"
+  resolved "https://npm.oodalolly.camp/command-exists/-/command-exists-1.2.9.tgz#c50725af3808c8ab0260fd60b01fbfa25b954f69"
+  integrity sha512-LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w==
 
 commander@2.9.0:
   version "2.9.0"
@@ -6158,6 +6179,11 @@ dotenv@8.2.0:
   version "8.2.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
   integrity sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==
+
+dotenv@^10.0.0:
+  version "10.0.0"
+  resolved "https://npm.oodalolly.camp/dotenv/-/dotenv-10.0.0.tgz#3d4227b8fb95f81096cdd2b66653fb2c7085ba81"
+  integrity sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==
 
 dotenv@^8.2.0:
   version "8.6.0"
