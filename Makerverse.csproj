@@ -34,7 +34,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.2.3" />
+    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.2.5" />
   </ItemGroup>
   <ItemGroup Condition=" '$(BUILD_ELECTRON)' == 'true' ">
     <PackageReference Include="ElectronNET.API" Version="11.5.1" />

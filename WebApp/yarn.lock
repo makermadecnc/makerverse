@@ -2396,10 +2396,10 @@
     "@open-wc/rollup-plugin-html" "^1.2.5"
     polyfills-loader "^1.7.5"
 
-"@openworkshop/maker-builder@0.2.3":
-  version "0.2.3"
-  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-builder/-/maker-builder-0.2.3.tgz#904515d74b54a6fa75cedc0943968a2c55a26622"
-  integrity sha512-agus5/uj8y7q2tKfzbpGvihesM7O/ht7DgR+uRh2U1N4wqRRNr8mbxvVmEYZ+0FaFUwNv4aA8A/F1vDGfq3jSg==
+"@openworkshop/maker-builder@0.2.5":
+  version "0.2.5"
+  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-builder/-/maker-builder-0.2.5.tgz#540b5add31e8b579d466d15a03f3d914606b68f0"
+  integrity sha512-kBoNPuF7d0hiAdeG0nT8IDwJrt8SaeluqOdj1feyxuzP2HWgKCrcpdjiif0grlSJYcpio3CFXB+UIdu1j1Eg+A==
   dependencies:
     child_process "^1.0.2"
     command-exists "^1.2.9"
@@ -2407,10 +2407,10 @@
     rimraf "^3.0.2"
     yargs "^17.0.1"
 
-"@openworkshop/maker-hub@0.2.3":
-  version "0.2.3"
-  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-hub/-/maker-hub-0.2.3.tgz#996e9ba2fd9db44fddd5c46a2eaf0c7c5d668c6c"
-  integrity sha512-UCQYyZPmzdeSIScrLODPvCPw+sE1eEOba7qlHb4qUE31E1HO+DqKO5esbEJzCI5ETvmaWGf4df7vhFHY86lTbA==
+"@openworkshop/maker-hub@0.2.5":
+  version "0.2.5"
+  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-hub/-/maker-hub-0.2.5.tgz#57f1721b4222750ca7f09f82aa6b91287dc8c3bc"
+  integrity sha512-Sgw9UTc8Gszu+D3IucvwBXQQ8VWk2eZCbdHNONJojz5jGb8OAezYpCkSJ1NlLrIqbSz1jIQeDPBt1xtuJNFR/g==
 
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":
   version "0.4.3"
