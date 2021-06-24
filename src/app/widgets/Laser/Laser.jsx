@@ -218,15 +218,7 @@ class Laser extends PureComponent {
                                               step={100}
                                               onChange={actions.changeLaserTestDuration}
                                           />
-                                          {/*<input
-                                              type="number"
-                                              className="form-control"
-                                              style={{ borderRadius: 0 }}
-                                              min={0}
-                                              max={5000}
-                                              step={1}
-                                              onChange={actions.changeLaserTestDuration}
-                                          />*/}
+
                                           {/*<span className="input-group-addon">{i18n._('ms')}</span>*/}
                                       </div>
                                   </div>
