@@ -2,10 +2,6 @@ steps:
   # Linux x64 Stand-Alone
   - label: ":ubuntu: AMD :hammer_and_wrench: x64"
     command: "./.buildkite/maker.sh electron build WebApp"
-    env:
-      BUILD_ELECTRON: true
-    artifact_paths:
-      - "bin/Desktop/**/*"
     agents:
       geo: "co"
       arch: "amd"
@@ -16,10 +12,6 @@ steps:
   # OSX x64 Stand-Alone can be built on linux
   - label: ":mac: AMD :hammer_and_wrench: x64"
     command: "./.buildkite/maker.sh electron build WebApp"
-    env:
-      BUILD_ELECTRON: true
-    artifact_paths:
-      - "bin/Desktop/**/*"
     agents:
       geo: "co"
       arch: "amd"
@@ -29,11 +21,7 @@ steps:
 
   # Windows has dependencies installed natively, and needs a native style invocation.
   - label: ":windows: AMD :hammer_and_wrench: x64"
-    command: "./.buildkite/maker.cmd electron build WebApp"
-    env:
-      BUILD_ELECTRON: true
-    artifact_paths:
-      - "bin/Desktop/**/*"
+    command: ".buildkite\\maker.cmd electron build WebApp"
     agents:
       geo: "co"
       arch: "amd"

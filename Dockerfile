@@ -1,5 +1,4 @@
 ARG DOCKER_REGISTRY="mcr.microsoft.com"
-ARG YARN_REGISTRY="https://registry.npmjs.org"
 ARG DOTNET_VERSION="5.0"
 ARG DOTNET_SDK="$DOTNET_VERSION"
 ARG DOTNET_RUNTIME="buster-slim"
@@ -19,7 +18,9 @@ RUN npm install -g npm@latest
 
 # Install yarn
 RUN npm install --global yarn
-RUN yarn config set registry $YARN_REGISTRY
+ARG NPM_YARN_REGISTRY="https://registry.npmjs.org"
+ENV YARN_REGISTRY="$NPM_YARN_REGISTRY"
+RUN yarn config set registry "$YARN_REGISTRY"
 
 # Copy csproj and restore as distinct layers
 COPY *.csproj ./
