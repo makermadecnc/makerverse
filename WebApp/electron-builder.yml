@@ -1,0 +1,35 @@
+appId: "com.Makerverse.app"
+productName: "Makerverse"
+copyright: "Copyright © 2020"
+buildVersion: "1.1.2"
+compression: "maximum"
+npmRebuild: "false"
+
+files:
+- build/**/*
+- node_modules/**/*
+- from: "../bin/Release"
+  to: "bin"
+  filter:
+    "**/*"
+
+directories:
+  output: "../bin/Desktop"
+  buildResources: "public"
+
+#extraFiles:
+#  from: "../bin/Release"
+#  to: "bin"
+#  filter:
+#    "**/*"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64

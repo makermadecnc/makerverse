@@ -1,7 +1,7 @@
 steps:
   # Linux x64 Stand-Alone
   - label: ":ubuntu: AMD :hammer_and_wrench: x64"
-    command: "./.buildkite/maker.sh electron build Makerverse"
+    command: "./.buildkite/maker.sh electron build WebApp"
     env:
       BUILD_ELECTRON: true
     artifact_paths:
@@ -15,7 +15,7 @@ steps:
 
   # OSX x64 Stand-Alone can be built on linux
   - label: ":mac: AMD :hammer_and_wrench: x64"
-    command: "./.buildkite/maker.sh electron build Makerverse"
+    command: "./.buildkite/maker.sh electron build WebApp"
     env:
       BUILD_ELECTRON: true
     artifact_paths:
@@ -29,9 +29,7 @@ steps:
 
   # Windows has dependencies installed natively, and needs a native style invocation.
   - label: ":windows: AMD :hammer_and_wrench: x64"
-    commands:
-      - "npm install -g @openworkshop/maker-builder@latest"
-      - "maker-electron build Makerverse"
+    command: "./.buildkite/maker.cmd electron build WebApp"
     env:
       BUILD_ELECTRON: true
     artifact_paths:

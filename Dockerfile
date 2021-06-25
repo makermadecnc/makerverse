@@ -9,7 +9,7 @@ WORKDIR /app
 
 # Install NPM
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y -qq --no-install-recommends nodejs \
+    && apt-get install -y --no-install-recommends nodejs \
     && echo "node version: $(node --version)" \
     && echo "npm version: $(npm --version)" \
     && rm -rf /var/lib/apt/lists/*
