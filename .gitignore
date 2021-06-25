@@ -29,3 +29,4 @@ MakerverseServerTests/bin/**
 .makerverse-status
 **/tsconfig.tsbuildinfo
 WebApp/build
+.env
