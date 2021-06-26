@@ -28,9 +28,11 @@
   ],
   "exclude": [
     "node_modules",
+    "/node_modules",
     "out",
     "bin",
     "build",
-    "dist"
+    "dist",
+    "*.d.ts"
   ]
 }

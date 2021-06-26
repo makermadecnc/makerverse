@@ -34,7 +34,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.2.6" />
+    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.2.8" />
   </ItemGroup>
   <ItemGroup Condition=" '$(BUILD_ELECTRON)' == 'true' ">
     <PackageReference Include="ElectronNET.API" Version="11.5.1" />
@@ -51,7 +51,7 @@
     <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn install" />
   </Target>
-  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish" Condition=" '$(BUILD_ELECTRON)' != 'true' " >
+  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish" Condition=" '$(BUILD_ELECTRON)' != 'true' ">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn run build" />

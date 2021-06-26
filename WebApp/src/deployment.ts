@@ -1,8 +1,7 @@
 import {packageDeployment} from '@openworkshop/maker-hub/deployments';
-import packageJson from './package';
+import deploymentJson from './deployment.json';
 
-const deployment = packageDeployment(packageJson);
-
-console.log('deployment', deployment);
+console.log('[PACKAGE]', deploymentJson.package);
+const deployment = packageDeployment(deploymentJson);
 
 export default deployment;
