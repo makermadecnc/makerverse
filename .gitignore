@@ -1,7 +1,5 @@
 obj
-bin/Debug
-bin/Release
-bin/Desktop
+bin/**/*
 yarn-error.log
 .idea
 .DS_Store
@@ -29,4 +27,5 @@ MakerverseServerTests/bin/**
 .makerverse-status
 **/tsconfig.tsbuildinfo
 WebApp/build
+build
 .env

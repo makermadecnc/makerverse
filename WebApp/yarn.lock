@@ -2424,21 +2424,24 @@
     "@open-wc/rollup-plugin-html" "^1.2.5"
     polyfills-loader "^1.7.5"
 
-"@openworkshop/maker-builder@0.2.8":
-  version "0.2.8"
-  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-builder/-/maker-builder-0.2.8.tgz#4c2eba55fb505366d2f2382b3ace1b4fbf096732"
-  integrity sha512-7rjymRbWFfmaut/B7EU9+ODdMCS7HZgvR06BHI4io1ZtNtLgCDKD1v/FynBZVURe1Y8wPVWoXosm+WyOeQNxKg==
+"@openworkshop/maker-builder@0.3.3":
+  version "0.3.3"
+  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-builder/-/maker-builder-0.3.3.tgz#9f3a4fd13b42a1061754f2e99fc1a0caa9bd1b51"
+  integrity sha512-h5POkT9F5aXvYHAlQm5XgdYrUWwey3CBYSV/e/EGacVWfLIkazM7CPNPP5J9pngbA7RQPR6PKVXPJBykel5nmw==
   dependencies:
     child_process "^1.0.2"
     command-exists "^1.2.9"
     dotenv "^10.0.0"
+    fs-extra "^10.0.0"
     rimraf "^3.0.2"
+    vs-parse "^3.1.1"
+    wait-on "^5.3.0"
     yargs "^17.0.1"
 
-"@openworkshop/maker-hub@0.2.8":
-  version "0.2.8"
-  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-hub/-/maker-hub-0.2.8.tgz#59250dcbae438c45463a29775c3249e0fdd96243"
-  integrity sha512-/fd57iVhH5D6qJDhnmI0tLyJnqH+8O01hqz8fY4PlbBml79dnlrC76NEXt7zP06XrRaussHA+WVh9m2dhkF3Eg==
+"@openworkshop/maker-hub@0.3.3":
+  version "0.3.3"
+  resolved "https://npm.oodalolly.camp/@openworkshop%2fmaker-hub/-/maker-hub-0.3.3.tgz#c515a9e5bc6bec7048073212597b8ae34447b7fc"
+  integrity sha512-65EiTNCsw9QQKaUTokAjsBwN9L7VmullUt+sndC8cfKgivR4FH3SJq6VoQXpFbBWecRz8M+KosLtmEwRLXTJ0A==
 
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":
   version "0.4.3"
@@ -8500,9 +8503,9 @@ is-buffer@^1.1.5:
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.6.tgz#efaa2ea9daa0d7ab2ea13a97b2b8ad51fefbe8be"
   integrity sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==
 
-is-buffer@^2.0.0:
+is-buffer@^2.0.0, is-buffer@^2.0.2:
   version "2.0.5"
-  resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-2.0.5.tgz#ebc252e400d22ff8d77fa09888821a24a658c191"
+  resolved "https://npm.oodalolly.camp/is-buffer/-/is-buffer-2.0.5.tgz#ebc252e400d22ff8d77fa09888821a24a658c191"
   integrity sha512-i2R6zNFDwgEHJyQUtJEk0XFi1i0dPFn/oqjK3/vPCcDeJvW5NQ83V8QbicfF1SupOaB0h8ntgBC2YiE7dfyctQ==
 
 is-builtin-module@^3.0.0:
@@ -13546,6 +13549,11 @@ semver-diff@^3.1.1:
   dependencies:
     semver "^6.3.0"
 
+semver-utils@^1.1.1:
+  version "1.1.4"
+  resolved "https://npm.oodalolly.camp/semver-utils/-/semver-utils-1.1.4.tgz#cf0405e669a57488913909fc1c3f29bf2a4871e2"
+  integrity sha512-EjnoLE5OGmDAVV/8YDoN5KiajNadjzIp9BAHOhYeQHt7j0UWxjmgsx4YD48wp4Ue1Qogq38F1GNUJNqF1kKKxA==
+
 "semver@2 || 3 || 4 || 5", semver@^5.4.1, semver@^5.5.0, semver@^5.5.1, semver@^5.6.0:
   version "5.7.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.1.tgz#a954f931aeba508d307bbf069eff0c01c96116f7"
@@ -15076,9 +15084,9 @@ unset-value@^1.0.0:
     has-value "^0.3.1"
     isobject "^3.0.0"
 
-upath@^1.1.1, upath@^1.1.2, upath@^1.2.0:
+upath@^1.1.0, upath@^1.1.1, upath@^1.1.2, upath@^1.2.0:
   version "1.2.0"
-  resolved "https://registry.yarnpkg.com/upath/-/upath-1.2.0.tgz#8f66dbcd55a883acdae4408af8b035a5044c1894"
+  resolved "https://npm.oodalolly.camp/upath/-/upath-1.2.0.tgz#8f66dbcd55a883acdae4408af8b035a5044c1894"
   integrity sha512-aZwGpamFO61g3OlfT7OQCHqhGnW43ieH9WZeP7QxN/G/jS4jfqUkZxoryvJgVPEcrl5NL/ggHsSmLMHuH64Lhg==
 
 update-notifier@^5.1.0:
@@ -15309,6 +15317,17 @@ void-elements@3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-3.1.0.tgz#614f7fbf8d801f0bb5f0661f5b2f5785750e4f09"
   integrity sha1-YU9/v42AHwu18GYfWy9XhXUOTwk=
+
+vs-parse@^3.1.1:
+  version "3.1.1"
+  resolved "https://npm.oodalolly.camp/vs-parse/-/vs-parse-3.1.1.tgz#50a99aacd8a59faaa4397b7bea4b2b79e37e7d79"
+  integrity sha512-0S0hib79ROLUNR7jaIyHk+4xxe/x9DJa9gFWgepzMZp/jqyqO7fAtpkuf3KHMOu07sTLct949ODmkhnkQtPmcQ==
+  dependencies:
+    fs-extra "^8.1.0"
+    is-buffer "^2.0.2"
+    semver-utils "^1.1.1"
+    upath "^1.1.0"
+    xml-parser "^1.2.1"
 
 w3c-hr-time@^1.0.2:
   version "1.0.2"
@@ -15840,6 +15859,13 @@ xml-name-validator@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/xml-name-validator/-/xml-name-validator-3.0.0.tgz#6ae73e06de4d8c6e47f9fb181f78d648ad457c6a"
   integrity sha512-A5CUptxDsvxKJEU3yO6DuWBSJz/qizqzJKOMIfUJHETbBw/sFaDxgd6fxm1ewUaM0jZ444Fc5vC5ROYurg/4Pw==
+
+xml-parser@^1.2.1:
+  version "1.2.1"
+  resolved "https://npm.oodalolly.camp/xml-parser/-/xml-parser-1.2.1.tgz#c31f4c34f2975db82ad013222120592736156fcd"
+  integrity sha1-wx9MNPKXXbgq0BMiISBZJzYVb80=
+  dependencies:
+    debug "^2.2.0"
 
 xmlbuilder@>=11.0.1:
   version "15.1.1"

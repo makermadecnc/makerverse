@@ -15,9 +15,8 @@ namespace Makerverse {
     // This method gets called by the runtime. Use this method to add services to the container.
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services) {
-      services.AddElectronDeployment();
       services.AddSpaStaticFiles(configuration => {
-        configuration.RootPath = "WebApp/build";
+        configuration.RootPath = "build"; // Copied here by maker-builder
       });
       services.AddMakerHubServices();
       services.AddAuthentication();
@@ -48,11 +47,9 @@ namespace Makerverse {
         endpoints.MapGraphQL(MakerHubDeployment.Singleton.GraphqlPath);
       });
       app.UseSpa(spa => {
-        spa.Options.SourcePath = "WebApp";
+        spa.Options.SourcePath = "WebApp"; // "during development" -- this folder doesn't exist in prod, and it's ok.
         if (env.IsDevelopment()) spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
       });
-
-      app.StartElectronDeployment(env);
     }
   }
 }

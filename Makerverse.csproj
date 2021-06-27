@@ -19,25 +19,18 @@
   <ItemGroup>
     <Content Remove="$(SpaRoot)**" />
     <None Remove="$(SpaRoot)**" />
-  </ItemGroup>
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="src\package.json" />
+    <Content Remove="ci\**" />
+    <None Remove="ci\**" />
+    <Content Remove="scripts\**" />
+    <None Remove="scripts\**" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="ElectronHostHook\**\*.*">
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Content Update="electron.manifest.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.2.8" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(BUILD_ELECTRON)' == 'true' ">
-    <PackageReference Include="ElectronNET.API" Version="11.5.1" />
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.3.3" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ProjectReference Include="..\..\MakerHub\MakerHub.csproj" />
@@ -51,13 +44,13 @@
     <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn install" />
   </Target>
-  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish" Condition=" '$(BUILD_ELECTRON)' != 'true' ">
+  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn run build" />
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>
-      <DistFiles Include="$(SpaRoot)build\**; $(SpaRoot)build-ssr\**" />
+      <DistFiles Include="$(SpaRoot)build\**;" />
       <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
         <RelativePath>%(DistFiles.Identity)</RelativePath>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

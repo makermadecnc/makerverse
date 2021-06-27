@@ -16,6 +16,7 @@ shift
 function installMbFromSource() {
   if [[ -z "$MB_INSTALLED" ]]; then
     echo "[INSTALL] dependencies in $1"
+    npm uninstall -g "@openworkshop/maker-builder"
     pushd "$1"
     # This is f*gly, but it gives us globals
     rm -rf node_modules

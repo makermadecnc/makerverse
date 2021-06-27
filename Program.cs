@@ -14,7 +14,6 @@ namespace Makerverse {
       Host.CreateDefaultBuilder(args)
           .ConfigureWebHostDefaults(webBuilder => {
              webBuilder.UseUrls("http://*:" + MakerHubDeployment.Singleton.Port);
-             webBuilder.ConfigureElectronDeployment(args);
              webBuilder.UseSerilog();
              webBuilder.UseStartup<Startup>();
            });

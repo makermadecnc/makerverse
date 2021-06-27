@@ -14,10 +14,10 @@ steps:
     command: "./.buildkite/maker.sh electron build WebApp"
     agents:
       geo: "co"
-      arch: "amd"
+#      arch: "amd"
       os: "mac"
-      cpu: "64"
-      arch_variant: "x64"
+#      cpu: "64"
+#      arch_variant: "x64"
 
   # Windows has dependencies installed natively, and needs a native style invocation.
   - label: ":windows: AMD :hammer_and_wrench: x64"
@@ -43,7 +43,8 @@ steps:
     command: "./.buildkite/maker.sh container build makerverse/core"
     agents:
       geo: "co"
-      arch: "arm"
+      hw: "rpi"
+      # arch: "arm"
       # cpu: "32"
       # arch_variant: "v7"
 
@@ -52,7 +53,8 @@ steps:
     command: "./.buildkite/maker.sh container build makerverse/core"
     agents:
       geo: "co"
-      arch: "arm"
+      hw: "rpi"
+      # arch: "arm"
       # cpu: "32"
       # arch_variant: "v7"
 

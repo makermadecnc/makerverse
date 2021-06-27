@@ -29,14 +29,14 @@ COPY *.csproj ./
 COPY . ./
 RUN dotnet publish -c Release -o out
 
+# After building everything, reconfigure Yarn to use the public registry.
+ENV YARN_REGISTRY="https://registry.npmjs.org"
+RUN yarn config set registry "https://registry.npmjs.org"
+
 # Build runtime image
 FROM $DOCKER_REGISTRY/dotnet/aspnet:$DOTNET_VERSION-$DOTNET_RUNTIME
 
 WORKDIR /app
 COPY --from=build-env /app/out .
-
-# After building everything, reconfigure Yarn to use the public registry.
-ENV YARN_REGISTRY="https://registry.npmjs.org"
-RUN yarn config set registry "https://registry.npmjs.org"
 
 ENTRYPOINT ["dotnet", "Makerverse.dll"]
