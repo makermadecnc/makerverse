@@ -40,7 +40,7 @@ steps:
 
   # ARM32v7 Docker Container
   - label: ":raspberry-pi: ARM :hammer_and_wrench: v7 :docker:"
-    command: "./.buildkite/maker.sh container build makerverse/core"
+    command: "./.buildkite/maker.sh container build makerverse/core --cpu 32 --arch_variant v7"
     agents:
       geo: "co"
       hw: "rpi"
@@ -50,7 +50,7 @@ steps:
 
   # ARM64v8 Docker Container
   - label: ":raspberry-pi: ARM :hammer_and_wrench: v8 :docker:"
-    command: "./.buildkite/maker.sh container build makerverse/core"
+    command: "./.buildkite/maker.sh container build makerverse/core --cpu 64 --arch_variant v8"
     agents:
       geo: "co"
       hw: "rpi"
