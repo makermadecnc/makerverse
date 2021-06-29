@@ -22,12 +22,16 @@ ARG NPM_YARN_REGISTRY="https://registry.npmjs.org"
 ENV YARN_REGISTRY="$NPM_YARN_REGISTRY"
 RUN yarn config set registry "$YARN_REGISTRY"
 
-# Copy csproj and restore as distinct layers
-COPY *.csproj ./
-
 # Copy file contents & build
-COPY . ./
-RUN dotnet publish -c Release -o out
+COPY WebApp ./WebApp
+COPY Server ./Server
+RUN cd /app/WebApp && \
+    sed -i -e "s#https://registry.yarnpkg.com#${YARN_REGISTRY}#g" yarn.lock && \
+    sed -i -e "s#https://registry.npmjs.org#${YARN_REGISTRY}#g" yarn.lock && \
+    yarn install --verbose
+RUN cd /app/Server && dotnet publish -c Release -o out && ls -la out
+RUN cat WebApp/yarn.lock
+RUN rm -rf WebApp && rm -rf Server
 
 # After building everything, reconfigure Yarn to use the public registry.
 ENV YARN_REGISTRY="https://registry.npmjs.org"

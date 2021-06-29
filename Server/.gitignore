@@ -1,0 +1,7 @@
+obj
+bin/**/*
+yarn-error.log
+.idea
+.DS_Store
+npm-debug.log
+**/tsconfig.tsbuildinfo

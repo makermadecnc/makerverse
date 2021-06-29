@@ -10,3 +10,10 @@ windows-store
 src
 node_modules
 filesystem.img
+bin
+ci
+obj
+docs
+scripts
+WebApp/build
+WebApp/node_modules

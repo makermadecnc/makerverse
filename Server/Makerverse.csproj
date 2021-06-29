@@ -6,7 +6,7 @@
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <IsPackable>false</IsPackable>
-    <SpaRoot>WebApp\</SpaRoot>
+    <SpaRoot>..\WebApp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExclusiondes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
     <PackageVersion>1.1.3</PackageVersion>
     <Title>Makerverse</Title>
@@ -17,42 +17,37 @@
     <RuntimeIdentifiers>linux-arm;linux-arm64;linux-x64;osx-x64;win-x64</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
-    <Content Remove="$(SpaRoot)**" />
-    <None Remove="$(SpaRoot)**" />
-    <Content Remove="ci\**" />
-    <None Remove="ci\**" />
-    <Content Remove="scripts\**" />
-    <None Remove="scripts\**" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Update="ElectronHostHook\**\*.*">
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
-    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.3.3" />
+    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.3.5" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <ProjectReference Include="..\..\MakerHub\MakerHub.csproj" />
+    <ProjectReference Include="..\..\..\MakerHub\MakerHub.csproj" />
   </ItemGroup>
-  <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') And '$(BUILD_ELECTRON)' != 'true' ">
+  <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
     <!-- Ensure Node.js is installed -->
-    <Exec Command="node --version" ContinueOnError="true">
+    <Exec Command=  "node --version" ContinueOnError="true">
       <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
     <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn install" />
   </Target>
-  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
+  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish" Condition="'$(SKIP_WEBAPP)' != 'true'">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn run build" />
+  </Target>
+  <Target Name="CopyWebpack" AfterTargets="ComputeFilesToPublish" >
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>
       <DistFiles Include="$(SpaRoot)build\**;" />
+      <Message Text="$([System.String]::Copy('%(DistFiles.Identity)').Replace('$(SpaRoot)',''))" />
       <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
-        <RelativePath>%(DistFiles.Identity)</RelativePath>
+        <RelativePath>$([System.String]::Copy('%(DistFiles.Identity)').Replace('$(SpaRoot)',''))</RelativePath>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       </ResolvedFileToPublish>

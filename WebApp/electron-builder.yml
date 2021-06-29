@@ -1,22 +1,14 @@
 appId: "com.Makerverse.app"
 productName: "Makerverse"
-homepage: "http://makerverse.com"
 copyright: "Copyright © 2020"
 buildVersion: "0.0.0" # Overwritten by maker-builder
 compression: "store"
 npmRebuild: "false"
-author:
-  name: "OpenWorkShop, Inc."
-  email: "zane@openwork.shop"
-repository:
-  url: "https://github.com/makermadecnc/makerverse"
-license: "GNU GPL 3 w. Commons Clause"
 
 fileAssociations:
-  ext:
-    - ext: gc
-    - ext: gcode
-    - ext: gc
+  - ext: "gc"
+  - ext: "gcode"
+  - ext: "gc"
 
 #build:
 #  afterPack:
