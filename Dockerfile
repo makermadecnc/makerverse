@@ -12,9 +12,9 @@ WORKDIR /app
 COPY WebApp ./WebApp
 COPY Server ./Server
 RUN cd /app/WebApp && \
-#    sed -i -e "s#https://registry.yarnpkg.com#${YARN_REGISTRY}#g" yarn.lock && \
-#    sed -i -e "s#https://registry.npmjs.org#${YARN_REGISTRY}#g" yarn.lock && \
-    yarn install
+    sed -i -e "s#https://registry.yarnpkg.com#${YARN_REGISTRY}#g" yarn.lock && \
+    sed -i -e "s#https://registry.npmjs.org#${YARN_REGISTRY}#g" yarn.lock && \
+    yarn install --network-timeout 1000000000
 RUN cd /app/Server && dotnet publish -c Release -o /app/out && ls -la /app/out
 RUN rm -rf WebApp && rm -rf Server
 

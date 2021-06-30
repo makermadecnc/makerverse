@@ -1,0 +1,5 @@
+#!/bin/bash
+
+if [[ "$BUILDKITE_AGENT_META_DATA_OS" == "linux" ]]; then
+  apt-get install -y binutils
+fi
