@@ -1,5 +1,6 @@
 obj
 bin/**/*
+.buildkite/pipeline.yml
 yarn-error.log
 .idea
 .DS_Store

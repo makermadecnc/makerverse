@@ -1,0 +1,13 @@
+defaults:
+  agents:
+    geo: "co"
+    arch: "amd"
+    cpu: "64"
+    os: "linux"
+
+steps:
+  - name: "Makerverse"
+    src: [ "Server/", "WebApp/" ] # Source code for frontend or backend.
+    build: "./.buildkite/mv.build.yml"
+    deploy: "./.buildkite/mv.deploy.yml"
+#
