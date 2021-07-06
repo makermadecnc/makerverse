@@ -2438,10 +2438,10 @@
     wait-on "^5.3.0"
     yargs "^17.0.1"
 
-"@openworkshop/maker-hub@0.3.7":
-  version "0.3.7"
-  resolved "https://registry.npmjs.org/@openworkshop/maker-hub/-/maker-hub-0.3.7.tgz#ddbe690628642c0b7c0c14e5acafc6b3ffce4bed"
-  integrity sha512-9gIIwoC7wGIzHgYNQ22lOTDmkEn3LMSILO4/TrdjGIeDKrk3MJU5IfDG5toz+zB4Vn8A5MBt10EeWtoO3GTUIw==
+"@openworkshop/maker-hub@0.3.9":
+  version "0.3.9"
+  resolved "https://registry.npmjs.org/@openworkshop/maker-hub/-/maker-hub-0.3.9.tgz#4ad1dd28af3aeb5601049dae938e8b193efcfe22"
+  integrity sha512-pFqZP95b3tCDy1/ql3KWB4zSKRwy7/IF7ybhC+XK6llMUQ/qs4VsFYopvxJ9ZTOAA3OJPkfkghHYgmGFQK4LbA==
 
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":
   version "0.4.3"

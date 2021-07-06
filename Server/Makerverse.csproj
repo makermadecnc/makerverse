@@ -22,7 +22,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
-    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.3.7" />
+    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.3.9" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ProjectReference Include="..\..\..\MakerHub\MakerHub.csproj" />
