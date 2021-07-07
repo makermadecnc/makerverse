@@ -1,8 +1,7 @@
 - label: ":docker: ${PRODUCT_NAME}:${DOCKER_BUILD_TAG} :rocket:"
-  command: "./.buildkite/maker.sh container deploy makerverse/core"
+  command: "maker/builder.sh container deploy makerverse/core"
   agents:
     geo: "co"
     arch: "amd"
     cpu: "64"
     os: "linux"
-

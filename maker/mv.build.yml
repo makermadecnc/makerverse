@@ -1,11 +1,11 @@
 
 # Linux x64 Stand-Alone
 - label: ":ubuntu: AMD :hammer_and_wrench: x64"
-  command: "./.buildkite/maker.sh electron build"
+  command: "maker/builder.sh electron build"
 
 # OSX x64 Stand-Alone can be built on linux
 - label: ":mac: AMD :hammer_and_wrench: x64"
-  command: "./.buildkite/maker.sh electron build"
+  command: "maker/builder.sh electron build"
   agents:
 #    arch: "arm"
     os: "mac"
@@ -14,17 +14,17 @@
 
 # Windows has dependencies installed natively, and needs a native style invocation.
 - label: ":windows: AMD :hammer_and_wrench: x64"
-  command: ".buildkite\\maker.cmd electron build"
+  command: "maker/builder.cmd electron build"
   agents:
     os: "win"
 
 # AMD64 Docker Container
 - label: ":ubuntu: AMD :hammer_and_wrench: x64 :docker:"
-  command: "./.buildkite/maker.sh container build makerverse/core"
+  command: "maker/builder.sh container build makerverse/core"
 
 # ARM32v7 Docker Container
 - label: ":raspberry-pi: ARM :hammer_and_wrench: v7 :docker:"
-  command: "./.buildkite/maker.sh container build makerverse/core --cpu 32 --arch_variant v7"
+  command: "maker/builder.sh container build makerverse/core --cpu 32 --arch_variant v7"
   agents:
     hw: "rpi"
     arch: "arm"
@@ -33,7 +33,7 @@
 
 # ARM64v8 Docker Container
 - label: ":raspberry-pi: ARM :hammer_and_wrench: v8 :docker:"
-  command: "./.buildkite/maker.sh container build makerverse/core --cpu 64 --arch_variant v8"
+  command: "maker/builder.sh container build makerverse/core --cpu 64 --arch_variant v8"
   agents:
     hw: "rpi"
     arch: "arm"

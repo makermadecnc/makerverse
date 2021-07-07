@@ -8,6 +8,6 @@ defaults:
 steps:
   - name: "Makerverse"
     src: [ "Server/", "WebApp/" ] # Source code for frontend or backend.
-    build: "./.buildkite/mv.build.yml"
-    deploy: "./.buildkite/mv.deploy.yml"
+    build: "./maker/mv.build.yml"
+    deploy: "./maker/mv.deploy.yml"
 #

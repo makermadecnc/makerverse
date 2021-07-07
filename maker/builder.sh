@@ -2,6 +2,13 @@
 # This script should be copied into the host machine's scripts/CI directory.
 set -euo pipefail
 
+## Deduce the maker file path
+DIR="$(cd "$(dirname "$0")"; pwd)"
+FN="$(basename "$0")"
+export MAKER="${DIR}/${FN}"
+#alias maker="${MAKER}"
+echo "[MB] ${MAKER}"
+
 # Set up defaults.
 CMD="${1:-}"
 CI="${CI:-false}"
@@ -20,7 +27,7 @@ function installMbFromSource() {
     pushd "$1"
     # This is f*gly, but it gives us globals
     rm -rf node_modules
-    npm install
+    yarn install
     popd
     echo "[INSTALL] global $1"
     npm install -g --force "$1"
@@ -52,5 +59,16 @@ fi
 
 # Print version & run commands.
 yarn exec maker-env -- --version
+yarn exec maker-env -- prep # Ensure CI has the correct version.
+
+ENVF=".env"
+if [[ -f "${ENVF}" ]]; then
+  echo "[MB] loading env file..."
+  set -o allexport; source "${ENVF}"; set +o allexport
+
+  # Print out the env, filtered to relevant vars
+  printenv | grep "MAKER_HUB"
+fi
+
 echo "[MB] maker-$CMD $*"
 yarn exec "maker-$CMD" -- "$@"
