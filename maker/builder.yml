@@ -1,3 +1,6 @@
+paths:
+  package: "WebApp"
+
 defaults:
   agents:
     geo: "co"
