@@ -1,12 +1,14 @@
-#!/bin/sh
+#!/bin/bash
 . "$(dirname "$0")/_/husky.sh"
 
 yarn run lint-staged
 
-if [[ $(which maker-project) ]]; then
-  pushd $MH
-  maker-project Makerverse prod
+# Check if this project is embedded within MakerHub. If so, ensure that it's using the right production config.
+PKG="../../package.json"
+if grep -q "\"productName\": \"MakerHub\"" "$PKG"; then
+  pushd "../../"
+  maker-env sync Makerverse
   popd
 else
-  echo "No maker-project found; skipped version checks."
+  echo "$PKG was not MakerHub root; skipping sync."
 fi

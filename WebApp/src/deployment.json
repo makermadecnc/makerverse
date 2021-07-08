@@ -4,7 +4,7 @@
     "MAKER_HUB_SEMVER_MEDIUM": "1.2.0-dev",
     "MAKER_HUB_SEMVER_LONG": "1.2.0-dev",
     "ASPNETCORE_ENVIRONMENT": "Development",
-    "MAKER_HUB_BACKEND_ENVIRONMENT": "Staging",
+    "MAKER_HUB_BACKEND_ENVIRONMENT": "Development",
     "MAKER_HUB_TAG": "dev",
     "DOCKER_BUILD_TAG": "dev",
     "MAKER_HUB_BRANCH": "dev",
@@ -14,7 +14,7 @@
   "package": {
     "name": "makerverse",
     "productName": "Makerverse",
-    "version": "1.2.0",
+    "version": "1.2.0-dev",
     "homepage": "http://makerverse.com",
     "author": "OpenWorkShop, Inc. & Maker Made <info@makermadecnc.com>",
     "license": "MIT",
