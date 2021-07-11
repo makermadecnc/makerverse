@@ -30,3 +30,5 @@ MakerverseServerTests/bin/**
 WebApp/build
 build
 .env
+hub.env
+

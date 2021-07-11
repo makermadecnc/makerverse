@@ -16,22 +16,25 @@ fileAssociations:
 #  afterAllArtifactBuild:
 #  onNodeModuleFile
 
-files:
-- from: "../bin/Dist"
-  to: "./"
-  filter:
-    "**/*"
-# .env file, for runtime configuration
-- from: "./"
-  to: "./"
-  filter:
-  - "**/*.env"
-  - "package.json"
+#files: []
 
 directories:
   output: "../bin/Desktop" # Default; can be overwritten with CLI in CI
 
-extraResources: []
+extraResources:
+- from: "../bin/Dist"
+  to: "./bin"
+  filter:
+    "**/*"
+# misc. root files used for config
+- from: "../"
+  to: "./bin"
+  filter:
+    - "*.env"
+#- from: "./"
+#  to: "./bin"
+#  filter:
+#    - "package.json"
 
 extraFiles: []
 
@@ -54,7 +57,7 @@ mac:
     - target: dmg
       arch:
         - x64
-        - arm64
+#        - arm64
 #  “x64” | “ia32” | “armv7l” | “arm64”
 
 # mas, dmg, pkg

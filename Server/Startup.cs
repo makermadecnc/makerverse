@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +17,7 @@ namespace Makerverse {
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services) {
       services.AddSpaStaticFiles(configuration => {
-        configuration.RootPath = "build"; // Copied here by maker-builder
+        configuration.RootPath = Path.Combine(MakerHubDeployment.Singleton.AppDir, "build");; // Copied here by maker-builder
       });
       services.AddMakerHubServices();
       services.AddAuthentication();

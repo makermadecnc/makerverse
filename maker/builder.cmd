@@ -31,4 +31,4 @@ CALL "%NPM_PATH%\\maker-env" "--version"
 CALL "%NPM_PATH%\\maker-env" "prep"
 
 CALL "%NPM_PATH%\\maker-%1" %2 %3 %4 %5 %6 %7 %8 %9
-if "%ERRORLEVEL%" != "0" exit /B %ERRORLEVEL%
+if NOT "%ERRORLEVEL%" == "0" exit /B %ERRORLEVEL%

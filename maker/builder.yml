@@ -11,7 +11,7 @@ defaults:
 steps:
   - name: "Makerverse"
     include:
-      paths: [ "Server/", "WebApp/" ] # Source code for frontend or backend.
+      paths: [ "Server/*", "WebApp/*", "DesktopApp/*" ] # Source code for frontend or backend.
     build: "./maker/mv.build.yml"
     deploy: "./maker/mv.deploy.yml"
 #
