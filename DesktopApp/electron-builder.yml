@@ -1,8 +1,4 @@
 appId: "com.Makerverse.app"
-productName: "Makerverse"
-copyright: "Copyright © 2020"
-buildVersion: "0.0.0" # Overwritten by maker-builder
-compression: "store"
 npmRebuild: "false"
 
 fileAssociations:
@@ -31,22 +27,29 @@ extraResources:
   to: "./bin"
   filter:
     - "*.env"
-#- from: "./"
-#  to: "./bin"
-#  filter:
-#    - "package.json"
 
 extraFiles: []
 
+publish:
+  # Used for auto-updating. Github releases are created via maker-builder.
+  provider: generic
+  url: https://releases.openwork.shop/makerverse
+#  - provider: github
+#    vPrefixedTagName: false
+#    owner: makermadecnc
+#    repo: makerverse
+#    releaseType: draft
+
 linux:
   target:
-    - target: deb
+    - target: AppImage
       arch:
         - x64
         - armv7l
         - arm64
         - ia32
 win:
+  icon: assets/icon.ico
   target:
     - target: nsis
       arch:
@@ -54,6 +57,8 @@ win:
         - ia32
 mac:
 #  asar: false
+  icon: assets/icon.icns
+  category: "public.app-category.graphics-design"
   target:
     - target: dmg
       arch:

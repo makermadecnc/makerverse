@@ -1,6 +1,6 @@
 
 # Linux x64 Stand-Alone
-- label: ":ubuntu: .deb :hammer_and_wrench:"
+- label: ":ubuntu: AppImage :hammer_and_wrench:"
   command: "maker/builder.sh electron build"
 
 # OSX x64 Stand-Alone can be built on linux

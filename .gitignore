@@ -31,4 +31,4 @@ WebApp/build
 build
 .env
 hub.env
-
+**/*.lock-e

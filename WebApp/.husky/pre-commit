@@ -12,3 +12,5 @@ if grep -q "\"productName\": \"MakerHub\"" "$PKG"; then
 else
   echo "$PKG was not MakerHub root; skipping sync."
 fi
+
+sed -i -e "s#https://npm.oodalolly.camp#https://registry.yarnpkg.com#g" WebApp/yarn.lock

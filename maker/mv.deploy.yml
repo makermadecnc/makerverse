@@ -1,4 +1,4 @@
-- label: ":docker: ${PRODUCT_NAME}:${DOCKER_BUILD_TAG} :rocket:"
+- label: ":docker: ${PRODUCT_NAME}:${MAKER_HUB_CHANNEL} :rocket:"
   command: "maker/builder.sh container deploy makerverse/core"
   agents:
     geo: "co"

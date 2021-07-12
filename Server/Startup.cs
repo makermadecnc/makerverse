@@ -17,7 +17,7 @@ namespace Makerverse {
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services) {
       services.AddSpaStaticFiles(configuration => {
-        configuration.RootPath = Path.Combine(MakerHubDeployment.Singleton.AppDir, "build");; // Copied here by maker-builder
+        configuration.RootPath = Path.Combine(MakerHubDeployment.Singleton.Paths["bin"], "build");
       });
       services.AddMakerHubServices();
       services.AddAuthentication();

@@ -1,14 +1,12 @@
 {
   "env": {
     "PRODUCT_NAME": "Makerverse",
+    "ASPNETCORE_ENVIRONMENT": "Staging",
     "MAKER_HUB_SEMVER_SHORT": "1.2.0",
     "MAKER_HUB_SEMVER_MEDIUM": "1.2.0-dev",
     "MAKER_HUB_SEMVER_LONG": "1.2.0-dev",
-    "ASPNETCORE_ENVIRONMENT": "Staging",
     "MAKER_HUB_BACKEND_ENVIRONMENT": "Staging",
-    "MAKER_HUB_TAG": "dev",
-    "DOCKER_BUILD_TAG": "dev",
-    "MAKER_HUB_BRANCH": "dev",
+    "MAKER_HUB_CHANNEL": "dev",
     "MAKER_HUB_PORT": 8000,
     "MAKER_HUB_FRONTEND_PORT": 3000
   },
@@ -18,7 +16,7 @@
     "version": "1.2.0-dev",
     "description": "A web-based interface for CNC milling controller.",
     "homepage": "http://makerverse.com",
-    "author": "OpenWorkShop, Inc. & Maker Made <info@makermadecnc.com>",
+    "author": "OpenWorkShop, Inc. & Maker Made",
     "license": "MIT",
     "repository": "github:makermadecnc/makerverse"
   }

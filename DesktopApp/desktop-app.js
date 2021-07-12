@@ -1,14 +1,14 @@
 const electron = require('electron');
+const { autoUpdater } = require('electron-updater');
 const { spawn } = require('child_process');
 const path = require('path');
 const electronDev = require('electron-is-dev');
-const waitOn = electronDev ? require('wait-on') : undefined;
+const waitOn = require('wait-on');
 const fs = require('fs');
 const dotenv = require('dotenv');
 const BrowserWindow = electron.BrowserWindow;
 
 // Globals
-const environments = { prod: 'Production', stag: 'Staging', dev: 'Development' };
 const hubEnv = {
   env: 'ASPNETCORE_ENVIRONMENT', beEnv: 'MAKER_HUB_BACKEND_ENVIRONMENT', productName: 'PRODUCT_NAME',
   fePort: 'MAKER_HUB_FRONTEND_PORT', bePort:'MAKER_HUB_PORT'
@@ -20,12 +20,26 @@ class DesktopApp {
   serverProc = null;
 
   constructor(resourcesPath = 'bin') {
+    console.log('[APP]', 'start');
     this.app = electron.app;
     const appPath = this.app.getAppPath();
     const rootPath = path.normalize(path.join(appPath, '..'));
     this.binPath = path.join(rootPath, resourcesPath);
     this.configureEnvironment();
     this.productName = process.env[hubEnv.productName];
+
+    this.paths = {
+      // home: this.app.getPath('home'),
+      // appData: this.app.getPath('appData'),
+      bin: this.binPath,
+      userData: this.app.getPath('userData'),
+      documents: this.app.getPath('documents'),
+      logs: this.app.getPath('logs'),
+      // crashDumps: this.app.getPath('crashDumps'),
+      // temp: this.app.getPath('temp'),
+    };
+
+    console.log('[APP]', 'paths', this.paths);
 
     // Spawn electron (ready invokes launch)
     this.app.on('window-all-closed', this.onAllClosed.bind(this));
@@ -37,7 +51,7 @@ class DesktopApp {
   // Set & check environment variables.
   configureEnvironment = () => {
     process.env['MAKER_HUB_APP_DIR'] = this.binPath;
-    console.log('[BIN]', this.binPath);
+    console.log('[APP]', process.platform, '@', this.binPath);
 
     const envFp = path.join(this.binPath, 'hub.env');
     if (!fs.existsSync(envFp)) {
@@ -76,6 +90,11 @@ class DesktopApp {
   }
 
   launch = async() => {
+    try {
+      await autoUpdater.checkForUpdatesAndNotify();
+    } catch (e) {
+      console.log('[UPDATE]', 'failed', e);
+    }
     this.serverProc = await this.launchServer();
     await this.launchFrontend();
   }
@@ -83,17 +102,25 @@ class DesktopApp {
   // Spawn the dotnet environment
   launchServer = async () => {
     let proc;
+
+    const flags = ['--MAKER_HUB_ELECTRON=true'];
+    Object.keys(this.paths).forEach(k => {
+      flags.push(`--path.${k}=\"${this.paths[k]}\"`);
+    });
+
     if (electronDev) {
       console.log('[APP] Spawning Dotnet Development Server');
       process.chdir('../');
-      proc = spawn('dotnet', ['watch', 'run']);
+      proc = spawn('dotnet', ['watch', 'run'].concat(flags));
     } else {
-      const fn = `${this.productName}.dll`; // In self-contained production
+      const fnParts = [this.productName];
+      const exeFn = fnParts.join('.');
+
       // If not in electronDev, we cannot be using development assets...
-      if (process.env[hubEnv.beEnv] === environments.dev) process.env[hubEnv.beEnv] = environments.stag;
-      console.log('[APP] Spawning Dotnet Server via', fn);
-      const dllFp = path.join(this.binPath, fn);
-      proc = spawn('dotnet', [dllFp, `--${hubEnv.beEnv}`, process.env[hubEnv.beEnv]]);
+      const exeFp = path.join(this.binPath, exeFn);
+
+      console.log('[APP] Spawning Dotnet Server via', exeFn, flags);
+      proc = spawn(exeFp, flags);
     }
     proc.stdout.pipe(process.stdout);
     proc.stderr.pipe(process.stderr);
@@ -121,11 +148,9 @@ class DesktopApp {
     }
 
     const backendRoot = `${schema}://${frontendHost}${portStr}`;
-    if (electronDev) {
-      console.log('[APP]', 'waiting on', backendRoot);
-      await waitOn({ resources: [backendRoot] });
-      console.log('[APP]', backendRoot, 'ready');
-    }
+    console.log('[APP]', 'waiting on', backendRoot);
+    await waitOn({ resources: [backendRoot] });
+    console.log('[APP]', backendRoot, 'ready');
 
     const backendUrl = `${schema}://${frontendHost}${portStr}`;
     console.log('[APP]', 'loading', backendUrl);
