@@ -51,13 +51,14 @@ win:
     - target: nsis
       arch:
         - x64
+        - ia32
 mac:
 #  asar: false
   target:
     - target: dmg
       arch:
         - x64
-#        - arm64
+        - arm64
 #  “x64” | “ia32” | “armv7l” | “arm64”
 
 # mas, dmg, pkg

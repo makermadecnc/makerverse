@@ -9,8 +9,8 @@
     "MAKER_HUB_TAG": "dev",
     "DOCKER_BUILD_TAG": "dev",
     "MAKER_HUB_BRANCH": "dev",
-    "MAKER_HUB_PORT": "8000",
-    "MAKER_HUB_FRONTEND_PORT": "3000"
+    "MAKER_HUB_PORT": 8000,
+    "MAKER_HUB_FRONTEND_PORT": 3000
   },
   "package": {
     "name": "makerverse",

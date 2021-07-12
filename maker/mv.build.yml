@@ -1,10 +1,10 @@
 
 # Linux x64 Stand-Alone
-- label: ":ubuntu: AMD :hammer_and_wrench: x64"
+- label: ":ubuntu: .deb :hammer_and_wrench:"
   command: "maker/builder.sh electron build"
 
 # OSX x64 Stand-Alone can be built on linux
-- label: ":mac: AMD :hammer_and_wrench: x64"
+- label: ":mac: .dmg :hammer_and_wrench:"
   command: "maker/builder.sh electron build"
   agents:
 #    arch: "arm"
@@ -13,7 +13,7 @@
 #      arch_variant: "x64"
 
 # Windows has dependencies installed natively, and needs a native style invocation.
-- label: ":windows: AMD :hammer_and_wrench: x64"
+- label: ":windows: .exe :hammer_and_wrench:"
   command: "maker/builder.cmd electron build"
   agents:
     os: "win"

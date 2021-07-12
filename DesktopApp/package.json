@@ -9,7 +9,7 @@
   "repository": "github:makermadecnc/makerverse",
   "dependencies": {
     "electron-is-dev": "^2.0.0",
-    "@openworkshop/maker-builder": "0.3.21"
+    "@openworkshop/maker-builder": "0.3.22"
   },
   "devDependencies": {
     "electron": "^13.1.4",
