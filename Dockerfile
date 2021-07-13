@@ -12,8 +12,7 @@ WORKDIR /app
 # Copy file contents & build
 COPY WebApp ./WebApp
 COPY Server ./Server
-RUN cd /app/WebApp && yarn install --network-timeout 1000000000
-RUN cd /app/Server && dotnet publish -c Release -o /app/out && ls -la /app/out
+RUN cd /app/Server && dotnet publish -c Release -o /app/out
 RUN rm -rf WebApp && rm -rf Server
 
 # Build runtime image

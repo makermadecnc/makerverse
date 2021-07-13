@@ -18,6 +18,7 @@ directories:
   output: "../bin/Desktop" # Default; can be overwritten with CLI in CI
 
 extraResources:
+# The actual application, as compiled into a stand-alone by dotnet, which contains the published assets in ./build/
 - from: "../bin/Dist"
   to: "./bin"
   filter:

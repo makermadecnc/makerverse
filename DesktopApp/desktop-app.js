@@ -114,6 +114,7 @@ class DesktopApp {
       proc = spawn('dotnet', ['watch', 'run'].concat(flags));
     } else {
       const fnParts = [this.productName];
+      if (process.platform.startsWith('win')) fnParts.push('exe');
       const exeFn = fnParts.join('.');
 
       // If not in electronDev, we cannot be using development assets...
@@ -155,6 +156,7 @@ class DesktopApp {
     const backendUrl = `${schema}://${frontendHost}${portStr}`;
     console.log('[APP]', 'loading', backendUrl);
     this.mainWindow = new BrowserWindow({ width: 800, height: 600 });
+    this.mainWindow.maximize();
     await this.mainWindow.loadURL(backendUrl);
     this.mainWindow.on('closed', () => this.mainWindow = null);
   }
