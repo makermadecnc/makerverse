@@ -13,4 +13,5 @@ else
   echo "$PKG was not MakerHub root; skipping sync."
 fi
 
-sed -i -e "s#https://npm.oodalolly.camp#https://registry.yarnpkg.com#g" WebApp/yarn.lock
+# Make sure to use public registries before committing.
+maker-env prep --npm https://registry.yarnpkg.com
