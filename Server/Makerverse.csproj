@@ -38,7 +38,7 @@
   </Target>
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish" Condition="'$(SKIP_WEBAPP)' != 'true'">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
-    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn install --network-timeout 1000000000" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn run build" />
   </Target>
   <Target Name="CopyWebpack" AfterTargets="ComputeFilesToPublish" >
