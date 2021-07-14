@@ -1,12 +1,9 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'eslint-plugin-react', 'eslint-plugin-react-hooks'],
+  plugins: ['@typescript-eslint'],
   extends: [
-    'prettier',
-    'prettier/@typescript-eslint',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    'plugin:prettier/recommended'
   ],
   rules: {
     'indent': ['error', 2],

@@ -11,7 +11,7 @@ const dotenv = require('dotenv');
 
 // Globals
 const hubEnv = {
-  env: 'ASPNETCORE_ENVIRONMENT', beEnv: 'MAKER_HUB_BACKEND_ENVIRONMENT', productName: 'PRODUCT_NAME',
+  env: 'ASPNETCORE_ENVIRONMENT', beEnv: 'MAKER_HUB_BACKEND_ENVIRONMENT', productName: 'MAKER_HUB_PROJECT',
   fePort: 'MAKER_HUB_FRONTEND_PORT', bePort:'MAKER_HUB_PORT'
 };
 

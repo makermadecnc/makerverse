@@ -1,6 +1,6 @@
 {
   "env": {
-    "PRODUCT_NAME": "Makerverse",
+    "MAKER_HUB_PROJECT": "Makerverse",
     "ASPNETCORE_ENVIRONMENT": "Staging",
     "MAKER_HUB_SEMVER_SHORT": "1.2.0",
     "MAKER_HUB_SEMVER_MEDIUM": "1.2.0-dev",
