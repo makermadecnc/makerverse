@@ -1,6 +1,13 @@
 #!/bin/bash
 . "$(dirname "$0")/_/husky.sh"
 
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+if [ "$branch" = "master" ]; then
+  echo "[ERR] commits directly to master are not allowed."
+  exit 1
+fi
+
 yarn run lint-staged
 
 # Check if this project is embedded within MakerHub. If so, ensure that it's using the right production config.

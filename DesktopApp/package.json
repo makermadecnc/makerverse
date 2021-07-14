@@ -3,17 +3,25 @@
   "productName": "Makerverse",
   "description": "A web-based interface for CNC milling controller.",
   "homepage": "http://makerverse.com",
-  "main": "desktop-app.js",
+  "main": "main.js",
   "author": "OpenWorkShop, Inc. & Maker Made",
   "license": "MIT",
   "repository": "github:makermadecnc/makerverse",
+  "scripts": {
+    "start": "electron ."
+  },
+  "bin": {
+    "makerverse-dev": "./desktop-app.js"
+  },
   "dependencies": {
     "electron-is-dev": "^2.0.0",
     "electron-updater": "^4.3.9",
     "path": "^0.12.7",
     "child_process": "^1.0.2",
     "wait-on": "^6.0.0",
-    "@openworkshop/maker-builder": "0.3.25"
+    "electron-webpack": "^2.8.2",
+    "@openworkshop/maker-builder": "0.3.28",
+    "electron-log": "^4.3.5"
   },
   "devDependencies": {
     "electron": "^13.1.4",

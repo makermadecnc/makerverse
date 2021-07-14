@@ -1,12 +1,13 @@
-const electron = require('electron');
-const { autoUpdater } = require('electron-updater');
+#!/usr/bin/env node
+const { app, BrowserWindow, ipcMain } = require('electron');
 const { spawn } = require('child_process');
 const path = require('path');
 const electronDev = require('electron-is-dev');
+const electronLog = require('electron-log');
+const { autoUpdater } = require('electron-updater');
 const waitOn = require('wait-on');
 const fs = require('fs');
 const dotenv = require('dotenv');
-const BrowserWindow = electron.BrowserWindow;
 
 // Globals
 const hubEnv = {
@@ -18,13 +19,16 @@ const hubEnv = {
 class DesktopApp {
   mainWindow = null;
   serverProc = null;
+  webAppProc = null;
 
   constructor(resourcesPath = 'bin') {
-    console.log('[APP]', 'start');
-    this.app = electron.app;
+    this.log('start', ipcMain);
+    this.app = app;
+
     const appPath = this.app.getAppPath();
-    const rootPath = path.normalize(path.join(appPath, '..'));
-    this.binPath = path.join(rootPath, resourcesPath);
+    this.rootPath = path.normalize(path.join(appPath, '..'));
+    this.binPath = electronDev ? path.join(this.rootPath, 'Server') : path.join(this.rootPath, resourcesPath);
+
     this.configureEnvironment();
     this.productName = process.env[hubEnv.productName];
 
@@ -32,48 +36,85 @@ class DesktopApp {
       // home: this.app.getPath('home'),
       // appData: this.app.getPath('appData'),
       bin: this.binPath,
-      userData: this.app.getPath('userData'),
-      documents: this.app.getPath('documents'),
-      logs: this.app.getPath('logs'),
+      root: this.rootPath,
+      userData: electronDev ? this.rootPath : this.app.getPath('userData'),
+      documents: electronDev ? this.rootPath : this.app.getPath('documents'),
+      logs: electronDev ? this.rootPath : this.app.getPath('logs'),
       // crashDumps: this.app.getPath('crashDumps'),
       // temp: this.app.getPath('temp'),
     };
 
-    console.log('[APP]', 'paths', this.paths);
+    this.log('paths', this.paths);
 
     // Spawn electron (ready invokes launch)
     this.app.on('window-all-closed', this.onAllClosed.bind(this));
     this.app.on('activate', this.onActivated.bind(this));
     this.app.on('ready', this.launch.bind(this));
+    this.app.on('before-quit', this.shutdown.bind(this));
     this.app.on('will-quit', this.shutdown.bind(this));
+    this.app.on('quit', this.shutdown.bind(this));
+
+    ipcMain.on('log', (event, args) => {
+      this.writeLogEntry(args);
+    });
+  }
+
+  normalizeLogLevel = (level) => {
+    if (level === 'debug') return 'DBG';
+    if (level === 'warn') return 'WRN';
+    if (level === 'error') return 'ERR';
+    return 'INF';
+  }
+
+  writeLogEntry = (logEntry) => {
+    const parts = [`<${this.normalizeLogLevel(logEntry.level)} #0>`, `[${logEntry.context}]`].concat(logEntry.message);
+    if (logEntry.level === 'debug') {
+      electronLog.debug(...parts);
+    } else if (logEntry.level === 'warn') {
+      electronLog.warn(...parts);
+    } else if (logEntry.level === 'error') {
+      electronLog.error(...parts);
+    } else {
+      electronLog.info(...parts);
+    }
+  }
+
+  // LogEntry is prepackaged by DefaultLogger
+  log = (...args) => {
+    this.writeLogEntry({ message: args, context: 'APP', timestamp: new Date().toLocaleTimeString('en-GB') });
   }
 
   // Set & check environment variables.
   configureEnvironment = () => {
     process.env['MAKER_HUB_APP_DIR'] = this.binPath;
-    console.log('[APP]', process.platform, '@', this.binPath);
+    this.log(process.platform, '@', this.binPath);
 
-    const envFp = path.join(this.binPath, 'hub.env');
+    const envFp = path.join(electronDev ? this.rootPath : this.binPath, 'hub.env');
     if (!fs.existsSync(envFp)) {
-      console.log('Missing', envFp);
+      this.log('Missing', envFp);
     }
 
     dotenv.config({ path: envFp });
-    console.log('[APP]', envFp, 'v', this.app.getVersion(), process.env[hubEnv.env]);
+    this.log(envFp, 'v', this.app.getVersion(), process.env[hubEnv.env]);
 
     Object.values(hubEnv).forEach(ev => {
       if (!process.env[ev]) {
-        console.log('Misconfigured environment; missing: ' + ev);
+        this.log('Misconfigured environment; missing: ' + ev);
         process.exit(1);
       }
     });
   }
 
   shutdown = () => {
-    console.log('[APP]', 'shutdown');
     if (this.serverProc) {
-      this.serverProc.stdin.pause();
+      this.log('shutdown', 'server');
       this.serverProc.kill();
+      this.serverProc = null;
+    }
+    if (this.webAppProc) {
+      this.log('shutdown', 'WebApp');
+      this.webAppProc.kill();
+      this.webAppProc = null;
     }
   }
 
@@ -93,7 +134,7 @@ class DesktopApp {
     try {
       await autoUpdater.checkForUpdatesAndNotify();
     } catch (e) {
-      console.log('[UPDATE]', 'failed', e);
+      this.log('[UPDATE]', 'failed', e);
     }
     this.serverProc = await this.launchServer();
     await this.launchFrontend();
@@ -109,8 +150,18 @@ class DesktopApp {
     });
 
     if (electronDev) {
-      console.log('[APP] Spawning Dotnet Development Server');
-      process.chdir('../');
+      this.log('Spawning WebApp frontend...');
+      process.chdir(path.join('..', '..', '..'));
+      this.webAppProc = spawn('yarn', ['start']);
+      this.webAppProc.stdout.pipe(process.stdout);
+      this.webAppProc.stderr.pipe(process.stderr);
+
+      Object.keys(process.env).forEach(k => {
+        if (k.startsWith('MAKER_')) flags.push(`--${k}=\"${process.env[k]}\""`)
+      });
+
+      this.log('Spawning Dotnet Development Server', flags);
+      process.chdir(path.join('src', this.productName, 'Server'));
       proc = spawn('dotnet', ['watch', 'run'].concat(flags));
     } else {
       const fnParts = [this.productName];
@@ -120,7 +171,7 @@ class DesktopApp {
       // If not in electronDev, we cannot be using development assets...
       const exeFp = path.join(this.binPath, exeFn);
 
-      console.log('[APP] Spawning Dotnet Server via', exeFn, flags);
+      this.log('Spawning Dotnet Server via', exeFn, flags);
       proc = spawn(exeFp, flags);
     }
     proc.stdout.pipe(process.stdout);
@@ -132,9 +183,9 @@ class DesktopApp {
   launchFrontend = async () => {
     if (electronDev) {
       const fePort = process.env[hubEnv.fePort] ?? 3000;
-      console.log('[APP]', 'waiting on frontend', fePort);
+      this.log('waiting on frontend', fePort);
       await waitOn({ resources: [`http://localhost:${fePort}`] });
-      console.log('[APP]', fePort, 'ready');
+      this.log(fePort, 'ready');
     }
 
     const port = process.env[hubEnv.bePort];
@@ -149,17 +200,24 @@ class DesktopApp {
     }
 
     const backendRoot = `${schema}://${frontendHost}${portStr}`;
-    console.log('[APP]', 'waiting on', backendRoot);
+    this.log('waiting on', backendRoot);
     await waitOn({ resources: [backendRoot] });
-    console.log('[APP]', backendRoot, 'ready');
+    this.log(backendRoot, 'ready');
 
     const backendUrl = `${schema}://${frontendHost}${portStr}`;
-    console.log('[APP]', 'loading', backendUrl);
-    this.mainWindow = new BrowserWindow({ width: 800, height: 600 });
-    this.mainWindow.maximize();
+    this.log('loading', backendUrl);
+    this.mainWindow = new BrowserWindow({ width: 800, height: 600, webPreferences: {
+        nodeIntegration: false, // is default value after Electron v5
+        contextIsolation: true, // protect against prototype pollution
+        enableRemoteModule: false, // turn off remote
+        preload: path.join(__dirname, "bridge.js") // use a preload script
+    }});
+    this.mainWindow.on('preferred-size-changed', (s) => {
+      this.log('size', s);
+    });
     await this.mainWindow.loadURL(backendUrl);
     this.mainWindow.on('closed', () => this.mainWindow = null);
   }
 }
 
-new DesktopApp();
+module.exports = DesktopApp;
