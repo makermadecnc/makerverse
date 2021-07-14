@@ -10,24 +10,19 @@
   "repository": "github:makermadecnc/makerverse",
   "scripts": {
     "env": "cross-env maker-env generate",
-    "app": "dotenv dotenv_config_path=hub.env electron .",
-    "set-version": "yarn exec maker-env generate --sv $@",
     "app-dev": "concurrently \"BROWSER=none yarn start\" \"yarn run app\"",
-    "electron-dev": "concurrently \"BROWSER=none yarn start\" \"yarn run electron-await\"",
     "backend-dev": "dotnet watch --project ../ run",
-    "electron-await": "dotenv dotenv_config_path=hub.env wait-on http://localhost:3000 && electron .",
     "dev": "concurrently \"yarn dev-lib\" \"yarn dev-ui\" \"react-scripts start\"",
     "start": "dotenv dotenv_config_path=hub.env yarn exec react-scripts start",
     "link": "cd ../ && bash ./ci/link-dev.sh",
     "build": "cross-env CI=false react-scripts build",
-    "build-electron": "cross-env CI=false BUILD_ELECTRON=true dotnet publish ",
     "test": "cross-env CI=true react-scripts test --env=jsdom",
     "lint": "eslint ./src/**/*.ts ./src/**/*.tsx",
-    "prepare": "cd .. && husky install WebApp/.husky",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "prepare": "cd .. && husky install WebApp/.husky"
   },
   "dependencies": {
+    "@openworkshop/maker-hub": "^0.3.29",
+    "@openworkshop/maker-builder": "^0.3.29",
     "@apollo/client": "^3.3.6",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^11.3.0",
@@ -73,11 +68,9 @@
     "subscriptions-transport-ws": "^0.9.18",
     "three": "^0.124.0",
     "wait-on": "^5.3.0",
-    "web-vitals": "^1.1.0",
-    "electron": "^13.1.6"
+    "web-vitals": "^1.1.0"
   },
   "devDependencies": {
-    "react-scripts": "^4.0.3",
     "@azimutlabs/rollup-plugin-external": "^0.1.0",
     "@babel/core": "^7.14.3",
     "@craco/craco": "^6.1.2",
@@ -134,6 +127,7 @@
     "prettier": "^2.3.0",
     "pretty-quick": "^3.1.0",
     "prop-types": "^15.7.2",
+    "react-scripts": "^4.0.3",
     "replace-in-file": "^6.2.0",
     "rimraf": "^3.0.2",
     "rollup": "^2.50.1",
@@ -145,10 +139,8 @@
     "semver": "^7.3.5",
     "tslib": "^2.2.0",
     "typescript": "^4.2.4",
-    "yargs": "^17.0.1",
     "wait-on": "^5.3.0",
-    "electron-is-dev": "^2.0.0",
-    "electron-builder": "^22.11.7"
+    "yargs": "^17.0.1"
   },
   "eslintConfig": {
     "extends": [
