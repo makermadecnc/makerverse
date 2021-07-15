@@ -2495,7 +2495,7 @@
 
 "@openworkshop/maker-builder@0.3.31":
   version "0.3.31"
-  resolved "https://registry.npmjs.org/@openworkshop/maker-builder/-/maker-builder-0.3.31.tgz#60ae9493dbb3e94a88ce8817b0c3d89e85698a5c"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-builder/-/maker-builder-0.3.31.tgz#60ae9493dbb3e94a88ce8817b0c3d89e85698a5c"
   integrity sha512-E0G6YkioxUyt0VkAw1QCVhrqC3RAsTlSyVXzWYy9L2d2xOJ54omBfPfWavoDH9s/SOhfVfE62QlXeM6i8KBmrQ==
   dependencies:
     child_process "^1.0.2"
@@ -2515,7 +2515,7 @@
 
 "@openworkshop/maker-hub@0.3.31":
   version "0.3.31"
-  resolved "https://registry.npmjs.org/@openworkshop/maker-hub/-/maker-hub-0.3.31.tgz#bc4ae84e2a5e49cc5fdd256c873a6bbda5231973"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-hub/-/maker-hub-0.3.31.tgz#bc4ae84e2a5e49cc5fdd256c873a6bbda5231973"
   integrity sha512-QcccB0+NNR0Q0oXTSKBnRfMA2UvR67rdBLHoqpGhriFJ2nh1nJAClG2ZYWqRUJ1fky+FuxoIomfdig+KaG8WJw==
 
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":

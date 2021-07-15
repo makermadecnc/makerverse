@@ -4,7 +4,6 @@
   "version": "1.2.0",
   "description": "A web-based interface for CNC milling controller.",
   "homepage": "http://makerverse.com",
-  "main": "public/main.js",
   "author": "OpenWorkShop, Inc. & Maker Made",
   "license": "MIT",
   "repository": "github:makermadecnc/makerverse",

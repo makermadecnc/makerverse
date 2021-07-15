@@ -17,7 +17,7 @@
     "child_process": "^1.0.2",
     "wait-on": "^6.0.0",
     "electron-webpack": "^2.8.2",
-    "@openworkshop/maker-builder": "0.3.29",
+    "@openworkshop/maker-builder": "0.3.31",
     "electron-log": "^4.3.5"
   },
   "devDependencies": {

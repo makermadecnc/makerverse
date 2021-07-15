@@ -22,10 +22,13 @@ class DesktopApp {
   webAppProc = null;
 
   constructor(resourcesPath = 'bin') {
-    this.log('start', ipcMain);
-    this.app = app;
+    this.app = app
 
+    // Set up logging...
     electronLog.transports.console.format = '%c{h}:{i}:{s}.{ms}%c <{level}> {text}';
+    electronLog.transports.file.level = 'debug';
+    autoUpdater.logger = electronLog;
+    this.log('start', ipcMain);
 
     const appPath = this.app.getAppPath();
     this.rootPath = path.normalize(path.join(appPath, '..'));
@@ -83,7 +86,9 @@ class DesktopApp {
 
   // LogEntry is prepackaged by DefaultLogger
   log = (...args) => {
-    this.writeLogEntry({ message: args, context: 'APP', timestamp: new Date().toLocaleTimeString('en-GB') });
+    this.writeLogEntry({
+      message: args, context: 'APP', timestamp: new Date().toLocaleTimeString('en-GB') // 24h
+    });
   }
 
   // Set & check environment variables.
