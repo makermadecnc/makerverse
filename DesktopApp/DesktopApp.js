@@ -25,6 +25,8 @@ class DesktopApp {
     this.log('start', ipcMain);
     this.app = app;
 
+    electronLog.transports.console.format = '%c{h}:{i}:{s}.{ms}%c <{level}> {text}';
+
     const appPath = this.app.getAppPath();
     this.rootPath = path.normalize(path.join(appPath, '..'));
     this.binPath = electronDev ? path.join(this.rootPath, 'Server') : path.join(this.rootPath, resourcesPath);
@@ -150,18 +152,18 @@ class DesktopApp {
     });
 
     if (electronDev) {
-      this.log('Spawning WebApp frontend...');
-      process.chdir(path.join('..', '..', '..'));
-      this.webAppProc = spawn('yarn', ['start']);
-      this.webAppProc.stdout.pipe(process.stdout);
-      this.webAppProc.stderr.pipe(process.stderr);
+      // this.log('Spawning WebApp frontend...');
+      // process.chdir(path.join('..', '..', '..'));
+      // this.webAppProc = spawn('yarn', ['start']);
+      // this.webAppProc.stdout.pipe(process.stdout);
+      // this.webAppProc.stderr.pipe(process.stderr);
 
       Object.keys(process.env).forEach(k => {
         if (k.startsWith('MAKER_')) flags.push(`--${k}=\"${process.env[k]}\""`)
       });
 
-      this.log('Spawning Dotnet Development Server', flags);
-      process.chdir(path.join('src', this.productName, 'Server'));
+      process.chdir(path.join('src', 'projects', this.productName, 'Server'));
+      this.log('Spawning Dotnet Development Server', process.cwd(), flags);
       proc = spawn('dotnet', ['watch', 'run'].concat(flags));
     } else {
       const fnParts = [this.productName];

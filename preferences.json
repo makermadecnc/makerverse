@@ -1,0 +1,70 @@
+{
+  "fileSystem": {
+    "documentsDirectory": null,
+    "ProgramsDirectory": "/Users/zaneclaes/zdrive/zaneclaes/Programming/MakerHub/src/projects/Makerverse/gcode",
+    "mountPoints": []
+  },
+  "appUpdates": {
+    "checkForUpdates": true,
+    "prereleases": false
+  },
+  "workspaces": [],
+  "users": [
+    {
+      "id": "3842c9ca-91c4-4cf1-82d6-56f10cd495d1",
+      "username": "zane",
+      "email": "zaneclaes@gmail.com",
+      "authenticationType": "OWS",
+      "roles": [
+        "MakerHubOwner"
+      ],
+      "tokens": [
+        "eyJhbGciOiJSUzI1NiIsImtpZCI6IkRldmVsb3BtZW50IiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2MjYzMDEzMzgsImV4cCI6MTYyNjkwNjEzOCwiaXNzIjoiaHR0cHM6Ly9zdGFnaW5nLm9wZW53b3JrLnNob3AiLCJhdWQiOiJPcGVuV29ya1Nob3BBUEkiLCJjbGllbnRfaWQiOiJPcGVuV29ya1Nob3BBUEkiLCJzdWIiOiIzODQyYzljYS05MWM0LTRjZjEtODJkNi01NmYxMGNkNDk1ZDEiLCJhdXRoX3RpbWUiOjE2MjYzMDEzMzMsImlkcCI6ImxvY2FsIiwianRpIjoiMDk3MjY5MkY3Qzk5MzUwMUQyQzkwMjNDOTkwRjA5RDUiLCJzaWQiOiJFNzBFRkE0NDYxMzg3NDVCNzZCOERCMDY0QURCMEZGRCIsImlhdCI6MTYyNjMwMTMzOCwic2NvcGUiOlsiT3BlbldvcmtTaG9wQVBJIiwib3BlbmlkIiwicHJvZmlsZSJdLCJhbXIiOlsicHdkIl19.qGGIe8TnSrvAGRIHFyu6lDib7ukhKtfqFnGF6zfxkWnt-jPc70rWkO_w5LubMnMevUO11Ma6kmbdhl_hSueRNvwXtAOzdFsehCTqK4iHgG8SBYPX0F9t2z-YawkTQu9o8GYLJ1tVuUcwZ0wJBlh2SN7ealK-k8P06rIRDO2MHVO1HHuPlEdfW58M89J6PC9N_GnBJzCLlSbMFFfZmt3g2OLDPRh7rngVUAVlf3gRoWshWdj7tkDQk2vZAciC39kLKdezLXMgbyxROQ_6_gqbQc2rl51QHzr7w3WlmFV2JdW4etjxjGpVS_2Y3BFQ0RwuJfU5JBPD2w8ognqLkVP4Zw"
+      ]
+    }
+  ],
+  "hub": {
+    "networked": false,
+    "environment": null,
+    "logs": {
+      "overrides": [
+        {
+          "nameSpace": "System",
+          "minimumLevel": "Information"
+        },
+        {
+          "nameSpace": "System.Net.Http",
+          "minimumLevel": "Warning"
+        },
+        {
+          "nameSpace": "Microsoft",
+          "minimumLevel": "Information"
+        },
+        {
+          "nameSpace": "Microsoft.AspNetCore",
+          "minimumLevel": "Error"
+        },
+        {
+          "nameSpace": "Serilog.AspNetCore",
+          "minimumLevel": "Information"
+        },
+        {
+          "nameSpace": "OpenWorkShop",
+          "minimumLevel": "Debug"
+        },
+        {
+          "nameSpace": "OpenWorkShop.MakerHub.Identity",
+          "minimumLevel": "Debug"
+        },
+        {
+          "nameSpace": "OpenWorkShop.MakerHub.Lib.Graphql",
+          "minimumLevel": "Debug"
+        },
+        {
+          "nameSpace": "OpenWorkShop.MakerHub.Controllers",
+          "minimumLevel": "Debug"
+        }
+      ]
+    }
+  }
+}

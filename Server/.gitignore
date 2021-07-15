@@ -1,7 +1,10 @@
-obj
-bin/**/*
-yarn-error.log
-.idea
+# [MAKER_SERVER]
+/bin
+/obj
+/hub.env
+
+# [COMMON_RIDER]
+.idea/
+
+# [COMMON_MAC]
 .DS_Store
-npm-debug.log
-**/tsconfig.tsbuildinfo

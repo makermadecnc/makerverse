@@ -1,10 +1,11 @@
 {
   "env": {
+    "ASPNETCORE_ENVIRONMENT": "Development",
     "MAKER_HUB_PROJECT": "Makerverse",
-    "ASPNETCORE_ENVIRONMENT": "Staging",
     "MAKER_HUB_SEMVER_SHORT": "1.2.0",
     "MAKER_HUB_SEMVER_MEDIUM": "1.2.0-dev",
     "MAKER_HUB_SEMVER_LONG": "1.2.0-dev",
+    "MAKER_HUB_SEMVER_PUB": "1.2.0",
     "MAKER_HUB_BACKEND_ENVIRONMENT": "Staging",
     "MAKER_HUB_CHANNEL": "dev",
     "MAKER_HUB_PORT": 8000,
@@ -19,5 +20,18 @@
     "author": "OpenWorkShop, Inc. & Maker Made",
     "license": "MIT",
     "repository": "github:makermadecnc/makerverse"
+  },
+  "semver": {
+    "short": "1.2.0",
+    "medium": "1.2.0-dev",
+    "long": "1.2.0-dev",
+    "pub": "1.2.0",
+    "major": 1,
+    "minor": 2,
+    "patch": 0,
+    "channel": "dev",
+    "suffix": "dev",
+    "branch": "dev",
+    "build": null
   }
 }

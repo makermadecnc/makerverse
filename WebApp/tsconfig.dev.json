@@ -1,13 +1,16 @@
 {
   "extends": "./tsconfig.base.json",
-  "rootDir": "../../../",
+  "rootDir": "../../../../",
   "compilerOptions": {
     "paths": {
       "@openworkshop/current-app/*": [
         "./*"
       ],
       "@openworkshop/maker-hub/*": [
-        "../../../maker-hub/src/*"
+        "../../../../maker-hub/src/*"
+      ],
+      "@openworkshop/maker-builder/*": [
+        "../../../../maker-builder/*"
       ]
     }
   }
