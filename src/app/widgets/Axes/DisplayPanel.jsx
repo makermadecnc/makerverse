@@ -176,7 +176,7 @@ class DisplayPanel extends PureComponent {
                         </MenuItem>
                     )}
                     <MenuItem divider />
-                    <MenuItem header>{i18n._('Temporary Offsets (G92)')}</MenuItem>
+                    {/*<MenuItem header>{i18n._('Temporary Offsets (G92)')}</MenuItem>
                     <MenuItem
                         eventKey="G92 X0 Y0 Z0"
                         disabled={!canClick}
@@ -187,9 +187,9 @@ class DisplayPanel extends PureComponent {
                         eventKey="G92.1 X0 Y0 Z0"
                         disabled={!canClick}
                     >
-                        {i18n._('Un-Zero Out Temporary Offsets (G92.1 X0 Y0 Z0)')}
+                        {i18n._('Clear Work Offsets')}
                     </MenuItem>
-                    <MenuItem divider />
+                    <MenuItem divider />*/}
                     <MenuItem header>{i18n._('Machine Coordinate System (G53)')}</MenuItem>
                     <MenuItem
                         eventKey="G53 G0 X0 Y0 Z0"
@@ -197,18 +197,18 @@ class DisplayPanel extends PureComponent {
                     >
                         {i18n._('Go To Machine Zero (G53 G0 X0 Y0 Z0)')}
                     </MenuItem>
-                    <MenuItem
+                    {/*<MenuItem
                         eventKey="G28.3 X0 Y0 Z0"
                         disabled={!canClick}
                     >
                         {i18n._('Set Machine Zero (G28.3 X0 Y0 Z0)')}
-                    </MenuItem>
-                    <MenuItem
+                    </MenuItem>*/}
+                    {/*<MenuItem
                         eventKey="G28.2 X0 Y0 Z0"
                         disabled={!canClick}
                     >
                         {i18n._('Homing Sequence (G28.2 X0 Y0 Z0)')}
-                    </MenuItem>
+                    </MenuItem>*/}
                 </Dropdown.Menu>
             </Dropdown>
         );
