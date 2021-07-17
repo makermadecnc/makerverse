@@ -2,6 +2,10 @@
 /bin
 /hub.env
 
+# [MAKER_HUB_RUNTIME]
+/preferences.json
+/gcode
+
 # [COMMON_RIDER]
 .idea/
 

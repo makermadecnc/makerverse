@@ -27,7 +27,7 @@ class DesktopApp {
 
     // Set up logging...
     // electronLog.transports.console.format = '%c{h}:{i}:{s}.{ms}%c <{level}> {text}';
-    electronLog.transports.console.level = 'debug';
+    electronLog.transports.console.level = 'error';
     electronLog.transports.file.format = '%c{h}:{i}:{s}.{ms}%c <{level}> {text}';
     electronLog.transports.file.level = 'debug';
     autoUpdater.logger = electronLog;
