@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ProjectReference Include="..\..\..\..\MakerHub\MakerHub.csproj" />
+    <Watch Remove="..\..\..\..\MakerHub\Generated\**" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />

@@ -5071,6 +5071,11 @@ node-loader@^0.6.0:
   resolved "https://registry.yarnpkg.com/node-loader/-/node-loader-0.6.0.tgz#c797ef51095ed5859902b157f6384f6361e05ae8"
   integrity sha1-x5fvUQle1YWZArFX9jhPY2HgWug=
 
+node-port-scanner@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/node-port-scanner/-/node-port-scanner-3.0.1.tgz#62c2acf2cabe870e3afb3e0e573db1a46d9a4361"
+  integrity sha512-TuFGEWfye+1atB74v0Vm6myEjpq0L5Jo3UaOG9xgtYHxnFZN0fF9CnwCxp7ENWDerGbI1UXAgdRMIPz8TM73Hg==
+
 node-releases@^1.1.71:
   version "1.1.73"
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.73.tgz#dd4e81ddd5277ff846b80b52bb40c49edf7a7b20"

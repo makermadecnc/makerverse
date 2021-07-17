@@ -34,7 +34,7 @@ extraFiles: []
 publish:
   # Used for auto-updating. Github releases are created via maker-builder.
   provider: generic
-  url: https://releases.openwork.shop/makerverse
+  url: https://downloads.openwork.shop/Makerverse
 #  - provider: github
 #    vPrefixedTagName: false
 #    owner: makermadecnc

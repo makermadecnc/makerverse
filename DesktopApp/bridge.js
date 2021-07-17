@@ -7,8 +7,8 @@ const {
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld(
   'bridge', {
-    log: (entry) => {
-      ipcRenderer.send('log', entry);
+    log: (level, ...parts) => {
+      ipcRenderer.send('log', level, parts);
     },
     // receive: (channel, func) => {
     //   let validChannels = ['fromMain'];
