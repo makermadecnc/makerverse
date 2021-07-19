@@ -7,7 +7,10 @@ namespace Makerverse {
   public class Program {
     public static void Main(string[] args) {
       MakerHubDeployment.Singleton.Initialize();
-      CreateHostBuilder(args).Build().Run();
+
+      using (IHost host = CreateHostBuilder(args).Build()) {
+        host.Run();
+      }
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
