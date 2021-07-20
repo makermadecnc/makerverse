@@ -139,7 +139,6 @@
     "Zero Out Work Offsets (G10 L20 P6 X0 Y0 Z0)": "ワークオフセットP6をゼロにする (G10 L20 P6 X0 Y0 Z0)",
     "Temporary Offsets (G92)": "テンポラリ オフセット (G92)",
     "Zero Out Temporary Offsets (G92 X0 Y0 Z0)": "オフセットのみをゼロにする",
-    "Un-Zero Out Temporary Offsets (G92.1 X0 Y0 Z0)": "オフセットをすべてゼロにする",
     "Machine Coordinate System (G53)": "機械座標系 (G53)",
     "Go To Machine Zero (G53 G0 X0 Y0 Z0)": "機械原点に移動 (G53 G0 X0 Y0 Z0)",
     "Set Machine Zero (G28.3 X0 Y0 Z0)": "絶対座標を0に設定 (G28.3 X0 Y0 Z0)",
@@ -610,5 +609,6 @@
     "Select \"no\" if your machine has already been calibrated.": "",
     "Laser Mode": "",
     "Error closing serial port": "",
-    "Wasteboard": ""
+    "Wasteboard": "",
+    "Clear Work Offsets": ""
 }

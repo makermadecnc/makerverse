@@ -139,7 +139,6 @@
     "Zero Out Work Offsets (G10 L20 P6 X0 Y0 Z0)": "设定工作原点 （G10 L20 P6 X0 Y0 Z0）",
     "Temporary Offsets (G92)": "临时原点 (G92)",
     "Zero Out Temporary Offsets (G92 X0 Y0 Z0)": "设置临时原点 （G92 X0 Y0 Z0）",
-    "Un-Zero Out Temporary Offsets (G92.1 X0 Y0 Z0)": "取消设置临时原点 （G92.1 X0 Y0 Z0）",
     "Machine Coordinate System (G53)": "机器坐标系统 （G53）",
     "Go To Machine Zero (G53 G0 X0 Y0 Z0)": "前往机器原点 （G53 G0 X0 Y0 Z0）",
     "Set Machine Zero (G28.3 X0 Y0 Z0)": "设置机器原点 (G28.3 X0 Y0 Z0)",
@@ -610,5 +609,6 @@
     "Select \"no\" if your machine has already been calibrated.": "",
     "Laser Mode": "",
     "Error closing serial port": "",
-    "Wasteboard": ""
+    "Wasteboard": "",
+    "Clear Work Offsets": ""
 }
