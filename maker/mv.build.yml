@@ -7,7 +7,7 @@
 - label: ":ubuntu: AMD :hammer_and_wrench: x64 :docker:"
   command: "maker/builder.sh container build makerverse/core"
 
-- block: "Build All?"
+#- block: "Build All?"
 
 # OSX x64 Stand-Alone can be built on linux
 - label: ":mac: .dmg :hammer_and_wrench:"
