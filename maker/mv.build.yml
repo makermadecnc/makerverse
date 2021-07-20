@@ -3,6 +3,12 @@
 - label: ":ubuntu: AppImage :hammer_and_wrench:"
   command: "maker/builder.sh electron build"
 
+# AMD64 Docker Container
+- label: ":ubuntu: AMD :hammer_and_wrench: x64 :docker:"
+  command: "maker/builder.sh container build makerverse/core"
+
+- block: "Build All?"
+
 # OSX x64 Stand-Alone can be built on linux
 - label: ":mac: .dmg :hammer_and_wrench:"
   command: "maker/builder.sh electron build"
@@ -17,10 +23,6 @@
   command: "maker/builder.cmd electron build"
   agents:
     os: "win"
-
-# AMD64 Docker Container
-- label: ":ubuntu: AMD :hammer_and_wrench: x64 :docker:"
-  command: "maker/builder.sh container build makerverse/core"
 
 # ARM32v7 Docker Container
 - label: ":raspberry-pi: ARM :hammer_and_wrench: v7 :docker:"
