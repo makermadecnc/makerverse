@@ -14,4 +14,3 @@ steps:
       paths: [ "Server/*", "WebApp/*", "DesktopApp/*" ] # Source code for frontend or backend.
     build: "./maker/mv.build.yml"
     deploy: "./maker/mv.deploy.yml"
-#

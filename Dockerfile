@@ -6,7 +6,7 @@ ARG MAKER_BUILDER_ARCH="amd64"
 ARG NPM_YARN_REGISTRY="registry.npmjs.org"
 
 # Based upon dotnet/sdk, with node.js and yarn installed
-FROM $DOCKER_REGISTRY/openworkshop/hub-base:latest-$MAKER_BUILDER_ARCH AS build-env
+FROM $DOCKER_REGISTRY/openworkshop/hub-base:latest AS build-env
 WORKDIR /app
 
 # Copy file contents & build
