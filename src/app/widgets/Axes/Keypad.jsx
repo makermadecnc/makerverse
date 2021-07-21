@@ -577,6 +577,32 @@ class Keypad extends PureComponent {
                         </div>
                     </div>
                 </div>
+                <div className="row no-gutters">
+                    <Button
+                        btnStyle="flat"
+                        className={cx(styles.btnKeypad, styles['btn-setOffset'])}
+                        onClick={() => {
+                            this.handleSelect('G92 X0 Y0');
+                        }}
+                        disabled={!canClickXY}
+                        title={i18n._('Set Work Home')}
+                    >
+                        <KeypadText>Set Work Home</KeypadText>
+                    </Button>
+                </div>
+                <div className="row no-gutters">
+                    <Button
+                        btnStyle="flat"
+                        className={cx(styles.btnKeypad, styles['btn-setOffset'])}
+                        onClick={() => {
+                            this.handleSelect('G53 G0 X0 Y0');
+                        }}
+                        disabled={!canClickXY}
+                        title={i18n._('Go To Machine Home')}
+                    >
+                        <KeypadText>Go To Machine Home</KeypadText>
+                    </Button>
+                </div>
             </div>
         );
     }

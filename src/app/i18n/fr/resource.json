@@ -139,7 +139,6 @@
     "Zero Out Work Offsets (G10 L20 P6 X0 Y0 Z0)": "Définir comme zéro de travail (G10 L20 P6 X0 Y0 Z0)",
     "Temporary Offsets (G92)": "Décallage temporaire (G92)",
     "Zero Out Temporary Offsets (G92 X0 Y0 Z0)": "Définir temporairement le zéro (G92 X0 Y0 Z0)",
-    "Un-Zero Out Temporary Offsets (G92.1 X0 Y0 Z0)": "Supprimer le zéro temporaire (G92.1 X0 Y0 Z0)",
     "Machine Coordinate System (G53)": "Système de coordonnées machine (G53)",
     "Go To Machine Zero (G53 G0 X0 Y0 Z0)": "Aller au zéro machine (G53 G0 X0 Y0 Z0)",
     "Set Machine Zero (G28.3 X0 Y0 Z0)": "",
@@ -610,5 +609,6 @@
     "Select \"no\" if your machine has already been calibrated.": "",
     "Laser Mode": "",
     "Error closing serial port": "",
-    "Wasteboard": ""
+    "Wasteboard": "",
+    "Clear Work Offsets": ""
 }
