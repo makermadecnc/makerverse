@@ -84,6 +84,7 @@ class ActiveState {
         this._modal = _.get(controllerState, this.modalStateKey) || {};
         this._mpos = _.get(controllerState, this.mposKey);
         this._wpos = _.get(controllerState, this.wposKey);
+        console.log(this._wpos, 'wpos from controller state');
         if (_.has(controllerState, 'status')) {
             const status = controllerState.status;
             this.error = status.error;
