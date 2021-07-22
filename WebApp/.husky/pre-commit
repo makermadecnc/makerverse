@@ -11,9 +11,9 @@ fi
 yarn run lint-staged
 
 # Check if this project is embedded within MakerHub. If so, ensure that it's using the right production config.
-PKG="../../package.json"
+PKG="../../../package.json"
 if grep -q "\"productName\": \"MakerHub\"" "$PKG"; then
-  pushd "../../"
+  pushd "../../../"
   maker-env sync Makerverse
   popd
 else
