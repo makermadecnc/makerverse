@@ -27,6 +27,7 @@ const Axes = (props) => {
                 axes={state.axes}
                 jog={state.jog}
                 actions={actions}
+                workPosition={state.workPosition}
             />
             <MDI
                 workspaceId={props.workspaceId}

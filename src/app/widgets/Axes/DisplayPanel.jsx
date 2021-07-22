@@ -1163,6 +1163,7 @@ class DisplayPanel extends PureComponent {
         const hasAxisA = includes(axes, AXIS_A);
         const hasAxisB = includes(axes, AXIS_B);
         const hasAxisC = includes(axes, AXIS_C);
+        console.log(workPosition, 'work position value');
 
         return (
             <Panel className={styles.displayPanel}>

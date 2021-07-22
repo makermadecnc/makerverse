@@ -34,7 +34,8 @@ class Keypad extends PureComponent {
         units: PropTypes.oneOf([IMPERIAL_UNITS, METRIC_UNITS]),
         axes: PropTypes.array,
         jog: PropTypes.object,
-        actions: PropTypes.object
+        actions: PropTypes.object,
+        workPosition: PropTypes.object
     };
 
     get workspace() {
@@ -588,6 +589,19 @@ class Keypad extends PureComponent {
                         title={i18n._('Set Work Home')}
                     >
                         <KeypadText>Set Work Home</KeypadText>
+                    </Button>
+                </div>
+                <div className="row no-gutters">
+                    <Button
+                        btnStyle="flat"
+                        className={cx(styles.btnKeypad, styles['btn-setOffset'])}
+                        onClick={() => {
+                            this.handleSelect('G92.1');
+                        }}
+                        disabled={!canClickXY}
+                        title={i18n._('Clear Work Home')}
+                    >
+                        <KeypadText>Clear Work Home</KeypadText>
                     </Button>
                 </div>
                 <div className="row no-gutters">
