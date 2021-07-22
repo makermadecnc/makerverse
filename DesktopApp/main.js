@@ -1,2 +1,1 @@
-const DesktopApp = require('./DesktopApp');
-const app = new DesktopApp();
+new (require('@openworkshop/maker-app/DesktopApp'));

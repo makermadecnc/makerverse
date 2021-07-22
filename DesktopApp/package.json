@@ -11,15 +11,7 @@
     "start": "electron ."
   },
   "dependencies": {
-    "electron-is-dev": "^2.0.0",
-    "electron-updater": "^4.3.9",
-    "path": "^0.12.7",
-    "child_process": "^1.0.2",
-    "wait-on": "^6.0.0",
-    "electron-webpack": "^2.8.2",
-    "@openworkshop/maker-builder": "0.3.31",
-    "electron-log": "^4.3.5",
-    "node-port-scanner": "^3.0.1"
+    "@openworkshop/maker-app": "0.4.1"
   },
   "devDependencies": {
     "electron": "^13.1.4",
