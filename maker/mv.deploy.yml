@@ -1,5 +1,5 @@
 - label: ":docker: ${MAKER_HUB_PROJECT}:${MAKER_HUB_CHANNEL} :rocket:"
-  command: "maker/builder.sh container deploy makerverse/core"
+  command: "maker/builder.sh container deploy makerverse/core --archs amd64,arm32v7"
 
 - label: ":ubuntu: ${MAKER_HUB_SEMVER_LONG} :rocket:"
   command: "maker/builder.sh electron deploy"
