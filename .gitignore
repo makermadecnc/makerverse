@@ -5,6 +5,7 @@
 # [MAKER_HUB_RUNTIME]
 /preferences.json
 /gcode
+*.log
 
 # [COMMON_RIDER]
 .idea/
