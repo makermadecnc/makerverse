@@ -1,6 +1,7 @@
 {
   "env": {
-    "ASPNETCORE_ENVIRONMENT": "Development",
+    "ASPNETCORE_ENVIRONMENT": "Staging",
+    "MAKER_HUB_APP_ENVIRONMENT": "Staging",
     "MAKER_HUB_PROJECT": "Makerverse",
     "MAKER_HUB_SEMVER_SHORT": "1.2.1",
     "MAKER_HUB_SEMVER_MEDIUM": "1.2.1-dev",

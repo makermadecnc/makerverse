@@ -214,10 +214,10 @@
   dependencies:
     "@octokit/openapi-types" "^8.3.0"
 
-"@openworkshop/maker-app@0.4.7":
-  version "0.4.7"
-  resolved "https://registry.yarnpkg.com/@openworkshop/maker-app/-/maker-app-0.4.7.tgz#f9b495efa36de7d38cd647364f6eb52823df7ca8"
-  integrity sha512-KUic5G2mjXDNXQkJ81/Zd0YsXIobqrBX7KyN+oq+bp82D9AMgW1savHmlnNlmNhUVAK7ThEv8q7ZJzoy23bflg==
+"@openworkshop/maker-app@0.4.9":
+  version "0.4.9"
+  resolved "https://registry.npmjs.org/@openworkshop/maker-app/-/maker-app-0.4.9.tgz#beb94ae0d96c3f82f9ffe74da139b920d79bb153"
+  integrity sha512-NG77nATm5A19XGL/6Jej6wXXhgRsn9tEnfL4csxzXs+rnYP/gHCQoLSsfqmwgVdEcEw6kJITXK+KbaJCkqHaEA==
   dependencies:
     child_process "^1.0.2"
     electron-is-dev "^2.0.0"
@@ -229,10 +229,10 @@
     ps-tree "^1.2.0"
     wait-on "^6.0.0"
 
-"@openworkshop/maker-builder@0.4.7":
-  version "0.4.7"
-  resolved "https://registry.yarnpkg.com/@openworkshop/maker-builder/-/maker-builder-0.4.7.tgz#b4ba2a24485d153678e401b2570969c6db3fdf05"
-  integrity sha512-ksszzlOGNsWhcMc+wbnOxQcs2tgHxB/TemtGpz2Lawlexk8tQ9oQbSTDFtxqTW7ISkhP5FR0Os8bAUWCM5iKtQ==
+"@openworkshop/maker-builder@0.4.9":
+  version "0.4.9"
+  resolved "https://registry.npmjs.org/@openworkshop/maker-builder/-/maker-builder-0.4.9.tgz#614ff5ebfa7a013b5724edb031759dbaad8d650f"
+  integrity sha512-12gSZaJEamF3BJTTVYp5t2tSRDjxf8je2SBOQnXMkPBNEMKfe6AB+X78qs7abfsm5LPAG6P1AqRS1u4zDCmfmg==
   dependencies:
     child_process "^1.0.2"
     command-exists "^1.2.9"

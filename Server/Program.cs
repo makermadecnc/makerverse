@@ -15,9 +15,10 @@ namespace Makerverse {
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
       Host.CreateDefaultBuilder(args)
-          .ConfigureWebHostDefaults(webBuilder => {
-             webBuilder.UseUrls("http://*:" + MakerHubDeployment.Singleton.Port);
-             webBuilder.UseSerilog();
+          .ConfigureWebHostDefaults(webBuilder =>
+          {
+            Serilog.Log.Information("WH: {host}", MakerHubDeployment.Singleton.AppEnvironment.ToString());
+             MakerHubDeployment.Singleton.ConfigureWebHost(webBuilder);
              webBuilder.UseStartup<Startup>();
            });
   }

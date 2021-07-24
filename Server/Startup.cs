@@ -17,7 +17,7 @@ namespace Makerverse {
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services) {
       services.AddSpaStaticFiles(configuration => {
-        configuration.RootPath = Path.Combine(MakerHubDeployment.Singleton.Paths["bin"], "build");
+        configuration.RootPath = Path.Combine(MakerHubDeployment.Singleton.GetPath("bin"), "build");
       });
       services.AddMakerHubServices();
       services.AddAuthentication();
@@ -30,7 +30,7 @@ namespace Makerverse {
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
       // ConfigFile? sf = app.ApplicationServices.GetService<ConfigFile>();
-      // Log.Information("[CONFIG] load filename: {sf}", sf);
+      Log.Information("[START] {env} {dev}", env.EnvironmentName, env.IsDevelopment());
 
       app.UseExceptionHandler(new ExceptionHandlerOptions {
         ExceptionHandler = ApiExceptionMiddleware.Invoke
