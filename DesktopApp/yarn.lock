@@ -216,7 +216,7 @@
 
 "@openworkshop/maker-app@0.4.9":
   version "0.4.9"
-  resolved "https://registry.npmjs.org/@openworkshop/maker-app/-/maker-app-0.4.9.tgz#beb94ae0d96c3f82f9ffe74da139b920d79bb153"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-app/-/maker-app-0.4.9.tgz#beb94ae0d96c3f82f9ffe74da139b920d79bb153"
   integrity sha512-NG77nATm5A19XGL/6Jej6wXXhgRsn9tEnfL4csxzXs+rnYP/gHCQoLSsfqmwgVdEcEw6kJITXK+KbaJCkqHaEA==
   dependencies:
     child_process "^1.0.2"
@@ -231,7 +231,7 @@
 
 "@openworkshop/maker-builder@0.4.9":
   version "0.4.9"
-  resolved "https://registry.npmjs.org/@openworkshop/maker-builder/-/maker-builder-0.4.9.tgz#614ff5ebfa7a013b5724edb031759dbaad8d650f"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-builder/-/maker-builder-0.4.9.tgz#614ff5ebfa7a013b5724edb031759dbaad8d650f"
   integrity sha512-12gSZaJEamF3BJTTVYp5t2tSRDjxf8je2SBOQnXMkPBNEMKfe6AB+X78qs7abfsm5LPAG6P1AqRS1u4zDCmfmg==
   dependencies:
     child_process "^1.0.2"

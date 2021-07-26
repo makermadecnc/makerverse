@@ -20,5 +20,7 @@ FROM $DOCKER_REGISTRY/dotnet/aspnet:$DOTNET_VERSION-$DOTNET_RUNTIME
 
 WORKDIR /app
 COPY --from=build-env /app/out .
+COPY hub.env .
+COPY maker.env .
 
 ENTRYPOINT ["dotnet", "Makerverse.dll"]

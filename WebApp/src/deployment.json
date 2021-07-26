@@ -1,7 +1,7 @@
 {
   "env": {
-    "ASPNETCORE_ENVIRONMENT": "Staging",
-    "MAKER_HUB_APP_ENVIRONMENT": "Staging",
+    "ASPNETCORE_ENVIRONMENT": "Development",
+    "MAKER_HUB_APP_ENVIRONMENT": "Development",
     "MAKER_HUB_PROJECT": "Makerverse",
     "MAKER_HUB_SEMVER_SHORT": "1.2.1",
     "MAKER_HUB_SEMVER_MEDIUM": "1.2.1-dev",
@@ -10,8 +10,10 @@
     "MAKER_HUB_BUILD_NUMBER": 0,
     "MAKER_HUB_BACKEND_ENVIRONMENT": "Staging",
     "MAKER_HUB_CHANNEL": "dev",
-    "MAKER_HUB_BACKEND_PORT": 8000,
-    "MAKER_HUB_FRONTEND_PORT": 3000
+    "MAKER_HUB_SUBDOMAIN": "",
+    "MAKER_HUB_SCHEME": "http",
+    "MAKER_HUB_HOSTNAME": "localhost",
+    "MAKER_HUB_PORT": 8000
   },
   "package": {
     "name": "makerverse",
@@ -35,5 +37,13 @@
     "suffix": "dev",
     "branch": "dev",
     "build": null
+  },
+  "makerEnv": {
+    "MAKER_BACKEND": "Server",
+    "MAKER_FRONTEND": "WebApp",
+    "MAKER_HUB_FRONTEND_PORT": 3000,
+    "MAKER_HUB_HOST_DOMAIN_NAME": "",
+    "MAKER_HUB_LISTEN_PORT": 8000,
+    "MAKER_START": "DesktopApp"
   }
 }

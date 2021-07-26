@@ -17,7 +17,7 @@ namespace Makerverse {
       Host.CreateDefaultBuilder(args)
           .ConfigureWebHostDefaults(webBuilder =>
           {
-            Serilog.Log.Information("WH: {host}", MakerHubDeployment.Singleton.AppEnvironment.ToString());
+            Log.Information("WH: {host}", MakerHubDeployment.Singleton.Env.AppEnvironment.ToString());
              MakerHubDeployment.Singleton.ConfigureWebHost(webBuilder);
              webBuilder.UseStartup<Startup>();
            });
