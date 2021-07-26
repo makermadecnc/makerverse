@@ -583,6 +583,19 @@ class Keypad extends PureComponent {
                         btnStyle="flat"
                         className={cx(styles.btnKeypad, styles['btn-setOffset'])}
                         onClick={() => {
+                            this.handleSelect('G92 Z0');
+                        }}
+                        disabled={!canClickXY}
+                        title={i18n._('Set Z-axis Zero')}
+                    >
+                        <KeypadText>Set Z-axis Zero</KeypadText>
+                    </Button>
+                </div>
+                <div className="row no-gutters">
+                    <Button
+                        btnStyle="flat"
+                        className={cx(styles.btnKeypad, styles['btn-setOffset'])}
+                        onClick={() => {
                             this.handleSelect('G92 X0 Y0');
                         }}
                         disabled={!canClickXY}
