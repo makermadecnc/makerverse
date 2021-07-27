@@ -1,7 +1,7 @@
 {
   "name": "makerverse",
   "productName": "Makerverse",
-  "version": "1.2.1-dev",
+  "version": "1.2.2-dev",
   "description": "A web-based interface for CNC milling controller.",
   "homepage": "http://makerverse.com",
   "author": "OpenWorkShop, Inc. & Maker Made",
@@ -18,8 +18,8 @@
     "prepare": "cd .. && husky install WebApp/.husky"
   },
   "dependencies": {
-    "@openworkshop/maker-hub": "0.4.9",
-    "@openworkshop/maker-builder": "0.4.9",
+    "@openworkshop/maker-hub": "0.4.12",
+    "@openworkshop/maker-builder": "0.4.12",
     "@apollo/client": "^3.3.21",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^11.3.0",

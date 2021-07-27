@@ -1,0 +1,4 @@
+provider: generic
+url: https://downloads.openwork.shop/Makerverse
+channel: beta
+updaterCacheDirName: makerverse-updater

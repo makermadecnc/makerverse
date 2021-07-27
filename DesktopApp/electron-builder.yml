@@ -1,4 +1,4 @@
-appId: "com.Makerverse.app"
+appId: "com.makermade.makerverse"
 artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
 npmRebuild: "false"
 

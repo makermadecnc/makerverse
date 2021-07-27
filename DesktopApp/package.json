@@ -11,8 +11,8 @@
     "start": "electron ."
   },
   "dependencies": {
-    "@openworkshop/maker-app": "./src/maker-app",
-    "@openworkshop/maker-builder": "0.4.9"
+    "@openworkshop/maker-app": "0.4.12",
+    "@openworkshop/maker-builder": "0.4.10"
   },
   "devDependencies": {
     "electron": "^13.1.4",

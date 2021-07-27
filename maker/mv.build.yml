@@ -11,7 +11,7 @@
 
 # OSX x64 Stand-Alone can be built on linux
 - label: ":mac: .dmg :hammer_and_wrench:"
-  command: "maker/builder.sh electron build"
+  command: "CSC_LINK=/Users/zaneclaes/makermade-app-store.p12 maker/builder.sh electron build"
   agents:
 #    arch: "arm"
     os: "mac"
