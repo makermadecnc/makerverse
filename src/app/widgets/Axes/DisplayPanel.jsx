@@ -1,7 +1,7 @@
 import chainedFunction from 'chained-function';
 import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
-import noop from 'lodash/noop';
+//import noop from 'lodash/noop';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Dropdown, { MenuItem } from 'app/components/Dropdown';
@@ -1015,7 +1015,7 @@ class DisplayPanel extends PureComponent {
     renderAxis = (axis) => {
         const { canClick, units, machinePosition, workPosition, jog } = this.props;
         const { actions } = this.props;
-        const wcs = actions.getWorkCoordinateSystem();
+        //const wcs = actions.getWorkCoordinateSystem();
         const lengthUnits = (units === METRIC_UNITS) ? i18n._('mm') : i18n._('in');
         const degreeUnits = i18n._('deg');
         const axisSettings = this.workspace.axes[axis];
@@ -1033,7 +1033,7 @@ class DisplayPanel extends PureComponent {
             [AXIS_B]: degreeUnits,
             [AXIS_C]: degreeUnits
         }[axis] || '';
-        const renderActionDropdown = {
+        /*const renderActionDropdown = {
             [AXIS_E]: this.renderActionDropdownForAxisE,
             [AXIS_X]: this.renderActionDropdownForAxisX,
             [AXIS_Y]: this.renderActionDropdownForAxisY,
@@ -1041,7 +1041,7 @@ class DisplayPanel extends PureComponent {
             [AXIS_A]: this.renderActionDropdownForAxisA,
             [AXIS_B]: this.renderActionDropdownForAxisB,
             [AXIS_C]: this.renderActionDropdownForAxisC
-        }[axis] || noop;
+        }[axis] || noop;*/
         //const canZeroOutMachine = canClick;
         //const canHomeMachine = canClick;
         //const canMoveBackward = canClick;
@@ -1146,16 +1146,16 @@ class DisplayPanel extends PureComponent {
                         </div>
                             </Taskbar>*/}
                 </td>
-                <td className={styles.action}>
+                {/*<td className={styles.action}>
                     {renderActionDropdown({ wcs })}
-                </td>
+                        </td>*/}
             </tr>
         );
     };
 
     render() {
         const { axes, machinePosition, workPosition } = this.props;
-        const wcs = this.props.actions.getWorkCoordinateSystem();
+        //const wcs = this.props.actions.getWorkCoordinateSystem();
         const hasAxisE = (machinePosition.e !== undefined && workPosition.e !== undefined);
         const hasAxisX = includes(axes, AXIS_X);
         const hasAxisY = includes(axes, AXIS_Y);
@@ -1163,7 +1163,6 @@ class DisplayPanel extends PureComponent {
         const hasAxisA = includes(axes, AXIS_A);
         const hasAxisB = includes(axes, AXIS_B);
         const hasAxisC = includes(axes, AXIS_C);
-        console.log(workPosition, 'work position value');
 
         return (
             <Panel className={styles.displayPanel}>
@@ -1173,9 +1172,9 @@ class DisplayPanel extends PureComponent {
                             <th style={{ textAlign: 'center' }} title={i18n._('Axis')}>{i18n._('Axis')}</th>
                             <th style={{ textAlign: 'center' }} title={i18n._('Machine Position')}>{i18n._('Machine Position')}</th>
                             <th style={{ textAlign: 'center' }} title={i18n._('Work Position')}>{i18n._('Work Position')}</th>
-                            <th className={styles.action}>
+                            {/*<th className={styles.action}>
                                 {this.renderActionDropdown({ wcs })}
-                            </th>
+        </th>*/}
                         </tr>
                     </thead>
                     <tbody>
