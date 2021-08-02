@@ -586,7 +586,7 @@ class Keypad extends PureComponent {
                             this.handleSelect('G92 Z0');
                         }}
                         disabled={!canClickXY}
-                        title={i18n._('Set Z-axis Zero')}
+                        title={i18n._('Sets current position of the z-axis to zero, so project commands will be relative to that point.')}
                     >
                         <KeypadText>Set Z-axis Zero</KeypadText>
                     </Button>
@@ -599,7 +599,7 @@ class Keypad extends PureComponent {
                             this.handleSelect('G92 X0 Y0');
                         }}
                         disabled={!canClickXY}
-                        title={i18n._('Set Work Home')}
+                        title={i18n._('Sets the current position to temporary XY zero so that project commands will be relative to this position.')}
                     >
                         <KeypadText>Set Work Home</KeypadText>
                     </Button>
@@ -612,7 +612,7 @@ class Keypad extends PureComponent {
                             this.handleSelect('G92.1');
                         }}
                         disabled={!canClickXY}
-                        title={i18n._('Clear Work Home')}
+                        title={i18n._('Clears any existing Work Home and all commands are relative to Machine Home again.')}
                     >
                         <KeypadText>Clear Work Home</KeypadText>
                     </Button>
@@ -625,7 +625,7 @@ class Keypad extends PureComponent {
                             this.handleSelect('G53 G0 X0 Y0');
                         }}
                         disabled={!canClickXY}
-                        title={i18n._('Go To Machine Home')}
+                        title={i18n._('Sends the sled back to the Home position that was set during calibration.')}
                     >
                         <KeypadText>Go To Machine Home</KeypadText>
                     </Button>
