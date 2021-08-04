@@ -578,6 +578,8 @@ class Keypad extends PureComponent {
                         </div>
                     </div>
                 </div>
+                {// work offset buttons
+                }
                 <div className="row no-gutters">
                     <Button
                         btnStyle="flat"
