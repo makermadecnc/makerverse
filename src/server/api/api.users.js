@@ -2,8 +2,9 @@
 // import bcrypt from 'bcrypt-nodejs';
 import ensureArray from 'ensure-array';
 import isPlainObject from 'lodash/isPlainObject';
-import superagent from 'superagent';
-import superagentUse from 'superagent-use';
+// import superagent from 'superagent';
+// import superagentUse from 'superagent-use';
+import request from 'request';
 import _ from 'lodash';
 // import uuid from 'uuid';
 import settings from '../config/settings';
@@ -27,17 +28,17 @@ const useLocal = false;
 const owsUrl = useLocal ? 'http://localhost:5000' : 'https://openwork.shop';
 
 // Modify request headers and query parameters to prevent caching
-const noCache = (request) => {
-    const now = Date.now();
-    request.set('Cache-Control', 'no-cache');
-    request.set('X-Requested-With', 'XMLHttpRequest');
+// const noCache = (request) => {
+//     const now = Date.now();
+//     request.set('Cache-Control', 'no-cache');
+//     request.set('X-Requested-With', 'XMLHttpRequest');
 
-    if (request.method === 'GET' || request.method === 'HEAD') {
-        // Force requested pages not to be cached by the browser by appending "_={timestamp}" to the GET parameters, this will work correctly with HEAD and GET requests. The parameter is not needed for other types of requests, except in IE8 when a POST is made to a URL that has already been requested by a GET.
-        request._query = ensureArray(request._query);
-        request._query.push(`_=${now}`);
-    }
-};
+//     if (request.method === 'GET' || request.method === 'HEAD') {
+//         // Force requested pages not to be cached by the browser by appending "_={timestamp}" to the GET parameters, this will work correctly with HEAD and GET requests. The parameter is not needed for other types of requests, except in IE8 when a POST is made to a URL that has already been requested by a GET.
+//         request._query = ensureArray(request._query);
+//         request._query.push(`_=${now}`);
+//     }
+// };
 
 const GUEST_KEY = 'insecureDangerousGuestAccess';
 
@@ -46,8 +47,8 @@ export const isGuestAccessEnabled = () => {
     return gk === true;
 };
 
-export const owsreq = superagentUse(superagent);
-owsreq.use(noCache);
+// export const owsreq = superagentUse(superagent);
+// owsreq.use(noCache);
 
 const sanitizeRecord = (record) => {
     let shouldUpdate = false;
@@ -113,13 +114,29 @@ export const signin = (req, res) => {
         res.send({ enabled: true, guest: true, user: guestUser });
     }
 
-    owsreq.use((request) => {
-        request.set('Authorization', 'Bearer ' + token);
-        request.set('ClientVersion', pkg.version);
-    });
-    owsreq.get(`${owsUrl}/api/users/me`)
-        .send()
+    return new Promise((resolve, reject) => {
+        request({
+            url: `${owsUrl}/api/users/me`,
+            method: 'GET',
+            json: true,
+            headers: {
+                Authorization: 'Bearer ' + token,
+                ClientVersion: pkg.version,
+                'Content-Type': 'application/json',
+            },
+            agentOptions: {
+                rejectUnauthorized: false,
+            }
+        }, (error, response, body) => {
+            if (!error) {
+                resolve(response);
+            } else {
+                reject(error);
+            }
+        });
+    })
         .then((result) => {
+            // log.debug(result);
             const body = result ? result.body : {};
             const record = body && body.data ? body.data : {};
 
