@@ -30,5 +30,5 @@ nav_order: 4
 ## Creating an Event
 
 - Go to Settings -> Events and press "+ Add"
-- To run scripts, use a "system" trigger and follow the [commands](/features/commands/) instructions.
+- To run scripts, use a "system" trigger and follow the [commands](/features/commands/) instructions. The event scripts reside in the events folder under the base makerverse folder and regardless of the makerverse folder name, the path to get to the event is ~/makerverse/events/scriptname.
 - To run Gcode, use a "G-code" trigger and enter any gcode you wish.

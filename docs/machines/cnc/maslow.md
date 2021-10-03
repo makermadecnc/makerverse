@@ -20,7 +20,13 @@ The Maslow requires calibration to correct "chain sag" (catenary effects).
 
 ### Before you Start
 
-Do a **pre-flight check**.
+!!! WARNING !!!
+
+- If this is the *first* use of your maslow, before you do anything, reset the chains !!!  Even if the sled is not exactly in the middle, to establish a baseline location, reset the chains.  Once that is complete, the sled should respond to the shuttle commands to move so then you can avoid costly disaster or erratic behavior.  As with all new equipment, please make power shutoff to the system accessible in case you must shut it off quickly.  In the makerverse, the RESET button will cut power to the motors, so keep that in mind.  After calibration, the sled will be properly positioned and allow future chain resets to occur with chain marks to reset back to the middle of the work piece.
+
+!!! WARNING !!!
+
+First, do a **pre-flight check**.
 
 Maslow frames are generally built from hand-cut, imprecise materials. Catching errors early will greatly improve the chances of an easy, successful calibration.
 
