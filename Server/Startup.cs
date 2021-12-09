@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,8 +38,8 @@ namespace Makerverse {
       app.UseAuthentication();
       app.UseRouting();
       app.UseSerilogRequestLogging();
-      app.UseWebSockets(new WebSocketOptions() { // "Must appear before UseEndpoints"
-        AllowedOrigins = {"*"}
+      app.UseWebSockets(new WebSocketOptions { // "Must appear before UseEndpoints"
+        AllowedOrigins = { "*" }
       });
       app.UseStaticFiles();
       app.UseSpaStaticFiles();

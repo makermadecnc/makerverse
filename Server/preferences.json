@@ -1,0 +1,20 @@
+{
+  "fileSystem": {
+    "documentsDirectory": null,
+    "ProgramsDirectory": "/Users/zaneclaes/zdrive/zaneclaes/Programming/MakerHub/src/projects/Makerverse/Server/gcode",
+    "mountPoints": []
+  },
+  "appUpdates": {
+    "checkForUpdates": true,
+    "prereleases": false
+  },
+  "workspaces": [],
+  "users": [],
+  "hub": {
+    "networked": false,
+    "environment": null,
+    "logs": {
+      "overrides": []
+    }
+  }
+}

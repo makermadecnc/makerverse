@@ -2,7 +2,7 @@
   "name": "makerverse",
   "productName": "Makerverse",
   "description": "A web-based interface for CNC milling controller.",
-  "homepage": "http://makerverse.com",
+  "homepage": "https://makerverse.com",
   "main": "main.js",
   "author": "OpenWorkShop, Inc. & Maker Made",
   "license": "MIT",
@@ -11,7 +11,7 @@
     "start": "electron ."
   },
   "dependencies": {
-    "@openworkshop/maker-app": "0.4.12",
+    "@openworkshop/maker-app": "0.4.13",
     "@openworkshop/maker-builder": "0.4.10"
   },
   "devDependencies": {

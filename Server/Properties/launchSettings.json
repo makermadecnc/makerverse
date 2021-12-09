@@ -1,15 +1,5 @@
 {
   "profiles": {
-    "Makerverse Stand-Alone App": {
-      "commandName": "Executable",
-      "executablePath": "/Users/zaneclaes/.dotnet/tools/electronize",
-      "commandLineArgs": "start",
-      "workingDirectory": ".",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Staging",
-        "BUILD_ELECTRON": "true"
-      }
-    },
     "Makerverse": {
       "commandName": "Project",
       "applicationUrl": "http://localhost:8000",

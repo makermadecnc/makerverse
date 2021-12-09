@@ -15,9 +15,8 @@ namespace Makerverse {
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
       Host.CreateDefaultBuilder(args)
-          .ConfigureWebHostDefaults(webBuilder =>
-          {
-            Log.Information("WH: {host}", MakerHubDeployment.Singleton.Env.AppEnvironment.ToString());
+          .ConfigureWebHostDefaults(webBuilder => {
+             Log.Information("WH: {host}", MakerHubDeployment.Singleton.Env.AppEnvironment.ToString());
              MakerHubDeployment.Singleton.ConfigureWebHost(webBuilder);
              webBuilder.UseStartup<Startup>();
            });
