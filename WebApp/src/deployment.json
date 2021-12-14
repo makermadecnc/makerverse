@@ -8,7 +8,7 @@
     "MAKER_HUB_SEMVER_LONG": "1.2.2-alpha",
     "MAKER_HUB_SEMVER_PUB": "1.2.2-alpha",
     "MAKER_HUB_BUILD_NUMBER": 0,
-    "MAKER_HUB_BACKEND_ENVIRONMENT": "Staging",
+    "MAKER_HUB_BACKEND_ENVIRONMENT": "Development",
     "MAKER_HUB_CHANNEL": "alpha",
     "MAKER_HUB_SUBDOMAIN": "",
     "MAKER_HUB_SCHEME": "http",

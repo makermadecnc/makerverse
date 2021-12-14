@@ -1,6 +1,18 @@
 @font-face {
-  font-family: 'Cabin';
-  src: local('Cabin'), url(./fonts/Cabin-Regular.ttf) format('truetype');
+  font-family: 'Rubik';
+  src: local('Rubik'), url(./fonts/Rubik-Regular.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src: local('Rubik-Bold'), url(./fonts/Rubik-Bold.ttf) format('truetype');
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src: local('Rubik-Italic'), url(./fonts/Rubik-Italic.ttf) format('truetype');
+  font-style: italic;
 }
 
 @font-face {
