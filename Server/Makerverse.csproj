@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <AspNetCoreModuleName>AspNetCoreModule</AspNetCoreModuleName>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
@@ -26,25 +26,25 @@
     </Content>
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' != 'Debug' ">
-    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.4.13-beta.365"/>
+    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.4.13-beta.399" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <ProjectReference Include="..\..\..\..\MakerHub\MakerHub.csproj"/>
-    <Watch Remove="..\..\..\..\MakerHub\Generated\**"/>
+    <ProjectReference Include="..\..\..\..\MakerHub\MakerHub.csproj" />
+    <Watch Remove="..\..\..\..\MakerHub\Generated\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0"/>
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
   </ItemGroup>
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish" Condition="'$(SKIP_WEBAPP)' != 'true'">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
-    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn install --network-timeout 1000000000"/>
-    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn run build"/>
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn install --network-timeout 1000000000" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn run build" />
   </Target>
   <Target Name="CopyWebpack" AfterTargets="ComputeFilesToPublish">
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>
-      <DistFiles Include="$(SpaRoot)build\**;"/>
-      <Message Text="$([System.String]::Copy('%(DistFiles.Identity)').Replace('$(SpaRoot)',''))"/>
+      <DistFiles Include="$(SpaRoot)build\**;" />
+      <Message Text="$([System.String]::Copy('%(DistFiles.Identity)').Replace('$(SpaRoot)',''))" />
       <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
         <RelativePath>$([System.String]::Copy('%(DistFiles.Identity)').Replace('$(SpaRoot)',''))</RelativePath>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

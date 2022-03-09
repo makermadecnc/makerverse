@@ -1,15 +1,15 @@
 {
   "env": {
-    "ASPNETCORE_ENVIRONMENT": "Development",
-    "MAKER_HUB_APP_ENVIRONMENT": "Development",
+    "ASPNETCORE_ENVIRONMENT": "Production",
+    "MAKER_HUB_APP_ENVIRONMENT": "Production",
     "MAKER_HUB_PROJECT": "Makerverse",
-    "MAKER_HUB_SEMVER_SHORT": "1.2.2",
-    "MAKER_HUB_SEMVER_MEDIUM": "1.2.2-alpha",
-    "MAKER_HUB_SEMVER_LONG": "1.2.2-alpha",
-    "MAKER_HUB_SEMVER_PUB": "1.2.2-alpha",
-    "MAKER_HUB_BUILD_NUMBER": 0,
-    "MAKER_HUB_BACKEND_ENVIRONMENT": "Development",
-    "MAKER_HUB_CHANNEL": "alpha",
+    "MAKER_HUB_SEMVER_SHORT": "0.4.13",
+    "MAKER_HUB_SEMVER_MEDIUM": "0.4.13-beta",
+    "MAKER_HUB_SEMVER_LONG": "0.4.13-beta.399",
+    "MAKER_HUB_SEMVER_PUB": "0.4.13-beta.399",
+    "MAKER_HUB_BUILD_NUMBER": 399,
+    "MAKER_HUB_BACKEND_ENVIRONMENT": "Production",
+    "MAKER_HUB_CHANNEL": "beta",
     "MAKER_HUB_SUBDOMAIN": "",
     "MAKER_HUB_SCHEME": "http",
     "MAKER_HUB_HOSTNAME": "localhost",
@@ -18,33 +18,26 @@
     "MAKER_HUB_URL": "http://localhost:8000"
   },
   "package": {
-    "name": "makerverse",
-    "productName": "Makerverse",
-    "version": "1.2.2-alpha",
-    "description": "A web-based interface for CNC milling controller.",
-    "homepage": "https://makerverse.com",
-    "author": "OpenWorkShop, Inc. & Maker Made",
-    "license": "MIT",
-    "repository": "github:makermadecnc/makerverse"
+    "name": "@openworkshop/current-app",
+    "productName": "MakerHub",
+    "version": "0.4.13-beta",
+    "license": "GPL-3.0-or-later"
   },
   "semver": {
-    "short": "1.2.2",
-    "medium": "1.2.2-alpha",
-    "long": "1.2.2-alpha",
-    "pub": "1.2.2-alpha",
-    "major": 1,
-    "minor": 2,
-    "patch": 2,
-    "channel": "alpha",
-    "suffix": "alpha",
-    "build": null
+    "short": "0.4.13",
+    "medium": "0.4.13-beta",
+    "long": "0.4.13-beta.399",
+    "pub": "0.4.13-beta.399",
+    "major": 0,
+    "minor": 4,
+    "patch": 13,
+    "channel": "beta",
+    "suffix": "beta.399",
+    "build": 399
   },
   "makerEnv": {
-    "MAKER_BACKEND": "Server",
-    "MAKER_FRONTEND": "WebApp",
     "MAKER_HUB_FRONTEND_PORT": 3000,
     "MAKER_HUB_HOST_DOMAIN_NAME": "",
-    "MAKER_HUB_LISTEN_PORT": 8000,
-    "MAKER_START": "DesktopApp"
+    "MAKER_HUB_LISTEN_PORT": 8000
   }
 }
