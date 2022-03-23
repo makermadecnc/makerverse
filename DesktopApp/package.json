@@ -12,11 +12,11 @@
   },
   "dependencies": {
     "@openworkshop/maker-app": "0.4.13-beta.399",
-    "@openworkshop/maker-builder": "0.4.13-beta.366"
+    "@openworkshop/maker-builder": "0.4.13-beta.399"
   },
   "devDependencies": {
     "electron": "^13.1.4",
-    "electron-builder": "^22.11.7"
+    "electron-builder": "^22.14.13"
   },
   "browserslist": {
     "production": [
