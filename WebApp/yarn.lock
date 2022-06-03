@@ -2819,10 +2819,10 @@
     "@open-wc/rollup-plugin-html" "^1.2.5"
     polyfills-loader "^1.7.5"
 
-"@openworkshop/maker-builder@0.4.13-beta.409":
-  version "0.4.13-beta.409"
-  resolved "https://registry.yarnpkg.com/@openworkshop/maker-builder/-/maker-builder-0.4.13-beta.409.tgz#22d7c208d077d21b88f9b855a3a30275e1a69434"
-  integrity sha512-/HiL5QoHNwsekPqF+y9/HCw6faLLJOzDQsbFm7AdMj32SwtTW/qsK+G9BzUp7UFRO8CUfnKKd20/zfDH7CE3Iw==
+"@openworkshop/maker-builder@0.4.13-beta.443":
+  version "0.4.13-beta.443"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-builder/-/maker-builder-0.4.13-beta.443.tgz#7227f89354872f4b2b8568390bac63b40b589301"
+  integrity sha512-VaESkJpOP6HZnQRxAVI7cEXZ6u+iAgc12fxQ3js5YsZMFYH1xqbLvTrIzyYJoNkYfZaNti+0zar0gZMNs6Sm5A==
   dependencies:
     child_process "^1.0.2"
     command-exists "^1.2.9"
@@ -2841,10 +2841,10 @@
     wait-on "^6.0.0"
     yargs "^17.0.1"
 
-"@openworkshop/maker-hub@0.4.13-beta.409":
-  version "0.4.13-beta.409"
-  resolved "https://registry.yarnpkg.com/@openworkshop/maker-hub/-/maker-hub-0.4.13-beta.409.tgz#31766a02e671a5f0b7f8218fb40612d0ca7ab1e9"
-  integrity sha512-0uKYJvLOAizWfUjgf1y7nCxrpD9twmr5+Ku13CsmvyoAsm5Ns/k1Dl16WVSFLJ8J5fYIiz7Yzhq6z+f+ZZqREw==
+"@openworkshop/maker-hub@0.4.13-beta.443":
+  version "0.4.13-beta.443"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-hub/-/maker-hub-0.4.13-beta.443.tgz#2a08f77773cdd4b6e9bb14661788b5d29963d776"
+  integrity sha512-aL7ICbJbdVbeAKvkv8pFXcUQCZQLkOxSVYu0dBdqv3sjFSMM+/d7ccADLwgF+BV74X9uEoWRr+cf3o9HJyuZug==
 
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":
   version "0.4.3"
