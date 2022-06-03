@@ -1,14 +1,14 @@
 {
   "env": {
-    "ASPNETCORE_ENVIRONMENT": "Production",
-    "MAKER_HUB_APP_ENVIRONMENT": "Production",
+    "ASPNETCORE_ENVIRONMENT": "Staging",
+    "MAKER_HUB_APP_ENVIRONMENT": "Staging",
     "MAKER_HUB_PROJECT": "Makerverse",
-    "MAKER_HUB_SEMVER_SHORT": "0.4.13",
-    "MAKER_HUB_SEMVER_MEDIUM": "0.4.13-beta",
-    "MAKER_HUB_SEMVER_LONG": "0.4.13-beta.439",
-    "MAKER_HUB_SEMVER_PUB": "0.4.13-beta.439",
-    "MAKER_HUB_BUILD_NUMBER": 439,
-    "MAKER_HUB_BACKEND_ENVIRONMENT": "Production",
+    "MAKER_HUB_SEMVER_SHORT": "2.0.0",
+    "MAKER_HUB_SEMVER_MEDIUM": "2.0.0-beta",
+    "MAKER_HUB_SEMVER_LONG": "2.0.0-beta.3",
+    "MAKER_HUB_SEMVER_PUB": "2.0.0-beta.3",
+    "MAKER_HUB_BUILD_NUMBER": 3,
+    "MAKER_HUB_BACKEND_ENVIRONMENT": "Staging",
     "MAKER_HUB_CHANNEL": "beta",
     "MAKER_HUB_SUBDOMAIN": "",
     "MAKER_HUB_SCHEME": "http",
@@ -18,26 +18,33 @@
     "MAKER_HUB_URL": "http://localhost:8000"
   },
   "package": {
-    "name": "@openworkshop/current-app",
-    "productName": "MakerHub",
-    "version": "0.4.13-beta",
-    "license": "GPL-3.0-or-later"
+    "name": "makerverse",
+    "productName": "Makerverse",
+    "version": "2.0.0-beta",
+    "description": "A web-based interface for CNC milling controller.",
+    "homepage": "https://makerverse.com",
+    "author": "OpenWorkShop, Inc. & Maker Made",
+    "license": "MIT",
+    "repository": "github:makermadecnc/makerverse"
   },
   "semver": {
-    "short": "0.4.13",
-    "medium": "0.4.13-beta",
-    "long": "0.4.13-beta.439",
-    "pub": "0.4.13-beta.439",
-    "major": 0,
-    "minor": 4,
-    "patch": 13,
+    "short": "2.0.0",
+    "medium": "2.0.0-beta",
+    "long": "2.0.0-beta.3",
+    "pub": "2.0.0-beta.3",
+    "major": 2,
+    "minor": 0,
+    "patch": 0,
     "channel": "beta",
-    "suffix": "beta.439",
-    "build": 439
+    "suffix": "beta.3",
+    "build": 3
   },
   "makerEnv": {
+    "MAKER_BACKEND": "Server",
+    "MAKER_FRONTEND": "WebApp",
     "MAKER_HUB_FRONTEND_PORT": 3000,
     "MAKER_HUB_HOST_DOMAIN_NAME": "",
-    "MAKER_HUB_LISTEN_PORT": 8000
+    "MAKER_HUB_LISTEN_PORT": 8000,
+    "MAKER_START": "DesktopApp"
   }
 }
