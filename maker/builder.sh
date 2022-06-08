@@ -38,6 +38,7 @@ function installMbFromSource() {
 
 function installMb() {
   echo "[INSTALL] from @openworkshop/maker-builder@latest"
+  npm uninstall -g "@openworkshop/maker-builder" || true
   npm install -g "@openworkshop/maker-builder@latest"
   export MB_INSTALLED="true"
 }
