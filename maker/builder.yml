@@ -7,6 +7,15 @@ defaults:
     arch: "amd"
     cpu: "64"
     os: "linux"
+  artifact_paths:
+    - "bin/Desktop/*.dmg"
+    - "bin/Desktop/*.pkg"
+    - "bin/Desktop/*.zip"
+    - "bin/Desktop/*.exe"
+    - "bin/Desktop/*.msi"
+    - "bin/Desktop/*.AppImage"
+    - "bin/Desktop/*.yml"
+    - "bin/Desktop/Dist/*"
 
 steps:
   - name: "Makerverse"

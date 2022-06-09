@@ -1,7 +1,7 @@
 @echo off
 ECHO "[MB] maker-%*"
-SET NPM_PATH=%APPDATA%\npm
-SET PATH=C:\Program Files\Git\usr\bin;C:\Program Files\nodejs;%NPM_PATH%\npm;%PATH%
+REM SET NPM_PATH=%APPDATA%\npm
+REM SET PATH=C:\Program Files\Git\usr\bin;C:\Program Files\nodejs;%NPM_PATH%\npm;%PATH%
 SET MB_SRC=src\maker-builder
 
 if exist "%MB_SRC%" (
@@ -22,13 +22,15 @@ if exist "%MB_SRC%" (
   SET MB_LOCAL=true
 ) else (
   ECHO "[MB] install global package..."
-  CALL npm install -g "@openworkshop/maker-builder@latest"
+  CALL npm install --registry=https://registry.npmjs.org/ -g "@openworkshop/maker-builder@latest"
   SET MB_INSTALLED=true
   SET MB_LOCAL=false
 )
 
-CALL "%NPM_PATH%\\maker-env" "--version"
-CALL "%NPM_PATH%\\maker-env" "prep"
+ECHO "[MB] installed!"
+CALL "maker-env" "--version"
+CALL "maker-env" "prep"
 
-CALL "%NPM_PATH%\\maker-%1" %2 %3 %4 %5 %6 %7 %8 %9
+ECHO "[MB] run..."
+CALL "maker-%1" %2 %3 %4 %5 %6 %7 %8 %9
 if NOT "%ERRORLEVEL%" == "0" exit /B %ERRORLEVEL%
