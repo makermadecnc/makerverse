@@ -18,8 +18,8 @@
     "prepare": "cd .. && husky install WebApp/.husky"
   },
   "dependencies": {
-    "@openworkshop/maker-hub": "0.4.13-beta.457",
-    "@openworkshop/maker-builder": "0.4.13-beta.457",
+    "@openworkshop/maker-hub": "0.4.13-beta.459",
+    "@openworkshop/maker-builder": "0.4.13-beta.459",
     "@apollo/client": "^3.3.21",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
