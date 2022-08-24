@@ -613,7 +613,7 @@ class CalibrationModal extends PureComponent {
                             <NavItem eventKey="machine">{i18n._('Machine')}</NavItem>
                             <NavItem eventKey="stock">{i18n._('Wasteboard')}</NavItem>
                             <NavItem eventKey="frame">{i18n._('Frame')}</NavItem>
-                            {/*<NavItem eventKey="sled">{i18n._('Sled')}</NavItem>*/}
+                            <NavItem eventKey="sled">{i18n._('Sled')}</NavItem>
                             <NavItem eventKey="z">{i18n._('Z-Axis')}</NavItem>
                             <NavItem eventKey="chains">{i18n._('Chains')}</NavItem>
                             <NavItem eventKey="edge">{i18n._('Edge')}</NavItem>
