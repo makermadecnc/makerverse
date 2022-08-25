@@ -11,7 +11,9 @@
 
 # OSX x64 Stand-Alone can be built on linux
 - label: ":mac: .dmg :hammer_and_wrench:"
-  command: "CSC_LINK=/Users/zaneclaes/makermade-app-store.p12 maker/builder.sh electron build"
+  command: "maker/builder.sh electron build"
+  env:
+    CSC_LINK: "/Users/zaneclaes/makermade-app-store.p12"
   agents:
 #    arch: "arm"
     os: "mac"
@@ -20,7 +22,10 @@
 
 # Windows has dependencies installed natively, and needs a native style invocation.
 - label: ":windows: .exe :hammer_and_wrench:"
-  command: "CSC_LINK=maker/cert-win.p12 CSC_KEY_PASSWORD=Makermade2022! maker/builder.cmd electron build"
+  command: "maker/builder.cmd electron build"
+  env:
+    CSC_LINK: "../maker/cert-win.p12"
+    CSC_KEY_PASSWORD: "Makermade2022!"
   agents:
     os: "win"
 
