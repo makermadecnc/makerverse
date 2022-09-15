@@ -2819,10 +2819,10 @@
     "@open-wc/rollup-plugin-html" "^1.2.5"
     polyfills-loader "^1.7.5"
 
-"@openworkshop/maker-builder@0.4.13-beta.469":
-  version "0.4.13-beta.469"
-  resolved "https://registry.yarnpkg.com/@openworkshop/maker-builder/-/maker-builder-0.4.13-beta.469.tgz#8514fea782555df82ab7eb02bb23eb3af7d7e095"
-  integrity sha512-rvH+4em8LnuhvSCHAZzjlrUd3lUuwqsx0PcwPI3p6AgA4PlRT9bReXUCsoTxTM/Yx5fEzrEU+Bf59qNqTyGRrQ==
+"@openworkshop/maker-builder@0.4.13-beta.478":
+  version "0.4.13-beta.478"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-builder/-/maker-builder-0.4.13-beta.478.tgz#4f077854bb635f493e31eaaa5d76984e511778b6"
+  integrity sha512-YU9XYwQSO0qXt07r5B1NhN/cOC99pTKlsqgAFG4MbhTff6Vt5FmsZDD8zIa4iQLkc9ZBiplvVt0NNr1jun/l6w==
   dependencies:
     child_process "^1.0.2"
     command-exists "^1.2.9"
@@ -2841,10 +2841,10 @@
     wait-on "^6.0.0"
     yargs "^17.0.1"
 
-"@openworkshop/maker-hub@0.4.13-beta.469":
-  version "0.4.13-beta.469"
-  resolved "https://registry.yarnpkg.com/@openworkshop/maker-hub/-/maker-hub-0.4.13-beta.469.tgz#d8f8741dd73b92aa37cf05f7c2866a68044eca29"
-  integrity sha512-X8boWASiVSJ8qxBYBxvO1eBO7OX5BhihOGdfPgS7qVz+eNB7b2izAHjMXzHZguTZd4IrgP2cv6vBFQlnosSWTA==
+"@openworkshop/maker-hub@0.4.13-beta.478":
+  version "0.4.13-beta.478"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-hub/-/maker-hub-0.4.13-beta.478.tgz#c5b689a3520db99d6ed10fcd2a34ad63c7c88440"
+  integrity sha512-kGSoj9wjxsI4uE1crl9PlCEFcpqd3CBmGNr8wpQ/fGRXxx+pRerDe1ZVOx4hNZD20wNsoU002gE9rfP7MF0NsQ==
 
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":
   version "0.4.3"
@@ -13163,7 +13163,7 @@ process-nextick-args@~2.0.0:
 process@^0.11.10:
   version "0.11.10"
   resolved "https://registry.yarnpkg.com/process/-/process-0.11.10.tgz#7332300e840161bda3e69a1d1d91a7d4bc16f182"
-  integrity sha1-czIwDoQBYb2j5podHZGn1LwW8YI=
+  integrity sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==
 
 progress-stream@^2.0.0:
   version "2.0.0"
@@ -15554,7 +15554,7 @@ through2@^2.0.0, through2@~2.0.3:
 through@^2.3.6, through@^2.3.8:
   version "2.3.8"
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
-  integrity sha1-DdTJ/6q8NXlgsbckEV1+Doai4fU=
+  integrity sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==
 
 thunky@^1.0.2:
   version "1.1.0"

@@ -11,8 +11,8 @@
     "start": "electron ."
   },
   "dependencies": {
-    "@openworkshop/maker-app": "0.4.13-beta.466",
-    "@openworkshop/maker-builder": "0.4.14"
+    "@openworkshop/maker-app": "0.4.13-beta.478",
+    "@openworkshop/maker-builder": "0.4.13-beta.469"
   },
   "devDependencies": {
     "electron": "^13.1.4",
@@ -30,5 +30,5 @@
       "last 1 safari version"
     ]
   },
-  "version": "2.0.0-beta"
+  "version": "2.0.1-beta"
 }

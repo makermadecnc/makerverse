@@ -4,9 +4,12 @@ import {
 } from '@openworkshop/maker-hub/deployments';
 import deploymentJson from './deployment.json';
 import theme from '@openworkshop/maker-hub/themes/MakerverseTheme';
+import SupportTicketForm from './components/SupportTicketForm';
 
 console.log('[PACKAGE]', deploymentJson.package);
 const deployment = prepareDeployment(deploymentJson as IMakerHubDeploymentData);
 deployment.theme = theme;
-
+deployment.components = [
+  { name: 'SupportTicketForm', component: SupportTicketForm },
+];
 export default deployment;
