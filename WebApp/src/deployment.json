@@ -5,9 +5,9 @@
     "MAKER_HUB_PROJECT": "Makerverse",
     "MAKER_HUB_SEMVER_SHORT": "0.4.13",
     "MAKER_HUB_SEMVER_MEDIUM": "0.4.13-beta",
-    "MAKER_HUB_SEMVER_LONG": "0.4.13-beta.478",
-    "MAKER_HUB_SEMVER_PUB": "0.4.13-beta.478",
-    "MAKER_HUB_BUILD_NUMBER": 478,
+    "MAKER_HUB_SEMVER_LONG": "0.4.13-beta.489",
+    "MAKER_HUB_SEMVER_PUB": "0.4.13-beta.489",
+    "MAKER_HUB_BUILD_NUMBER": 481,
     "MAKER_HUB_BACKEND_ENVIRONMENT": "Production",
     "MAKER_HUB_CHANNEL": "beta",
     "MAKER_HUB_SUBDOMAIN": "",
@@ -26,14 +26,14 @@
   "semver": {
     "short": "0.4.13",
     "medium": "0.4.13-beta",
-    "long": "0.4.13-beta.478",
-    "pub": "0.4.13-beta.478",
+    "long": "0.4.13-beta.489",
+    "pub": "0.4.13-beta.489",
     "major": 0,
     "minor": 4,
     "patch": 13,
     "channel": "beta",
-    "suffix": "beta.478",
-    "build": 478
+    "suffix": "beta.489",
+    "build": 481
   },
   "makerEnv": {
     "MAKER_HUB_FRONTEND_PORT": 3000,
