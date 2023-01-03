@@ -228,8 +228,10 @@
   dependencies:
     "@octokit/openapi-types" "^8.3.0"
 
-"@openworkshop/maker-app@../../../maker-app":
-  version "0.4.13-beta.466"
+"@openworkshop/maker-app@0.4.13-beta.491":
+  version "0.4.13-beta.491"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-app/-/maker-app-0.4.13-beta.491.tgz#9267b5165cdd745f0114f35b7bea6b76f0fda743"
+  integrity sha512-NRqFFVNxjLqKyIxpiK7ZHPT955UDniclLU9fQmBdZEq191O3YyDNjhoWLYmtVv/pw5S9rpORrGqQEI7PDHuM6Q==
   dependencies:
     child_process "^1.0.2"
     electron-context-menu "^3.1.1"
@@ -242,10 +244,10 @@
     ps-tree "^1.2.0"
     wait-on "^6.0.0"
 
-"@openworkshop/maker-builder@0.4.13-beta.469":
-  version "0.4.13-beta.469"
-  resolved "https://registry.yarnpkg.com/@openworkshop/maker-builder/-/maker-builder-0.4.13-beta.469.tgz#8514fea782555df82ab7eb02bb23eb3af7d7e095"
-  integrity sha512-rvH+4em8LnuhvSCHAZzjlrUd3lUuwqsx0PcwPI3p6AgA4PlRT9bReXUCsoTxTM/Yx5fEzrEU+Bf59qNqTyGRrQ==
+"@openworkshop/maker-builder@0.4.13-beta.491":
+  version "0.4.13-beta.491"
+  resolved "https://registry.yarnpkg.com/@openworkshop/maker-builder/-/maker-builder-0.4.13-beta.491.tgz#1a9a7d7f303f7e0c3e254202f635c25694148f7d"
+  integrity sha512-7WqSRIkIMrXgZAwRGHBt3Bq/WKBuyf017tA/O5JG79wjajbG4ILYrITPWZKTzUmZHclyiu1hbU24VmzfEezPLA==
   dependencies:
     child_process "^1.0.2"
     command-exists "^1.2.9"
