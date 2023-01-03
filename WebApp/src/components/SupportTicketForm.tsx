@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import React, { FunctionComponent } from 'react';
 import {
   FormControl,
@@ -18,7 +20,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { useSelector } from 'react-redux';
 import { MakerHubState } from '@openworkshop/maker-hub/deployments';
-import { MakerHubSessionFragment } from '@openworkshop/maker-hub/components/schema';
+import {
+  MakerHubSessionFragment,
+  MakerverseSupportTicketRequestInput,
+  useMakerverseSupportTicketMutation,
+} from '@openworkshop/maker-hub/components/schema';
 import { AlertList } from '@openworkshop/maker-hub/components';
 
 const SupportTicketForm: FunctionComponent = () => {
@@ -37,6 +43,8 @@ const SupportTicketForm: FunctionComponent = () => {
   const [success, setSuccess] = React.useState<boolean>(false);
   const [error, setError] = React.useState<boolean>(false);
 
+  const [createTicket] = useMakerverseSupportTicketMutation();
+
   let formValid = body.length > 0 && email.length > 0;
   if (category === 'Project') {
     if (doUpload && !file) {
@@ -47,34 +55,38 @@ const SupportTicketForm: FunctionComponent = () => {
     formValid = false;
   }
 
+  const blobToBase64 = (blob: Blob): Promise<string> => {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    return new Promise((resolve) => {
+      reader.onloadend = () => {
+        if (reader.result !== null) {
+          resolve(reader.result as string);
+        }
+      };
+    });
+  };
+
   const submitTicket = async () => {
     setLoading(true);
-    const formData: FormData = new FormData();
+    let fileData = '';
+
     if (file) {
-      formData.append('attachments', file, file.name);
+      fileData = await blobToBase64(file);
     }
-    formData.append('email', email);
-    formData.append('subject', category || `Custom - ${subj}`);
-    formData.append('description', body);
-    formData.append('status', '2');
-    formData.append('priority', '1');
-    formData.append('group_id', '2043001807202');
+
+    const input: MakerverseSupportTicketRequestInput = {
+      description: body,
+      email: email,
+      subject: category || `Custom - ${subj}`,
+      file: file ? fileData : '',
+      filename: file ? file.name : '',
+    };
+
     try {
-      const response = await fetch(
-        'https://makermade.freshdesk.com/api/v2/tickets',
-        {
-          method: 'POST',
-          body: formData,
-          headers: { Authorization: 'Basic MG90a2k4TncwMXBmVE94VWNPOlg=' },
-          redirect: 'follow',
-        },
-      );
-      if (response.ok) {
-        setSuccess(true);
-      } else {
-        setError(true);
-      }
-    } catch (err) {
+      await createTicket({ variables: { req: input } });
+      setSuccess(true);
+    } catch (e) {
       setError(true);
     }
     setLoading(false);
@@ -93,7 +105,8 @@ const SupportTicketForm: FunctionComponent = () => {
           margin='normal'
           fullWidth={true}
           required={true}
-          variant='outlined'>
+          variant='outlined'
+        >
           <InputLabel htmlFor='email'>Your email</InputLabel>
           <Input
             id='email'
@@ -118,7 +131,8 @@ const SupportTicketForm: FunctionComponent = () => {
             onChange={(e) => {
               setCategory(e.target.value);
               //Do noting
-            }}>
+            }}
+          >
             <MenuItem value='Login'>Login</MenuItem>
             <MenuItem value='Calibration'>Calibration</MenuItem>
             <MenuItem value='Project'>Project Error</MenuItem>
@@ -143,7 +157,8 @@ const SupportTicketForm: FunctionComponent = () => {
                     value={doUpload ? 'yes' : 'no'}
                     onChange={(e) => {
                       setDoUpload(e.target.value === 'yes');
-                    }}>
+                    }}
+                  >
                     <FormControlLabel
                       value='yes'
                       control={<Radio />}
@@ -205,7 +220,8 @@ const SupportTicketForm: FunctionComponent = () => {
             // className={classes.input}
             margin='normal'
             fullWidth={true}
-            variant='filled'>
+            variant='filled'
+          >
             <InputLabel htmlFor='subj'>
               Please specify your issue type:
             </InputLabel>
@@ -226,7 +242,8 @@ const SupportTicketForm: FunctionComponent = () => {
           // className={classes.input}
           margin='normal'
           fullWidth={true}
-          variant='outlined'>
+          variant='outlined'
+        >
           <TextField
             id='body'
             type='body'
@@ -245,7 +262,8 @@ const SupportTicketForm: FunctionComponent = () => {
           disabled={loading || !formValid || success}
           onClick={() => {
             void submitTicket();
-          }}>
+          }}
+        >
           Submit Help Request
         </Button>
       </Grid>
