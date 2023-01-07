@@ -2,7 +2,7 @@ paths:
   package: "WebApp"
 
 defaults:
-  timeout_in_minutes: 120
+  timeout_in_minutes: 360
   agents:
     geo: "co"
     arch: "amd"
