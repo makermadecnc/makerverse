@@ -1,1 +1,1 @@
-new (require('@openworkshop/maker-app/DesktopApp'));
+new (require('@openworkshop/maker-app'))();

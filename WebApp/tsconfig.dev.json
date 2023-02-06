@@ -10,7 +10,7 @@
         "../../../../maker-hub/src/*"
       ],
       "@openworkshop/maker-builder/*": [
-        "../../../../maker-builder/*"
+        "../../../../maker-builder/src/*"
       ]
     }
   }

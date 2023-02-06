@@ -26,14 +26,14 @@
     </Content>
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' != 'Debug' ">
-    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.4.13-beta.500" />
+    <PackageReference Include="OpenWorkShop.MakerHub" Version="0.4.13-beta.564" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ProjectReference Include="..\..\..\..\MakerHub\MakerHub.csproj" />
     <Watch Remove="..\..\..\..\MakerHub\Generated\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
   </ItemGroup>
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish" Condition="'$(SKIP_WEBAPP)' != 'true'">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->

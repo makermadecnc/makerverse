@@ -6,7 +6,7 @@ using Serilog;
 namespace Makerverse {
   public class Program {
     public static void Main(string[] args) {
-      MakerHubDeployment.Singleton.Initialize();
+      MakerHubDeployment.Singleton.Initialize((c) => c);
 
       using (IHost host = CreateHostBuilder(args).Build()) {
         host.Run();

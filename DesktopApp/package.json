@@ -4,14 +4,14 @@
   "description": "A web-based interface for CNC milling controller.",
   "homepage": "https://makerverse.com",
   "main": "main.js",
-  "author": "OpenWorkShop, Inc. & Maker Made",
+  "author": "OpenWorkShop, Inc.",
   "license": "MIT",
   "repository": "github:makermadecnc/makerverse",
   "scripts": {
     "start": "electron ."
   },
   "dependencies": {
-    "@openworkshop/maker-app": "0.4.13-beta.500",
+    "@openworkshop/maker-app": "0.4.13-beta.564",
     "@openworkshop/maker-builder": "0.4.13-beta.500"
   },
   "devDependencies": {
